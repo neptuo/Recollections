@@ -1,0 +1,21 @@
+﻿@inherits LoginModel
+@page "/login"
+
+<div class="component-login text-center">
+    <form onsubmit="@LoginAsync">
+
+		<h1 class="h3 mb-3 font-weight-normal">Recollections</h1>
+		<label for="Username" class="sr-only">Username:</label>
+		<input type="text" id="Username" class="form-control" placeholder="Username:" bind="@Username" />
+		<label for="Password" class="sr-only">Password:</label>
+		<input type="password" id="Password" class="form-control" placeholder="Password:" bind="@Password" />
+
+		<div class="checkbox mb-3">
+			<label>
+				<input type="checkbox" value="remember-me"> Remember me
+			</label>
+		</div>
+
+        <button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
+    </form>
+</div>

@@ -24,5 +24,7 @@
     <Content Update="wwwroot\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+
+    <Watch Include="**\*.razor" />
   </ItemGroup>
 </Project>
