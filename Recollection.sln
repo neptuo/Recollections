@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollection.Api", "src\Recollection.Api\Recollection.Api.csproj", "{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Api", "src\Recollection.Api\Recollection.Api.csproj", "{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollection.Blazor.UI", "src\Recollection.Blazor.UI\Recollection.Blazor.UI.csproj", "{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
