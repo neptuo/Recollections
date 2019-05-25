@@ -17,14 +17,22 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview5-19227-01" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.0.0-preview5-19227-01" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.DevServer" Version="3.0.0-preview5-19227-01" PrivateAssets="all" />
+    <PackageReference Include="Neptuo" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <Content Update="wwwroot\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
 
     <Watch Include="**\*.razor" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
   </ItemGroup>
 </Project>

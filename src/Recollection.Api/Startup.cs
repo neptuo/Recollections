@@ -7,28 +7,51 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Neptuo.Recollection.Accounts;
 
 namespace Neptuo.Recollection
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private readonly IConfiguration configuration;
+        private readonly AccountsStartup accountsStartup;
 
-        public Startup(IConfiguration configuration) => Configuration = configuration;
+        public Startup(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+            this.accountsStartup = new AccountsStartup(configuration);
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            accountsStartup.ConfigureServices(services);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
+            else
+                app.UseStatusCodePages();
+
+            UseCors(app);
+
+            accountsStartup.ConfigureAuthentication(app, env);
 
             app.UseMvc();
+        }
+
+        private static void UseCors(IApplicationBuilder app)
+        {
+            app.UseCors(p =>
+            {
+                p.WithOrigins("http://localhost:5000");
+                p.AllowAnyMethod();
+                p.AllowCredentials();
+                p.AllowAnyHeader();
+                p.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+            });
         }
     }
 }
