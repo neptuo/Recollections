@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -52,6 +53,16 @@ namespace Neptuo.Recollection.Accounts.Controllers
             }
 
             return BadRequest();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Info()
+        {
+            return Ok(new UserInfoResponse()
+            {
+                Username = HttpContext.User.Identity.Name
+            });
         }
     }
 }

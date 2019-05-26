@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollection.Accounts.Components;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,8 +13,8 @@ namespace Neptuo.Recollection.Accounts.Pages
 {
     public class LoginModel : ComponentBase
     {
-        [Inject]
-        public HttpClient HttpClient { get; set; }
+        [CascadingParameter]
+        public UserStateModel UserState { get; set; }
 
         [Required]
         public string Username { get; set; }
@@ -24,14 +25,14 @@ namespace Neptuo.Recollection.Accounts.Pages
         protected override void OnInit()
         {
             base.OnInit();
-
-            //HttpClient.BaseAddress = new Uri("http://localhost:62198/");
         }
 
         protected async Task LoginAsync()
         {
-            LoginResponse response = await HttpClient.PostJsonAsync<LoginResponse>("http://localhost:62198/api/accounts/login", new LoginRequest(Username, Password));
-            Console.WriteLine($"BearerToken: {response.BearerToken}");
+            if (UserState == null)
+                Console.WriteLine("UserState is null!");
+            else
+                await UserState.LoginAsync(Username, Password);
         }
     }
 }

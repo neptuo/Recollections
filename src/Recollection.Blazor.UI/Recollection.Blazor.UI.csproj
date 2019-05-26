@@ -33,6 +33,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Watch Remove="Accounts\Components\UserState.razor" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
   </ItemGroup>
 </Project>
