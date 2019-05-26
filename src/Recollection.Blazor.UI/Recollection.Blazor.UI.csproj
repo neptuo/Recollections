@@ -37,6 +37,11 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Include="wwwroot\css\open-iconic\css\open-iconic-bootstrap.scss" />
+    <None Include="wwwroot\css\open-iconic\fonts\open-iconic.svg" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
   </ItemGroup>
 </Project>

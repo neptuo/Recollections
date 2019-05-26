@@ -31,10 +31,16 @@ namespace Neptuo.Recollection.Accounts.Components
 
         public static string Url(string appRelative) => $"http://localhost:62198/api{appRelative}";
 
-        private void SetAuthorization(string bearerToken)
+        private void SetAuthorization(string bearerToken, bool isPersistent)
         {
             BearerToken = bearerToken;
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            if (isPersistent)
+            {
+
+            }
+
             UserChanged?.Invoke();
         }
 
@@ -76,12 +82,12 @@ namespace Neptuo.Recollection.Accounts.Components
             return true;
         }
 
-        public async Task LoginAsync(string username, string password)
+        public async Task LoginAsync(string username, string password, bool isPersistent = false)
         {
             LoginResponse response = await HttpClient.PostJsonAsync<LoginResponse>(Url("/accounts/login"), new LoginRequest(username, password));
             if (response.BearerToken != null)
             {
-                SetAuthorization(response.BearerToken);
+                SetAuthorization(response.BearerToken, isPersistent);
                 await LoadUserInfoAsync();
 
                 Uri.NavigateTo("/");

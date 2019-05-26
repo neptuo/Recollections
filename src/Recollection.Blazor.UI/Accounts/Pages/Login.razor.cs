@@ -22,6 +22,8 @@ namespace Neptuo.Recollection.Accounts.Pages
         [Required]
         public string Password { get; set; }
 
-        protected async Task LoginAsync() => await UserState.LoginAsync(Username, Password);
+        public bool IsPersistent { get; set; }
+
+        protected async Task LoginAsync() => await UserState.LoginAsync(Username, Password, IsPersistent);
     }
 }
