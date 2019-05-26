@@ -1,0 +1,8 @@
+﻿@inherits UserInfoModel
+
+<span>
+	<a class="btn btn-outline-info" href="/me">
+		@UserState.Username
+	</a>
+	<button type="button" class="btn btn-outline-danger" onclick="@LogoutAsync">Log out</button>
+</span>

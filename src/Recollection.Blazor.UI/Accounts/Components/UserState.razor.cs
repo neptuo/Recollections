@@ -22,8 +22,12 @@ namespace Neptuo.Recollection.Accounts.Components
         [Parameter]
         protected RenderFragment ChildContent { get; set; }
 
+        public event Action UserChanged;
+        public event Action UserInfoChanged;
+
         public string BearerToken { get; private set; }
         public string Username { get; private set; }
+        public bool IsAuthenticated => BearerToken != null;
 
         public static string Url(string appRelative) => $"http://localhost:62198/api{appRelative}";
 
@@ -31,6 +35,7 @@ namespace Neptuo.Recollection.Accounts.Components
         {
             BearerToken = bearerToken;
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+            UserChanged?.Invoke();
         }
 
         private void ClearAuthorization()
@@ -38,24 +43,37 @@ namespace Neptuo.Recollection.Accounts.Components
             if (BearerToken != null)
             {
                 BearerToken = null;
+                Username = null;
                 HttpClient.DefaultRequestHeaders.Authorization = null;
+                UserChanged?.Invoke();
+                UserInfoChanged?.Invoke();
             }
         }
 
         protected override async Task OnInitAsync()
+        {
+            await LoadUserInfoAsync();
+        }
+
+        private async Task<bool> LoadUserInfoAsync()
         {
             HttpResponseMessage response = await HttpClient.GetAsync(Url("/accounts/info"));
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 ClearAuthorization();
                 Uri.NavigateTo("/login");
-                return;
+                return false;
             }
 
             string responseContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(responseContent);
             UserInfoResponse responseModel = SimpleJson.SimpleJson.DeserializeObject<UserInfoResponse>(responseContent);
 
-            Username = responseModel.Username;
+            Username = responseModel.username;
+            Console.WriteLine($"Set username to {Username}");
+            UserInfoChanged?.Invoke();
+
+            return true;
         }
 
         public async Task LoginAsync(string username, string password)
@@ -64,8 +82,17 @@ namespace Neptuo.Recollection.Accounts.Components
             if (response.BearerToken != null)
             {
                 SetAuthorization(response.BearerToken);
+                await LoadUserInfoAsync();
+
                 Uri.NavigateTo("/");
             }
+        }
+
+        public Task LogoutAsync()
+        {
+            ClearAuthorization();
+            Uri.NavigateTo("/login");
+            return Task.FromResult(true);
         }
     }
 }

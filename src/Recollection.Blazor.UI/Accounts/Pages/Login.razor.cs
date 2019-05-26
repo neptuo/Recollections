@@ -22,17 +22,6 @@ namespace Neptuo.Recollection.Accounts.Pages
         [Required]
         public string Password { get; set; }
 
-        protected override void OnInit()
-        {
-            base.OnInit();
-        }
-
-        protected async Task LoginAsync()
-        {
-            if (UserState == null)
-                Console.WriteLine("UserState is null!");
-            else
-                await UserState.LoginAsync(Username, Password);
-        }
+        protected async Task LoginAsync() => await UserState.LoginAsync(Username, Password);
     }
 }

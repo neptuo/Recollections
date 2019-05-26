@@ -61,7 +61,7 @@ namespace Neptuo.Recollection.Accounts.Controllers
         {
             return Ok(new UserInfoResponse()
             {
-                Username = HttpContext.User.Identity.Name
+                username = HttpContext.User.Identity.Name
             });
         }
     }
