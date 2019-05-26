@@ -2,5 +2,13 @@
   {
     "outputFile": "wwwroot/css/site.css",
     "inputFile": "wwwroot/css/site.scss"
+  },
+  {
+    "outputFile": "wwwroot/font/css/open-iconic-bootstrap.css",
+    "inputFile": "wwwroot/font/css/open-iconic-bootstrap.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/open-iconic/css/open-iconic-bootstrap.css",
+    "inputFile": "wwwroot/css/open-iconic/css/open-iconic-bootstrap.scss"
   }
 ]
