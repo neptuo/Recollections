@@ -1,0 +1,15 @@
+﻿@inherits Neptuo.Recollection.Entries.Components.EntryCreateModel
+
+<div class="entry entry-new">
+    <form onsubmit="@CreateAsync">
+        <div class="form-group">
+            <input class="form-control form-control-lg" type="text" placeholder="Heading..." bind="@Title" />
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" placeholder="When" bind="@When" />
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">Create entry</button>
+        </div>
+    </form>
+</div>

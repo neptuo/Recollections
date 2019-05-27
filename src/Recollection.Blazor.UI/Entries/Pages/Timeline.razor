@@ -1,0 +1,15 @@
+﻿@inherits TimelineModel
+@page "/"
+
+<div class="timeline">
+    <EntryCreate />
+
+    @foreach (var entry in Entries)
+    {
+        <div class="entry">
+            <h2>@entry.Title</h2>
+            <div class="datetime">@entry.When.ToLongDateString()</div>
+            <div class="text">@entry.Text</div>
+        </div>
+    }
+</div>
