@@ -19,6 +19,9 @@ namespace Neptuo.Recollection.Accounts.Components
         [Inject]
         protected IUriHelper Uri { get; set; }
 
+        [Inject]
+        protected Interop Interop { get; set; }
+
         [Parameter]
         protected RenderFragment ChildContent { get; set; }
 
@@ -29,7 +32,7 @@ namespace Neptuo.Recollection.Accounts.Components
         public string Username { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
 
-        public static string Url(string appRelative) => $"http://localhost:62198/api{appRelative}";
+        public static string Url(string appRelative) => $"http://localhost:33880/api{appRelative}";
 
         private void SetAuthorization(string bearerToken, bool isPersistent)
         {
@@ -37,9 +40,7 @@ namespace Neptuo.Recollection.Accounts.Components
             HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
             if (isPersistent)
-            {
-
-            }
+                Interop.SaveToken(bearerToken);
 
             UserChanged?.Invoke();
         }
@@ -51,6 +52,8 @@ namespace Neptuo.Recollection.Accounts.Components
                 BearerToken = null;
                 Username = null;
                 HttpClient.DefaultRequestHeaders.Authorization = null;
+                Interop.SaveToken(null);
+
                 UserChanged?.Invoke();
                 UserInfoChanged?.Invoke();
             }
@@ -58,6 +61,21 @@ namespace Neptuo.Recollection.Accounts.Components
 
         protected override async Task OnInitAsync()
         {
+            if (BearerToken == null)
+            {
+                string bearerToken = await Interop.LoadTokenAsync();
+                Console.WriteLine($"Loaded token '{bearerToken}'.");
+                if (!string.IsNullOrEmpty(bearerToken))
+                {
+                    SetAuthorization(bearerToken, false);
+                }
+                else
+                {
+                    NavigateToLogin();
+                    return;
+                }
+            }
+
             await LoadUserInfoAsync();
         }
 
@@ -67,7 +85,7 @@ namespace Neptuo.Recollection.Accounts.Components
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 ClearAuthorization();
-                Uri.NavigateTo("/login");
+                NavigateToLogin();
                 return false;
             }
 
@@ -81,6 +99,8 @@ namespace Neptuo.Recollection.Accounts.Components
 
             return true;
         }
+
+        private void NavigateToLogin() => Uri.NavigateTo("/login");
 
         public async Task LoginAsync(string username, string password, bool isPersistent = false)
         {
