@@ -1,4 +1,7 @@
-﻿.loading-bar {
+﻿.clear {
+  clear: both; }
+
+.loading-bar {
   display: inline-block;
   position: relative;
   width: 64px;
@@ -62,3 +65,7 @@
   margin: 24px 0;
   border-radius: 10px;
   border: 2px solid #f6f6f8; }
+  .timeline .entry .title h2 {
+    float: left; }
+  .timeline .entry .title .actions {
+    float: right; }

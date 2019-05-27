@@ -7,7 +7,23 @@
     @foreach (var entry in Entries)
     {
         <div class="entry">
-            <h2>@entry.Title</h2>
+            <div class="title">
+                <h2>@entry.Title</h2>
+
+                <div class="actions btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary">
+                        <Icon Identifier="pencil" />
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info">
+                        <Icon Identifier="image" />
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger">
+                        <Icon Identifier="trash" />
+                    </button>
+                </div>
+
+                <div class="clear"></div>
+            </div>
             <div class="datetime">@entry.When.ToLongDateString()</div>
             <div class="text">@entry.Text</div>
         </div>
