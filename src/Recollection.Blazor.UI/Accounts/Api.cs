@@ -24,11 +24,11 @@ namespace Neptuo.Recollection.Accounts
             set => http.DefaultRequestHeaders.Authorization = value;
         }
 
-        public Api(HttpClient http, UrlResolver urlResolver)
+        public Api(IFactory<HttpClient> httpFactory, UrlResolver urlResolver)
         {
-            Ensure.NotNull(http, "http");
+            Ensure.NotNull(httpFactory, "httpFactory");
             Ensure.NotNull(urlResolver, "urlResolver");
-            this.http = http;
+            this.http = httpFactory.Create();
             this.urlResolver = urlResolver;
         }
 

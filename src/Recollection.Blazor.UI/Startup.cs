@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Neptuo.Activators;
 using Neptuo.Recollection.Accounts;
+using Neptuo.Recollection.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +14,21 @@ namespace Neptuo.Recollection
     public class Startup
     {
         private readonly AccountsStartup accounts;
+        private readonly EntriesStartup entries;
 
         public Startup()
         {
             accounts = new AccountsStartup();
+            entries = new EntriesStartup();
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<HttpClient>();
+            services.AddSingleton<IFactory<HttpClient>, HttpClientProvider>();
             services.AddSingleton<UrlResolver>(Resolve);
 
             accounts.ConfigureServices(services);
+            entries.ConfigureServices(services);
         }
 
         private static string Resolve(string appRelative) => $"http://localhost:33880/api{appRelative}";
