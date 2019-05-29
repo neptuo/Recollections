@@ -11,7 +11,7 @@ namespace Neptuo.Recollection.Accounts
 {
     public class DataContext : IdentityDbContext<ApplicationUser>
     {
-        public DataContext(DbContextOptions options) 
+        public DataContext(DbContextOptions<DataContext> options) 
             : base(options)
         { }
     }

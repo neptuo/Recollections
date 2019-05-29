@@ -12,7 +12,7 @@ namespace Neptuo.Recollection.Entries
     {
         public DbSet<Entry> Entries { get; set; }
 
-        public DataContext(DbContextOptions options)
+        public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         { }
     }
