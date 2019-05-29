@@ -14,7 +14,7 @@ namespace Neptuo.Recollection.Accounts.Components
     public class UserStateModel : ComponentBase
     {
         [Inject]
-        protected HttpClient HttpClient { get; set; }
+        protected Api Api { get; set; }
 
         [Inject]
         protected IUriHelper Uri { get; set; }
@@ -32,12 +32,10 @@ namespace Neptuo.Recollection.Accounts.Components
         public string UserName { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
 
-        public static string Url(string appRelative) => $"http://localhost:33880/api{appRelative}";
-
         private void SetAuthorization(string bearerToken, bool isPersistent)
         {
             BearerToken = bearerToken;
-            HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+            Api.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
             if (isPersistent)
                 Interop.SaveToken(bearerToken);
@@ -51,7 +49,7 @@ namespace Neptuo.Recollection.Accounts.Components
             {
                 BearerToken = null;
                 UserName = null;
-                HttpClient.DefaultRequestHeaders.Authorization = null;
+                Api.Authorization = null;
                 Interop.SaveToken(null);
 
                 UserChanged?.Invoke();
@@ -81,37 +79,39 @@ namespace Neptuo.Recollection.Accounts.Components
 
         private async Task<bool> LoadUserInfoAsync()
         {
-            HttpResponseMessage response = await HttpClient.GetAsync(Url("/accounts/info"));
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            try
+            {
+                UserInfoResponse response = await Api.GetInfoAsync();
+
+                UserName = response.username;
+                UserInfoChanged?.Invoke();
+            }
+            catch (UnauthorizedAccessException)
             {
                 ClearAuthorization();
                 NavigateToLogin();
                 return false;
             }
 
-            string responseContent = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(responseContent);
-            UserInfoResponse responseModel = SimpleJson.SimpleJson.DeserializeObject<UserInfoResponse>(responseContent);
-
-            UserName = responseModel.username;
-            Console.WriteLine($"Set username to {UserName}");
-            UserInfoChanged?.Invoke();
-
             return true;
         }
 
         private void NavigateToLogin() => Uri.NavigateTo("/login");
 
-        public async Task LoginAsync(string username, string password, bool isPersistent = false)
+        public async Task<bool> LoginAsync(string username, string password, bool isPersistent = false)
         {
-            LoginResponse response = await HttpClient.PostJsonAsync<LoginResponse>(Url("/accounts/login"), new LoginRequest(username, password));
+            LoginResponse response = await Api.LoginAsync(new LoginRequest(username, password));
             if (response.BearerToken != null)
             {
                 SetAuthorization(response.BearerToken, isPersistent);
                 await LoadUserInfoAsync();
 
                 Uri.NavigateTo("/");
+
+                return true;
             }
+
+            return false;
         }
 
         public Task LogoutAsync()

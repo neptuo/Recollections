@@ -24,6 +24,13 @@ namespace Neptuo.Recollection.Accounts.Pages
 
         public bool IsPersistent { get; set; }
 
-        protected async Task LoginAsync() => await UserState.LoginAsync(UserName, Password, IsPersistent);
+        public List<string> ErrorMessages { get; } = new List<string>();
+
+        protected async Task LoginAsync()
+        {
+            ErrorMessages.Clear();
+            if (!await UserState.LoginAsync(UserName, Password, IsPersistent))
+                ErrorMessages.Add("Invalid combination of username and password.");
+        }
     }
 }

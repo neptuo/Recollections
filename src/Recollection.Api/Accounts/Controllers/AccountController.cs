@@ -61,7 +61,7 @@ namespace Neptuo.Recollection.Accounts.Controllers
                 }
             }
 
-            return BadRequest();
+            return Ok(new LoginResponse());
         }
 
         [HttpPost]

@@ -13,6 +13,7 @@ namespace Neptuo.Recollection.Accounts
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<Interop>();
+            services.AddTransient<Api>();
         }
     }
 }

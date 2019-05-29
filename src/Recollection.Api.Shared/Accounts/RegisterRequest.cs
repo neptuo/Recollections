@@ -11,5 +11,14 @@ namespace Neptuo.Recollection.Accounts
     {
         public string UserName { get; set; }
         public string Password { get; set; }
+
+        public RegisterRequest()
+        { }
+
+        public RegisterRequest(string userName, string password)
+        {
+            UserName = userName;
+            Password = password;
+        }
     }
 }
