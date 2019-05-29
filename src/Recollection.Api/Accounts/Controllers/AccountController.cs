@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Neptuo;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,40 +18,47 @@ namespace Neptuo.Recollection.Accounts.Controllers
     [Route("api/accounts/[action]")]
     public class AccountController : ControllerBase
     {
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly JwtOptions configuration;
         private readonly JwtSecurityTokenHandler tokenHandler;
 
-        public AccountController(IOptions<JwtOptions> configuration, JwtSecurityTokenHandler tokenHandler)
+        public AccountController(UserManager<ApplicationUser> userManager, IOptions<JwtOptions> configuration, JwtSecurityTokenHandler tokenHandler)
         {
+            Ensure.NotNull(userManager, "userManager");
             Ensure.NotNull(configuration, "configuration");
             Ensure.NotNull(tokenHandler, "tokenHandler");
+            this.userManager = userManager;
             this.configuration = configuration.Value;
             this.tokenHandler = tokenHandler;
         }
 
         [HttpPost]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if (request.Username == "demo" && request.Password == "demo")
+            ApplicationUser user = await userManager.FindByNameAsync(request.UserName);
+            if (user != null)
             {
-                var claims = new[]
+                if (await userManager.CheckPasswordAsync(user, request.Password))
                 {
-                    new Claim(ClaimTypes.Name, request.Username),
-                    new Claim(ClaimTypes.NameIdentifier, 1.ToString())
-                };
+                    var claims = new[]
+                    {
+                        new Claim(ClaimTypes.Name, user.UserName),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id)
+                    };
 
-                var credentials = new SigningCredentials(configuration.GetSecurityKey(), SecurityAlgorithms.HmacSha256);
-                var expiry = DateTime.Now.Add(configuration.GetExpiry());
+                    var credentials = new SigningCredentials(configuration.GetSecurityKey(), SecurityAlgorithms.HmacSha256);
+                    var expiry = DateTime.Now.Add(configuration.GetExpiry());
 
-                var token = new JwtSecurityToken(
-                    configuration.Issuer,
-                    configuration.Issuer,
-                    claims,
-                    expires: expiry,
-                    signingCredentials: credentials
-                );
+                    var token = new JwtSecurityToken(
+                        configuration.Issuer,
+                        configuration.Issuer,
+                        claims,
+                        expires: expiry,
+                        signingCredentials: credentials
+                    );
 
-                return Ok(new LoginResponse(tokenHandler.WriteToken(token)));
+                    return Ok(new LoginResponse(tokenHandler.WriteToken(token)));
+                }
             }
 
             return BadRequest();

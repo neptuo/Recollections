@@ -10,17 +10,17 @@ namespace Neptuo.Recollection.Accounts
 {
     public class LoginRequest
     {
-        public string Username { get; set; }
+        public string UserName { get; set; }
         public string Password { get; set; }
 
         public LoginRequest()
         { }
 
-        public LoginRequest(string username, string password)
+        public LoginRequest(string userName, string password)
         {
-            Ensure.NotNull(username, "username");
+            Ensure.NotNull(userName, "userName");
             Ensure.NotNull(password, "password");
-            Username = username;
+            UserName = userName;
             Password = password;
         }
     }

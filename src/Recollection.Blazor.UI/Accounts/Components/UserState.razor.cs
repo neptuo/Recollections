@@ -29,7 +29,7 @@ namespace Neptuo.Recollection.Accounts.Components
         public event Action UserInfoChanged;
 
         public string BearerToken { get; private set; }
-        public string Username { get; private set; }
+        public string UserName { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
 
         public static string Url(string appRelative) => $"http://localhost:33880/api{appRelative}";
@@ -50,7 +50,7 @@ namespace Neptuo.Recollection.Accounts.Components
             if (BearerToken != null)
             {
                 BearerToken = null;
-                Username = null;
+                UserName = null;
                 HttpClient.DefaultRequestHeaders.Authorization = null;
                 Interop.SaveToken(null);
 
@@ -93,8 +93,8 @@ namespace Neptuo.Recollection.Accounts.Components
             Console.WriteLine(responseContent);
             UserInfoResponse responseModel = SimpleJson.SimpleJson.DeserializeObject<UserInfoResponse>(responseContent);
 
-            Username = responseModel.username;
-            Console.WriteLine($"Set username to {Username}");
+            UserName = responseModel.username;
+            Console.WriteLine($"Set username to {UserName}");
             UserInfoChanged?.Invoke();
 
             return true;
