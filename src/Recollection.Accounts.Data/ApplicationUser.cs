@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollection.Accounts
 {
-    public class ApplicationUser : Microsoft.AspNetCore.Identity.IdentityUser
+    public class ApplicationUser : IdentityUser
     {
-        
     }
 }
