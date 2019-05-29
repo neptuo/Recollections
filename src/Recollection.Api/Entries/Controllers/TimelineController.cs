@@ -42,7 +42,7 @@ namespace Neptuo.Recollection.Entries.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(result);
+            return Ok(new TimelineListResponse(result));
         }
     }
 }
