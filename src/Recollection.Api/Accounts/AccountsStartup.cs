@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -18,12 +20,22 @@ namespace Neptuo.Recollection.Accounts
     public class AccountsStartup
     {
         private readonly IConfiguration configuration;
+        private readonly PathResolver pathResolver;
 
-        public AccountsStartup(IConfiguration configuration) => this.configuration = configuration;
+        public AccountsStartup(IConfiguration configuration, PathResolver pathResolver)
+        {
+            this.configuration = configuration;
+            this.pathResolver = pathResolver;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+
+            services
+                .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
+                .AddIdentityCore<ApplicationUser>(options => configuration.GetSection("Identity").GetSection("Password").Bind(options.Password))
+                .AddEntityFrameworkStores<DataContext>();
 
             services
                 .AddTransient<JwtSecurityTokenHandler>()

@@ -10,10 +10,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.0" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Recollection.Accounts.Data\Recollection.Accounts.Data.csproj" />
     <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
   </ItemGroup>
 

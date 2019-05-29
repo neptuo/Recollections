@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,5 +11,8 @@ namespace Neptuo.Recollection.Accounts
 {
     public class DataContext : IdentityDbContext<ApplicationUser>
     {
+        public DataContext(DbContextOptions options) 
+            : base(options)
+        { }
     }
 }
