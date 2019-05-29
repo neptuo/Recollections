@@ -21,27 +21,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
+    <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Update="wwwroot\index.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-
+    
+    <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Watch Remove="Accounts\Components\UserState.razor" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="wwwroot\css\open-iconic\css\open-iconic-bootstrap.scss" />
-    <None Include="wwwroot\css\open-iconic\fonts\open-iconic.svg" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
   </ItemGroup>
 </Project>
