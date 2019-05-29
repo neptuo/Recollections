@@ -65,6 +65,28 @@ namespace Neptuo.Recollection.Accounts
                         .RequireAuthenticatedUser()
                         .Build();
                 });
+
+            EnsureDatabase(services);
+        }
+
+        private static void EnsureDatabase(IServiceCollection services)
+        {
+            try
+            {
+                using (var scope = services.BuildServiceProvider().CreateScope())
+                {
+                    var provider = scope.ServiceProvider;
+                    var userManager = provider.GetService<UserManager<ApplicationUser>>();
+                    var db = provider.GetService<DataContext>();
+
+                    db.Database.EnsureCreated();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public void ConfigureAuthentication(IApplicationBuilder app, IHostingEnvironment env)
