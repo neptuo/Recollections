@@ -13,6 +13,8 @@ namespace Neptuo.Recollection.Accounts.Components
 {
     public class UserStateModel : ComponentBase
     {
+        private readonly TaskCompletionSource<string> authenticationSource = new TaskCompletionSource<string>();
+
         [Inject]
         protected Api Api { get; set; }
 
@@ -41,6 +43,7 @@ namespace Neptuo.Recollection.Accounts.Components
                 Interop.SaveToken(bearerToken);
 
             UserChanged?.Invoke();
+            authenticationSource.SetResult(bearerToken);
         }
 
         private void ClearAuthorization()
@@ -59,10 +62,13 @@ namespace Neptuo.Recollection.Accounts.Components
 
         protected override async Task OnInitAsync()
         {
+            Console.WriteLine("UserStateModel.Init");
+
             if (BearerToken == null)
             {
+                Console.WriteLine("UserStateModel.TokenLoad");
                 string bearerToken = await Interop.LoadTokenAsync();
-                Console.WriteLine($"Loaded token '{bearerToken}'.");
+                Console.WriteLine($"UserStateModel.TokenLoaded '{bearerToken}'.");
                 if (!string.IsNullOrEmpty(bearerToken))
                 {
                     SetAuthorization(bearerToken, false);
@@ -120,5 +126,7 @@ namespace Neptuo.Recollection.Accounts.Components
             Uri.NavigateTo("/login");
             return Task.FromResult(true);
         }
+
+        public Task EnsureAuthenticated() => authenticationSource.Task;
     }
 }

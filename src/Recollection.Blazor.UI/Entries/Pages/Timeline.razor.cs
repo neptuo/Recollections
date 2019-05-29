@@ -13,13 +13,19 @@ namespace Neptuo.Recollection.Entries.Pages
         [Inject]
         protected Api Api { get; set; }
 
+        [CascadingParameter]
+        protected UserStateModel UserState { get; set; }
+
         public List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
 
         protected async override Task OnInitAsync()
         {
-            await base.OnInitAsync();
+            Console.WriteLine("Timeline.Init");
 
-            Console.WriteLine("Timeline.List");
+            await base.OnInitAsync();
+            await UserState.EnsureAuthenticated();
+
+            Console.WriteLine("Timeline.Load");
             TimelineListResponse response = await Api.GetListAsync(new TimelineListRequest());
             Entries.AddRange(response.Entries);
         }
