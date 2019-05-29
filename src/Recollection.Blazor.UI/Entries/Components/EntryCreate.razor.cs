@@ -10,6 +10,9 @@ namespace Neptuo.Recollection.Entries.Components
 {
     public class EntryCreateModel : ComponentBase
     {
+        [Inject]
+        protected Api Api { get; set; }
+
         public string Title { get; set; }
         public DateTime When { get; set; }
 
@@ -22,6 +25,8 @@ namespace Neptuo.Recollection.Entries.Components
 
         public async Task CreateAsync()
         {
+            await Api.CreateAsync(new EntryCreateRequest(Title, When));
+
             Title = null;
             When = DateTime.Today;
         }
