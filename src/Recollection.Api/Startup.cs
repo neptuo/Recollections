@@ -57,7 +57,7 @@ namespace Neptuo.Recollection
         {
             app.UseCors(p =>
             {
-                p.WithOrigins("http://localhost:5000", "http://localhost:33885");
+                p.WithOrigins("http://localhost:33881");
                 p.AllowAnyMethod();
                 p.AllowCredentials();
                 p.AllowAnyHeader();
