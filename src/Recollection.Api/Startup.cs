@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Neptuo;
 using Neptuo.Recollection.Accounts;
+using Neptuo.Recollection.Entries;
 
 namespace Neptuo.Recollection
 {
@@ -16,18 +17,17 @@ namespace Neptuo.Recollection
 
     public class Startup
     {
-        private readonly IConfiguration configuration;
         private readonly IHostingEnvironment environment;
         private readonly AccountsStartup accountsStartup;
+        private readonly EntriesStartup entriesStartup;
 
         public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
-            Ensure.NotNull(configuration, "configuration");
             Ensure.NotNull(environment, "environment");
-            this.configuration = configuration;
             this.environment = environment;
 
-            this.accountsStartup = new AccountsStartup(configuration.GetSection("Accounts"), ResolvePath);
+            accountsStartup = new AccountsStartup(configuration.GetSection("Accounts"), ResolvePath);
+            entriesStartup = new EntriesStartup(configuration.GetSection("Entries"), ResolvePath);
         }
 
         private string ResolvePath(string relativePath) => relativePath.Replace("{BasePath}", environment.ContentRootPath);
@@ -36,6 +36,7 @@ namespace Neptuo.Recollection
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             accountsStartup.ConfigureServices(services);
+            entriesStartup.ConfigureServices(services);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

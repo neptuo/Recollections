@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Recollection.Accounts.Data\Recollection.Accounts.Data.csproj" />
     <ProjectReference Include="..\Recollection.Api.Shared\Recollection.Api.Shared.csproj" />
+    <ProjectReference Include="..\Recollection.Entries.Data\Recollection.Entries.Data.csproj" />
   </ItemGroup>
 
 </Project>
