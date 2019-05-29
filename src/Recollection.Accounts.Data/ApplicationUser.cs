@@ -10,5 +10,11 @@ namespace Neptuo.Recollection.Accounts
 {
     public class ApplicationUser : IdentityUser
     {
+        public ApplicationUser()
+        { }
+
+        public ApplicationUser(string userName) 
+            : base(userName)
+        { }
     }
 }

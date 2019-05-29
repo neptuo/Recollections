@@ -64,6 +64,19 @@ namespace Neptuo.Recollection.Accounts.Controllers
             return BadRequest();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        {
+            var user = new ApplicationUser(model.UserName);
+            var result = await userManager.CreateAsync(user, model.Password);
+
+            var response = new RegisterResponse();
+            if (!result.Succeeded)
+                response.ErrorMessages.AddRange(result.Errors.Select(e => e.Description));
+
+            return Ok(response);
+        }
+
         [Authorize]
         [HttpGet]
         public IActionResult Info()
