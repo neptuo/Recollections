@@ -4,18 +4,25 @@
 <div class="component-login text-center">
     <form onsubmit="@LoginAsync">
 
-		<h1 class="h3 mb-3 font-weight-normal">Recollections</h1>
-		<label for="UserName" class="sr-only">Username:</label>
-		<input type="text" id="UserName" class="form-control" placeholder="Username:" bind="@UserName" />
-		<label for="Password" class="sr-only">Password:</label>
-		<input type="password" id="Password" class="form-control" placeholder="Password:" bind="@Password" />
+        <h1 class="h3 font-weight-normal">Recollections</h1>
+        <h2 class="h4 mb-3 font-weight-normal">Login</h2>
 
-		<div class="checkbox mb-3">
-			<label>
-				<input type="checkbox" value="remember-me" bind="@IsPersistent" /> Remember me
-			</label>
-		</div>
+        <label for="UserName" class="sr-only">Username:</label>
+        <input type="text" id="UserName" class="form-control" placeholder="Username:" bind="@UserName" />
+        <label for="Password" class="sr-only">Password:</label>
+        <input type="password" id="Password" class="form-control" placeholder="Password:" bind="@Password" />
 
-        <button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" value="remember-me" bind="@IsPersistent" /> Remember me
+            </label>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
+        </div>
+        <div class="mb-3">
+            <a href="/register">Register</a>
+        </div>
     </form>
 </div>
