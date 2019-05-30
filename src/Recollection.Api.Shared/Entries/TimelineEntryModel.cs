@@ -9,6 +9,7 @@ namespace Neptuo.Recollection.Entries
 {
     public class TimelineEntryModel
     {
+        public string Id { get; set; }
         public string Title { get; set; }
         public DateTime When { get; set; }
 

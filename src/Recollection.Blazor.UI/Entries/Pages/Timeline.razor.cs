@@ -13,6 +13,9 @@ namespace Neptuo.Recollection.Entries.Pages
     {
         [Inject]
         protected Api Api { get; set; }
+        
+        [Inject]
+        protected Navigator Navigator { get; set; }
 
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
@@ -29,6 +32,15 @@ namespace Neptuo.Recollection.Entries.Pages
             Console.WriteLine("Timeline.Load");
             TimelineListResponse response = await Api.GetListAsync(new TimelineListRequest());
             Entries.AddRange(response.Entries);
+        }
+
+        public async Task DeleteAsync(string entryId, string title)
+        {
+            if (await Navigator.AskAsync($"Do you really want to delete entry '{title}'?"))
+            {
+                await Api.DeleteAsync(entryId);
+                Entries.Remove(Entries.Single(e => e.Id == entryId);
+            }
         }
     }
 }

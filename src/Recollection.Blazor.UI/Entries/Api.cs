@@ -28,5 +28,8 @@ namespace Neptuo.Recollection.Entries
 
         public Task CreateAsync(EntryCreateRequest request)
             => http.PostJsonAsync(urlResolver("/entries/create"), request);
+
+        public Task DeleteAsync(string entryId)
+            => http.PostJsonAsync(urlResolver("/entries/list"), new { EntryId = entryId });
     }
 }
