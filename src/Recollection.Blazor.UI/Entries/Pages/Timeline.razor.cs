@@ -19,8 +19,11 @@ namespace Neptuo.Recollection.Entries.Pages
 
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
+        
+        private int offset;
 
         public List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
+        public bool HasMore { get; private set; }
 
         protected async override Task OnInitAsync()
         {
@@ -30,8 +33,15 @@ namespace Neptuo.Recollection.Entries.Pages
             await UserState.EnsureAuthenticated();
 
             Console.WriteLine("Timeline.Load");
-            TimelineListResponse response = await Api.GetListAsync(new TimelineListRequest());
+            await LoadAsync();
+        }
+
+        private async Task LoadAsync()
+        {
+            TimelineListResponse response = await Api.GetListAsync(offset);
             Entries.AddRange(response.Entries);
+            HasMore = response.HasMore;
+            offset = Entries.Count;
         }
 
         public async Task DeleteAsync(string entryId, string title)
@@ -41,6 +51,12 @@ namespace Neptuo.Recollection.Entries.Pages
                 await Api.DeleteAsync(entryId);
                 Entries.Remove(Entries.Single(e => e.Id == entryId));
             }
+        }
+
+        public async Task LoadMoreAsync()
+        {
+            if (HasMore)
+                await LoadAsync();
         }
     }
 }

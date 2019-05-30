@@ -16,6 +16,8 @@ namespace Neptuo.Recollection.Entries.Controllers
     [Route("api/entries/[action]")]
     public class TimelineController : ControllerBase
     {
+        private const int PageSize = 10;
+
         private readonly DataContext dataContext;
 
         public TimelineController(DataContext dataContext)
@@ -25,15 +27,18 @@ namespace Neptuo.Recollection.Entries.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(int offset)
         {
+            Ensure.PositiveOrZero(offset, "offset");
+
             string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
             List<TimelineEntryModel> result = await dataContext.Entries
                 .Where(e => e.UserId == userId)
-                .Take(10)
+                .Skip(offset)
+                .Take(PageSize)
                 .Select(e => new TimelineEntryModel()
                 {
                     Id = e.Id,
@@ -43,7 +48,7 @@ namespace Neptuo.Recollection.Entries.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(new TimelineListResponse(result));
+            return Ok(new TimelineListResponse(result, result.Count == PageSize));
         }
 
         [HttpPost]

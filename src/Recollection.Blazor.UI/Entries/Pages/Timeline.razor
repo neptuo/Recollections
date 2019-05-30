@@ -38,4 +38,11 @@
             </div>
         </div>
     }
+
+    @if (HasMore)
+    {
+        <div class="center">
+            <button class="btn btn-outline-primary" onclick="@LoadMoreAsync">More...</button>
+        </div>
+    }
 </div>
