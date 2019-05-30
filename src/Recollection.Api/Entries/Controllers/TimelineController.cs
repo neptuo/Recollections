@@ -63,5 +63,25 @@ namespace Neptuo.Recollection.Entries.Controllers
 
             return Ok();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id)
+        {
+            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            Entry entity = await dataContext.Entries.FindAsync(id);
+            if (entity == null)
+                return NotFound();
+
+            if (entity.UserId != userId)
+                return Unauthorized();
+
+            dataContext.Entries.Remove(entity);
+            await dataContext.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
