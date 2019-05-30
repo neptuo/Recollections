@@ -39,7 +39,7 @@ namespace Neptuo.Recollection.Entries.Pages
             if (await Navigator.AskAsync($"Do you really want to delete entry '{title}'?"))
             {
                 await Api.DeleteAsync(entryId);
-                Entries.Remove(Entries.Single(e => e.Id == entryId);
+                Entries.Remove(Entries.Single(e => e.Id == entryId));
             }
         }
     }
