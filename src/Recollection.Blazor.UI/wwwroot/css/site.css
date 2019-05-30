@@ -1,6 +1,9 @@
 ﻿.clear {
   clear: both; }
 
+.body-offset {
+  margin-top: 24px; }
+
 .loading-bar {
   display: inline-block;
   position: relative;

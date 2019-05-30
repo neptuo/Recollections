@@ -48,5 +48,11 @@ namespace Neptuo.Recollection.Accounts
             UserInfoResponse responseModel = SimpleJson.SimpleJson.DeserializeObject<UserInfoResponse>(responseContent);
             return responseModel;
         }
+
+        public Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
+            => http.PostJsonAsync<ChangePasswordResponse>(urlResolver("/accounts/changepassword"), request);
+
+        public Task<UserDetailResponse> GetDetailAsync()
+            => http.GetJsonAsync<UserDetailResponse>(urlResolver("/accounts/detail"));
     }
 }

@@ -1,8 +1,13 @@
-﻿.clear {
+﻿@import "_colors.scss";
+
+.clear {
     clear: both;
 }
 
-@import "_colors.scss";
+.body-offset {
+    margin-top: 24px;
+}
+
 @import "_loading.scss";
 @import "_accounts.scss";
 @import "_timeline.scss";

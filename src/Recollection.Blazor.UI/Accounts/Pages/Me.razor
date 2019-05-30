@@ -1,0 +1,40 @@
+﻿@page  "/me"
+@inherits MeModel
+@layout Entries.Layouts.MainLayout
+
+<div class="row body-offset">
+    <div class="col-6">
+        <h2 class="mb-3">
+            <Icon Identifier="person" />
+            @UserName
+        </h2>
+        <p>
+            Registered at @Created
+        </p>
+    </div>
+</div>
+<div class="row body-offset">
+    <div class="col-6">
+        <h2 class="mb-3">
+            <Icon Identifier="lock-locked" />
+            Change password
+        </h2>
+        <div class="change-password">
+            <Validation ErrorMessages="@ChangePassword.ErrorMessages" />
+            <form onsubmit="@ChangePassword.ExecuteAsync">
+                <div class="form-group">
+                    <input class="form-control" type="password" placeholder="Current password" bind="@ChangePassword.Current" />
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="password" placeholder="New password" bind="@ChangePassword.New" />
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="password" placeholder="Confirm new password" bind="@ChangePassword.ConfirmNew" />
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" type="submit">Change password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

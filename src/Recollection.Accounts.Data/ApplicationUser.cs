@@ -10,11 +10,17 @@ namespace Neptuo.Recollection.Accounts
 {
     public class ApplicationUser : IdentityUser
     {
-        public ApplicationUser()
-        { }
+        public DateTime Created { get; set; }
 
-        public ApplicationUser(string userName) 
+        public ApplicationUser()
+        {
+            Created = DateTime.Now;
+        }
+
+        public ApplicationUser(string userName)
             : base(userName)
-        { }
+        {
+            Created = DateTime.Now;
+        }
     }
 }

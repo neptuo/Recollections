@@ -86,5 +86,37 @@ namespace Neptuo.Recollection.Accounts.Controllers
                 username = HttpContext.User.Identity.Name
             });
         }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Detail()
+        {
+            ApplicationUser user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new UserDetailResponse()
+            {
+                UserName = user.UserName,
+                Created = user.Created
+            });
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            ApplicationUser user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            if (user == null)
+                return NotFound();
+
+            IdentityResult result = await userManager.ChangePasswordAsync(user, request.Current, request.New);
+
+            var response = new ChangePasswordResponse();
+            if (!result.Succeeded)
+                response.ErrorMessages.AddRange(result.Errors.Select(e => e.Description));
+
+            return Ok(response);
+        }
     }
 }
