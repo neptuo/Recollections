@@ -37,6 +37,7 @@ namespace Neptuo.Recollection.Entries.Controllers
 
             List<TimelineEntryModel> result = await dataContext.Entries
                 .Where(e => e.UserId == userId)
+                .OrderByDescending(e => e.When)
                 .Skip(offset)
                 .Take(PageSize)
                 .Select(e => new TimelineEntryModel()
