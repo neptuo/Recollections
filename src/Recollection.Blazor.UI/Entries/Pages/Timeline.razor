@@ -19,13 +19,16 @@
                         <h2>@entry.Title</h2>
 
                         <div class="actions btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit title and text">
                                 <Icon Identifier="pencil" />
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-info">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit date">
+                                <Icon Identifier="calendar" />
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info" title="Edit images">
                                 <Icon Identifier="image" />
                             </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="@(() => DeleteAsync(entry.Id, entry.Title))">
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="@(() => DeleteAsync(entry.Id, entry.Title))" title="Delete entry">
                                 <Icon Identifier="trash" />
                             </button>
                         </div>
