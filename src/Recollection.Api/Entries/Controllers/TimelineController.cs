@@ -72,13 +72,13 @@ namespace Neptuo.Recollection.Entries.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete([FromBody] TimelineEntryModel entry)
         {
             string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            Entry entity = await dataContext.Entries.FindAsync(id);
+            Entry entity = await dataContext.Entries.FindAsync(entry.Id);
             if (entity == null)
                 return NotFound();
 
