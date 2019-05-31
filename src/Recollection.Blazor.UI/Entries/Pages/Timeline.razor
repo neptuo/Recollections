@@ -19,7 +19,7 @@
                         <h2>@entry.Title</h2>
 
                         <div class="actions btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit title and text">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit title and text" onclick="@(() => IsEditTextVisible = true)">
                                 <Icon Identifier="pencil" />
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit date">
@@ -48,4 +48,6 @@
             <button class="btn btn-outline-primary" onclick="@LoadMoreAsync">More...</button>
         </div>
     }
+
+    <EntryUpdateText bind-IsVisible="@IsEditTextVisible" />
 </div>

@@ -6,7 +6,7 @@
                 $(e.currentTarget).find('[data-autofocus]').select().focus();
             });
             target.on('hidden.bs.modal', function (e) {
-                DotNet.invokeMethodAsync("Neptuo.Recollection", "Bootstrap_ModalHidden", e.currentTarget.id);
+                DotNet.invokeMethodAsync("Recollection.Blazor.UI", "Bootstrap_ModalHidden", e.currentTarget.id);
             });
 
             return true;

@@ -25,6 +25,8 @@ namespace Neptuo.Recollection.Entries.Pages
         public List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
         public bool HasMore { get; private set; }
 
+        protected bool IsEditTextVisible { get; set; }
+
         protected async override Task OnInitAsync()
         {
             Console.WriteLine("Timeline.Init");

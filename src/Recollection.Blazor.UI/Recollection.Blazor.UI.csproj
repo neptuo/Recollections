@@ -32,4 +32,8 @@
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Watch Remove="Entries\Components\EntryUpdateText.razor" />
+  </ItemGroup>
 </Project>
