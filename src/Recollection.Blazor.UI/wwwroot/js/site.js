@@ -1,4 +1,26 @@
-﻿window.Recollection = {
+﻿window.Bootstrap = {
+    Modal: {
+        Register: function (id) {
+            var target = $("#" + id);
+            target.on('shown.bs.modal', function (e) {
+                $(e.currentTarget).find('[data-autofocus]').select().focus();
+            });
+            target.on('hidden.bs.modal', function (e) {
+                DotNet.invokeMethodAsync("Neptuo.Recollection", "Bootstrap_ModalHidden", e.currentTarget.id);
+            });
+
+            return true;
+        },
+        Toggle: function (id, isVisible) {
+            var target = $("#" + id);
+            target.modal(isVisible ? 'show' : 'hide');
+
+            return true;
+        }
+    }
+};
+
+window.Recollection = {
     NavigateTo: function (href) {
         window.location.href = href;
         return true;

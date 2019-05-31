@@ -24,9 +24,11 @@ namespace Neptuo.Recollection
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IFactory<HttpClient>, HttpClientProvider>();
-            services.AddSingleton<UrlResolver>(Resolve);
-            services.AddTransient<Navigator>();
+            services
+                .AddSingleton<IFactory<HttpClient>, HttpClientProvider>()
+                .AddSingleton<UrlResolver>(Resolve)
+                .AddTransient<Navigator>()
+                .AddSingleton<ModalNative>();
 
             accounts.ConfigureServices(services);
             entries.ConfigureServices(services);
