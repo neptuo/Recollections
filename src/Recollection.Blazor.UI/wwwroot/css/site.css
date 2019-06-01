@@ -81,7 +81,7 @@
 .timeline .entry {
   padding: 24px;
   margin: 24px 0;
-  border-radius: 10px;
+  border-radius: 4px;
   border: 1px solid #e5e5e5; }
   .timeline .entry .title h2 {
     float: left; }
