@@ -66,14 +66,14 @@
 .timeline .timeline-item {
   position: relative;
   margin-left: 24px;
-  border-left: 2px dashed #e5e5e5; }
+  border-left: 1px solid #e5e5e5; }
 
 .timeline .timeline-item-connector {
   position: absolute;
   width: 24px;
   height: 2px;
   top: 76px;
-  border-bottom: 2px dashed #e5e5e5; }
+  border-bottom: 1px solid #e5e5e5; }
 
 .timeline .timeline-item-body {
   padding: 1px 0 1px 24px; }
@@ -82,7 +82,7 @@
   padding: 24px;
   margin: 24px 0;
   border-radius: 10px;
-  border: 2px solid #e5e5e5; }
+  border: 1px solid #e5e5e5; }
   .timeline .entry .title h2 {
     float: left; }
   .timeline .entry .title .actions {
