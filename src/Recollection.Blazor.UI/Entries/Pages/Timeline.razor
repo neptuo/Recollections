@@ -16,7 +16,9 @@
             <div class="timeline-item-body">
                 <div class="entry">
                     <div class="title">
-                        <h2>@entry.Title</h2>
+                        <a href="/entry/@entry.Id">
+                            <h2>@entry.Title</h2>
+                        </a>
 
                         <div class="actions btn-group">
                             <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit title and text" onclick="@(() => IsEditTextVisible = true)">

@@ -1,0 +1,25 @@
+﻿@page "/entry/{EntryId}"
+@inherits EntryDetailModel
+
+@if (Model != null)
+{
+    <div class="entry-detail">
+        <h2 class="title">
+            @Model.Title
+        </h2>
+        <div class="datetime">
+            <Icon Identifier="calendar" /> 
+            @Model.When.ToLongDateString()
+        </div>
+        <div class="text">
+            @if (String.IsNullOrEmpty(Model.Text))
+            {
+                <span class="placeholder">No description provided...</span>
+            }
+            else
+            {
+                @Model.Text
+            }
+        </div>
+    </div>
+}

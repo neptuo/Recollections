@@ -52,6 +52,28 @@ namespace Neptuo.Recollection.Entries.Controllers
             return Ok(new TimelineListResponse(result, result.Count == PageSize));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Detail(string entryId)
+        {
+            Ensure.NotNullOrEmpty(entryId, "entryId");
+
+            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            Entry entity = await dataContext.Entries.FindAsync(entryId);
+            if (entity == null)
+                return NotFound();
+
+            return Ok(new EntryResponse()
+            {
+                Id = entity.Id,
+                Title = entity.Title,
+                When = entity.When,
+                Text = entity.Text
+            });
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EntryCreateRequest request)
         {

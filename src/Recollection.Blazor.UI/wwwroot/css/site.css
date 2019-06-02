@@ -87,3 +87,11 @@
     float: left; }
   .timeline .entry .title .actions {
     float: right; }
+
+.entry-detail {
+  padding: 24px;
+  margin: 24px 0; }
+  .entry-detail .text {
+    margin: 24px 0; }
+  .entry-detail .placeholder {
+    color: #aaaaaa; }
