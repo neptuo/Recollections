@@ -29,5 +29,11 @@ namespace Neptuo.Recollection.Entries.Pages
 
             Model = await Api.GetDetailAsync(EntryId);
         }
+
+        protected async Task SaveTitleAsync(string value)
+        {
+            Model.Title = value;
+            await Api.UpdateAsync(Model);
+        }
     }
 }

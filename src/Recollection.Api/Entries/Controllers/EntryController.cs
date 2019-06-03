@@ -69,6 +69,34 @@ namespace Neptuo.Recollection.Entries.Controllers
             return CreatedAtAction(nameof(Get), new { id = entity.Id });
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<EntryModel>> Update(string id, EntryModel model)
+        {
+            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            if (id != model.Id)
+                return BadRequest();
+
+            Entry entity = await dataContext.Entries.FindAsync(id);
+            if (entity == null)
+                return NotFound();
+
+            if (entity.UserId != userId)
+                return Unauthorized();
+
+            entity.Id = model.Id;
+            entity.Title = model.Title;
+            entity.When = model.When;
+            entity.Text = model.Text;
+
+            dataContext.Entries.Update(entity);
+            await dataContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

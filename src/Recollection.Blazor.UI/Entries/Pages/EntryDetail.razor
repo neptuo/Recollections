@@ -5,7 +5,7 @@
 {
     <div class="entry-detail">
         <h2 class="title">
-            <InlineTextEdit Value="@Model.Title" ValueChanged="@(value => { Model.Title = "Test: " + value; Console.WriteLine($"Changed to: {value}."); })" />
+            <InlineTextEdit Value="@Model.Title" ValueChanged="@(value => SaveTitleAsync(value))" />
         </h2>
         <div class="datetime">
             <Icon Identifier="calendar" />
