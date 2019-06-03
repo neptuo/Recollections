@@ -42,6 +42,12 @@ namespace Neptuo.Recollection.Entries.Pages
             await SaveAsync();
         }
 
+        protected async Task SaveWhenAsync(DateTime value)
+        {
+            Model.When = value;
+            await SaveAsync();
+        }
+
         private Task SaveAsync() => Api.UpdateAsync(Model);
     }
 }

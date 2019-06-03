@@ -9,10 +9,10 @@
         </h2>
         <div class="datetime">
             <Icon Identifier="calendar" />
-            <InlineTextEdit Value="@Model.When.ToLongDateString()" />
+            <InlineDateEdit Value="@Model.When" ValueChanged="@(value => SaveWhenAsync(value))" DisplayFormat="dd.MM.yyyy" />
         </div>
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
         </div>
     </div>
-}
+} 
