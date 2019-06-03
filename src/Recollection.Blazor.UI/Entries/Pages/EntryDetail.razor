@@ -12,7 +12,7 @@
             <InlineTextEdit Value="@Model.When.ToLongDateString()" />
         </div>
         <div class="text">
-            <InlineTextEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
+            <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
         </div>
     </div>
 }

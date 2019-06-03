@@ -37,6 +37,9 @@
 .inline-editor .oi {
   color: var(--green); }
 
+.inline-editor .form-control {
+  font-size: inherit; }
+
 .inline-editor-viewmode .oi {
   display: none;
   color: #aaaaaa; }

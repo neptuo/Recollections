@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollection.Entries.Pages
-{
+{ 
     public class EntryDetailModel : ComponentBase
     {
         [Inject]
@@ -34,7 +34,7 @@ namespace Neptuo.Recollection.Entries.Pages
         {
             Model.Title = value;
             await SaveAsync();
-        }
+        } 
 
         protected async Task SaveTextAsync(string value)
         {

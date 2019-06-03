@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollection.Components.Editors
 {
-    public class InlineTextEditModel : InlineEditModel<string>
+    public class InlineMarkdownEditModel : InlineEditModel<string>
     {
     }
 }

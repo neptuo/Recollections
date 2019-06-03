@@ -1,14 +1,10 @@
-﻿@inherits InlineTextEditModel
+﻿@inherits InlineMarkdownEditModel
 
 <span class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
-        <form class="form-inline" onsubmit="@OnSaveValue">
-            <input type="text" class="form-control" bind="@Value" autofocus />
-            <button class="btn btn-link">
-                <Icon Identifier="check" />
-            </button>
-        </form>
+        <textarea class="form-control" bind="@Value" />
+        <Icon Identifier="check" onclick="@OnSaveValue" />
     }
     else
     {
