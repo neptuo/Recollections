@@ -33,7 +33,15 @@ namespace Neptuo.Recollection.Entries.Pages
         protected async Task SaveTitleAsync(string value)
         {
             Model.Title = value;
-            await Api.UpdateAsync(Model);
+            await SaveAsync();
         }
+
+        protected async Task SaveTextAsync(string value)
+        {
+            Model.Text = value;
+            await SaveAsync();
+        }
+
+        private Task SaveAsync() => Api.UpdateAsync(Model);
     }
 }
