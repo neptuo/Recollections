@@ -13,5 +13,22 @@ namespace Neptuo.Recollection.Entries
         public string Title { get; set; }
         public DateTime When { get; set; }
         public string Text { get; set; }
+
+        public EntryModel()
+        { }
+
+        public EntryModel(string title, DateTime when)
+        {
+            Title = title;
+            When = when;
+        }
+
+        public EntryModel(string id, string title, DateTime when, string text)
+        {
+            Id = id;
+            Title = title;
+            When = when;
+            Text = text;
+        }
     }
 }

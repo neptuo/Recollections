@@ -25,7 +25,7 @@ namespace Neptuo.Recollection.Entries.Components
 
         public async Task CreateAsync()
         {
-            await Api.CreateAsync(new EntryCreateRequest(Title, When));
+            await Api.CreateAsync(new EntryModel(Title, When));
 
             Title = null;
             When = DateTime.Today;

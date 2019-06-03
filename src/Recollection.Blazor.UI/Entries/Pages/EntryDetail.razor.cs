@@ -20,7 +20,7 @@ namespace Neptuo.Recollection.Entries.Pages
         [Parameter]
         protected string EntryId { get; set; }
 
-        protected EntryResponse Model { get; set; }
+        protected EntryModel Model { get; set; }
 
         protected async override Task OnInitAsync()
         {
