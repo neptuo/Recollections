@@ -1,10 +1,14 @@
 ﻿@inherits InlineMarkdownEditModel
 
-<span class="inline-editor @GetModeCssClass()">
+<div class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
-        <textarea class="form-control" bind="@Value" />
-        <Icon Identifier="check" onclick="@OnSaveValue" />
+        <form onsubmit="@OnSaveValue">
+            <textarea class="form-control" bind="@Value" />
+            <button type="submit" class="btn btn-link" title="Save changes">
+                <Icon Identifier="check" />
+            </button>
+        </form>
     }
     else
     {
@@ -20,4 +24,4 @@
             <Icon Identifier="pencil" />
         </span>
     }
-</span>
+</div>

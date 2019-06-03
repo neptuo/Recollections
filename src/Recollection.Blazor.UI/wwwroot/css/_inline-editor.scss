@@ -6,6 +6,10 @@
     .form-control {
         font-size: inherit;
     }
+
+    textarea {
+        min-height: 400px;
+    }
 }
 
 .inline-editor-viewmode {
