@@ -12,5 +12,8 @@ namespace Neptuo.Recollection.Components
     {
         [Parameter]
         protected string Identifier { get; set; }
+
+        [Parameter]
+        protected Action OnClick { get; set; }
     }
 }

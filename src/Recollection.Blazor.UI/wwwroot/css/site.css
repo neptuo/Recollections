@@ -35,10 +35,13 @@
     height: 26px; } }
 
 .inline-editor .oi {
+  color: var(--green); }
+
+.inline-editor-viewmode .oi {
   display: none;
   color: #aaaaaa; }
 
-.inline-editor:hover .oi {
+.inline-editor-viewmode:hover .oi {
   display: inline-block; }
 
 .component-login form {

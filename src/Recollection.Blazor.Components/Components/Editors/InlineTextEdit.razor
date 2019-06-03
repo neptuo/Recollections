@@ -1,1 +1,28 @@
-﻿
+﻿@inherits InlineTextEditModel
+
+<span class="inline-editor @GetModeCssClass()">
+    @if (IsEditMode)
+    {
+        <input type="text" bind="@Value" />
+        <Icon Identifier="check" onclick="@OnSaveValue" />
+    }
+    else
+    {
+        <span class="inline-editor-value" onclick="@(() => IsEditMode = true)">
+            @if (String.IsNullOrEmpty(Value))
+            {
+                <span class="placeholder">@(PlaceHolder ?? "No value...")</span>
+            }
+            else
+            {
+                @Value
+            }
+            <Icon Identifier="pencil" />
+        </span>
+    }
+</span>
+
+@functions
+{
+    protected string GetModeCssClass() => IsEditMode ? String.Empty : "inline-editor-viewmode";
+}
