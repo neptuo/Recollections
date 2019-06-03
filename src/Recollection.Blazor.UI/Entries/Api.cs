@@ -27,12 +27,12 @@ namespace Neptuo.Recollection.Entries
             => http.GetJsonAsync<TimelineListResponse>(urlResolver($"/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
         public Task CreateAsync(EntryCreateRequest request)
-            => http.PostJsonAsync(urlResolver("/timeline/create"), request);
+            => http.PostJsonAsync(urlResolver("/entries"), request);
 
         public Task DeleteAsync(string entryId)
-            => http.PostJsonAsync(urlResolver("/timeline/delete"), new { Id = entryId });
+            => http.DeleteAsync(urlResolver($"/entries/{entryId}"));
 
         public Task<EntryResponse> GetDetailAsync(string entryId)
-            => http.GetJsonAsync<EntryResponse>(urlResolver($"/entries/timeline?entryId={entryId}"));
+            => http.GetJsonAsync<EntryResponse>(urlResolver($"/entries/{entryId}"));
     }
 }
