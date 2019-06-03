@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Neptuo.Activators;
 using Neptuo.Recollection.Accounts;
+using Neptuo.Recollection.Components;
 using Neptuo.Recollection.Entries;
 using System;
 using System.Collections.Generic;

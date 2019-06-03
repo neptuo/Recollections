@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection
+namespace Neptuo.Recollection.Components
 {
-    public enum ModalSize
+    public enum AlertMode
     {
-        Small,
-        Normal,
-        Large
+        Success,
+        Info,
+        Warning,
+        Error
     }
 }

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <RootNamespace>Neptuo.Recollection</RootNamespace>
+    
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <RazorLangVersion>3.0</RazorLangVersion>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Browser" Version="3.0.0-preview5-19227-01" />
+    <PackageReference Include="Neptuo" Version="6.0.1" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
+    <Watch Include="**\*.razor" />
+  </ItemGroup>
+
+</Project>

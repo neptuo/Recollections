@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection
+namespace Neptuo.Recollection.Components
 {
     public class ModalModel : ComponentBase, IDisposable
     {

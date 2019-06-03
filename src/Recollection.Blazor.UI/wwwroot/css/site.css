@@ -34,6 +34,13 @@
     top: 19px;
     height: 26px; } }
 
+.inline-editor .oi {
+  display: none;
+  color: #aaaaaa; }
+
+.inline-editor:hover .oi {
+  display: inline-block; }
+
 .component-login form {
   width: 100%;
   max-width: 330px;

@@ -5,7 +5,10 @@
 {
     <div class="entry-detail">
         <h2 class="title">
-            @Model.Title
+            <span class="inline-editor">
+                <input type="text" value="@Model.Title" />
+                <Icon Identifier="pencil" />
+            </span>
         </h2>
         <div class="datetime">
             <Icon Identifier="calendar" /> 

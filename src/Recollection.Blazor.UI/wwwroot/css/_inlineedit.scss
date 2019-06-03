@@ -1,0 +1,14 @@
+﻿.inline-editor {
+
+    .oi {
+        display: none;
+        color: $placeholder-color;
+    }
+
+    &:hover {
+
+        .oi {
+            display: inline-block;
+        }
+    }
+}

@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Entries.Data",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{878840AE-DD42-49B3-A130-F606F16D7D38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollection.Blazor.Components", "src\Recollection.Blazor.Components\Recollection.Blazor.Components.csproj", "{59EC1693-4D39-420E-A758-41A6C42C6917}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{FE8E9370-78C4-4787-98F5-EACE029CE4DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE8E9370-78C4-4787-98F5-EACE029CE4DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE8E9370-78C4-4787-98F5-EACE029CE4DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59EC1693-4D39-420E-A758-41A6C42C6917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59EC1693-4D39-420E-A758-41A6C42C6917}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59EC1693-4D39-420E-A758-41A6C42C6917}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59EC1693-4D39-420E-A758-41A6C42C6917}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
