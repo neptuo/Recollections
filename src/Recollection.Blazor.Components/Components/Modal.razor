@@ -5,8 +5,10 @@
         <form onsubmit="@OnFormSubmit">
             <div class="modal-content">
                 <div class="modal-header">
-                    <a class="close" onclick="@(() => IsVisible = false)"><span aria-hidden="true">&times;</span></a>
                     <h4 class="modal-title" id="myModalLabel">@Title</h4>
+                    <button class="close" onclick="@(() => IsVisible = false)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     @ChildContent
