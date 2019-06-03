@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Neptuo.Recollection.Entries.Controllers
 {
     [Authorize]
-    [Route("api/entries/[action]")]
+    [Route("api/timeline/[action]")]
     public class TimelineController : ControllerBase
     {
         private const int PageSize = 10;
