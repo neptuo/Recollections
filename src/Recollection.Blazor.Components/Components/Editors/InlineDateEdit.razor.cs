@@ -11,6 +11,6 @@ namespace Neptuo.Recollection.Components.Editors
     public class InlineDateEditModel : InlineEditModel<DateTime>
     {
         [Parameter]
-        protected string DisplayFormat { get; set; }
+        protected string Format { get; set; }
     }
 }

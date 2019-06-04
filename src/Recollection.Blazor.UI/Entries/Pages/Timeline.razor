@@ -17,7 +17,7 @@
                         </a>
                     </h2>
                 </div>
-                <div class="datetime">@entry.When.ToLongDateString()</div>
+                <div class="datetime">@entry.When.ToString(UiOptions.DateFormat)</div>
                 <div class="text">@entry.Text</div>
             </div>
         </TimelineItem>

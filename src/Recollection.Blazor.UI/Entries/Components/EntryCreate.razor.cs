@@ -16,6 +16,9 @@ namespace Neptuo.Recollection.Entries.Components
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected UiOptions UiOptions { get; set; }
+
         public string Title { get; set; }
         public DateTime When { get; set; }
 

@@ -17,6 +17,9 @@ namespace Neptuo.Recollection.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected UiOptions UiOptions { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
