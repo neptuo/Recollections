@@ -13,6 +13,9 @@ namespace Neptuo.Recollection.Entries.Components
         [Inject]
         protected Api Api { get; set; }
 
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
         public string Title { get; set; }
         public DateTime When { get; set; }
 
@@ -29,10 +32,8 @@ namespace Neptuo.Recollection.Entries.Components
         {
             if (Validate())
             {
-                await Api.CreateAsync(new EntryModel(Title, When));
-
-                Title = null;
-                When = DateTime.Today;
+                EntryModel model = await Api.CreateAsync(new EntryModel(Title, When));
+                Navigator.OpenEntryDetail(model.Id);
             }
         }
 
