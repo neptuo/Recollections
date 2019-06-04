@@ -1,6 +1,8 @@
 ﻿@inherits Neptuo.Recollection.Entries.Components.EntryCreateModel
 
 <div class="entry entry-new">
+    <Validation ErrorMessages="@ErrorMessages" />
+
     <form onsubmit="@CreateAsync">
         <div class="form-row form-group">
             <div class="col">

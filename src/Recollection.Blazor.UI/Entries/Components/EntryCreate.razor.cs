@@ -16,6 +16,8 @@ namespace Neptuo.Recollection.Entries.Components
         public string Title { get; set; }
         public DateTime When { get; set; }
 
+        public List<string> ErrorMessages { get; } = new List<string>();
+
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
@@ -25,10 +27,26 @@ namespace Neptuo.Recollection.Entries.Components
 
         public async Task CreateAsync()
         {
-            await Api.CreateAsync(new EntryModel(Title, When));
+            if (Validate())
+            {
+                await Api.CreateAsync(new EntryModel(Title, When));
 
-            Title = null;
-            When = DateTime.Today;
+                Title = null;
+                When = DateTime.Today;
+            }
+        }
+
+        public bool Validate()
+        {
+            ErrorMessages.Clear();
+
+            if (String.IsNullOrEmpty(Title))
+                ErrorMessages.Add("Missing title.");
+
+            if (When == DateTime.MinValue)
+                ErrorMessages.Add("When should be something meaningful.");
+
+            return ErrorMessages.Count == 0;
         }
     }
 }
