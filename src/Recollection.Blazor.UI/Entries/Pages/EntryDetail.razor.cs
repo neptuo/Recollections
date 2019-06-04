@@ -14,6 +14,9 @@ namespace Neptuo.Recollection.Entries.Pages
         [Inject]
         protected Api Api { get; set; }
 
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
@@ -49,5 +52,14 @@ namespace Neptuo.Recollection.Entries.Pages
         }
 
         private Task SaveAsync() => Api.UpdateAsync(Model);
+
+        public async Task DeleteAsync()
+        {
+            if (await Navigator.AskAsync($"Do you really want to delete entry '{Model.Title}'?"))
+            {
+                await Api.DeleteAsync(Model.Id);
+                Navigator.OpenTimeline();
+            }
+        }
     }
 }

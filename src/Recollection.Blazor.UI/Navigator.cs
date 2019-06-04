@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,15 +11,21 @@ namespace Neptuo.Recollection
 {
     public class Navigator
     {
+        private readonly IUriHelper uri;
         private readonly IJSRuntime jsRuntime;
 
-        public Navigator(IJSRuntime jsRuntime)
+        public Navigator(IUriHelper uri, IJSRuntime jsRuntime)
         {
+            Ensure.NotNull(uri, "uri");
             Ensure.NotNull(jsRuntime, "jsRuntime");
+            this.uri = uri;
             this.jsRuntime = jsRuntime;
         }
 
         public Task<bool> AskAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.confirm", message);
+
+        public void OpenTimeline()
+            => uri.NavigateTo("/");
     }
 }
