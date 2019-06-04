@@ -2,14 +2,20 @@
 
 <div class="entry entry-new">
     <form onsubmit="@CreateAsync">
-        <div class="form-group">
-            <input class="form-control form-control-lg" type="text" placeholder="Heading..." bind="@Title" />
+        <div class="form-row form-group">
+            <div class="col">
+                <label for="entry-create-title">Title:</label>
+                <input id="entry-create-title" class="form-control" type="text" placeholder="Entry title..." bind="@Title" />
+            </div>
+            <div class="col-auto">
+                <label for="entry-create-title">When:</label>
+                <input id="entry-create-when" class="form-control" type="date" placeholder="When it happend..." bind="@When" />
+            </div>
         </div>
-        <div class="form-group">
-            <input class="form-control" type="text" placeholder="When" bind="@When" />
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary" type="submit">Create entry</button>
+        <div class="form-row">
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Create entry</button>
+            </div>
         </div>
     </form>
 </div>
