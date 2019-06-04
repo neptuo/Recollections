@@ -2,46 +2,25 @@
 @inherits TimelineModel
 
 <div class="timeline">
-    <div class="timeline-item">
-        <div class="timeline-item-connector"></div>
-        <div class="timeline-item-body">
-            <EntryCreate />
-        </div>
-    </div>
+    <TimelineItem>
+        <EntryCreate />
+    </TimelineItem>
 
     @foreach (var entry in Entries)
     {
-        <div class="timeline-item">
-            <div class="timeline-item-connector"></div>
-            <div class="timeline-item-body">
-                <div class="entry">
-                    <div class="title">
-                        <a href="/entry/@entry.Id">
-                            <h2>@entry.Title</h2>
+        <TimelineItem>
+            <div class="entry">
+                <div class="title">
+                    <h2>
+                        <a href="@Navigator.UrlEntryDetail(entry.Id)">
+                            @entry.Title
                         </a>
-
-                        <div class="actions btn-group">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit title and text" onclick="@(() => IsEditTextVisible = true)">
-                                <Icon Identifier="pencil" />
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Edit date">
-                                <Icon Identifier="calendar" />
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-info" title="Edit images">
-                                <Icon Identifier="image" />
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="@(() => DeleteAsync(entry.Id, entry.Title))" title="Delete entry">
-                                <Icon Identifier="trash" />
-                            </button>
-                        </div>
-
-                        <div class="clear"></div>
-                    </div>
-                    <div class="datetime">@entry.When.ToLongDateString()</div>
-                    <div class="text">@entry.Text</div>
+                    </h2>
                 </div>
+                <div class="datetime">@entry.When.ToLongDateString()</div>
+                <div class="text">@entry.Text</div>
             </div>
-        </div>
+        </TimelineItem>
     }
 
     @if (HasMore)
@@ -50,6 +29,4 @@
             <button class="btn btn-outline-primary" onclick="@LoadMoreAsync">More...</button>
         </div>
     }
-
-    <EntryUpdateText bind-IsVisible="@IsEditTextVisible" />
 </div>

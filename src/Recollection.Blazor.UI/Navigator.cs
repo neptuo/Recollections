@@ -25,7 +25,16 @@ namespace Neptuo.Recollection
         public Task<bool> AskAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.confirm", message);
 
+        public string UrlTimeline()
+            => "/";
+
         public void OpenTimeline()
-            => uri.NavigateTo("/");
+            => uri.NavigateTo(UrlTimeline());
+
+        public string UrlEntryDetail(string entryId)
+            => $"/entry/{entryId}";
+
+        public void OpenEntryDetail(string entryId)
+            => uri.NavigateTo(UrlEntryDetail(entryId));
     }
 }

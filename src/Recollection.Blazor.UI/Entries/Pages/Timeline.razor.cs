@@ -46,15 +46,6 @@ namespace Neptuo.Recollection.Entries.Pages
             offset = Entries.Count;
         }
 
-        public async Task DeleteAsync(string entryId, string title)
-        {
-            if (await Navigator.AskAsync($"Do you really want to delete entry '{title}'?"))
-            {
-                await Api.DeleteAsync(entryId);
-                Entries.Remove(Entries.Single(e => e.Id == entryId));
-            }
-        }
-
         public async Task LoadMoreAsync()
         {
             if (HasMore)
