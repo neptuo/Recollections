@@ -1,5 +1,6 @@
 ﻿using Neptuo;
 using Neptuo.Activators;
+using Neptuo.Recollection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -23,5 +24,17 @@ namespace Neptuo.Recollection
         }
 
         public HttpClient Create() => http;
+    }
+}
+
+namespace Microsoft.Extensions.DependencyInjection
+{
+    public static class HttpClientFactoryServiceCollectionExtensions
+    {
+        public static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
+        {
+            Ensure.NotNull(services, "services");
+            return services.AddSingleton<IFactory<HttpClient>, HttpClientProvider>();
+        }
     }
 }
