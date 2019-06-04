@@ -31,49 +31,43 @@ namespace Neptuo.Recollection.Entries.Controllers
         {
             Ensure.NotNullOrEmpty(id, "id");
 
-            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            string userId = FindUserId();
+            if (userId == null)
                 return Unauthorized();
 
             Entry entity = await dataContext.Entries.FindAsync(id);
             if (entity == null)
                 return NotFound();
 
-            return Ok(new EntryModel()
-            {
-                Id = entity.Id,
-                Title = entity.Title,
-                When = entity.When,
-                Text = entity.Text
-            });
+            EntryModel model = new EntryModel();
+            MapEntityToModel(entity, model);
+
+            return Ok(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(EntryModel model)
         {
-            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            string userId = FindUserId();
+            if (userId == null)
                 return Unauthorized();
 
-            Entry entity = new Entry()
-            {
-                Title = model.Title,
-                When = model.When,
-                Text = model.Text,
-                UserId = userId
-            };
+            Entry entity = new Entry();
+            MapModelToEntity(model, entity);
+            entity.UserId = userId;
 
             await dataContext.Entries.AddAsync(entity);
             await dataContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(Get), new { id = entity.Id });
+            MapEntityToModel(entity, model);
+            return CreatedAtAction(nameof(Get), new { id = entity.Id }, model);
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<EntryModel>> Update(string id, EntryModel model)
         {
-            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            string userId = FindUserId();
+            if (userId == null)
                 return Unauthorized();
 
             if (id != model.Id)
@@ -86,10 +80,7 @@ namespace Neptuo.Recollection.Entries.Controllers
             if (entity.UserId != userId)
                 return Unauthorized();
 
-            entity.Id = model.Id;
-            entity.Title = model.Title;
-            entity.When = model.When;
-            entity.Text = model.Text;
+            MapModelToEntity(model, entity);
 
             dataContext.Entries.Update(entity);
             await dataContext.SaveChangesAsync();
@@ -100,8 +91,8 @@ namespace Neptuo.Recollection.Entries.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            string userId = FindUserId();
+            if (userId == null)
                 return Unauthorized();
 
             Entry entity = await dataContext.Entries.FindAsync(id);
@@ -115,6 +106,31 @@ namespace Neptuo.Recollection.Entries.Controllers
             await dataContext.SaveChangesAsync();
 
             return Ok();
+        }
+
+        private string FindUserId()
+        {
+            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (String.IsNullOrEmpty(userId))
+                return null;
+
+            return userId;
+        }
+
+        private void MapEntityToModel(Entry entity, EntryModel model)
+        {
+            model.Id = entity.Id;
+            model.Title = entity.Title;
+            model.When = entity.When;
+            model.Text = entity.Text;
+        }
+
+        private void MapModelToEntity(EntryModel model, Entry entity)
+        {
+            entity.Id = model.Id;
+            entity.Title = model.Title;
+            entity.When = model.When;
+            entity.Text = model.Text;
         }
     }
 }
