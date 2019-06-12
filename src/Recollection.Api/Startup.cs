@@ -57,7 +57,11 @@ namespace Neptuo.Recollection
         {
             app.UseCors(p =>
             {
+#if DEBUG
                 p.WithOrigins("http://localhost:33881");
+#else
+                p.WithOrigins("https://app.recollections.neptuo.com");
+#endif
                 p.AllowAnyMethod();
                 p.AllowCredentials();
                 p.AllowAnyHeader();
