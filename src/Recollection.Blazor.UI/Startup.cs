@@ -36,7 +36,14 @@ namespace Neptuo.Recollection
             entries.ConfigureServices(services);
         }
 
-        private static string Resolve(string appRelative) => $"http://localhost:33880/api{appRelative}";
+        private static string Resolve(string appRelative)
+        {
+#if DEBUG
+            return $"http://localhost:33880/api{appRelative}";
+#else
+            return $"https://api.recollections.neptuo.com/api{appRelative}";
+#endif
+        }
 
         public void Configure(IComponentsApplicationBuilder app)
         {
