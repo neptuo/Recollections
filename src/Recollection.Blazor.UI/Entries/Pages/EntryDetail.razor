@@ -14,6 +14,9 @@
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
         </div>
+        <div class="images">
+            <FileUpload />
+        </div>
 
         <div class="actions">
             <button type="button" class="btn btn-sm btn-danger" onclick="@(() => DeleteAsync())" title="Delete Entry">

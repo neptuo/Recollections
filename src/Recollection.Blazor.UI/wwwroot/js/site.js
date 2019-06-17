@@ -41,3 +41,18 @@ window.Recollection = {
         return null;
     }
 };
+
+window.FileUpload = {
+    Initialize: function (formId) {
+        var form = $("#" + formId);
+        var input = form.find("input[type=file]");
+        form.find("button").click(function (e) {
+            input.click();
+            e.preventDefault();
+        });
+        input.change(function () {
+            var files = input[0].files;
+            alert("Selected " + files.length + " files");
+        });
+    }
+}

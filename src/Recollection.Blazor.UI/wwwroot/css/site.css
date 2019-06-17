@@ -50,6 +50,9 @@
 .inline-editor-viewmode:hover .oi {
   display: inline-block; }
 
+.file-upload input[type=file] {
+  display: none; }
+
 .component-login form {
   width: 100%;
   max-width: 330px;
@@ -104,6 +107,8 @@
   padding: 24px;
   margin: 24px 0; }
   .entry-detail .text {
+    margin: 24px 0; }
+  .entry-detail .images {
     margin: 24px 0; }
   .entry-detail .placeholder {
     color: #aaaaaa; }

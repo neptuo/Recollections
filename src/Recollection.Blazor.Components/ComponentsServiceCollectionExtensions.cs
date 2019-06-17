@@ -1,4 +1,6 @@
-﻿using Neptuo;
+﻿using Microsoft.Extensions.DependencyInjection.Extensions;
+using Neptuo;
+using Neptuo.Identifiers;
 using Neptuo.Recollection.Components;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,11 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddComponents(this IServiceCollection services)
         {
             Ensure.NotNull(services, "services");
-            return services.AddSingleton<ModalNative>();
+            services.AddSingleton<ModalNative>();
+            services.AddSingleton<FileUploadInterop>();
+            services.TryAdd(ServiceDescriptor.Singleton<IUniqueNameProvider, GuidUniqueNameProvider>());
+
+            return services;
         }
     }
 }
