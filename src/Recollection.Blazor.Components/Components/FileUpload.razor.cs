@@ -17,6 +17,9 @@ namespace Neptuo.Recollection.Components
         [Inject]
         protected IUniqueNameProvider NameProvider { get; set; }
 
+        [Parameter]
+        protected string Url { get; set; }
+
         protected string FormId {get;private set; }
 
         protected override void OnInit()

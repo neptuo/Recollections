@@ -37,5 +37,7 @@ namespace Neptuo.Recollection.Entries
 
         public Task<EntryModel> GetDetailAsync(string entryId)
             => http.GetJsonAsync<EntryModel>(urlResolver($"/entries/{entryId}"));
+
+        public string ImageUploadUrl(string entryId) => urlResolver($"/entries/{entryId}/images");
     }
 }

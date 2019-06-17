@@ -15,7 +15,7 @@
             <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
         </div>
         <div class="images">
-            <FileUpload />
+            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" />
         </div>
 
         <div class="actions">

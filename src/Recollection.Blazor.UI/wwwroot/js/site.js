@@ -46,13 +46,62 @@ window.FileUpload = {
     Initialize: function (formId) {
         var form = $("#" + formId);
         var input = form.find("input[type=file]");
+
+        var uploadIndex = -1;
+        function uploadStep() {
+            uploadIndex++;
+
+            var files = input[0].files;
+            if (files.length > uploadIndex) {
+                FileUpload.UploadFile(files[uploadIndex], form[0].action, uploadStep, uploadStep);
+            }
+            else {
+                uploadIndex = -1;
+                form[0].reset();
+                // TODO: Raise completed.
+            }
+        }
+
         form.find("button").click(function (e) {
             input.click();
             e.preventDefault();
         });
         input.change(function () {
-            var files = input[0].files;
-            alert("Selected " + files.length + " files");
+            uploadStep();
         });
+    },
+    UploadFile: function(file, url, onCompleted, onError, onProgress) {
+        var formData = new FormData();
+        formData.append("file", file, file.customName || file.name);
+
+        var currentRequest = new XMLHttpRequest();
+        currentRequest.onreadystatechange = function (e) {
+            var request = e.target;
+
+            if (request.readyState == XMLHttpRequest.DONE) {
+                if (request.status == 200) {
+                    var responseText = currentRequest.responseText;
+                    onCompleted(responseText);
+                }
+                else if (onError != null) {
+                    onError(currentRequest.status, currentRequest.statusText);
+                }
+            }
+        };
+
+        if (onError != null) {
+            currentRequest.onerror = function (e) {
+                onError(500, e.message);
+            };
+        }
+
+        if (onProgress != null) {
+            currentRequest.upload.onprogress = function (e) {
+                onProgress(e.loaded, e.total);
+            };
+        }
+
+        currentRequest.open("POST", url);
+        currentRequest.send(formData);
     }
 }
