@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <RootNamespace>Neptuo.Recollection.Accounts</RootNamespace>
+    <RootNamespace>Neptuo.Recollections.Accounts</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Accounts
+namespace Neptuo.Recollections.Accounts
 {
     public class Api
     {

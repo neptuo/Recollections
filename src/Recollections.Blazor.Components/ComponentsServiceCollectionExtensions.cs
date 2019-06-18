@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Neptuo;
 using Neptuo.Identifiers;
-using Neptuo.Recollection.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;

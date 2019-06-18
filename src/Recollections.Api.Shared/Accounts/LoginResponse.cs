@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Accounts
+namespace Neptuo.Recollections.Accounts
 {
     public class LoginResponse
     {

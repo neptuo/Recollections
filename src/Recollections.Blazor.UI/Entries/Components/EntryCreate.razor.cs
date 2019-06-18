@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Entries.Components
+namespace Neptuo.Recollections.Entries.Components
 {
     public class EntryCreateModel : ComponentBase
     {

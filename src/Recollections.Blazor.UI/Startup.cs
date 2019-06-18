@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Neptuo.Activators;
-using Neptuo.Recollection.Accounts;
-using Neptuo.Recollection.Components;
-using Neptuo.Recollection.Entries;
+using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection
+namespace Neptuo.Recollections
 {
     public class Startup
     {

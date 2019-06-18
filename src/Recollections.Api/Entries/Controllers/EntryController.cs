@@ -8,7 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Entries.Controllers
+namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/entries")]

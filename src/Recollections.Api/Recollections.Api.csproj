@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <RootNamespace>Neptuo.Recollection</RootNamespace>
-    <StartupObject>Neptuo.Recollection.Program</StartupObject>
+    <RootNamespace>Neptuo.Recollections</RootNamespace>
+    <StartupObject>Neptuo.Recollections.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

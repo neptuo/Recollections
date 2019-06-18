@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Entries.Controllers
+namespace Neptuo.Recollections.Entries.Controllers
 {
     [Authorize]
     [Route("api/timeline/[action]")]

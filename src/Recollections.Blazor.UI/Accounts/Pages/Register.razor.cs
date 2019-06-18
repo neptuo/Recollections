@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Accounts.Pages
+namespace Neptuo.Recollections.Accounts.Pages
 {
     public class RegisterModel : ComponentBase
     {

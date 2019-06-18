@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Neptuo.Recollection.Accounts.Components;
+using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Accounts.Pages
+namespace Neptuo.Recollections.Accounts.Pages
 {
     public class MeModel : ComponentBase
     {

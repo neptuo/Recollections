@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Entries
+namespace Neptuo.Recollections.Entries
 {
     public class Api
     {

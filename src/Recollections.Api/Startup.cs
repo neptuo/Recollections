@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Neptuo;
-using Neptuo.Recollection.Accounts;
-using Neptuo.Recollection.Entries;
+using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Entries;
 
-namespace Neptuo.Recollection
+namespace Neptuo.Recollections
 {
     public delegate string PathResolver(string relativePath);
 

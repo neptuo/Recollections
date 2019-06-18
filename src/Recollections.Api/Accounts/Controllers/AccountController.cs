@@ -13,7 +13,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Accounts.Controllers
+namespace Neptuo.Recollections.Accounts.Controllers
 {
     [Route("api/accounts/[action]")]
     public class AccountController : ControllerBase

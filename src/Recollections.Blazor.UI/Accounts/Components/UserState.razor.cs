@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Accounts.Components
+namespace Neptuo.Recollections.Accounts.Components
 {
     public class UserStateModel : ComponentBase
     {

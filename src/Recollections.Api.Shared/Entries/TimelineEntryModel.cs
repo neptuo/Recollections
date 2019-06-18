@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Entries
+namespace Neptuo.Recollections.Entries
 {
     public class TimelineEntryModel
     {

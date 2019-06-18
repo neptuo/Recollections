@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Components
+namespace Neptuo.Recollections.Components
 {
     public class FileUploadModel : ComponentBase
     {

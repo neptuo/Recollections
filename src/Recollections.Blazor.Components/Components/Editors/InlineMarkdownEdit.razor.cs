@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollection.Components.Editors
+namespace Neptuo.Recollections.Components.Editors
 {
     public class InlineMarkdownEditModel : InlineEditModel<string>
     {
