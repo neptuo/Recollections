@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Api", "src\Recollection.Api\Recollection.Api.csproj", "{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Api", "src\Recollections.Api\Recollections.Api.csproj", "{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Blazor.UI", "src\Recollection.Blazor.UI\Recollection.Blazor.UI.csproj", "{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Blazor.UI", "src\Recollections.Blazor.UI\Recollections.Blazor.UI.csproj", "{9B459D4B-0452-4A94-BDCE-2C91C4AC3D1E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Api.Shared", "src\Recollection.Api.Shared\Recollection.Api.Shared.csproj", "{C09BF6A4-63DF-4175-BB6E-4045E52476D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Api.Shared", "src\Recollections.Api.Shared\Recollections.Api.Shared.csproj", "{C09BF6A4-63DF-4175-BB6E-4045E52476D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Accounts.Data", "src\Recollection.Accounts.Data\Recollection.Accounts.Data.csproj", "{E618BA46-81C5-4CEA-80F4-630988A0EEEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Accounts.Data", "src\Recollections.Accounts.Data\Recollections.Accounts.Data.csproj", "{E618BA46-81C5-4CEA-80F4-630988A0EEEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollection.Entries.Data", "src\Recollection.Entries.Data\Recollection.Entries.Data.csproj", "{FE8E9370-78C4-4787-98F5-EACE029CE4DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Entries.Data", "src\Recollections.Entries.Data\Recollections.Entries.Data.csproj", "{FE8E9370-78C4-4787-98F5-EACE029CE4DE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{878840AE-DD42-49B3-A130-F606F16D7D38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollection.Blazor.Components", "src\Recollection.Blazor.Components\Recollection.Blazor.Components.csproj", "{59EC1693-4D39-420E-A758-41A6C42C6917}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Blazor.Components", "src\Recollections.Blazor.Components\Recollections.Blazor.Components.csproj", "{59EC1693-4D39-420E-A758-41A6C42C6917}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
