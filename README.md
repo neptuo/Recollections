@@ -1,4 +1,4 @@
-# Recollection
+# Recollections
 Manage your recollections
 
 ## Docker
