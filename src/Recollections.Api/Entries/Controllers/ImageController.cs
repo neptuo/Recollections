@@ -54,12 +54,22 @@ namespace Neptuo.Recollections.Entries.Controllers
             string imageId = Guid.NewGuid().ToString();
             string imageName = imageId + Path.GetExtension(file.FileName);
 
+            Image entity = new Image()
+            {
+                Id = imageId,
+                FileName = imageName,
+                Entry = entry
+            };
+
+            await dataContext.Images.AddAsync(entity);
+
             string storagePath = GetStoragePath(entry);
             string path = Path.Combine(storagePath, imageName);
 
             await CopyFileAsync(file, path);
+            await dataContext.SaveChangesAsync();
 
-            return base.Ok();
+            return base.Ok(new ImageModel(entity.Id, null, entity.Name, entity.Description));
         });
 
         private static async Task CopyFileAsync(IFormFile file, string path)
