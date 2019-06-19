@@ -31,13 +31,16 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             Ensure.NotNullOrEmpty(id, "id");
 
-            string userId = FindUserId();
+            string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
 
             Entry entity = await dataContext.Entries.FindAsync(id);
             if (entity == null)
                 return NotFound();
+
+            if (entity.UserId != userId)
+                return Unauthorized();
 
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
@@ -48,7 +51,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EntryModel model)
         {
-            string userId = FindUserId();
+            string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
 
@@ -66,7 +69,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<EntryModel>> Update(string id, EntryModel model)
         {
-            string userId = FindUserId();
+            string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
 
@@ -91,7 +94,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            string userId = FindUserId();
+            string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
 
@@ -106,15 +109,6 @@ namespace Neptuo.Recollections.Entries.Controllers
             await dataContext.SaveChangesAsync();
 
             return Ok();
-        }
-
-        private string FindUserId()
-        {
-            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (String.IsNullOrEmpty(userId))
-                return null;
-
-            return userId;
         }
 
         private void MapEntityToModel(Entry entity, EntryModel model)
