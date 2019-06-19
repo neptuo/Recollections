@@ -15,6 +15,14 @@
             <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
         </div>
         <div class="images">
+            @if (Images != null)
+            {
+                foreach (var image in Images)
+                {
+                    <img src="@Api.ResolveUrl(image.Preview)" height="100" />
+                }
+            }
+
             <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" />
         </div>
 

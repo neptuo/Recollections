@@ -27,6 +27,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected string EntryId { get; set; }
 
         protected EntryModel Model { get; set; }
+        protected List<ImageModel> Images { get; set; }
 
         protected async override Task OnInitAsync()
         {
@@ -34,6 +35,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await UserState.EnsureAuthenticated();
 
             Model = await Api.GetDetailAsync(EntryId);
+            Images = await Api.GetImagesAsync(EntryId);
         }
 
         protected async Task SaveTitleAsync(string value)

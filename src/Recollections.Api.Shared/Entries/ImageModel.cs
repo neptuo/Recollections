@@ -10,7 +10,8 @@ namespace Neptuo.Recollections.Entries
     public class ImageModel
     {
         public string Id { get; set; }
-        public string Link { get; set; }
+
+        public string Preview { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
@@ -21,7 +22,7 @@ namespace Neptuo.Recollections.Entries
         public ImageModel(string id, string link, string name, string description)
         {
             Id = id;
-            Link = link;
+            Preview = link;
 
             Name = name;
             Description = description;
