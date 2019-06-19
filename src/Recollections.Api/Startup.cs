@@ -34,6 +34,7 @@ namespace Neptuo.Recollections
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<PathResolver>(ResolvePath);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             accountsStartup.ConfigureServices(services);
             entriesStartup.ConfigureServices(services);

@@ -28,7 +28,8 @@ namespace Neptuo.Recollections.Entries
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))));
+                .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
+                .Configure<StorageOptions>(configuration.GetSection("Storage"));
 
             EnsureDatabase(services);
         }
