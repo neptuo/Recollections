@@ -18,7 +18,7 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public Task InitializeAsync(string id)
-            => jsRuntime.InvokeAsync<bool>("FileUpload.Initialize", id);
+        public Task InitializeAsync(string id, string bearerToken)
+            => jsRuntime.InvokeAsync<bool>("FileUpload.Initialize", id, bearerToken);
     }
 }

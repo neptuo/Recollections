@@ -43,7 +43,7 @@ window.Recollection = {
 };
 
 window.FileUpload = {
-    Initialize: function (formId) {
+    Initialize: function (formId, bearerToken) {
         var form = $("#" + formId);
         var input = form.find("input[type=file]");
 
@@ -53,7 +53,7 @@ window.FileUpload = {
 
             var files = input[0].files;
             if (files.length > uploadIndex) {
-                FileUpload.UploadFile(files[uploadIndex], form[0].action, uploadStep, uploadStep);
+                FileUpload.UploadFile(files[uploadIndex], form[0].action, bearerToken, uploadStep, uploadStep);
             }
             else {
                 uploadIndex = -1;
@@ -70,7 +70,7 @@ window.FileUpload = {
             uploadStep();
         });
     },
-    UploadFile: function(file, url, onCompleted, onError, onProgress) {
+    UploadFile: function(file, url, bearerToken, onCompleted, onError, onProgress) {
         var formData = new FormData();
         formData.append("file", file, file.customName || file.name);
 
@@ -102,6 +102,11 @@ window.FileUpload = {
         }
 
         currentRequest.open("POST", url);
+
+        if (bearerToken != null) {
+            currentRequest.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        }
+
         currentRequest.send(formData);
     }
 }

@@ -20,6 +20,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         protected string Url { get; set; }
 
+        [Parameter]
+        protected string BearerToken { get; set; }
+
         protected string FormId {get;private set; }
 
         protected override void OnInit()
@@ -31,7 +34,7 @@ namespace Neptuo.Recollections.Components
         protected async override Task OnAfterRenderAsync()
         {
             await base.OnAfterRenderAsync();
-            await Interop.InitializeAsync(FormId);
+            await Interop.InitializeAsync(FormId, BearerToken);
         }
     }
 }
