@@ -11,6 +11,7 @@ namespace Neptuo.Recollections.Components
     public class FileUploadInterop
     {
         private readonly IJSRuntime jsRuntime;
+        private static Dictionary<string, FileUploadModel> models = new Dictionary<string, FileUploadModel>();
 
         public FileUploadInterop(IJSRuntime jsRuntime)
         {
@@ -18,7 +19,28 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public Task InitializeAsync(string id, string bearerToken)
-            => jsRuntime.InvokeAsync<bool>("FileUpload.Initialize", id, bearerToken);
+        public Task InitializeAsync(FileUploadModel model, string bearerToken)
+        {
+            Console.WriteLine($"Add file upload form {model.FormId}");
+            models.Add(model.FormId, model);
+            return jsRuntime.InvokeAsync<bool>("FileUpload.Initialize", model.FormId, bearerToken);
+        }
+
+        [JSInvokable]
+        public static void FileUpload_OnCompleted(string id)
+        {
+            Console.WriteLine($"FileUpload_OnCompleted, FormId: {id}");
+            if (models.TryGetValue(id, out FileUploadModel model))
+            {
+                Console.WriteLine("Model found");
+                model.OnCompleted();
+            }
+        }
+
+        public void Destroy(FileUploadModel model)
+        {
+            Console.WriteLine($"Destroy file upload form {model.FormId}");
+            models.Remove(model.FormId);
+        }
     }
 }

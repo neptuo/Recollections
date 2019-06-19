@@ -6,7 +6,7 @@
                 $(e.currentTarget).find('[data-autofocus]').select().focus();
             });
             target.on('hidden.bs.modal', function (e) {
-                DotNet.invokeMethodAsync("Recollection.Blazor.UI", "Bootstrap_ModalHidden", e.currentTarget.id);
+                DotNet.invokeMethodAsync("Recollections.Blazor.Components", "Bootstrap_ModalHidden", e.currentTarget.id);
             });
 
             return true;
@@ -20,7 +20,7 @@
     }
 };
 
-window.Recollection = {
+window.Recollections = {
     NavigateTo: function (href) {
         window.location.href = href;
         return true;
@@ -58,7 +58,7 @@ window.FileUpload = {
             else {
                 uploadIndex = -1;
                 form[0].reset();
-                // TODO: Raise completed.
+                DotNet.invokeMethodAsync("Recollections.Blazor.Components", "FileUpload_OnCompleted", formId);
             }
         }
 

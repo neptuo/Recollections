@@ -23,7 +23,7 @@
                 }
             }
 
-            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" />
+            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Completed="@(() => OnUploadCompletedAsync())" />
         </div>
 
         <div class="actions">

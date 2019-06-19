@@ -35,6 +35,11 @@ namespace Neptuo.Recollections.Entries.Pages
             await UserState.EnsureAuthenticated();
 
             Model = await Api.GetDetailAsync(EntryId);
+            await LoadImagesAsync();
+        }
+
+        private async Task LoadImagesAsync()
+        {
             Images = await Api.GetImagesAsync(EntryId);
         }
 
@@ -57,6 +62,12 @@ namespace Neptuo.Recollections.Entries.Pages
         }
 
         private Task SaveAsync() => Api.UpdateAsync(Model);
+
+        protected async Task OnUploadCompletedAsync()
+        {
+            await LoadImagesAsync();
+            StateHasChanged();
+        }
 
         public async Task DeleteAsync()
         {

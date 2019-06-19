@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class FileUploadModel : ComponentBase
+    public class FileUploadModel : ComponentBase, IDisposable
     {
         [Inject]
         protected FileUploadInterop Interop { get; set; }
@@ -23,7 +23,10 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         protected string BearerToken { get; set; }
 
-        protected string FormId {get;private set; }
+        [Parameter]
+        protected Action Completed { get; set; }
+
+        public string FormId { get; private set; }
 
         protected override void OnInit()
         {
@@ -34,7 +37,18 @@ namespace Neptuo.Recollections.Components
         protected async override Task OnAfterRenderAsync()
         {
             await base.OnAfterRenderAsync();
-            await Interop.InitializeAsync(FormId, BearerToken);
+            await Interop.InitializeAsync(this, BearerToken);
+        }
+
+        internal void OnCompleted()
+        {
+            Console.WriteLine("FileUploadModel.OnCompleted");
+            Completed?.Invoke();
+        }
+
+        public void Dispose()
+        {
+            Interop.Destroy(this);
         }
     }
 }
