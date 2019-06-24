@@ -110,5 +110,15 @@
     margin: 24px 0; }
   .entry-detail .images {
     margin: 24px 0; }
+    .entry-detail .images .image {
+      display: flex;
+      align-items: center;
+      padding-top: 15px;
+      padding-bottom: 15px; }
+      .entry-detail .images .image img {
+        max-width: 100%;
+        max-height: 160px;
+        display: block;
+        margin: 0 auto; }
   .entry-detail .placeholder {
     color: #aaaaaa; }
