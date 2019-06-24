@@ -32,7 +32,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitAsync()
         {
             await base.OnInitAsync();
-            await UserState.EnsureAuthenticated();
+            await UserState.EnsureAuthenticatedAsync();
 
             Model = await Api.GetDetailAsync(EntryId);
             await LoadImagesAsync();

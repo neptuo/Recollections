@@ -30,7 +30,7 @@ namespace Neptuo.Recollections.Accounts.Pages
             ChangePassword = new ChangePasswordViewModel(Api);
 
             await base.OnInitAsync();
-            await UserState.EnsureAuthenticated();
+            await UserState.EnsureAuthenticatedAsync();
 
             Console.WriteLine("Me.GetDetail");
             UserDetailResponse response = await Api.GetDetailAsync();

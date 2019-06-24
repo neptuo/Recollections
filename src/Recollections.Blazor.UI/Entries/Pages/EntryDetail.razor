@@ -27,7 +27,9 @@
                             var image = Images[row * columns + column];
 
                             <div class="col-2 image">
-                                <img src="@Api.ResolveUrl(image.Preview)" />
+                                <a href="@Navigator.UrlImageDetail(Model.Id, image.Id)">
+                                    <img src="@Api.ResolveUrl(image.Preview)" />
+                                </a>
                             </div>
                         }
                     </div>

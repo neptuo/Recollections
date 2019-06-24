@@ -115,10 +115,23 @@
       align-items: center;
       padding-top: 15px;
       padding-bottom: 15px; }
-      .entry-detail .images .image img {
-        max-width: 100%;
-        max-height: 160px;
+      .entry-detail .images .image a {
         display: block;
         margin: 0 auto; }
+      .entry-detail .images .image img {
+        max-width: 100%;
+        max-height: 160px; }
   .entry-detail .placeholder {
     color: #aaaaaa; }
+
+.image-detail {
+  padding: 24px;
+  margin: 24px 0; }
+  .image-detail .image {
+    display: flex;
+    align-items: center; }
+    .image-detail .image img {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+      margin: 0 auto; }

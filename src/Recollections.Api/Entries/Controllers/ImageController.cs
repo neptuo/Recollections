@@ -66,6 +66,19 @@ namespace Neptuo.Recollections.Entries.Controllers
             return Ok(result);
         });
 
+        [HttpGet("{imageId}")]
+        public Task<IActionResult> Detail(string entryId, string imageId) => RunEntryAsync(entryId, async entry =>
+        {
+            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            if (entity == null)
+                return NotFound();
+
+            var model = new ImageModel();
+            MapEntityToModel(entity, model);
+
+            return Ok(model);
+        });
+
         [HttpGet("{imageId}/preview")]
         public async Task<IActionResult> FileContent(string entryId, string imageId)
         {

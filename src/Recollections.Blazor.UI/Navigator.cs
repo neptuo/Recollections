@@ -36,5 +36,11 @@ namespace Neptuo.Recollections
 
         public void OpenEntryDetail(string entryId)
             => uri.NavigateTo(UrlEntryDetail(entryId));
+
+        public string UrlImageDetail(string entryId, string imageId)
+            => $"/entry/{entryId}/image/{imageId}";
+
+        public void OpenImageDetail(string entryId, string imageId)
+            => uri.NavigateTo(UrlImageDetail(entryId, imageId));
     }
 }

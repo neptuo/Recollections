@@ -41,6 +41,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<ImageModel>> GetImagesAsync(string entryId)
             => http.GetJsonAsync<List<ImageModel>>(urlResolver($"/entries/{entryId}/images"));
 
+        public Task<ImageModel> GetImageAsync(string entryId, string imageId)
+            => http.GetJsonAsync<ImageModel>(urlResolver($"/entries/{entryId}/images/{imageId}"));
+
         public string ImageUploadUrl(string entryId) => urlResolver($"/entries/{entryId}/images");
 
         public string ResolveUrl(string relativeUrl) => urlResolver(relativeUrl).Replace("apiapi", "api");

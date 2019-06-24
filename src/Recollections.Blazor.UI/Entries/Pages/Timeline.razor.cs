@@ -35,7 +35,7 @@ namespace Neptuo.Recollections.Entries.Pages
             Console.WriteLine("Timeline.Init");
 
             await base.OnInitAsync();
-            await UserState.EnsureAuthenticated();
+            await UserState.EnsureAuthenticatedAsync();
 
             Console.WriteLine("Timeline.Load");
             await LoadAsync();

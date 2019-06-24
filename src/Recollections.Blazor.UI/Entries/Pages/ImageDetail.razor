@@ -1,0 +1,11 @@
+﻿@page "/entry/{EntryId}/image/{ImageId}"
+@inherits ImageDetailModel
+
+@if (Model != null)
+{
+    <div class="image-detail">
+        <div class="image">
+            <img src="@Api.ResolveUrl(Model.Preview)" />
+        </div>
+    </div>
+}

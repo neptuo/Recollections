@@ -127,6 +127,6 @@ namespace Neptuo.Recollections.Accounts.Components
             return Task.FromResult(true);
         }
 
-        public Task EnsureAuthenticated() => authenticationSource.Task;
+        public Task EnsureAuthenticatedAsync() => authenticationSource.Task;
     }
 }
