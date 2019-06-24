@@ -127,6 +127,8 @@
 .image-detail {
   padding: 24px;
   margin: 24px 0; }
+  .image-detail .text {
+    margin: 24px 0; }
   .image-detail .image {
     margin: 24px 0;
     display: flex;
@@ -136,3 +138,5 @@
       max-height: 100%;
       display: block;
       margin: 0 auto; }
+  .image-detail .placeholder {
+    color: #aaaaaa; }

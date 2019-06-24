@@ -44,6 +44,9 @@ namespace Neptuo.Recollections.Entries
         public Task<ImageModel> GetImageAsync(string entryId, string imageId)
             => http.GetJsonAsync<ImageModel>(urlResolver($"/entries/{entryId}/images/{imageId}"));
 
+        public Task UpdateImageAsync(string entryId, ImageModel model)
+            => http.PutJsonAsync(urlResolver($"/entries/{entryId}/images/{model.Id}"), model);
+
         public Task DeleteImageAsync(string entryId, string imageId)
             => http.DeleteAsync(urlResolver($"/entries/{entryId}/images/{imageId}"));
 

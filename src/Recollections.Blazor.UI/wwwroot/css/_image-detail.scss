@@ -2,9 +2,12 @@
     padding: 24px;
     margin: 24px 0;
 
+    .text {
+        margin: 24px 0;
+    }
+
     .image {
         margin: 24px 0;
-
         display: flex;
         align-items: center;
 
@@ -14,5 +17,9 @@
             display: block;
             margin: 0 auto;
         }
+    }
+
+    .placeholder {
+        color: $placeholder-color;
     }
 }

@@ -125,6 +125,21 @@ namespace Neptuo.Recollections.Entries.Controllers
             return base.Ok(model);
         });
 
+        [HttpPut("{imageId}")]
+        public Task<IActionResult> Update(string entryId, string imageId, ImageModel model) => RunEntryAsync(entryId, async entry =>
+        {
+            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            if (entity == null)
+                return NotFound();
+
+            MapModelToEntity(model, entity);
+
+            dataContext.Images.Update(entity);
+            await dataContext.SaveChangesAsync();
+
+            return NoContent();
+        });
+
         [HttpDelete("{imageId}")]
         public Task<IActionResult> Delete(string entryId, string imageId) => RunEntryAsync(entryId, async entry =>
         {
@@ -164,6 +179,12 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Description = entity.Description;
 
             model.Preview = $"api/entries/{entity.Entry.Id}/images/{entity.Id}/preview";
+        }
+
+        private void MapModelToEntity(ImageModel model, Image entity)
+        {
+            entity.Name = model.Name;
+            entity.Description = model.Description;
         }
     }
 }

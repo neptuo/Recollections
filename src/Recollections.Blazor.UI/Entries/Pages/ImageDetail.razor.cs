@@ -36,6 +36,20 @@ namespace Neptuo.Recollections.Entries.Pages
             Model = await Api.GetImageAsync(EntryId, ImageId);
         }
 
+        protected async Task SaveNameAsync(string value)
+        {
+            Model.Name = value;
+            await SaveAsync();
+        }
+
+        protected async Task SaveDescriptionAsync(string value)
+        {
+            Model.Description = value;
+            await SaveAsync();
+        }
+
+        private Task SaveAsync() => Api.UpdateImageAsync(EntryId, Model);
+
         protected async Task DeleteAsync()
         {
             if (await Navigator.AskAsync($"Do you really want to delete this image?"))
