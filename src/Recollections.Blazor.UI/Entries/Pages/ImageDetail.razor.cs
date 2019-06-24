@@ -11,6 +11,12 @@ namespace Neptuo.Recollections.Entries.Pages
 {
     public class ImageDetailModel : ComponentBase
     {
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
+        [Inject]
+        protected Api Api { get; set; }
+
         [Parameter]
         protected string EntryId { get; set; }
 
@@ -20,9 +26,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
-        [Inject]
-        protected Api Api { get; set; }
-
         protected ImageModel Model { get; set; }
 
         protected async override Task OnInitAsync()
@@ -31,6 +34,15 @@ namespace Neptuo.Recollections.Entries.Pages
             await UserState.EnsureAuthenticatedAsync();
 
             Model = await Api.GetImageAsync(EntryId, ImageId);
+        }
+
+        protected async Task DeleteAsync()
+        {
+            if (await Navigator.AskAsync($"Do you really want to delete this image?"))
+            {
+                await Api.DeleteImageAsync(EntryId, ImageId);
+                Navigator.OpenEntryDetail(EntryId);
+            }
         }
     }
 }

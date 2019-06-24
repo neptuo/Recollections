@@ -128,6 +128,7 @@
   padding: 24px;
   margin: 24px 0; }
   .image-detail .image {
+    margin: 24px 0;
     display: flex;
     align-items: center; }
     .image-detail .image img {

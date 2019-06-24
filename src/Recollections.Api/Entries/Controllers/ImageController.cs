@@ -125,6 +125,24 @@ namespace Neptuo.Recollections.Entries.Controllers
             return base.Ok(model);
         });
 
+        [HttpDelete("{imageId}")]
+        public Task<IActionResult> Delete(string entryId, string imageId) => RunEntryAsync(entryId, async entry =>
+        {
+            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            if (entity == null)
+                return NotFound();
+
+            string storagePath = GetStoragePath(entry);
+            string path = Path.Combine(storagePath, entity.FileName);
+
+            dataContext.Images.Remove(entity);
+            await dataContext.SaveChangesAsync();
+
+            IoFile.Delete(path);
+
+            return Ok();
+        });
+
         private static async Task CopyFileAsync(IFormFile file, string path)
         {
             using (FileStream target = IoFile.Create(path))
