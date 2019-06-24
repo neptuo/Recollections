@@ -19,12 +19,23 @@
             {
                 var columns = 6;
                 var rows = Images.Count / columns;
+                if ((Images.Count % columns) > 0)
+                {
+                    rows++;
+                }
+
                 for (int row = 0; row < rows; row++)
                 {
                     <div class="row">
                         @for (int column = 0; column < columns; column++)
                         {
-                            var image = Images[row * columns + column];
+                            var index = row * columns + column;
+                            if (index >= Images.Count)
+                            {
+                                break;
+                            }
+
+                            var image = Images[index];
 
                             <div class="col-2 image">
                                 <a href="@Navigator.UrlImageDetail(Model.Id, image.Id)">
