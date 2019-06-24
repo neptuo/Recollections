@@ -11,7 +11,9 @@ namespace Neptuo.Recollections.Entries
     {
         public string Id { get; set; }
 
+        public string Thumbnail { get; set; }
         public string Preview { get; set; }
+        public string Original{ get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }

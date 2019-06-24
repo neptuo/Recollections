@@ -179,6 +179,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Description = entity.Description;
 
             model.Preview = $"api/entries/{entity.Entry.Id}/images/{entity.Id}/preview";
+            model.Thumbnail = model.Preview;
+            model.Original = model.Preview;
         }
 
         private void MapModelToEntity(ImageModel model, Image entity)

@@ -7,11 +7,11 @@
         <h2 class="title">
             <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(value => SaveNameAsync(value))" />
         </h2>
-        <div class="image">
-            <img src="@Api.ResolveUrl(Model.Preview)" />
-        </div>
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description provided..." ValueChanged="@(value => SaveDescriptionAsync(value))" />
+        </div>
+        <div class="image">
+            <img src="@Api.ResolveUrl(Model.Preview)" />
         </div>
 
         <div class="actions">
