@@ -1,6 +1,6 @@
 ﻿@inherits InlineTextEditModel
 
-<span class="inline-editor @GetModeCssClass()">
+<div class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
         <form class="form-inline" onsubmit="@OnSaveValueAsync">
@@ -13,15 +13,16 @@
     else
     {
         <span class="inline-editor-value" onclick="@(() => IsEditMode = true)">
+            <Icon Identifier="pencil" />
+
             @if (String.IsNullOrEmpty(Value))
             {
-                <span class="placeholder">@(PlaceHolder ?? "No value...")</span>
+                <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else
             {
-                @Value
+                <span class="inline-editor-content">@Value</span>
             }
-            <Icon Identifier="pencil" />
         </span>
     }
-</span>
+</div>

@@ -13,15 +13,16 @@
     else
     {
         <span class="inline-editor-value" onclick="@(() => IsEditMode = true)">
+            <Icon Identifier="pencil" />
+
             @if (String.IsNullOrEmpty(Value))
             {
-                <span class="placeholder">@(PlaceHolder ?? "No value...")</span>
+                <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else
             {
-                @MarkdownValue
+                <span class="inline-editor-content">@MarkdownValue</span>
             }
-            <Icon Identifier="pencil" />
         </span>
     }
 </div>

@@ -34,7 +34,7 @@
     top: 19px;
     height: 26px; } }
 
-.inline-editor .oi {
+.inline-editor .oi-check {
   color: var(--green); }
 
 .inline-editor .form-control {
@@ -43,12 +43,22 @@
 .inline-editor textarea {
   min-height: 400px; }
 
-.inline-editor-viewmode .oi {
-  display: none;
-  color: #aaaaaa; }
+.inline-editor-viewmode .inline-editor-value {
+  position: relative; }
 
-.inline-editor-viewmode:hover .oi {
+.inline-editor-viewmode .oi-pencil {
+  display: none;
+  color: #aaaaaa;
+  font-size: 16px;
+  left: -24px;
+  position: absolute;
+  top: 2px; }
+
+.inline-editor-viewmode:hover .oi-pencil, .inline-editor-viewmode:active .oi-pencil {
   display: inline-block; }
+
+h2 .inline-editor-viewmode .oi {
+  top: 14px; }
 
 .file-upload input[type=file] {
   display: none; }

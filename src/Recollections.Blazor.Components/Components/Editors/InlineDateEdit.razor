@@ -1,6 +1,6 @@
 ﻿@inherits InlineDateEditModel
 
-<span class="inline-editor @GetModeCssClass()">
+<div class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
         <form class="form-inline" onsubmit="@OnSaveValueAsync">
@@ -12,16 +12,18 @@
     }
     else
     {
-        <span class="inline-editor-value" onclick="@(() => IsEditMode = true)">
+        <a class="inline-editor-value" onclick="@(() => IsEditMode = true)">
+            <Icon Identifier="pencil" />
+
+            <Icon Identifier="calendar" />
             @if (Value == DateTime.MinValue)
             {
-                <span class="placeholder">@(PlaceHolder ?? "No value...")</span>
+                <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else
             {
-                @Value.ToString(Format ?? "yyyy-MM-dd")
+                <span class="inline-editor-content">@Value.ToString(Format ?? "yyyy-MM-dd")</span>
             }
-            <Icon Identifier="pencil" />
-        </span>
+        </a>
     }
-</span>
+</div>

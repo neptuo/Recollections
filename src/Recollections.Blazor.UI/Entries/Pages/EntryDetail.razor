@@ -8,7 +8,6 @@
             <InlineTextEdit Value="@Model.Title" ValueChanged="@(value => SaveTitleAsync(value))" />
         </h2>
         <div class="datetime">
-            <Icon Identifier="calendar" />
             <InlineDateEdit Value="@Model.When" ValueChanged="@(value => SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
         </div>
         <div class="text">
