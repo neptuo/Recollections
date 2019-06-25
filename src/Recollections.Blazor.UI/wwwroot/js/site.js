@@ -121,7 +121,9 @@ window.InlineMarkdownEdit = {
         var editor = new SimpleMDE({
             element: document.getElementById(textAreaId),
             autofocus: true,
-            forceSync: true
+            forceSync: true,
+            spellChecker: false,
+            toolbar: ["heading-2", "heading-3", "|", "bold", "italic", "|", "unordered-list", "ordered-list", "|", "link", "quote", "horizontal-rule"]
         });
         InlineMarkdownEdit.editors[textAreaId] = editor;
     },

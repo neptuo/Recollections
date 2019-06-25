@@ -1,5 +1,9 @@
 ﻿@import "_colors.scss";
 
+blockquote {
+    color: $placeholder-color;
+}
+
 .clear {
     clear: both;
 }

@@ -1,4 +1,7 @@
-﻿.clear {
+﻿blockquote {
+  color: #aaaaaa; }
+
+.clear {
   clear: both; }
 
 .body-offset {
