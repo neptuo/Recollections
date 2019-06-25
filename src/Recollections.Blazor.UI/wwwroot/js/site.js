@@ -110,3 +110,35 @@ window.FileUpload = {
         currentRequest.send(formData);
     }
 }
+
+window.InlineMarkdownEdit = {
+    editors: {},
+    Initialize: function (textAreaId) {
+        if (InlineMarkdownEdit.editors[textAreaId] != null) {
+            return;
+        }
+
+        var editor = new SimpleMDE({
+            element: document.getElementById(textAreaId),
+            autofocus: true,
+            forceSync: true
+        });
+        InlineMarkdownEdit.editors[textAreaId] = editor;
+    },
+    Destroy: function (textAreaId) {
+        if (InlineMarkdownEdit.editors[textAreaId] != null) {
+            InlineMarkdownEdit.editors[textAreaId].toTextArea();
+            InlineMarkdownEdit.editors[textAreaId] = null;
+        }
+    },
+    SetValue: function (textAreaId, value) {
+        if (InlineMarkdownEdit.editors[textAreaId] != null) {
+            return InlineMarkdownEdit.editors[textAreaId].value(value);
+        }
+    },
+    GetValue: function (textAreaId) {
+        if (InlineMarkdownEdit.editors[textAreaId] != null) {
+            return InlineMarkdownEdit.editors[textAreaId].value();
+        }
+    }
+}

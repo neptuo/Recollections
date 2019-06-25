@@ -21,14 +21,17 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected bool IsEditMode { get; set; }
 
-        protected void OnSaveValue()
+        protected Task OnSaveValueAsync()
         {
             IsEditMode = false;
-            OnValueChanged();
+            return OnValueChangedAsync();
         }
 
-        protected virtual void OnValueChanged()
-            => ValueChanged?.Invoke(Value);
+        protected virtual Task OnValueChangedAsync()
+        {
+            ValueChanged?.Invoke(Value);
+            return Task.CompletedTask;
+        }
 
         protected string GetModeCssClass() 
             => IsEditMode ? String.Empty : "inline-editor-viewmode";

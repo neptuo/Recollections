@@ -3,7 +3,7 @@
 <span class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
-        <form class="form-inline" onsubmit="@OnSaveValue">
+        <form class="form-inline" onsubmit="@OnSaveValueAsync">
             <input type="text" class="form-control" bind="@Value" format-value="@Format" autofocus />
             <button class="btn btn-link">
                 <Icon Identifier="check" />

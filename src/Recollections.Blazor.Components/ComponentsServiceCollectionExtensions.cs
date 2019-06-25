@@ -2,6 +2,7 @@
 using Neptuo;
 using Neptuo.Identifiers;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Components.Editors;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
             Ensure.NotNull(services, "services");
             services.AddSingleton<ModalNative>();
             services.AddSingleton<FileUploadInterop>();
+            services.AddSingleton<InlineMarkdownEditInterop>();
             services.TryAdd(ServiceDescriptor.Singleton<IUniqueNameProvider, GuidUniqueNameProvider>());
 
             return services;

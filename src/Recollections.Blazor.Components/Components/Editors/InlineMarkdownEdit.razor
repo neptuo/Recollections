@@ -3,8 +3,8 @@
 <div class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
-        <form onsubmit="@OnSaveValue">
-            <textarea class="form-control" bind="@Value" />
+        <form onsubmit="@OnSaveValueAsync">
+            <textarea id="@TextAreaId" class="form-control" />
             <button type="submit" class="btn btn-link" title="Save changes">
                 <Icon Identifier="check" />
             </button>
