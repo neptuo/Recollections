@@ -1,11 +1,11 @@
 ﻿@inherits InlineMarkdownEditModel
 
-<div class="inline-editor @GetModeCssClass()">
+<div class="inline-editor inline-markdown @GetModeCssClass()">
     @if (IsEditMode)
     {
         <form onsubmit="@OnSaveValueAsync">
             <textarea id="@TextAreaId" class="form-control" />
-            <button type="submit" class="btn btn-link" title="Save changes">
+            <button type="submit" class="btn btn-link inline-submit" title="Save changes">
                 <Icon Identifier="check" />
             </button>
         </form>
@@ -17,6 +17,7 @@
 
             @if (String.IsNullOrEmpty(Value))
             {
+                
                 <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else

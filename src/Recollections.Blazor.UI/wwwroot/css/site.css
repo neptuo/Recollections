@@ -60,6 +60,9 @@
 h2 .inline-editor-viewmode .oi {
   top: 14px; }
 
+.inline-markdown .inline-submit {
+  margin-top: -60px; }
+
 .file-upload input[type=file] {
   display: none; }
 
