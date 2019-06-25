@@ -17,6 +17,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Api Api { get; set; }
 
+        [Inject]
+        protected UiOptions UiOptions { get; set; }
+
         [Parameter]
         protected string EntryId { get; set; }
 
@@ -45,6 +48,12 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task SaveDescriptionAsync(string value)
         {
             Model.Description = value;
+            await SaveAsync();
+        }
+
+        protected async Task SaveWhenAsync(DateTime value)
+        {
+            Model.When = value;
             await SaveAsync();
         }
 

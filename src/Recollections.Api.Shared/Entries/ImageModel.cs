@@ -17,17 +17,6 @@ namespace Neptuo.Recollections.Entries
 
         public string Name { get; set; }
         public string Description { get; set; }
-
-        public ImageModel()
-        { }
-
-        public ImageModel(string id, string link, string name, string description)
-        {
-            Id = id;
-            Preview = link;
-
-            Name = name;
-            Description = description;
-        }
+        public DateTime When { get; set; }
     }
 }

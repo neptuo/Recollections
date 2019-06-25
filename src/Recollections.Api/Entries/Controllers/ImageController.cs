@@ -109,6 +109,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             {
                 Id = imageId,
                 FileName = imageName,
+                Created = DateTime.Now,
+                When = DateTime.Now,
                 Entry = entry
             };
 
@@ -177,6 +179,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Id = entity.Id;
             model.Name = entity.Name;
             model.Description = entity.Description;
+            model.When = entity.When;
 
             model.Preview = $"api/entries/{entity.Entry.Id}/images/{entity.Id}/preview";
             model.Thumbnail = model.Preview;
@@ -187,6 +190,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             entity.Name = model.Name;
             entity.Description = model.Description;
+            entity.When = model.When;
         }
     }
 }
