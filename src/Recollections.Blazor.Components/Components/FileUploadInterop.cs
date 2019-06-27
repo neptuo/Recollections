@@ -22,8 +22,13 @@ namespace Neptuo.Recollections.Components
         public Task InitializeAsync(FileUploadModel model, string bearerToken)
         {
             Console.WriteLine($"Add file upload form {model.FormId}");
-            models.Add(model.FormId, model);
-            return jsRuntime.InvokeAsync<bool>("FileUpload.Initialize", model.FormId, bearerToken);
+            if (!models.ContainsKey(model.FormId))
+            {
+                models.Add(model.FormId, model);
+                return jsRuntime.InvokeAsync<bool>("FileUpload.Initialize", model.FormId, bearerToken);
+            }
+
+            return Task.CompletedTask;
         }
 
         [JSInvokable]
