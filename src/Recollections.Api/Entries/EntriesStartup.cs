@@ -44,6 +44,7 @@ namespace Neptuo.Recollections.Entries
                     var db = provider.GetService<DataContext>();
 
                     db.Database.EnsureCreated();
+                    db.Database.Migrate();
                 }
             }
             catch (Exception e)
