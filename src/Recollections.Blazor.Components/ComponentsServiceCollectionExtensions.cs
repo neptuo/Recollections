@@ -19,7 +19,8 @@ namespace Microsoft.Extensions.DependencyInjection
             Ensure.NotNull(services, "services");
             services.AddSingleton<ModalNative>();
             services.AddSingleton<FileUploadInterop>();
-            services.AddSingleton<InlineMarkdownEditInterop>();
+            services.AddTransient<InlineMarkdownEditInterop>();
+            services.AddTransient<InlineDateEditInterop>();
             services.TryAdd(ServiceDescriptor.Singleton<IUniqueNameProvider, GuidUniqueNameProvider>());
 
             return services;

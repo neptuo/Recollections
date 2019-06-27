@@ -4,7 +4,7 @@
     @if (IsEditMode)
     {
         <form class="form-inline" onsubmit="@OnSaveValueAsync">
-            <input type="text" class="form-control" bind="@Value" format-value="@Format" autofocus />
+            <input id="@InputId" type="text" class="form-control" bind="@Value" format-value="@Format" autofocus />
             <button class="btn btn-link">
                 <Icon Identifier="check" />
             </button>

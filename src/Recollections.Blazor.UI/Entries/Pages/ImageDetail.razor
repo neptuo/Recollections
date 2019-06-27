@@ -8,7 +8,7 @@
             <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(value => SaveNameAsync(value))" />
         </h2>
         <div class="datetime">
-            <InlineDateEdit Value="@Model.When" ValueChanged="@(value => SaveWhenAsync(value))" Format="@UiOptions.DateTimeFormat" />
+            <InlineDateEdit Value="@Model.When" ValueChanged="@(value => SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
         </div>
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description provided..." ValueChanged="@(value => SaveDescriptionAsync(value))" />
