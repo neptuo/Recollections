@@ -20,6 +20,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected UiOptions UiOptions { get; set; }
 
+        [Inject]
+        protected MarkdownConverter MarkdownConverter { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
         
@@ -53,6 +56,17 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             if (HasMore)
                 await LoadAsync();
+        }
+
+        protected MarkupString ConvertMarkdown(string text)
+        {
+            if (text == null)
+                return new MarkupString();
+
+            if (text.Length > UiOptions.TextPreviewLength)
+                text = text.Substring(0, UiOptions.TextPreviewLength - 3) + "...";
+
+            return new MarkupString(MarkdownConverter.Convert(text));
         }
     }
 }

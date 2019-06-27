@@ -18,6 +18,9 @@ namespace Neptuo.Recollections.Components.Editors
         [Inject]
         protected IUniqueNameProvider NameProvider { get; set; }
 
+        [Inject]
+        protected MarkdownConverter MarkdownConverter { get; set; }
+
         public string TextAreaId { get; private set; }
 
         private MarkupString? markdownValue;
@@ -73,7 +76,7 @@ namespace Neptuo.Recollections.Components.Editors
             if (String.IsNullOrEmpty(Value))
                 return Value;
 
-            string html = CommonMarkConverter.Convert(Value);
+            string html = MarkdownConverter.Convert(Value);
             return html;
         }
     }

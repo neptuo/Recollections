@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection.Extensions;
 using Neptuo;
 using Neptuo.Identifiers;
+using Neptuo.Recollections;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Components.Editors;
 using System;
@@ -21,6 +22,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<InlineDateEditInterop>();
+            services.AddTransient<MarkdownConverter>();
             services.TryAdd(ServiceDescriptor.Singleton<IUniqueNameProvider, GuidUniqueNameProvider>());
 
             return services;
