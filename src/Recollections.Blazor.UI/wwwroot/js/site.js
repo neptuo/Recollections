@@ -135,6 +135,10 @@ window.InlineMarkdownEdit = {
     },
     SetValue: function (textAreaId, value) {
         if (InlineMarkdownEdit.editors[textAreaId] != null) {
+            if (value == null) {
+                value = "";
+            }
+
             return InlineMarkdownEdit.editors[textAreaId].value(value);
         }
     },
