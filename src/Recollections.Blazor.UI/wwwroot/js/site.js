@@ -165,3 +165,20 @@ window.InlineDateEdit = {
         return $('#' + inputId).val();
     }
 }
+
+window.DatePicker = {
+    Initialize: function (inputId, format) {
+        $('#' + inputId).datepicker({
+            format: format.toLowerCase(),
+            autoclose: true,
+            todayHighlight: true,
+            todayBtn: "linked"
+        });
+    },
+    Destroy: function (inputId) {
+        $('#' + inputId).datepicker("destroy");
+    },
+    GetValue: function (inputId) {
+        return $('#' + inputId).val();
+    }
+}

@@ -13,7 +13,7 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineDateEditModel : InlineEditModel<DateTime>
     {
         [Inject]
-        protected InlineDateEditInterop Interop { get; set; }
+        protected DatePickerInterop Interop { get; set; }
 
         [Inject]
         protected IUniqueNameProvider NameProvider { get; set; }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,12 +19,17 @@ namespace Neptuo.Recollections.Entries.Components
         protected Navigator Navigator { get; set; }
 
         [Inject]
+        protected DatePickerInterop DatePickerInterop { get; set; }
+
+        [Inject]
         protected UiOptions UiOptions { get; set; }
 
         public string Title { get; set; }
         public DateTime When { get; set; }
 
         public List<string> ErrorMessages { get; } = new List<string>();
+
+        protected string WhenInputId { get; } = "entry-create-when";
 
         protected override void OnParametersSet()
         {
@@ -31,13 +38,30 @@ namespace Neptuo.Recollections.Entries.Components
             When = DateTime.Today;
         }
 
+        protected async override Task OnAfterRenderAsync()
+        {
+            await base.OnAfterRenderAsync();
+            await DatePickerInterop.InitializeAsync(WhenInputId, UiOptions.DateFormat);
+        }
+
         public async Task CreateAsync()
         {
+            await BindWhenFromUi();
+
             if (Validate())
             {
                 EntryModel model = await Api.CreateAsync(new EntryModel(Title, When));
                 Navigator.OpenEntryDetail(model.Id);
             }
+        }
+
+        private async Task BindWhenFromUi()
+        {
+            string rawWhen = await DatePickerInterop.GetValueAsync(WhenInputId);
+            if (DateTime.TryParseExact(rawWhen, UiOptions.DateFormat, CultureInfo.CurrentCulture, DateTimeStyles.None, out var when))
+                When = when;
+            else
+                When = DateTime.MinValue;
         }
 
         public bool Validate()

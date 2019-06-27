@@ -6,25 +6,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Components.Editors
+namespace Neptuo.Recollections.Components
 {
-    public class InlineDateEditInterop
+    public class DatePickerInterop
     {
         private readonly IJSRuntime jsRuntime;
 
-        public InlineDateEditInterop(IJSRuntime jsRuntime)
+        public DatePickerInterop(IJSRuntime jsRuntime)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
             this.jsRuntime = jsRuntime;
         }
 
         public Task InitializeAsync(string inputId, string format)
-            => jsRuntime.InvokeAsync<object>("InlineDateEdit.Initialize", inputId, format);
+            => jsRuntime.InvokeAsync<object>("DatePicker.Initialize", inputId, format);
 
         public Task DestroyAsync(string inputId)
-            => jsRuntime.InvokeAsync<object>("InlineDateEdit.Destroy", inputId);
+            => jsRuntime.InvokeAsync<object>("DatePicker.Destroy", inputId);
 
         public Task<string> GetValueAsync(string inputId)
-            => jsRuntime.InvokeAsync<string>("InlineDateEdit.GetValue", inputId);
+            => jsRuntime.InvokeAsync<string>("DatePicker.GetValue", inputId);
     }
 }
