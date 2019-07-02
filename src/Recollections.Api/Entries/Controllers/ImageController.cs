@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo;
+using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,15 +18,18 @@ namespace Neptuo.Recollections.Entries.Controllers
     [Route("api/entries/{entryId}/images")]
     public class ImageController : ControllerBase
     {
+        private readonly ImageService service;
         private readonly DataContext dataContext;
         private readonly StorageOptions configuration;
         private readonly PathResolver pathResolver;
 
-        public ImageController(DataContext dataContext, PathResolver pathResolver, IOptions<StorageOptions> configuration)
+        public ImageController(ImageService service, DataContext dataContext, PathResolver pathResolver, IOptions<StorageOptions> configuration)
         {
+            Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(pathResolver, "pathResolver");
             Ensure.NotNull(configuration, "configuration");
+            this.service = service;
             this.dataContext = dataContext;
             this.pathResolver = pathResolver;
             this.configuration = configuration.Value;
@@ -58,7 +62,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             foreach (Image entity in entities)
             {
                 var model = new ImageModel();
-                MapEntityToModel(entity, model);
+                service.MapEntityToModel(entity, model);
 
                 result.Add(model);
             }
@@ -74,7 +78,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return NotFound();
 
             var model = new ImageModel();
-            MapEntityToModel(entity, model);
+            service.MapEntityToModel(entity, model);
 
             return Ok(model);
         });
@@ -86,7 +90,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entry == null)
                 return NotFound();
 
-            string storagePath = GetStoragePath(entry);
+            string storagePath = service.GetStoragePath(entry);
 
             Image entity = await dataContext.Images.FindAsync(imageId);
             if (entity == null)
@@ -102,29 +106,11 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPost]
         public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, async entry =>
         {
-            string imageId = Guid.NewGuid().ToString();
-            string imageName = imageId + Path.GetExtension(file.FileName);
-
-            Image entity = new Image()
-            {
-                Id = imageId,
-                Name = Path.GetFileNameWithoutExtension(file.FileName),
-                FileName = imageName,
-                Created = DateTime.Now,
-                When = entry.When,
-                Entry = entry
-            };
-
-            await dataContext.Images.AddAsync(entity);
-
-            string storagePath = GetStoragePath(entry);
-            string path = Path.Combine(storagePath, imageName);
-
-            await CopyFileAsync(file, path);
-            await dataContext.SaveChangesAsync();
+            Image entity = await service.CreateAsync(entry, file);
 
             ImageModel model = new ImageModel();
-            MapEntityToModel(entity, model);
+            service.MapEntityToModel(entity, model);
+
             return base.Ok(model);
         });
 
@@ -135,7 +121,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity == null)
                 return NotFound();
 
-            MapModelToEntity(model, entity);
+            service.MapModelToEntity(model, entity);
 
             dataContext.Images.Update(entity);
             await dataContext.SaveChangesAsync();
@@ -150,48 +136,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity == null)
                 return NotFound();
 
-            string storagePath = GetStoragePath(entry);
-            string path = Path.Combine(storagePath, entity.FileName);
-
-            dataContext.Images.Remove(entity);
-            await dataContext.SaveChangesAsync();
-
-            IoFile.Delete(path);
+            await service.DeleteAsync(entry, entity);
 
             return Ok();
         });
-
-        private static async Task CopyFileAsync(IFormFile file, string path)
-        {
-            using (FileStream target = IoFile.Create(path))
-            using (Stream source = file.OpenReadStream())
-                await source.CopyToAsync(target);
-        }
-
-        private string GetStoragePath(Entry entry)
-        {
-            string storagePath = pathResolver(configuration.GetPath(entry.UserId, entry.Id));
-            Directory.CreateDirectory(storagePath);
-            return storagePath;
-        }
-
-        private void MapEntityToModel(Image entity, ImageModel model)
-        {
-            model.Id = entity.Id;
-            model.Name = entity.Name;
-            model.Description = entity.Description;
-            model.When = entity.When;
-
-            model.Preview = $"api/entries/{entity.Entry.Id}/images/{entity.Id}/preview";
-            model.Thumbnail = model.Preview;
-            model.Original = model.Preview;
-        }
-
-        private void MapModelToEntity(ImageModel model, Image entity)
-        {
-            entity.Name = model.Name;
-            entity.Description = model.Description;
-            entity.When = model.When;
-        }
     }
 }
