@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Neptuo;
+using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,11 +17,14 @@ namespace Neptuo.Recollections.Entries.Controllers
     public class EntryController : ControllerBase
     {
         private readonly DataContext dataContext;
+        private readonly ImageService imageService;
 
-        public EntryController(DataContext dataContext)
+        public EntryController(DataContext dataContext, ImageService imageService)
         {
             Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(imageService, "imageService");
             this.dataContext = dataContext;
+            this.imageService = imageService;
         }
 
         [HttpGet("{id}")]
@@ -105,6 +110,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.UserId != userId)
                 return Unauthorized();
 
+            await imageService.DeleteAllAsync(entity);
             dataContext.Entries.Remove(entity);
             await dataContext.SaveChangesAsync();
 

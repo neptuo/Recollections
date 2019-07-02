@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,6 +29,7 @@ namespace Neptuo.Recollections.Entries
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .AddTransient<ImageService>()
                 .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
                 .Configure<StorageOptions>(configuration.GetSection("Storage"));
 
