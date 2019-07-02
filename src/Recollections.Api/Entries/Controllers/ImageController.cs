@@ -108,6 +108,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             Image entity = new Image()
             {
                 Id = imageId,
+                Name = Path.GetFileNameWithoutExtension(file.FileName),
                 FileName = imageName,
                 Created = DateTime.Now,
                 When = entry.When,
