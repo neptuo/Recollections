@@ -110,7 +110,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 Id = imageId,
                 FileName = imageName,
                 Created = DateTime.Now,
-                When = DateTime.Now,
+                When = entry.When,
                 Entry = entry
             };
 
