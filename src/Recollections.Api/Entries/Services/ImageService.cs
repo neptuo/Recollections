@@ -16,15 +16,18 @@ namespace Neptuo.Recollections.Entries.Services
         private readonly DataContext dataContext;
         private readonly StorageOptions configuration;
         private readonly PathResolver pathResolver;
+        private readonly ImageResizeService resizeService;
 
-        public ImageService(DataContext dataContext, PathResolver pathResolver, IOptions<StorageOptions> configuration)
+        public ImageService(DataContext dataContext, PathResolver pathResolver, IOptions<StorageOptions> configuration, ImageResizeService resizeService)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(pathResolver, "pathResolver");
             Ensure.NotNull(configuration, "configuration");
+            Ensure.NotNull(resizeService, "resizeService");
             this.dataContext = dataContext;
             this.pathResolver = pathResolver;
             this.configuration = configuration.Value;
+            this.resizeService = resizeService;
         }
 
         public string GetStoragePath(Entry entry)
@@ -57,7 +60,24 @@ namespace Neptuo.Recollections.Entries.Services
             await CopyFileAsync(file, path);
             await dataContext.SaveChangesAsync();
 
+            await ComputeOtherSizesAsync(path);
+
             return entity;
+        }
+
+        private Task ComputeOtherSizesAsync(string path)
+        {
+            string directoryPath = Path.GetDirectoryName(path);
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            string extension = Path.GetExtension(path);
+
+            string thumbnailPath = Path.Combine(directoryPath, String.Concat(fileName, ".thumbnail", extension));
+            string previewPath = Path.Combine(directoryPath, String.Concat(fileName, ".preview", extension));
+
+            resizeService.Thumbnail(path, thumbnailPath, 200, 150);
+            resizeService.Thumbnail(path, previewPath, 800, 600);
+
+            return Task.CompletedTask;
         }
 
         public async Task DeleteAllAsync(Entry entry)
@@ -92,9 +112,10 @@ namespace Neptuo.Recollections.Entries.Services
             model.Description = entity.Description;
             model.When = entity.When;
 
-            model.Preview = $"api/entries/{entity.Entry.Id}/images/{entity.Id}/preview";
-            model.Thumbnail = model.Preview;
-            model.Original = model.Preview;
+            string basePath = $"api/entries/{entity.Entry.Id}/images/{entity.Id}";
+            model.Preview = $"{basePath}/preview";
+            model.Thumbnail = $"{basePath}/thumbnail";
+            model.Original = $"{basePath}/original";
         }
 
         public void MapModelToEntity(ImageModel model, Image entity)

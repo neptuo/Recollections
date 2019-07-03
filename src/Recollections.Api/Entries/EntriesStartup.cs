@@ -30,6 +30,7 @@ namespace Neptuo.Recollections.Entries
         {
             services
                 .AddTransient<ImageService>()
+                .AddTransient<ImageResizeService>()
                 .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
                 .Configure<StorageOptions>(configuration.GetSection("Storage"));
 

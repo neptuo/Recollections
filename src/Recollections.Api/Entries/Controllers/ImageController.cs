@@ -84,7 +84,18 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpGet("{imageId}/preview")]
-        public async Task<IActionResult> FileContent(string entryId, string imageId)
+        public Task<IActionResult> FileContentPreview(string entryId, string imageId)
+            => GetFileContent(entryId, imageId, "preview");
+
+        [HttpGet("{imageId}/thumbnail")]
+        public Task<IActionResult> FileContentThumbnail(string entryId, string imageId)
+            => GetFileContent(entryId, imageId, "thumbnail");
+
+        [HttpGet("{imageId}/original")]
+        public Task<IActionResult> FileContent(string entryId, string imageId)
+            => GetFileContent(entryId, imageId, null);
+
+        private async Task<IActionResult> GetFileContent(string entryId, string imageId, string type)
         {
             Entry entry = await dataContext.Entries.FindAsync(entryId);
             if (entry == null)
@@ -99,7 +110,18 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.Entry.Id != entryId)
                 return BadRequest();
 
-            string path = Path.Combine(storagePath, entity.FileName);
+            string fileName = entity.FileName;
+            if (type != null)
+            {
+                string extension = Path.GetExtension(fileName);
+                fileName = Path.GetFileNameWithoutExtension(fileName);
+                fileName = String.Concat(fileName, ".", type, extension);
+            }
+
+            string path = Path.Combine(storagePath, fileName);
+            if (!IoFile.Exists(path))
+                return NotFound();
+
             return File(new FileStream(path, FileMode.Open), "image/png");
         }
 
