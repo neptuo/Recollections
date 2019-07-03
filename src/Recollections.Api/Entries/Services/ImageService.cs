@@ -75,7 +75,7 @@ namespace Neptuo.Recollections.Entries.Services
             string previewPath = Path.Combine(directoryPath, String.Concat(fileName, ".preview", extension));
 
             resizeService.Thumbnail(path, thumbnailPath, 200, 150);
-            resizeService.Thumbnail(path, previewPath, 800, 600);
+            resizeService.Resize(path, previewPath, 1024);
 
             return Task.CompletedTask;
         }
