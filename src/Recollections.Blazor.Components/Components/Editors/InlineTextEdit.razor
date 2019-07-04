@@ -5,17 +5,17 @@
     {
         <form class="form-inline" onsubmit="@OnSaveValueAsync">
             <input type="text" class="form-control" bind="@Value" autofocus />
-            <button class="btn btn-link">
+            <button class="btn btn-link" title="Save changes">
                 <Icon Identifier="check" />
             </button>
-            <button class="btn btn-link" onclick="@OnResetAsync">
+            <button class="btn btn-link" onclick="@OnResetAsync" title="Revert changes">
                 <Icon Identifier="x" />
             </button>
         </form>
     }
     else
     {
-        <span class="inline-editor-value" onclick="@OnEdit">
+        <a class="inline-editor-value" onclick="@OnEdit">
             <Icon Identifier="pencil" />
 
             @if (String.IsNullOrEmpty(Value))
@@ -26,6 +26,6 @@
             {
                 <span class="inline-editor-content">@Value</span>
             }
-        </span>
+        </a>
     }
 </div>
