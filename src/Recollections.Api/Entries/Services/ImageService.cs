@@ -60,22 +60,17 @@ namespace Neptuo.Recollections.Entries.Services
             await CopyFileAsync(file, path);
             await dataContext.SaveChangesAsync();
 
-            await ComputeOtherSizesAsync(path);
+            await ComputeOtherSizesAsync(entry, entity);
 
             return entity;
         }
 
-        private Task ComputeOtherSizesAsync(string path)
+        private Task ComputeOtherSizesAsync(Entry entry, Image image)
         {
-            string directoryPath = Path.GetDirectoryName(path);
-            string fileName = Path.GetFileNameWithoutExtension(path);
-            string extension = Path.GetExtension(path);
+            var path = new ImagePath(this, entry, image);
 
-            string thumbnailPath = Path.Combine(directoryPath, String.Concat(fileName, ".thumbnail", extension));
-            string previewPath = Path.Combine(directoryPath, String.Concat(fileName, ".preview", extension));
-
-            resizeService.Thumbnail(path, thumbnailPath, 200, 150);
-            resizeService.Resize(path, previewPath, 1024);
+            resizeService.Thumbnail(path.Original, path.Thumbnail, 200, 150);
+            resizeService.Resize(path.Original, path.Preview, 1024);
 
             return Task.CompletedTask;
         }
@@ -89,13 +84,14 @@ namespace Neptuo.Recollections.Entries.Services
 
         public async Task DeleteAsync(Entry entry, Image entity)
         {
-            string storagePath = GetStoragePath(entry);
-            string path = Path.Combine(storagePath, entity.FileName);
+            ImagePath path = new ImagePath(this, entry, entity);
 
             dataContext.Images.Remove(entity);
             await dataContext.SaveChangesAsync();
 
-            File.Delete(path);
+            File.Delete(path.Original);
+            File.Delete(path.Preview);
+            File.Delete(path.Thumbnail);
         }
 
         private static async Task CopyFileAsync(IFormFile file, string path)

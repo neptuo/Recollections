@@ -85,23 +85,21 @@ namespace Neptuo.Recollections.Entries.Controllers
 
         [HttpGet("{imageId}/preview")]
         public Task<IActionResult> FileContentPreview(string entryId, string imageId)
-            => GetFileContent(entryId, imageId, "preview");
+            => GetFileContent(entryId, imageId, ImageType.Preview);
 
         [HttpGet("{imageId}/thumbnail")]
         public Task<IActionResult> FileContentThumbnail(string entryId, string imageId)
-            => GetFileContent(entryId, imageId, "thumbnail");
+            => GetFileContent(entryId, imageId, ImageType.Thumbnail);
 
         [HttpGet("{imageId}/original")]
         public Task<IActionResult> FileContent(string entryId, string imageId)
-            => GetFileContent(entryId, imageId, null);
+            => GetFileContent(entryId, imageId, ImageType.Original);
 
-        private async Task<IActionResult> GetFileContent(string entryId, string imageId, string type)
+        private async Task<IActionResult> GetFileContent(string entryId, string imageId, ImageType type)
         {
             Entry entry = await dataContext.Entries.FindAsync(entryId);
             if (entry == null)
                 return NotFound();
-
-            string storagePath = service.GetStoragePath(entry);
 
             Image entity = await dataContext.Images.FindAsync(imageId);
             if (entity == null)
@@ -110,19 +108,12 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.Entry.Id != entryId)
                 return BadRequest();
 
-            string fileName = entity.FileName;
-            if (type != null)
-            {
-                string extension = Path.GetExtension(fileName);
-                fileName = Path.GetFileNameWithoutExtension(fileName);
-                fileName = String.Concat(fileName, ".", type, extension);
-            }
-
-            string path = Path.Combine(storagePath, fileName);
-            if (!IoFile.Exists(path))
+            ImagePath path = new ImagePath(service, entry, entity);
+            string filePath = path.Get(type);
+            if (!IoFile.Exists(filePath))
                 return NotFound();
 
-            return File(new FileStream(path, FileMode.Open), "image/png");
+            return File(new FileStream(filePath, FileMode.Open), "image/png");
         }
 
         [HttpPost]
