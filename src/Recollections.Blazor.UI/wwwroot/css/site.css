@@ -40,6 +40,9 @@
 .inline-editor .oi-check {
   color: var(--green); }
 
+.inline-editor .oi-x {
+  color: var(--danger); }
+
 .inline-editor .form-control {
   font-size: inherit; }
 

@@ -10,6 +10,8 @@ namespace Neptuo.Recollections.Components.Editors
 {
     public class InlineEditModel<T> : ComponentBase
     {
+        private T originalValue;
+
         [Parameter]
         protected T Value { get; set; }
 
@@ -21,10 +23,23 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected bool IsEditMode { get; set; }
 
+        protected void OnEdit()
+        {
+            IsEditMode = true;
+            originalValue = Value;
+        }
+
         protected Task OnSaveValueAsync()
         {
             IsEditMode = false;
             return OnValueChangedAsync();
+        }
+
+        protected Task OnResetAsync()
+        {
+            IsEditMode = false;
+            Value = originalValue;
+            return Task.CompletedTask;
         }
 
         protected virtual Task OnValueChangedAsync()

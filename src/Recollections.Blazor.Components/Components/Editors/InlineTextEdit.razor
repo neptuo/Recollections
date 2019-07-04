@@ -8,11 +8,14 @@
             <button class="btn btn-link">
                 <Icon Identifier="check" />
             </button>
+            <button class="btn btn-link" onclick="@OnResetAsync">
+                <Icon Identifier="x" />
+            </button>
         </form>
     }
     else
     {
-        <span class="inline-editor-value" onclick="@(() => IsEditMode = true)">
+        <span class="inline-editor-value" onclick="@OnEdit">
             <Icon Identifier="pencil" />
 
             @if (String.IsNullOrEmpty(Value))
