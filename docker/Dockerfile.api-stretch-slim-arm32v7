@@ -6,13 +6,7 @@ WORKDIR /src/src/Recollections.Api
 RUN dotnet publish -c Release -r linux-arm -o /app
 
 # Final image.
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-stretch-slim-arm32v7
-RUN apt-get update \
-    && apt-get install -y --allow-unauthenticated \
-        libc6-dev \
-        libgdiplus \
-        libx11-dev \
-    && rm -rf /var/lib/apt/lists/*
+FROM neptuo/aspnet-system-drawing:2.2-stretch-slim-arm32v7
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "Recollections.Api.dll"]
