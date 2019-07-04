@@ -24,5 +24,7 @@ namespace Neptuo.Recollections
             Minor = model.Minor;
             Patch = model.Build;
         }
+
+        public override string ToString() => $"v{Major}.{Minor}.{Patch}";
     }
 }

@@ -53,5 +53,8 @@ namespace Neptuo.Recollections.Entries
         public string ImageUploadUrl(string entryId) => urlResolver($"/entries/{entryId}/images");
 
         public string ResolveUrl(string relativeUrl) => urlResolver(relativeUrl).Replace("apiapi", "api");
+
+        public Task<VersionModel> GetVersionAsync()
+            => http.GetJsonAsync<VersionModel>(urlResolver($"/entries/version"));
     }
 }
