@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class EntryModel
+    public class EntryModel : ICloneable<EntryModel>, IEquatable<EntryModel>
     {
         public string Id { get; set; }
         public string Title { get; set; }
@@ -29,6 +29,32 @@ namespace Neptuo.Recollections.Entries
             Title = title;
             When = when;
             Text = text;
+        }
+
+        public EntryModel Clone() => new EntryModel()
+        {
+            Id = Id,
+            Title = Title,
+            When = When,
+            Text = Text
+        };
+
+        public override bool Equals(object obj) => Equals(obj as EntryModel);
+
+        public bool Equals(EntryModel other) => other != null &&
+            Id == other.Id &&
+            Title == other.Title &&
+            When == other.When &&
+            Text == other.Text;
+
+        public override int GetHashCode()
+        {
+            var hashCode = 3;
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Id);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Title);
+            hashCode = hashCode * 7 + When.GetHashCode();
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Text);
+            return hashCode;
         }
     }
 }

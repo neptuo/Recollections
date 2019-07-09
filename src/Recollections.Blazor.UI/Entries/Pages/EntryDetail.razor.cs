@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
-{ 
+{
     public class EntryDetailModel : ComponentBase
     {
         [Inject]
@@ -26,6 +26,7 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         protected string EntryId { get; set; }
 
+        private EntryModel original;
         protected EntryModel Model { get; set; }
         protected List<ImageModel> Images { get; set; }
 
@@ -35,6 +36,8 @@ namespace Neptuo.Recollections.Entries.Pages
             await UserState.EnsureAuthenticatedAsync();
 
             Model = await Api.GetDetailAsync(EntryId);
+            original = Model.Clone();
+
             await LoadImagesAsync();
         }
 
@@ -47,7 +50,7 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Model.Title = value;
             await SaveAsync();
-        } 
+        }
 
         protected async Task SaveTextAsync(string value)
         {
@@ -61,7 +64,17 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        private Task SaveAsync() => Api.UpdateAsync(Model);
+        private async Task SaveAsync()
+        {
+            Console.WriteLine("Model: " + SimpleJson.SimpleJson.SerializeObject(Model));
+            Console.WriteLine("Original: " + SimpleJson.SimpleJson.SerializeObject(original));
+
+            if (original.Equals(Model))
+                return;
+
+            await Api.UpdateAsync(Model);
+            original = Model.Clone();
+        }
 
         protected async Task OnUploadCompletedAsync()
         {
