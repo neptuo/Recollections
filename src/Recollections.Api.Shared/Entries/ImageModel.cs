@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class ImageModel
+    public class ImageModel : ICloneable<ImageModel>, IEquatable<ImageModel>
     {
         public string Id { get; set; }
 
@@ -18,5 +18,40 @@ namespace Neptuo.Recollections.Entries
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime When { get; set; }
+
+        public ImageModel Clone() => new ImageModel()
+        {
+            Id = Id,
+            Thumbnail = Thumbnail,
+            Preview = Preview,
+            Original = Original,
+            Name = Name,
+            Description = Description,
+            When = When
+        };
+
+        public override bool Equals(object obj) => Equals(obj as ImageModel);
+
+        public bool Equals(ImageModel other) => other != null &&
+            Id == other.Id &&
+            Thumbnail == other.Thumbnail &&
+            Preview == other.Preview &&
+            Original == other.Original &&
+            Name == other.Name &&
+            Description == other.Description &&
+            When == other.When;
+
+        public override int GetHashCode()
+        {
+            var hashCode = 3;
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Id);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Thumbnail);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Preview);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Original);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Name);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Description);
+            hashCode = hashCode * 7 + When.GetHashCode();
+            return hashCode;
+        }
     }
 }

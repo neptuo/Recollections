@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await UserState.EnsureAuthenticatedAsync();
 
             Model = await Api.GetDetailAsync(EntryId);
-            original = Model.Clone();
+            UpdateOriginal();
 
             await LoadImagesAsync();
         }
@@ -66,15 +66,14 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task SaveAsync()
         {
-            Console.WriteLine("Model: " + SimpleJson.SimpleJson.SerializeObject(Model));
-            Console.WriteLine("Original: " + SimpleJson.SimpleJson.SerializeObject(original));
-
             if (original.Equals(Model))
                 return;
 
             await Api.UpdateAsync(Model);
-            original = Model.Clone();
+            UpdateOriginal();
         }
+
+        private void UpdateOriginal() => original = Model.Clone();
 
         protected async Task OnUploadCompletedAsync()
         {

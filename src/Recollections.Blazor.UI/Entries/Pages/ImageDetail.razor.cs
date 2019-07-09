@@ -29,6 +29,7 @@ namespace Neptuo.Recollections.Entries.Pages
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
+        private ImageModel original;
         protected ImageModel Model { get; set; }
 
         protected async override Task OnInitAsync()
@@ -37,6 +38,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await UserState.EnsureAuthenticatedAsync();
 
             Model = await Api.GetImageAsync(EntryId, ImageId);
+            UpdateOriginal();
         }
 
         protected async Task SaveNameAsync(string value)
@@ -57,7 +59,16 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        private Task SaveAsync() => Api.UpdateImageAsync(EntryId, Model);
+        private async Task SaveAsync()
+        {
+            if (original.Equals(Model))
+                return;
+
+            await Api.UpdateImageAsync(EntryId, Model);
+            UpdateOriginal();
+        }
+
+        private void UpdateOriginal() => original = Model.Clone();
 
         protected async Task DeleteAsync()
         {
