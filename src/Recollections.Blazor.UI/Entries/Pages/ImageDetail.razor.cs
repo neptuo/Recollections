@@ -49,6 +49,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task SaveDescriptionAsync(string value)
         {
+            if (String.IsNullOrEmpty(value))
+                value = null;
+
             Model.Description = value;
             await SaveAsync();
         }

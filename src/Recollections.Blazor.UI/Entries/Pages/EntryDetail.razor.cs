@@ -48,6 +48,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task SaveTitleAsync(string value)
         {
+            if (String.IsNullOrEmpty(value))
+                value = null;
+
             Model.Title = value;
             await SaveAsync();
         }
