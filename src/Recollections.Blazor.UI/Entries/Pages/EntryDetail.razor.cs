@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected List<ImageModel> Images { get; set; }
+        protected FileUploadProgress UploadProgress { get; set; }
 
         protected async override Task OnInitAsync()
         {
@@ -41,10 +43,8 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadImagesAsync();
         }
 
-        private async Task LoadImagesAsync()
-        {
-            Images = await Api.GetImagesAsync(EntryId);
-        }
+        private async Task LoadImagesAsync() 
+            => Images = await Api.GetImagesAsync(EntryId);
 
         protected async Task SaveTitleAsync(string value)
         {
@@ -78,11 +78,20 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private void UpdateOriginal() => original = Model.Clone();
 
-        protected async Task OnUploadCompletedAsync()
+        protected async Task OnUploadProgressAsync(FileUploadProgress e)
         {
-            await LoadImagesAsync();
+            UploadProgress = e;
+            if (e.Completed == e.Total)
+            {
+                await LoadImagesAsync();
+                UploadProgress = null;
+            }
+
             StateHasChanged();
         }
+
+        protected Task OnUploadErrorAsync() 
+            => Navigator.MessageAsync("Error during file upload...");
 
         public async Task DeleteAsync()
         {

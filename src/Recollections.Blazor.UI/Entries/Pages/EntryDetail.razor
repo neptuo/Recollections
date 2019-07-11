@@ -46,7 +46,14 @@
                 }
             }
 
-            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Completed="@(() => OnUploadCompletedAsync())" />
+            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Progress="@(e => OnUploadProgressAsync(e))" Error="@(() => OnUploadErrorAsync())" />
+
+            @if (UploadProgress != null)
+            {
+                <span>
+                    @UploadProgress.Completed / @UploadProgress.Total
+                </span>
+            }
         </div>
 
         <div class="actions">

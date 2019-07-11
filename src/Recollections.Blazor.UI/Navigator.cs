@@ -25,6 +25,9 @@ namespace Neptuo.Recollections
         public Task<bool> AskAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.confirm", message);
 
+        public Task MessageAsync(string message)
+            => jsRuntime.InvokeAsync<bool>("window.alert", message);
+
         public string UrlTimeline()
             => "/";
 

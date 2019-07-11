@@ -18,13 +18,19 @@ namespace Neptuo.Recollections.Components
         protected IUniqueNameProvider NameProvider { get; set; }
 
         [Parameter]
+        protected string Text { get; set; } = "Upload Images";
+
+        [Parameter]
         protected string Url { get; set; }
 
         [Parameter]
         protected string BearerToken { get; set; }
 
         [Parameter]
-        protected Action Completed { get; set; }
+        protected Action<FileUploadProgress> Progress { get; set; }
+
+        [Parameter]
+        protected Action Error { get; set; }
 
         public string FormId { get; private set; }
 
@@ -40,10 +46,16 @@ namespace Neptuo.Recollections.Components
             await Interop.InitializeAsync(this, BearerToken);
         }
 
-        internal void OnCompleted()
+        internal void OnCompleted(int total, int completed)
         {
             Console.WriteLine("FileUploadModel.OnCompleted");
-            Completed?.Invoke();
+            Progress?.Invoke(new FileUploadProgress(total, completed));
+        }
+
+        internal void OnError()
+        {
+            Console.WriteLine("FileUploadModel.OnError");
+            Error?.Invoke();
         }
 
         public void Dispose()
