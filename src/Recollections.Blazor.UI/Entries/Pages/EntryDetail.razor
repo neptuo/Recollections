@@ -14,6 +14,11 @@
             <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
         </div>
         <div class="images">
+            @if (!string.IsNullOrEmpty(UploadError))
+            {
+                <Alert Message="@UploadError" Mode="AlertMode.Error" />
+            }
+
             @if (Images != null)
             {
                 var columns = 6;
@@ -46,14 +51,7 @@
                 }
             }
 
-            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Progress="@(e => OnUploadProgressAsync(e))" Error="@(() => OnUploadErrorAsync())" />
-
-            @if (UploadProgress != null)
-            {
-                <span>
-                    @UploadProgress.Completed / @UploadProgress.Total
-                </span>
-            }
+            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Text="@UploadButtonText" Progress="@(e => OnUploadProgressAsync(e))" Error="@(e => OnUploadErrorAsync(e))" />
         </div>
 
         <div class="actions">

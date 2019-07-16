@@ -11,6 +11,8 @@ namespace Neptuo.Recollections.Components
 {
     public class FileUploadModel : ComponentBase, IDisposable
     {
+        public const string DefaultText = "Upload Images";
+
         [Inject]
         protected FileUploadInterop Interop { get; set; }
 
@@ -18,7 +20,7 @@ namespace Neptuo.Recollections.Components
         protected IUniqueNameProvider NameProvider { get; set; }
 
         [Parameter]
-        protected string Text { get; set; } = "Upload Images";
+        protected string Text { get; set; } = DefaultText;
 
         [Parameter]
         protected string Url { get; set; }
@@ -30,7 +32,7 @@ namespace Neptuo.Recollections.Components
         protected Action<FileUploadProgress> Progress { get; set; }
 
         [Parameter]
-        protected Action Error { get; set; }
+        protected Action<FileUploadProgress> Error { get; set; }
 
         public string FormId { get; private set; }
 
@@ -52,10 +54,10 @@ namespace Neptuo.Recollections.Components
             Progress?.Invoke(new FileUploadProgress(total, completed));
         }
 
-        internal void OnError()
+        internal void OnError(int total, int completed)
         {
             Console.WriteLine("FileUploadModel.OnError");
-            Error?.Invoke();
+            Error?.Invoke(new FileUploadProgress(total, completed));
         }
 
         public void Dispose()

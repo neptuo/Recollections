@@ -30,10 +30,13 @@ namespace Neptuo.Recollections.Entries.Pages
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected List<ImageModel> Images { get; set; }
-        protected FileUploadProgress UploadProgress { get; set; }
+        protected string UploadButtonText { get; set; }
+        protected string UploadError { get; set; }
 
         protected async override Task OnInitAsync()
         {
+            ResetUploadButtonText();
+
             await base.OnInitAsync();
             await UserState.EnsureAuthenticatedAsync();
 
@@ -43,7 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadImagesAsync();
         }
 
-        private async Task LoadImagesAsync() 
+        private async Task LoadImagesAsync()
             => Images = await Api.GetImagesAsync(EntryId);
 
         protected async Task SaveTitleAsync(string value)
@@ -80,18 +83,34 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task OnUploadProgressAsync(FileUploadProgress e)
         {
-            UploadProgress = e;
+            UploadError = null;
+
             if (e.Completed == e.Total)
             {
                 await LoadImagesAsync();
-                UploadProgress = null;
+                ResetUploadButtonText();
+            }
+            else
+            {
+                UploadButtonText = $"{FileUploadModel.DefaultText} - {e.Completed} / {e.Total}";
             }
 
             StateHasChanged();
         }
 
-        protected Task OnUploadErrorAsync() 
-            => Navigator.MessageAsync("Error during file upload...");
+        private void ResetUploadButtonText()
+        {
+            UploadButtonText = FileUploadModel.DefaultText;
+        }
+
+        protected async Task OnUploadErrorAsync(FileUploadProgress e)
+        {
+            ResetUploadButtonText();
+            UploadError = $"Error during file upload ({e.Completed + 1} / {e.Total})...";
+            await LoadImagesAsync();
+
+            StateHasChanged();
+        }
 
         public async Task DeleteAsync()
         {
