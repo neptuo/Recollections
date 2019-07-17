@@ -83,7 +83,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task OnUploadProgressAsync(FileUploadProgress e)
         {
-            UploadError = null;
+            SetUploadError(null);
 
             if (e.Completed == e.Total)
             {
@@ -103,13 +103,37 @@ namespace Neptuo.Recollections.Entries.Pages
             UploadButtonText = FileUploadModel.DefaultText;
         }
 
-        protected async Task OnUploadErrorAsync(FileUploadProgress e)
+        protected async Task OnUploadErrorAsync(FileUploadError e)
         {
             ResetUploadButtonText();
-            UploadError = $"Error during file upload ({e.Completed + 1} / {e.Total})...";
+            SetUploadError(e);
+
             await LoadImagesAsync();
 
             StateHasChanged();
+        }
+
+        private void SetUploadError(FileUploadError e)
+        {
+            if (e != null)
+            {
+                string reason;
+                switch (e.StatusCode)
+                {
+                    case 400:
+                        reason = "File is of not supported type or too large.";
+                        break;
+                    default:
+                        reason = "Unknown reason.";
+                        break;
+                }
+
+                UploadError = $"Error during file upload ({e.Completed + 1} / {e.Total}): {reason}";
+            }
+            else
+            {
+                UploadError = null;
+            }
         }
 
         public async Task DeleteAsync()

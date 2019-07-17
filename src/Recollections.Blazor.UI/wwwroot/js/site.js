@@ -51,7 +51,7 @@ window.FileUpload = {
         function uploadError(statusCode, message) {
             var total = input[0].files.length;
             form[0].reset();
-            DotNet.invokeMethodAsync("Recollections.Blazor.Components", "FileUpload_OnError", formId, total, uploadIndex);
+            DotNet.invokeMethodAsync("Recollections.Blazor.Components", "FileUpload_OnError", formId, statusCode, total, uploadIndex);
         }
 
         function uploadCallback(total, completed) {

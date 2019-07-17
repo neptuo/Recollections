@@ -43,13 +43,13 @@ namespace Neptuo.Recollections.Components
         }
 
         [JSInvokable]
-        public static void FileUpload_OnError(string id, int total, int completed)
+        public static void FileUpload_OnError(string id, int statusCode, int total, int completed)
         {
             Console.WriteLine($"FileUpload_OnError, FormId: {id}");
             if (models.TryGetValue(id, out FileUploadModel model))
             {
                 Console.WriteLine("Model found");
-                model.OnError(total, completed);
+                model.OnError(statusCode, total, completed);
             }
         }
 

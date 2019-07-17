@@ -32,7 +32,7 @@ namespace Neptuo.Recollections.Components
         protected Action<FileUploadProgress> Progress { get; set; }
 
         [Parameter]
-        protected Action<FileUploadProgress> Error { get; set; }
+        protected Action<FileUploadError> Error { get; set; }
 
         public string FormId { get; private set; }
 
@@ -54,10 +54,10 @@ namespace Neptuo.Recollections.Components
             Progress?.Invoke(new FileUploadProgress(total, completed));
         }
 
-        internal void OnError(int total, int completed)
+        internal void OnError(int statusCode, int total, int completed)
         {
             Console.WriteLine("FileUploadModel.OnError");
-            Error?.Invoke(new FileUploadProgress(total, completed));
+            Error?.Invoke(new FileUploadError(statusCode, total, completed));
         }
 
         public void Dispose()
