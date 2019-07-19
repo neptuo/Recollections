@@ -134,7 +134,7 @@ window.InlineMarkdownEdit = {
             return;
         }
 
-        var editor = new SimpleMDE({
+        var editor = new EasyMDE({
             element: document.getElementById(textAreaId),
             autofocus: true,
             forceSync: true,
