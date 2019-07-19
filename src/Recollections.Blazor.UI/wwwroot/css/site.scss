@@ -12,6 +12,10 @@ blockquote {
     margin-top: 24px;
 }
 
+.hidden, .inline-editor .hidden {
+    display: none;
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";

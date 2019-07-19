@@ -139,7 +139,32 @@ window.InlineMarkdownEdit = {
             autofocus: true,
             forceSync: true,
             spellChecker: false,
-            toolbar: ["heading-2", "heading-3", "|", "bold", "italic", "|", "unordered-list", "ordered-list", "|", "link", "quote", "horizontal-rule"]
+            toolbar: [
+                "heading-2",
+                "heading-3",
+                "|",
+                "bold",
+                "italic",
+                "|",
+                "unordered-list",
+                "ordered-list",
+                "|",
+                "link",
+                "quote",
+                "horizontal-rule",
+                {
+                    name: "save",
+                    className: "fa fa-star hidden",
+                    title: "Save",
+                    action: function (editor) {
+                        var value = editor.value();
+                        DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineMarkdownEdit_OnSave", textAreaId, value);
+                    }
+                }
+            ],
+            shortcuts: {
+                "save": "Ctrl-Enter"
+            }
         });
         InlineMarkdownEdit.editors[textAreaId] = editor;
     },

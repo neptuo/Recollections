@@ -54,7 +54,7 @@ namespace Neptuo.Recollections.Components.Editors
 
             if (IsEditMode)
             {
-                await Interop.InitializeAsync(TextAreaId);
+                await Interop.InitializeAsync(this);
                 await Interop.SetValueAsync(TextAreaId, Value);
             }
             else
@@ -69,6 +69,13 @@ namespace Neptuo.Recollections.Components.Editors
             markdownValue = null;
 
             await base.OnValueChangedAsync();
+        }
+
+        internal async void OnSave(string value)
+        {
+            await OnSaveValueAsync();
+            StateHasChanged();
+            Console.WriteLine($"Save completed, IsEditMode: {IsEditMode}");
         }
 
         private string TransformValue()

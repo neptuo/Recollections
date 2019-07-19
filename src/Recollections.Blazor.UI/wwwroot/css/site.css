@@ -7,6 +7,9 @@
 .body-offset {
   margin-top: 24px; }
 
+.hidden, .inline-editor .hidden {
+  display: none; }
+
 .loading-bar {
   display: inline-block;
   position: relative;
