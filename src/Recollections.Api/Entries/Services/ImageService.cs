@@ -40,13 +40,15 @@ namespace Neptuo.Recollections.Entries.Services
         public async Task<Image> CreateAsync(Entry entry, IFormFile file)
         {
             string imageId = Guid.NewGuid().ToString();
-            string imageName = imageId + Path.GetExtension(file.FileName);
+            string fileName = imageId + Path.GetExtension(file.FileName);
+
+            Validate(file);
 
             Image entity = new Image()
             {
                 Id = imageId,
                 Name = Path.GetFileNameWithoutExtension(file.FileName),
-                FileName = imageName,
+                FileName = fileName,
                 Created = DateTime.Now,
                 When = entry.When,
                 Entry = entry
@@ -55,7 +57,7 @@ namespace Neptuo.Recollections.Entries.Services
             await dataContext.Images.AddAsync(entity);
 
             string storagePath = GetStoragePath(entry);
-            string path = Path.Combine(storagePath, imageName);
+            string path = Path.Combine(storagePath, fileName);
 
             await CopyFileAsync(file, path);
             await dataContext.SaveChangesAsync();
@@ -63,6 +65,20 @@ namespace Neptuo.Recollections.Entries.Services
             await ComputeOtherSizesAsync(entry, entity);
 
             return entity;
+        }
+
+        private void Validate(IFormFile file)
+        {
+            if (file.Length > configuration.MaxLength)
+                throw new ImageMaxLengthExceededException();
+
+            string extension = Path.GetExtension(file.FileName);
+            if (extension == null)
+                throw new ImageNotSupportedExtensionException();
+
+            extension = extension.ToLowerInvariant();
+            if (!configuration.IsSupportedExtension(extension))
+                throw new ImageNotSupportedExtensionException();
         }
 
         private Task ComputeOtherSizesAsync(Entry entry, Image image)

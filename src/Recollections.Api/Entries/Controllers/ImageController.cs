@@ -119,12 +119,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPost]
         public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, async entry =>
         {
-            Image entity = await service.CreateAsync(entry, file);
+            try
+            {
+                Image entity = await service.CreateAsync(entry, file);
 
-            ImageModel model = new ImageModel();
-            service.MapEntityToModel(entity, model);
+                ImageModel model = new ImageModel();
+                service.MapEntityToModel(entity, model);
 
-            return base.Ok(model);
+                return base.Ok(model);
+            }
+            catch (ImageUploadValidationException)
+            {
+                return BadRequest();
+            }
         });
 
         [HttpPut("{imageId}")]
