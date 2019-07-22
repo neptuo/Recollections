@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -16,37 +17,23 @@ namespace Neptuo.Recollections.Entries.Services
 
         public void Thumbnail(string inputPath, string outputPath, int width, int height)
         {
-            using (var image = DrImage.FromFile(inputPath))
+            using (var input = DrImage.FromFile(inputPath))
             {
-                int resizeWidth = width;
-                int resizeHeight = height;
+                int sourceWidth = input.Width;
+                int sourceHeight = input.Height;
 
-                if (image.Width < image.Height)
-                {
-                    var resizeRatio = resizeWidth / (double)image.Width;
-                    resizeHeight = (int)(resizeRatio * image.Height);
-                }
-                else
-                {
-                    var resizeRatio = resizeHeight / (double)image.Height;
-                    resizeWidth = (int)(resizeRatio * image.Width);
-                }
+                double widthRatio = (double)sourceWidth / width;
+                double heightRatio = (double)sourceHeight / height;
 
-                using (Bitmap thumbnail = (Bitmap)image.GetThumbnailImage(resizeWidth, resizeHeight, GetThumbnalImageAbort, IntPtr.Zero))
-                {
-                    if (width != resizeWidth || height != resizeHeight)
-                    {
-                        int x = (resizeWidth - width) / 2;
-                        int y = (resizeHeight - height) / 2;
+                double ratio = widthRatio < heightRatio ? widthRatio : heightRatio;
 
-                        using (var cropped = thumbnail.Clone(new Rectangle(x, y, width, height), PixelFormat.DontCare))
-                            cropped.Save(outputPath, ImageFormat);
-                    }
-                    else
-                    {
-                        thumbnail.Save(outputPath, ImageFormat);
-                    }
-                }
+                sourceWidth = (int)(ratio * width);
+                sourceHeight = (int)(ratio * height);
+
+                int offsetX = (input.Width - sourceWidth) / 2;
+                int offsetY = (input.Height - sourceHeight) / 2;
+
+                Resize(input, outputPath, new Rectangle(offsetX, offsetY, sourceWidth, sourceHeight), width, height);
             }
         }
 
@@ -59,8 +46,7 @@ namespace Neptuo.Recollections.Entries.Services
                     var ratio = width / (double)input.Width;
                     int height = (int)(ratio * input.Height);
 
-                    using (var target = input.GetThumbnailImage(width, height, GetThumbnalImageAbort, IntPtr.Zero))
-                        target.Save(outputPath, ImageFormat);
+                    Resize(input, outputPath, null, width, height);
                 }
                 else
                 {
@@ -69,6 +55,18 @@ namespace Neptuo.Recollections.Entries.Services
             }
         }
 
-        private bool GetThumbnalImageAbort() => false;
+        private void Resize(DrImage input, string outputPath, Rectangle? inputRect, int width, int height)
+        {
+            using (var target = new Bitmap(width, height))
+            using (Graphics targetGraphics = Graphics.FromImage(target))
+            {
+                targetGraphics.CompositingQuality = CompositingQuality.HighQuality;
+                targetGraphics.SmoothingMode = SmoothingMode.HighQuality;
+                targetGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                targetGraphics.DrawImage(input, new Rectangle(0, 0, width, height), inputRect ?? new Rectangle(0, 0, input.Width, input.Height), GraphicsUnit.Pixel);
+
+                target.Save(outputPath, ImageFormat);
+            }
+        }
     }
 }
