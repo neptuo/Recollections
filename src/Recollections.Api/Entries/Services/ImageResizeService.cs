@@ -12,6 +12,8 @@ namespace Neptuo.Recollections.Entries.Services
 {
     public class ImageResizeService
     {
+        private ImageFormat ImageFormat => ImageFormat.Png;
+
         public void Thumbnail(string inputPath, string outputPath, int width, int height)
         {
             using (var image = DrImage.FromFile(inputPath))
@@ -38,11 +40,11 @@ namespace Neptuo.Recollections.Entries.Services
                         int y = (resizeHeight - height) / 2;
 
                         using (var cropped = thumbnail.Clone(new Rectangle(x, y, width, height), PixelFormat.DontCare))
-                            cropped.Save(outputPath);
+                            cropped.Save(outputPath, ImageFormat);
                     }
                     else
                     {
-                        thumbnail.Save(outputPath);
+                        thumbnail.Save(outputPath, ImageFormat);
                     }
                 }
             }
@@ -58,11 +60,11 @@ namespace Neptuo.Recollections.Entries.Services
                     int height = (int)(ratio * input.Height);
 
                     using (var target = input.GetThumbnailImage(width, height, GetThumbnalImageAbort, IntPtr.Zero))
-                        target.Save(outputPath);
+                        target.Save(outputPath, ImageFormat);
                 }
                 else
                 {
-                    input.Save(outputPath);
+                    input.Save(outputPath, ImageFormat);
                 }
             }
         }
