@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ExifLib;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo;
@@ -60,6 +61,11 @@ namespace Neptuo.Recollections.Entries.Services
             string path = Path.Combine(storagePath, fileName);
 
             await CopyFileAsync(file, path);
+            SetProperties(entity, path);
+
+            if (entity.Location.HasValue() && !entry.Locations.Contains(entity.Location))
+                entry.Locations.Add(entity.Location);
+
             await dataContext.SaveChangesAsync();
 
             await ComputeOtherSizesAsync(entry, entity);
@@ -79,6 +85,22 @@ namespace Neptuo.Recollections.Entries.Services
             extension = extension.ToLowerInvariant();
             if (!configuration.IsSupportedExtension(extension))
                 throw new ImageNotSupportedExtensionException();
+        }
+
+        private void SetProperties(Image entity, string path)
+        {
+            try
+            {
+                using (ImagePropertyReader propertyReader = new ImagePropertyReader(path))
+                {
+                    entity.Location.Longitude = propertyReader.GetLongitude();
+                    entity.Location.Latitude = propertyReader.GetLatitude();
+                    entity.Location.Altitude = propertyReader.GetAltitude();
+                }
+            }
+            catch (ExifLibException)
+            {
+            }
         }
 
         private Task ComputeOtherSizesAsync(Entry entry, Image image)

@@ -16,5 +16,17 @@ namespace Neptuo.Recollections.Entries
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Entry>().OwnsMany(e => e.Locations, e =>
+            {
+                e.HasForeignKey("EntryId");
+                e.Property<int>("Id").ValueGeneratedOnAdd();
+                e.HasKey("EntryId", "Id");
+            });
+        }
     }
 }

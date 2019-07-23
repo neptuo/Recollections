@@ -18,6 +18,8 @@ namespace Neptuo.Recollections.Entries
         public string Title { get; set; }
         public string Text { get; set; }
 
+        public ICollection<Location> Locations { get; set; } = new List<Location>();
+
         public DateTime When { get; set; }
         public DateTime Created { get; set; }
     }

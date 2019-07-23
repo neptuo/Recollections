@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Entries.Services
         public double? GetLongitude() 
             => GetCoordinate(ExifTags.GPSLongitude);
 
+        public double? GetAltitude() 
+            => GetCoordinate(ExifTags.GPSAltitude);
+
         private double? GetCoordinate(ExifTags type)
         {
             if (reader.GetTagValue(type, out double[] coordinates))

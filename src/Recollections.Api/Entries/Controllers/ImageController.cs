@@ -126,7 +126,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 ImageModel model = new ImageModel();
                 service.MapEntityToModel(entity, model);
 
-                return base.Ok(model);
+                return Ok(model);
             }
             catch (ImageUploadValidationException)
             {
