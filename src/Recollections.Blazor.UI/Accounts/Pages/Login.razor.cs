@@ -28,6 +28,9 @@ namespace Neptuo.Recollections.Accounts.Pages
 
         protected async Task LoginAsync()
         {
+            Console.WriteLine($"UserName: '{UserName}'");
+            Console.WriteLine($"Password: '{Password}'");
+
             ErrorMessages.Clear();
             if (!await UserState.LoginAsync(UserName, Password, IsPersistent))
                 ErrorMessages.Add("Invalid combination of username and password.");

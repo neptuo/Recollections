@@ -146,6 +146,10 @@ namespace Neptuo.Recollections.Entries.Services
             model.Description = entity.Description;
             model.When = entity.When;
 
+            model.Location.Latitude = entity.Location.Latitude;
+            model.Location.Longitude = entity.Location.Longitude;
+            model.Location.Altitude = entity.Location.Altitude;
+
             string basePath = $"api/entries/{entity.Entry.Id}/images/{entity.Id}";
             model.Preview = $"{basePath}/preview";
             model.Thumbnail = $"{basePath}/thumbnail";
@@ -157,6 +161,10 @@ namespace Neptuo.Recollections.Entries.Services
             entity.Name = model.Name;
             entity.Description = model.Description;
             entity.When = model.When;
+
+            entity.Location.Latitude = model.Location.Latitude;
+            entity.Location.Longitude = model.Location.Longitude;
+            entity.Location.Altitude = model.Location.Altitude;
         }
     }
 }

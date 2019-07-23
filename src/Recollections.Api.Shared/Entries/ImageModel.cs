@@ -19,6 +19,8 @@ namespace Neptuo.Recollections.Entries
         public string Description { get; set; }
         public DateTime When { get; set; }
 
+        public LocationModel Location { get; set; } = new LocationModel();
+
         public ImageModel Clone() => new ImageModel()
         {
             Id = Id,
@@ -27,7 +29,8 @@ namespace Neptuo.Recollections.Entries
             Original = Original,
             Name = Name,
             Description = Description,
-            When = When
+            When = When,
+            Location = Location.Clone()
         };
 
         public override bool Equals(object obj) => Equals(obj as ImageModel);
@@ -39,7 +42,8 @@ namespace Neptuo.Recollections.Entries
             Original == other.Original &&
             Name == other.Name &&
             Description == other.Description &&
-            When == other.When;
+            When == other.When &&
+            Location.Equals(other.Location);
 
         public override int GetHashCode()
         {
@@ -51,6 +55,7 @@ namespace Neptuo.Recollections.Entries
             hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Name);
             hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Description);
             hashCode = hashCode * 7 + When.GetHashCode();
+            hashCode = hashCode * 7 + Location.GetHashCode();
             return hashCode;
         }
     }
