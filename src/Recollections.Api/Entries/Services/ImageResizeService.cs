@@ -21,7 +21,7 @@ namespace Neptuo.Recollections.Entries.Services
         {
             using (var input = DrImage.FromFile(inputPath))
             {
-                EnsureExifImageRotation(input);
+                EnsureExifImageRotation(input, inputPath);
 
                 int sourceWidth = input.Width;
                 int sourceHeight = input.Height;
@@ -45,7 +45,7 @@ namespace Neptuo.Recollections.Entries.Services
         {
             using (var input = DrImage.FromFile(inputPath))
             {
-                EnsureExifImageRotation(input);
+                EnsureExifImageRotation(input, inputPath);
 
                 if (width < input.Width)
                 {
@@ -75,20 +75,25 @@ namespace Neptuo.Recollections.Entries.Services
             }
         }
 
-        private void EnsureExifImageRotation(DrImage image)
+        private void EnsureExifImageRotation(DrImage image, string imagePath)
         {
-            if (image.PropertyIdList.Contains(ImageRotationPropertyId))
+            using (var imageReader = new ImagePropertyReader(imagePath))
             {
-                PropertyItem property = image.GetPropertyItem(ImageRotationPropertyId);
-                if (property.Type == 3 && property.Len == 2)
+                ImagePropertyReader.Orientation? orientation = imageReader.FindOrientation();
+                if (orientation != null)
                 {
-                    ushort orientationExif = BitConverter.ToUInt16(image.GetPropertyItem(ImageRotationPropertyId).Value, 0);
-                    if (orientationExif == 8)
-                        image.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                    else if (orientationExif == 3)
-                        image.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                    else if (orientationExif == 6)
-                        image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    switch (orientation.Value)
+                    {
+                        case ImagePropertyReader.Orientation.D270:
+                            image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                            break;
+                        case ImagePropertyReader.Orientation.D180:
+                            image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                            break;
+                        case ImagePropertyReader.Orientation.D90:
+                            image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                            break;
+                    }
                 }
             }
         }

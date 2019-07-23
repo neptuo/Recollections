@@ -89,21 +89,15 @@ namespace Neptuo.Recollections.Entries.Services
 
         private void SetProperties(Image entity, string path)
         {
-            try
+            using (ImagePropertyReader propertyReader = new ImagePropertyReader(path))
             {
-                using (ImagePropertyReader propertyReader = new ImagePropertyReader(path))
-                {
-                    entity.Location.Longitude = propertyReader.FindLongitude();
-                    entity.Location.Latitude = propertyReader.FindLatitude();
-                    entity.Location.Altitude = propertyReader.FindAltitude();
+                entity.Location.Longitude = propertyReader.FindLongitude();
+                entity.Location.Latitude = propertyReader.FindLatitude();
+                entity.Location.Altitude = propertyReader.FindAltitude();
 
-                    DateTime? when = propertyReader.FindTakenWhen();
-                    if (when != null)
-                        entity.When = when.Value;
-                }
-            }
-            catch (ExifLibException)
-            {
+                DateTime? when = propertyReader.FindTakenWhen();
+                if (when != null)
+                    entity.When = when.Value;
             }
         }
 

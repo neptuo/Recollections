@@ -8,39 +8,63 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Services
 {
-    public class ImagePropertyReader : DisposableBase
+    public partial class ImagePropertyReader : DisposableBase
     {
         private readonly ExifReader reader;
 
-        public ImagePropertyReader(string imagePath) 
-            => reader = new ExifReader(imagePath);
+        public ImagePropertyReader(string imagePath)
+        {
+            try
+            {
+                reader = new ExifReader(imagePath);
+            }
+            catch (ExifLibException)
+            {
+                reader = null;
+            }
+        }
+
+        public Orientation? FindOrientation()
+        {
+            ushort? value = Find<ushort>(ExifTags.Orientation);
+            if (value == null)
+                return null;
+
+            return (Orientation)value.Value;
+        }
 
         public DateTime? FindTakenWhen()
             => Find<DateTime>(ExifTags.DateTimeDigitized);
 
-        public double? FindLatitude() 
+        public double? FindLatitude()
             => FindCoordinate(ExifTags.GPSLatitude);
 
-        public double? FindLongitude() 
+        public double? FindLongitude()
             => FindCoordinate(ExifTags.GPSLongitude);
 
-        public double? FindAltitude() 
+        public double? FindAltitude()
             => FindCoordinate(ExifTags.GPSAltitude);
 
         private double? FindCoordinate(ExifTags type)
         {
+            if (reader == null)
+                return null;
+
             if (reader.GetTagValue(type, out double[] coordinates))
                 return ToDoubleCoordinates(coordinates);
 
             return null;
         }
 
-        private double ToDoubleCoordinates(double[] coordinates) 
+        private double ToDoubleCoordinates(double[] coordinates)
             => coordinates[0] + (coordinates[1] / 60f) + coordinates[2] / 3600f;
 
         private T? Find<T>(ExifTags type)
             where T : struct
         {
+            if (reader == null)
+                return null;
+
             if (reader.GetTagValue(type, out T value))
                 return value;
 
@@ -50,7 +74,9 @@ namespace Neptuo.Recollections.Entries.Services
         protected override void DisposeManagedResources()
         {
             base.DisposeManagedResources();
-            reader.Dispose();
+
+            if (reader != null)
+                reader.Dispose();
         }
     }
 }
