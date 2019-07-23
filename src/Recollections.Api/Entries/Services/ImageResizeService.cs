@@ -13,12 +13,16 @@ namespace Neptuo.Recollections.Entries.Services
 {
     public class ImageResizeService
     {
+        private const int ImageRotationPropertyId = 0x112;
+
         private ImageFormat ImageFormat => ImageFormat.Png;
 
         public void Thumbnail(string inputPath, string outputPath, int width, int height)
         {
             using (var input = DrImage.FromFile(inputPath))
             {
+                EnsureExifImageRotation(input);
+
                 int sourceWidth = input.Width;
                 int sourceHeight = input.Height;
 
@@ -41,6 +45,8 @@ namespace Neptuo.Recollections.Entries.Services
         {
             using (var input = DrImage.FromFile(inputPath))
             {
+                EnsureExifImageRotation(input);
+
                 if (width < input.Width)
                 {
                     var ratio = width / (double)input.Width;
@@ -66,6 +72,24 @@ namespace Neptuo.Recollections.Entries.Services
                 targetGraphics.DrawImage(input, new Rectangle(0, 0, width, height), inputRect ?? new Rectangle(0, 0, input.Width, input.Height), GraphicsUnit.Pixel);
 
                 target.Save(outputPath, ImageFormat);
+            }
+        }
+
+        private void EnsureExifImageRotation(DrImage image)
+        {
+            if (image.PropertyIdList.Contains(ImageRotationPropertyId))
+            {
+                PropertyItem property = image.GetPropertyItem(ImageRotationPropertyId);
+                if (property.Type == 3 && property.Len == 2)
+                {
+                    ushort orientationExif = BitConverter.ToUInt16(image.GetPropertyItem(ImageRotationPropertyId).Value, 0);
+                    if (orientationExif == 8)
+                        image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                    else if (orientationExif == 3)
+                        image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                    else if (orientationExif == 6)
+                        image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                }
             }
         }
     }
