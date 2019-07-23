@@ -15,16 +15,19 @@ namespace Neptuo.Recollections.Entries.Services
         public ImagePropertyReader(string imagePath) 
             => reader = new ExifReader(imagePath);
 
-        public double? GetLatitude() 
-            => GetCoordinate(ExifTags.GPSLatitude);
+        public DateTime? FindTakenWhen()
+            => Find<DateTime>(ExifTags.DateTimeDigitized);
 
-        public double? GetLongitude() 
-            => GetCoordinate(ExifTags.GPSLongitude);
+        public double? FindLatitude() 
+            => FindCoordinate(ExifTags.GPSLatitude);
 
-        public double? GetAltitude() 
-            => GetCoordinate(ExifTags.GPSAltitude);
+        public double? FindLongitude() 
+            => FindCoordinate(ExifTags.GPSLongitude);
 
-        private double? GetCoordinate(ExifTags type)
+        public double? FindAltitude() 
+            => FindCoordinate(ExifTags.GPSAltitude);
+
+        private double? FindCoordinate(ExifTags type)
         {
             if (reader.GetTagValue(type, out double[] coordinates))
                 return ToDoubleCoordinates(coordinates);
@@ -34,6 +37,15 @@ namespace Neptuo.Recollections.Entries.Services
 
         private double ToDoubleCoordinates(double[] coordinates) 
             => coordinates[0] + (coordinates[1] / 60f) + coordinates[2] / 3600f;
+
+        private T? Find<T>(ExifTags type)
+            where T : struct
+        {
+            if (reader.GetTagValue(type, out T value))
+                return value;
+
+            return default;
+        }
 
         protected override void DisposeManagedResources()
         {
