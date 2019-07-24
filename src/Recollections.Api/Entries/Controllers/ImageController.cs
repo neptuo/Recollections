@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo;
@@ -113,7 +114,16 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!IoFile.Exists(filePath))
                 return NotFound();
 
-            return File(new FileStream(filePath, FileMode.Open), "image/png");
+            return File(new FileStream(filePath, FileMode.Open), GetFileContentType(filePath));
+        }
+
+        private static string GetFileContentType(string filePath)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            if (!provider.TryGetContentType(filePath, out string contentType))
+                contentType = "application/octet-stream";
+
+            return contentType;
         }
 
         [HttpPost]
