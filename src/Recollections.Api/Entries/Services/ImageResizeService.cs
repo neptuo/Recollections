@@ -13,9 +13,8 @@ namespace Neptuo.Recollections.Entries.Services
 {
     public class ImageResizeService
     {
-        private const int ImageRotationPropertyId = 0x112;
-
         private ImageFormat ImageFormat => ImageFormat.Png;
+        public static string ImageExtension = ".png";
 
         public void Thumbnail(string inputPath, string outputPath, int width, int height)
         {

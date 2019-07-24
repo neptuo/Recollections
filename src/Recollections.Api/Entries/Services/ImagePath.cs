@@ -22,11 +22,10 @@ namespace Neptuo.Recollections.Entries.Services
 
             string storagePath = service.GetStoragePath(entry);
             string baseName = Path.GetFileNameWithoutExtension(image.FileName);
-            string extension = Path.GetExtension(image.FileName);
 
             Original = Path.Combine(storagePath, image.FileName);
-            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", extension));
-            Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", extension));
+            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", service.GetThumbnailFileExtension()));
+            Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", service.GetPreviewFileExtension()));
         }
 
         public string Get(ImageType type)
