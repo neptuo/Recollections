@@ -123,6 +123,12 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Title = entity.Title;
             model.When = entity.When;
             model.Text = entity.Text;
+            model.Locations.AddRange(entity.Locations.Select(l => new LocationModel()
+            {
+                Longitude = l.Longitude,
+                Latitude = l.Latitude,
+                Altitude = l.Altitude
+            }));
         }
 
         private void MapModelToEntity(EntryModel model, Entry entity)
@@ -131,6 +137,17 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Title = model.Title;
             entity.When = model.When;
             entity.Text = model.Text;
+            entity.Locations.Clear();
+
+            foreach (LocationModel location in model.Locations)
+            {
+                entity.Locations.Add(new Location()
+                {
+                    Longitude = location.Longitude,
+                    Latitude = location.Latitude,
+                    Altitude = location.Altitude
+                });
+            }
         }
     }
 }

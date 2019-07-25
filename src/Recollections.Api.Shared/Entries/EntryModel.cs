@@ -14,6 +14,8 @@ namespace Neptuo.Recollections.Entries
         public DateTime When { get; set; }
         public string Text { get; set; }
 
+        public List<LocationModel> Locations { get; } = new List<LocationModel>();
+
         public EntryModel()
         { }
 
@@ -39,21 +41,23 @@ namespace Neptuo.Recollections.Entries
             Text = Text
         };
 
-        public override bool Equals(object obj) => Equals(obj as EntryModel);
+        public override bool Equals(object obj) => Equals(obj is EntryModel);
 
-        public bool Equals(EntryModel other) => other != null &&
+        public bool Equals(EntryModel other) => 
             Id == other.Id &&
             Title == other.Title &&
             When == other.When &&
-            Text == other.Text;
+            Text == other.Text &&
+            EqualityComparer<ICollection<LocationModel>>.Default.Equals(Locations, other.Locations);
 
         public override int GetHashCode()
         {
-            var hashCode = 3;
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Id);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Title);
-            hashCode = hashCode * 7 + When.GetHashCode();
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Text);
+            var hashCode = 242076647;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Id);
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Title);
+            hashCode = hashCode * -1521134295 + When.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Text);
+            hashCode = hashCode * -1521134295 + EqualityComparer<ICollection<LocationModel>>.Default.GetHashCode(Locations);
             return hashCode;
         }
     }
