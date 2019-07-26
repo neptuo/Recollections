@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,9 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Inject]
         protected IUriHelper Uri { get; set; }
 
+        [CascadingParameter]
+        protected UserStateModel UserState { get; set; }
+
         public List<string> ErrorMessages { get; } = new List<string>();
 
         public string UserName { get; set; }
@@ -26,9 +30,10 @@ namespace Neptuo.Recollections.Accounts.Pages
             RegisterResponse response = await Api.RegisterAsync(new RegisterRequest(UserName, Password));
             if (response.IsSuccess)
             {
+                await UserState.LoginAsync(UserName, Password);
+                
                 UserName = null;
                 Password = null;
-                Uri.NavigateTo("/login");
             }
             else
             {
