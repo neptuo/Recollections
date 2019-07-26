@@ -223,3 +223,13 @@ window.DatePicker = {
         return $('#' + inputId).val();
     }
 }
+
+window.Downloader = {
+    FromUrlAsync: function (name, url) {
+        var link = document.createElement("a");
+        link.target = "_blank";
+        link.download = name;
+        link.href = url;
+        link.click();
+    }
+};

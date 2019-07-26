@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected UiOptions UiOptions { get; set; }
+
+        [Inject]
+        protected Downloader Downloader { get; set; }
 
         [Parameter]
         protected string EntryId { get; set; }
@@ -81,5 +85,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 Navigator.OpenEntryDetail(EntryId);
             }
         }
+
+        protected Task DownloadOriginalAsync() => Downloader.FromUrlAsync(Model.Name, Api.ResolveUrl(Model.Original));
     }
 }

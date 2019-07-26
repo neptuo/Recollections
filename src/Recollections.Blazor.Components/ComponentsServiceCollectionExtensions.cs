@@ -23,6 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<DatePickerInterop>();
             services.AddTransient<MarkdownConverter>();
+            services.AddTransient<Downloader>();
             services.TryAdd(ServiceDescriptor.Singleton<IUniqueNameProvider, GuidUniqueNameProvider>());
 
             return services;

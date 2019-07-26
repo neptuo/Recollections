@@ -22,6 +22,11 @@
                 <Icon Identifier="trash" />
                 Delete Image
             </button>
+
+            <button type="button" class="btn btn-sm" @onclick="@(() => DownloadOriginalAsync())" title="Download Original Image">
+                <Icon Identifier="cloud-download" />
+                Download Original
+            </button>
         </div>
     </div>
 }
