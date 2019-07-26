@@ -79,7 +79,6 @@ namespace Neptuo.Recollections.Accounts
                     var userManager = provider.GetService<UserManager<ApplicationUser>>();
                     var db = provider.GetService<DataContext>();
 
-                    db.Database.EnsureCreated();
                     db.Database.Migrate();
                 }
             }

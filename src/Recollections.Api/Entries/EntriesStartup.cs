@@ -46,7 +46,6 @@ namespace Neptuo.Recollections.Entries
                     var provider = scope.ServiceProvider;
                     var db = provider.GetService<DataContext>();
 
-                    db.Database.EnsureCreated();
                     db.Database.Migrate();
                 }
             }
