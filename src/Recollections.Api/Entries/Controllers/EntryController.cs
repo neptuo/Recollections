@@ -123,7 +123,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Title = entity.Title;
             model.When = entity.When;
             model.Text = entity.Text;
-            model.Locations.AddRange(entity.Locations.Select(l => new LocationModel()
+            model.Locations.AddRange(entity.Locations.OrderBy(l => l.Order).Select(l => new LocationModel()
             {
                 Longitude = l.Longitude,
                 Latitude = l.Latitude,
@@ -139,10 +139,13 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Text = model.Text;
             entity.Locations.Clear();
 
-            foreach (LocationModel location in model.Locations)
+            for (int i = 0; i < model.Locations.Count; i++)
             {
-                entity.Locations.Add(new Location()
+                LocationModel location = model.Locations[i];
+
+                entity.Locations.Add(new OrderedLocation()
                 {
+                    Order = i,
                     Longitude = location.Longitude,
                     Latitude = location.Latitude,
                     Altitude = location.Altitude

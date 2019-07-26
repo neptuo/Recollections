@@ -23,9 +23,9 @@ namespace Neptuo.Recollections.Entries
 
             modelBuilder.Entity<Entry>().OwnsMany(e => e.Locations, e =>
             {
-                e.HasForeignKey("EntryId");
-                e.Property<int>("Id").ValueGeneratedOnAdd();
-                e.HasKey("EntryId", "Id");
+                e.ToTable("EntriesLocations");
+                e.Property("EntryId");
+                e.HasKey("EntryId", nameof(OrderedLocation.Order));
             });
         }
     }

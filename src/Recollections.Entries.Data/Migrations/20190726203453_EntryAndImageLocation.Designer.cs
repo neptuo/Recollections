@@ -9,7 +9,7 @@ using Neptuo.Recollections.Entries;
 namespace Neptuo.Recollections.Entries.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190723102420_EntryAndImageLocation")]
+    [Migration("20190726203453_EntryAndImageLocation")]
     partial class EntryAndImageLocation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,12 +64,11 @@ namespace Neptuo.Recollections.Entries.Migrations
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Entry", b =>
                 {
-                    b.OwnsMany("Neptuo.Recollections.Entries.Location", "Locations", b1 =>
+                    b.OwnsMany("Neptuo.Recollections.Entries.OrderedLocation", "Locations", b1 =>
                         {
                             b1.Property<string>("EntryId");
 
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd();
+                            b1.Property<int>("Order");
 
                             b1.Property<double?>("Altitude");
 
@@ -77,9 +76,9 @@ namespace Neptuo.Recollections.Entries.Migrations
 
                             b1.Property<double?>("Longitude");
 
-                            b1.HasKey("EntryId", "Id");
+                            b1.HasKey("EntryId", "Order");
 
-                            b1.ToTable("Entries_Locations");
+                            b1.ToTable("EntriesLocations");
 
                             b1.HasOne("Neptuo.Recollections.Entries.Entry")
                                 .WithMany("Locations")

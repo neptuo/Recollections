@@ -22,20 +22,20 @@ namespace Neptuo.Recollections.Entries.Migrations
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "Entries_Locations",
+                name: "EntriesLocations",
                 columns: table => new
                 {
+                    Order = table.Column<int>(nullable: false),
                     EntryId = table.Column<string>(nullable: false),
-                    Id = table.Column<int>(nullable: false).Annotation("Sqlite:Autoincrement", true),
                     Longitude = table.Column<double>(nullable: true),
                     Latitude = table.Column<double>(nullable: true),
                     Altitude = table.Column<double>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Entries_Locations", x => new { x.EntryId, x.Id });
+                    table.PrimaryKey("PK_EntriesLocations", x => new { x.EntryId, x.Order });
                     table.ForeignKey(
-                        name: "FK_Entries_Locations_Entries_EntryId",
+                        name: "FK_EntriesLocations_Entries_EntryId",
                         column: x => x.EntryId,
                         principalTable: "Entries",
                         principalColumn: "Id",
@@ -46,7 +46,7 @@ namespace Neptuo.Recollections.Entries.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Entries_Locations");
+                name: "EntriesLocations");
 
             migrationBuilder.DropColumn(
                 name: "Location_Altitude",

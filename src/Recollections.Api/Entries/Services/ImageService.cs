@@ -66,8 +66,9 @@ namespace Neptuo.Recollections.Entries.Services
             await CopyFileAsync(file, path);
             SetProperties(entity, path);
 
-            if (entity.Location.HasValue() && !entry.Locations.Contains(entity.Location))
-                entry.Locations.Add(entity.Location);
+            OrderedLocation location = new OrderedLocation(entry.Locations.Count, entity.Location);
+            if (entity.Location.HasValue() && !entry.Locations.Contains(location))
+                entry.Locations.Add(location);
 
             await dataContext.SaveChangesAsync();
 
