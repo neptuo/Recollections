@@ -28,6 +28,12 @@ namespace Neptuo.Recollections
         public Task MessageAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.alert", message);
 
+        public string UrlRegister()
+            => "/register";
+
+        public void OpenRegister()
+            => uri.NavigateTo(UrlRegister());
+
         public string UrlTimeline()
             => "/";
 

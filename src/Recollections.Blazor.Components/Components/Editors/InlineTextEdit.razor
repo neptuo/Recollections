@@ -3,19 +3,19 @@
 <div class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)
     {
-        <form class="form-inline" onsubmit="@OnSaveValueAsync">
-            <input type="text" class="form-control" bind="@Value" autofocus />
+        <form class="form-inline" @onsubmit="@OnSaveValueAsync">
+            <input type="text" class="form-control" @bind="Value" autofocus />
             <button class="btn btn-link" title="Save changes">
                 <Icon Identifier="check" />
             </button>
-            <button class="btn btn-link" onclick="@OnResetAsync" title="Revert changes">
+            <button class="btn btn-link" @onclick="@OnResetAsync" title="Revert changes">
                 <Icon Identifier="x" />
             </button>
         </form>
     }
     else
     {
-        <a class="inline-editor-value" onclick="@OnEdit">
+        <a class="inline-editor-value" @onclick="@OnEdit">
             <Icon Identifier="pencil" />
 
             @if (String.IsNullOrEmpty(Value))

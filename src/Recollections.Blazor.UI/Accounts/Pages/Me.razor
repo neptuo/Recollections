@@ -20,16 +20,16 @@
             Change password
         </h2>
         <div class="change-password">
-            <Validation ErrorMessages="@ChangePassword.ErrorMessages" />
-            <form onsubmit="@ChangePassword.ExecuteAsync">
+            <Validation ErrorMessages="ChangePassword.ErrorMessages" />
+            <form @onsubmit="@ChangePassword.ExecuteAsync">
                 <div class="form-group">
-                    <input class="form-control" type="password" placeholder="Current password" bind="@ChangePassword.Current" />
+                    <input class="form-control" type="password" placeholder="Current password" @bind="ChangePassword.Current" />
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="password" placeholder="New password" bind="@ChangePassword.New" />
+                    <input class="form-control" type="password" placeholder="New password" @bind="ChangePassword.New" />
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="password" placeholder="Confirm new password" bind="@ChangePassword.ConfirmNew" />
+                    <input class="form-control" type="password" placeholder="Confirm new password" @bind="ChangePassword.ConfirmNew" />
                 </div>
                 <div class="form-group">
                     <button class="btn btn-primary" type="submit">Change password</button>

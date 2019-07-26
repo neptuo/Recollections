@@ -144,5 +144,12 @@ namespace Neptuo.Recollections.Entries.Pages
                 Navigator.OpenTimeline();
             }
         }
+
+        protected void TestGps()
+        {
+            Model.Locations.RemoveAt(0);
+
+            SaveAsync();
+        }
     }
 }

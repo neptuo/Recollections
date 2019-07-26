@@ -2,11 +2,11 @@
 
 <div class="modal fade" id="@Id" tabindex="-1" role="dialog">
     <div class="@DialogCssClass" role="document">
-        <form onsubmit="@OnFormSubmit">
+        <form @onsubmit="@OnFormSubmit">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalLabel">@Title</h4>
-                    <button class="close" onclick="@(() => IsVisible = false)">
+                    <button class="close" @onclick="@(() => IsVisible = false)">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -16,9 +16,9 @@
                 <div class="modal-footer">
                     @if (!String.IsNullOrEmpty(PrimaryButtonText))
                     {
-                        <button class="btn btn-primary" onclick="@OnPrimaryButtonClick">@PrimaryButtonText</button>
+                        <button class="btn btn-primary" @onclick="@OnPrimaryButtonClick">@PrimaryButtonText</button>
                     }
-                    <button class="btn btn-default" onclick="@OnCloseButtonClick">@CloseButtonText</button>
+                    <button class="btn btn-default" @onclick="@OnCloseButtonClick">@CloseButtonText</button>
                 </div>
             </div>
         </form>

@@ -13,8 +13,11 @@ namespace Neptuo.Recollections.Accounts.Pages
 {
     public class LoginModel : ComponentBase
     {
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
         [CascadingParameter]
-        public UserStateModel UserState { get; set; }
+        protected UserStateModel UserState { get; set; }
 
         [Required]
         public string UserName { get; set; }

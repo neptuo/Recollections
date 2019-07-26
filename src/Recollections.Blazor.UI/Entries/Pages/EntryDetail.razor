@@ -55,10 +55,10 @@
         </div>
 
         <div class="actions">
-            <button type="button" class="btn btn-sm btn-danger" onclick="@(() => DeleteAsync())" title="Delete Entry">
+            <button type="button" class="btn btn-sm btn-danger" @onclick="(() => DeleteAsync())" title="Delete Entry">
                 <Icon Identifier="trash" />
                 Delete Entry
             </button>
         </div>
-    </div>
-} 
+    </div> 
+}

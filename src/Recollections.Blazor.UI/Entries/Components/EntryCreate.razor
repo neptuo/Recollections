@@ -1,17 +1,17 @@
 ﻿@inherits Neptuo.Recollections.Entries.Components.EntryCreateModel
 
 <div class="entry entry-new">
-    <Validation ErrorMessages="@ErrorMessages" />
+    <Validation ErrorMessages="ErrorMessages" />
 
-    <form onsubmit="@CreateAsync">
+    <form @onsubmit="@CreateAsync">
         <div class="form-row form-group">
             <div class="col">
                 <label for="entry-create-title">Title:</label>
-                <input id="entry-create-title" class="form-control" type="text" placeholder="Entry title..." bind="@Title" />
+                <input id="entry-create-title" class="form-control" type="text" placeholder="Entry title..." @bind="Title" />
             </div>
             <div class="col-auto">
                 <label for="entry-create-title">When:</label>
-                <input id="@WhenInputId" class="form-control" type="text" placeholder="When it happend..." bind="@When" format-value="@UiOptions.DateFormat" />
+                <input id="@WhenInputId" class="form-control" type="text" placeholder="When it happend..." @bind="When" @bind:format="@UiOptions.DateFormat" />
             </div>
         </div>
         <div class="form-row">
