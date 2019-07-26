@@ -41,9 +41,9 @@ namespace Neptuo.Recollections.Entries
             Text = Text
         };
 
-        public override bool Equals(object obj) => Equals(obj is EntryModel);
+        public override bool Equals(object obj) => Equals(obj as EntryModel);
 
-        public bool Equals(EntryModel other) => 
+        public bool Equals(EntryModel other) => other != null &&
             Id == other.Id &&
             Title == other.Title &&
             When == other.When &&
