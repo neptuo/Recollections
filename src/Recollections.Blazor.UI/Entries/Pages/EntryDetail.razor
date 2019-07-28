@@ -19,37 +19,19 @@
                 <Alert Message="@UploadError" Mode="AlertMode.Error" />
             }
 
-            @if (Images != null)
-            {
-                var columns = 6;
-                var rows = Images.Count / columns;
-                if ((Images.Count % columns) > 0)
+            <div class="row">
+                @if (Images != null)
                 {
-                    rows++;
+                    @foreach (var image in Images)
+                    {
+                        <div class="col-sm-4 col-md-3 col-lg-2 image">
+                            <a href="@Navigator.UrlImageDetail(Model.Id, image.Id)">
+                                <img src="@Api.ResolveUrl(image.Thumbnail)" />
+                            </a>
+                        </div>
+                    }
                 }
-
-                for (int row = 0; row < rows; row++)
-                {
-                    <div class="row">
-                        @for (int column = 0; column < columns; column++)
-                        {
-                            var index = row * columns + column;
-                            if (index >= Images.Count)
-                            {
-                                break;
-                            }
-
-                            var image = Images[index];
-
-                            <div class="col-2 image">
-                                <a href="@Navigator.UrlImageDetail(Model.Id, image.Id)">
-                                    <img src="@Api.ResolveUrl(image.Thumbnail)" />
-                                </a>
-                            </div>
-                        }
-                    </div>
-                }
-            }
+            </div>
 
             <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Text="@UploadButtonText" Progress="@(e => OnUploadProgressAsync(e))" Error="@(e => OnUploadErrorAsync(e))" />
         </div>
@@ -60,5 +42,5 @@
                 Delete Entry
             </button>
         </div>
-    </div> 
+    </div>
 }
