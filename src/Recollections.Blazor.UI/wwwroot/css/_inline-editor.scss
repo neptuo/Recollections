@@ -7,12 +7,37 @@
         color: $error-color;
     }
 
+    .input-group-append {
+        button:hover {
+            .oi-check {
+                color: white;
+            }
+
+            .oi-x {
+                color: white;
+            }
+        }
+    }
+
     .form-control {
         font-size: inherit;
     }
 
     textarea {
         min-height: 400px;
+    }
+
+    input[type=text] {
+        border-right: none;
+    }
+
+    button.btn-save, button.btn-cancel {
+        border-color: #ced4da;
+        border-left: none;
+    }
+
+    button.btn-save {
+        border-right: none;
     }
 }
 

@@ -46,11 +46,27 @@
 .inline-editor .oi-x {
   color: var(--danger); }
 
+.inline-editor .input-group-append button:hover .oi-check {
+  color: white; }
+
+.inline-editor .input-group-append button:hover .oi-x {
+  color: white; }
+
 .inline-editor .form-control {
   font-size: inherit; }
 
 .inline-editor textarea {
   min-height: 400px; }
+
+.inline-editor input[type=text] {
+  border-right: none; }
+
+.inline-editor button.btn-save, .inline-editor button.btn-cancel {
+  border-color: #ced4da;
+  border-left: none; }
+
+.inline-editor button.btn-save {
+  border-right: none; }
 
 .inline-editor-viewmode .inline-editor-value {
   position: relative; }

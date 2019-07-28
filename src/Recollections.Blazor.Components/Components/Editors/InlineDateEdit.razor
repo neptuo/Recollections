@@ -4,13 +4,17 @@
     @if (IsEditMode)
     {
         <form class="form-inline" @onsubmit="@OnSaveValueAsync">
-            <input id="@InputId" type="text" class="form-control" @bind="Value" @bind:format="@Format" autofocus />
-            <button class="btn btn-link" title="Save changes">
-                <Icon Identifier="check" />
-            </button>
-            <button class="btn btn-link" @onclick="@OnResetAsync" title="Revert changes">
-                <Icon Identifier="x" />
-            </button>
+            <div class="input-group">
+                <input id="@InputId" type="text" class="form-control" @bind="Value" @bind:format="@Format" autofocus />
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success btn-save" title="Save changes">
+                        <Icon Identifier="check" />
+                    </button>
+                    <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
+                        <Icon Identifier="x" />
+                    </button>
+                </div>
+            </div>
         </form>
     }
     else
