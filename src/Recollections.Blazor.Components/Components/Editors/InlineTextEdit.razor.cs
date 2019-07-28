@@ -44,10 +44,11 @@ namespace Neptuo.Recollections.Components.Editors
             }
         }
 
-        internal async Task OnCancelAsync()
+        internal async void OnCancel()
         {
             await OnResetAsync();
             StateHasChanged();
+            Console.WriteLine($"Cancel completed, IsEditMode: {IsEditMode}");
         }
     }
 }

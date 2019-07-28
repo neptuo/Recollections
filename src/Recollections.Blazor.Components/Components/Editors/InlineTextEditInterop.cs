@@ -26,16 +26,14 @@ namespace Neptuo.Recollections.Components.Editors
         }
 
         [JSInvokable]
-        public static Task InlineTextEdit_OnCancel(string inputId)
+        public static void InlineTextEdit_OnCancel(string inputId)
         {
             Console.WriteLine($"InlineTextEdit_OnCancel, InputId: {inputId}");
             if (models.TryGetValue(inputId, out var model))
             {
                 Console.WriteLine("Model found");
-                return model.OnCancelAsync();
+                model.OnCancel();
             }
-
-            return Task.CompletedTask;
         }
     }
 }
