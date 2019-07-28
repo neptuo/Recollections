@@ -1,9 +1,9 @@
 ﻿.inline-editor {
-    .oi-check {
+    .oi-check, .fa-check { 
         color: $ok-color;
     }
 
-    .oi-x {
+    .oi-x, .fa-times {
         color: $error-color;
     }
 

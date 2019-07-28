@@ -5,12 +5,6 @@
     {
         <form @onsubmit="@OnSaveValueAsync">
             <textarea id="@TextAreaId" class="form-control" />
-            <button type="submit" class="btn btn-link inline-submit" title="Save changes">
-                <Icon Identifier="check" />
-            </button>
-            <button class="btn btn-link inline-submit" @onclick="@OnResetAsync" title="Revert changes">
-                <Icon Identifier="x" />
-            </button>
         </form>
     }
     else

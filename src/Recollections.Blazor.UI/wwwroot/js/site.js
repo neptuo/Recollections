@@ -153,17 +153,26 @@ window.InlineMarkdownEdit = {
                 "quote",
                 "horizontal-rule",
                 {
+                    name: "cancel",
+                    className: "fa fa-times pull-right",
+                    title: "Close Editor",
+                    action: function (editor) {
+                        DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineMarkdownEdit_OnCancel", textAreaId);
+                    }
+                },
+                {
                     name: "save",
-                    className: "fa fa-star hidden",
+                    className: "fa fa-check pull-right",
                     title: "Save",
                     action: function (editor) {
                         var value = editor.value();
                         DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineMarkdownEdit_OnSave", textAreaId, value);
                     }
-                }
+                },
             ],
             shortcuts: {
-                "save": "Ctrl-Enter"
+                "save": "Ctrl-Enter",
+                "cancel": "Escape"
             }
         });
         InlineMarkdownEdit.editors[textAreaId] = editor;

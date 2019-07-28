@@ -78,6 +78,13 @@ namespace Neptuo.Recollections.Components.Editors
             Console.WriteLine($"Save completed, IsEditMode: {IsEditMode}");
         }
 
+        internal async void OnCancel()
+        {
+            await OnResetAsync();
+            StateHasChanged();
+            Console.WriteLine($"Cancel completed, IsEditMode: {IsEditMode}");
+        }
+
         private string TransformValue()
         {
             if (String.IsNullOrEmpty(Value))

@@ -51,5 +51,16 @@ namespace Neptuo.Recollections.Components.Editors
                 model.OnSave(value);
             }
         }
+
+        [JSInvokable]
+        public static void InlineMarkdownEdit_OnCancel(string id)
+        {
+            Console.WriteLine($"InlineMarkdownEdit_OnCancel, TextAreaId: {id}");
+            if (models.TryGetValue(id, out InlineMarkdownEditModel model))
+            {
+                Console.WriteLine("Model found");
+                model.OnCancel();
+            }
+        }
     }
 }
