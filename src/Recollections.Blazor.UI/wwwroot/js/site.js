@@ -190,6 +190,16 @@ window.InlineMarkdownEdit = {
     }
 }
 
+window.InlineTextEdit = {
+    Initialize: function (inputId) {
+        $('#' + inputId).focus().keydown (function (e) {
+            if (e.keyCode == 27) {
+                DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineTextEdit_OnCancel", inputId);
+            }
+        });
+    }
+};
+
 window.InlineDateEdit = {
     Initialize: function (inputId, format) {
         $('#' + inputId).datepicker({
@@ -205,7 +215,7 @@ window.InlineDateEdit = {
     GetValue: function (inputId) {
         return $('#' + inputId).val();
     }
-}
+};
 
 window.DatePicker = {
     Initialize: function (inputId, format) {

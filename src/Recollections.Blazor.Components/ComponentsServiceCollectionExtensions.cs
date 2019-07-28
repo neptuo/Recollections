@@ -21,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ModalNative>();
             services.AddSingleton<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
+            services.AddTransient<InlineTextEditInterop>();
             services.AddTransient<DatePickerInterop>();
             services.AddTransient<MarkdownConverter>();
             services.AddTransient<Downloader>();

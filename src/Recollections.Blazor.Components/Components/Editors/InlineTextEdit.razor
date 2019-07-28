@@ -5,7 +5,7 @@
     {
         <form @onsubmit="@OnSaveValueAsync">
             <div class="input-group">
-                <input type="text" class="form-control" @bind="Value" autofocus />
+                <input id="@InputId" type="text" class="form-control" @bind="Value" />
                 <div class="input-group-append">
                     <button class="btn btn-outline-success btn-save" title="Save changes">
                         <Icon Identifier="check" />
@@ -19,7 +19,7 @@
     }
     else
     {
-        <a class="inline-editor-value" @onclick="@OnEdit">
+        <a class="inline-editor-value" @onclick="@OnEditAsync">
             <Icon Identifier="pencil" />
 
             @if (String.IsNullOrEmpty(Value))

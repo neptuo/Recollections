@@ -23,10 +23,11 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected bool IsEditMode { get; set; }
 
-        protected void OnEdit()
+        protected virtual Task OnEditAsync()
         {
             IsEditMode = true;
             originalValue = Value;
+            return Task.CompletedTask;
         }
 
         protected Task OnSaveValueAsync()
