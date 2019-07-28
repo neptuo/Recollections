@@ -5,11 +5,11 @@
 
     <form @onsubmit="@CreateAsync">
         <div class="form-row form-group">
-            <div class="col">
+            <div class="col-md col-sm-12">
                 <label for="entry-create-title">Title:</label>
                 <input id="entry-create-title" class="form-control" type="text" placeholder="Entry title..." @bind="Title" />
             </div>
-            <div class="col-auto">
+            <div class="col-md-auto col-sm-12">
                 <label for="entry-create-title">When:</label>
                 <input id="@WhenInputId" class="form-control" type="text" placeholder="When it happend..." @bind="When" @bind:format="@UiOptions.DateFormat" />
             </div>
