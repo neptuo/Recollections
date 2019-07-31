@@ -1,0 +1,38 @@
+﻿@inherits InlineGpsEditModel
+
+<div class="inline-editor @GetModeCssClass()">
+    @if (IsEditMode)
+    {
+        <form class="form-inline" @onsubmit="@OnSaveValueAsync">
+            <div class="input-group">
+                <input type="text" class="form-control" @bind="Value.Latitude" placeholder="Latitude" />
+                <input type="text" class="form-control" @bind="Value.Longitude" placeholder="Longitude" />
+                <input type="text" class="form-control" @bind="Value.Altitude" placeholder="Altitude" />
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success btn-save" title="Save changes">
+                        <Icon Identifier="check" />
+                    </button>
+                    <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
+                        <Icon Identifier="x" />
+                    </button>
+                </div>
+            </div>
+        </form>
+    }
+    else
+    {
+        <a class="inline-editor-value" @onclick="@OnEditAsync">
+            <Icon Identifier="pencil" />
+
+            <Icon Identifier="location" />
+            @if (Value == null)
+            {
+                <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
+            }
+            else
+            {
+                <span class="inline-editor-content">@Value.Latitude, @Value.Longitude, @Value.Altitude</span>
+            }
+        </a>
+    }
+</div>

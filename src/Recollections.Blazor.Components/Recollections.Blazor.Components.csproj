@@ -19,5 +19,9 @@
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Recollections.Api.Shared\Recollections.Api.Shared.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -43,7 +43,18 @@ namespace Neptuo.Recollections.Entries.Services
             => FindCoordinate(ExifTags.GPSLongitude);
 
         public double? FindAltitude()
-            => FindCoordinate(ExifTags.GPSAltitude);
+        {
+            if (reader == null)
+                return null;
+
+            if (reader.GetTagValue(ExifTags.GPSAltitude, out uint[] value))
+            {
+                if (value != null && value.Length == 2)
+                    return value[1];
+            }
+
+            return null;
+        }
 
         private double? FindCoordinate(ExifTags type)
         {
