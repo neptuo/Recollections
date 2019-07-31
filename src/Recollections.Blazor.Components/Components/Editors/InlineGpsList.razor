@@ -1,0 +1,7 @@
+﻿@inherits InlineGpsListModel
+
+@foreach (var item in Value)
+{
+    var x = item;
+    <InlineGpsEdit Value="@item" ValueChanged="@(newValue => OnValueChanged(newValue, x))" /> 
+}

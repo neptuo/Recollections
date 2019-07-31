@@ -5,13 +5,16 @@
 {
     <div class="entry-detail">
         <h2 class="title">
-            <InlineTextEdit Value="@Model.Title" ValueChanged="@(value => SaveTitleAsync(value))" />
+            <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
         </h2>
         <div class="datetime">
-            <InlineDateEdit Value="@Model.When" ValueChanged="@(value => SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
+            <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
+        </div>
+        <div class="gps">
+            <InlineGpsList Value="@Model.Locations" ValueChanged="@(async value => await SaveLocationsAsync(value))" />
         </div>
         <div class="text">
-            <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(value => SaveTextAsync(value))" />
+            <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(async value => await SaveTextAsync(value))" />
         </div>
         <div class="images">
             @if (!string.IsNullOrEmpty(UploadError))
@@ -33,11 +36,11 @@
                 }
             </div>
 
-            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Text="@UploadButtonText" Progress="@(e => OnUploadProgressAsync(e))" Error="@(e => OnUploadErrorAsync(e))" />
+            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Text="@UploadButtonText" Progress="@(async e => await OnUploadProgressAsync(e))" Error="@(async e => await OnUploadErrorAsync(e))" />
         </div>
 
         <div class="actions">
-            <button type="button" class="btn btn-sm btn-danger" @onclick="(() => DeleteAsync())" title="Delete Entry">
+            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
                 <Icon Identifier="trash" />
                 Delete Entry
             </button>
