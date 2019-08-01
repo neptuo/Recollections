@@ -20,6 +20,8 @@ namespace Neptuo.Recollections.Entries
             Altitude = Altitude
         };
 
+        public bool HasValue() => Longitude != null && Latitude != null;
+
         public override bool Equals(object obj) => Equals(obj as LocationModel);
 
         public bool Equals(LocationModel other) => other != null &&

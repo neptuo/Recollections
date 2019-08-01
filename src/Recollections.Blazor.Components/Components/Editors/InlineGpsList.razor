@@ -3,5 +3,5 @@
 @foreach (var item in Value)
 {
     var x = item;
-    <InlineGpsEdit Value="@item" ValueChanged="@(newValue => OnValueChanged(newValue, x))" /> 
+    <InlineGpsEdit Value="@item" ValueChanged="@(newValue => ValueChanged?.Invoke(Value))" Delete="OnItemRemoved" /> 
 }

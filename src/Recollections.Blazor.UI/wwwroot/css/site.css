@@ -61,12 +61,13 @@
 .inline-editor input[type=text] {
   border-right: none; }
 
-.inline-editor button.btn-save, .inline-editor button.btn-cancel {
+.inline-editor .input-group-append button {
   border-color: #ced4da;
-  border-left: none; }
+  border-left-width: 0px;
+  border-right-width: 0px; }
 
-.inline-editor button.btn-save {
-  border-right: none; }
+.inline-editor .input-group-append button:last-of-type {
+  border-right-width: 1px; }
 
 .inline-editor-viewmode .inline-editor-value {
   position: relative; }

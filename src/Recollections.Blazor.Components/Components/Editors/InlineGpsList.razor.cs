@@ -29,5 +29,14 @@ namespace Neptuo.Recollections.Components.Editors
                 ValueChanged?.Invoke(Value);
             }
         }
+
+        protected void OnItemRemoved(LocationModel item)
+        {
+            if (Value != null)
+            {
+                Value.Remove(item);
+                ValueChanged?.Invoke(Value);
+            }
+        }
     }
 }

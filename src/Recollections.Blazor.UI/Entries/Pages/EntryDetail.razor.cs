@@ -81,6 +81,7 @@ namespace Neptuo.Recollections.Entries.Pages
             Console.WriteLine("Saving model.");
             await Api.UpdateAsync(Model);
             UpdateOriginal();
+            StateHasChanged();
         }
 
         private void UpdateOriginal() => original = Model.Clone();

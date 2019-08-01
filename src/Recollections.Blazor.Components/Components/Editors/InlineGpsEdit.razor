@@ -15,6 +15,12 @@
                     <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
                         <Icon Identifier="x" />
                     </button>
+                    @if (Delete != null)
+                    {
+                        <button class="btn btn-outline-danger btn-cancel" @onclick="@(() => Delete(Value))" title="Delete">
+                            <Icon Identifier="trash" />
+                        </button>
+                    }
                 </div>
             </div>
         </form>
@@ -25,7 +31,7 @@
             <Icon Identifier="pencil" />
 
             <Icon Identifier="location" />
-            @if (Value == null)
+            @if (Value == null || !Value.HasValue())
             {
                 <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
