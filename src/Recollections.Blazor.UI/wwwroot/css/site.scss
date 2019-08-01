@@ -20,6 +20,12 @@ blockquote {
 @import "_inline-editor.scss";
 @import "_file-upload.scss";
 
+.actions {
+    .right-actions {
+        text-align: right;
+    }
+}
+
 @import "_accounts.scss";
 @import "_timeline.scss";
 @import "_entry-detail.scss";

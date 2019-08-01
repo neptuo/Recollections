@@ -89,8 +89,14 @@ h2 .inline-editor-viewmode .oi {
 .inline-markdown .inline-submit {
   margin-top: -60px; }
 
-.file-upload input[type=file] {
-  display: none; }
+.file-upload {
+  float: left;
+  margin-right: 4px; }
+  .file-upload input[type=file] {
+    display: none; }
+
+.actions .right-actions {
+  text-align: right; }
 
 .component-login form {
   width: 100%;

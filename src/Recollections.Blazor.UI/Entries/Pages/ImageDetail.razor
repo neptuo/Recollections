@@ -20,16 +20,18 @@
             <img src="@Api.ResolveUrl(Model.Preview)" />
         </div>
 
-        <div class="actions">
-            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Image">
-                <Icon Identifier="trash" />
-                Delete Image
-            </button>
+        <ActionPanel>
 
             <button type="button" class="btn btn-sm" @onclick="@(async () => await DownloadOriginalAsync())" title="Download Original Image">
                 <Icon Identifier="cloud-download" />
                 Download Original
             </button>
-        </div>
+
+            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Image">
+                <Icon Identifier="trash" />
+                Delete Image
+            </button>
+
+        </ActionPanel>
     </div>
 }

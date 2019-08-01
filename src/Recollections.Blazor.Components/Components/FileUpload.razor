@@ -1,6 +1,9 @@
 ﻿@inherits FileUploadModel
 
-<form id="@FormId" class="file-upload" action="@Url">
+<form id="@FormId" class="inline-form file-upload" action="@Url">
     <input type="file" multiple />
-    <button type="button" class="btn btn-primary">@Text</button>
+    <button type="button" class="btn btn-sm btn-primary">
+        <Icon Identifier="image" />
+        @Text
+    </button>
 </form>

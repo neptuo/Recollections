@@ -36,18 +36,26 @@
                 }
             </div>
 
-            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)" BearerToken="@UserState.BearerToken" Text="@UploadButtonText" Progress="@(async e => await OnUploadProgressAsync(e))" Error="@(async e => await OnUploadErrorAsync(e))" />
         </div>
 
-        <div class="actions">
+        <ActionPanel>
+                
+            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
+                        BearerToken="@UserState.BearerToken"
+                        Text="@UploadButtonText"
+                        Progress="@(async e => await OnUploadProgressAsync(e))"
+                        Error="@(async e => await OnUploadErrorAsync(e))" />
+
+            <button type="button" class="btn btn-sm" @onclick="@(() => Model.Locations.Add(new LocationModel()))" title="Add GPS">
+                <Icon Identifier="location" />
+                Add Location
+            </button>
+
             <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
                 <Icon Identifier="trash" />
                 Delete Entry
             </button>
-            <button type="button" class="btn btn-sm" @onclick="@(() => Model.Locations.Add(new LocationModel()))" title="Add GPS">
-                <Icon Identifier="location" />
-                Add location
-            </button>
-        </div>
+
+        </ActionPanel>
     </div>
 }
