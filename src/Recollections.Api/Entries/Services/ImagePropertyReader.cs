@@ -68,7 +68,7 @@ namespace Neptuo.Recollections.Entries.Services
         }
 
         private double ToDoubleCoordinates(double[] coordinates)
-            => coordinates[0] + (coordinates[1] / 60f) + coordinates[2] / 3600f;
+            => Math.Round(coordinates[0] + (coordinates[1] / 60f) + coordinates[2] / 3600f, 13);
 
         private T? Find<T>(ExifTags type)
             where T : struct
