@@ -10,5 +10,17 @@ using System.Threading.Tasks;
 namespace Neptuo.Recollections.Components.Editors
 {
     public class InlineGpsEditModel : InlineEditModel<LocationModel>
-    { }
+    {
+        protected string FormatToString()
+        {
+            if (Value == null)
+                return null;
+
+            string result = $"{Value.Latitude}, {Value.Longitude}";
+            if (Value.Altitude != null)
+                result += $" ({Value.Altitude})";
+
+            return result;
+        }
+    }
 }
