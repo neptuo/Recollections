@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using IoFile = System.IO.File;
@@ -113,6 +114,16 @@ namespace Neptuo.Recollections.Entries.Controllers
             string filePath = path.Get(type);
             if (!IoFile.Exists(filePath))
                 return NotFound();
+
+            if (type == ImageType.Original)
+            {
+                ContentDisposition header = new ContentDisposition
+                {
+                    FileName = entity.Name + Path.GetExtension(path.Original),
+                    Inline = false
+                };
+                Response.Headers.Add("Content-Disposition", header.ToString());
+            }
 
             return File(new FileStream(filePath, FileMode.Open), GetFileContentType(filePath));
         }
