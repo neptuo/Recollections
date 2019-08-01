@@ -170,5 +170,17 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             return Ok();
         });
+
+        [HttpPost("{imageId}/set-location-from-original")]
+        public Task<IActionResult> SetLocationFromOriginal(string entryId, string imageId) => RunEntryAsync(entryId, async entry =>
+        {
+            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            if (entity == null)
+                return NotFound();
+
+            await service.SetLocationFromOriginalAsync(entry, entity);
+
+            return NoContent();
+        });
     }
 }

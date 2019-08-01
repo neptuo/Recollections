@@ -65,16 +65,20 @@ namespace Neptuo.Recollections.Entries.Services
 
             await CopyFileAsync(file, path);
             SetProperties(entity, path);
-
-            OrderedLocation location = new OrderedLocation(entry.Locations.Count, entity.Location);
-            if (entity.Location.HasValue() && !entry.Locations.Contains(location))
-                entry.Locations.Add(location);
+            TryAddLocationToEntry(entry, entity);
 
             await dataContext.SaveChangesAsync();
 
             await ComputeOtherSizesAsync(entry, entity);
 
             return entity;
+        }
+
+        private static void TryAddLocationToEntry(Entry entry, Image entity)
+        {
+            OrderedLocation location = new OrderedLocation(entry.Locations.Count, entity.Location);
+            if (entity.Location.HasValue() && !entry.Locations.Contains(location))
+                entry.Locations.Add(location);
         }
 
         private void Validate(IFormFile file)
@@ -91,7 +95,7 @@ namespace Neptuo.Recollections.Entries.Services
                 throw new ImageNotSupportedExtensionException();
         }
 
-        private void SetProperties(Image entity, string path)
+        private void SetProperties(Image entity, string path, bool isWhenIncluded = true)
         {
             using (ImagePropertyReader propertyReader = new ImagePropertyReader(path))
             {
@@ -99,9 +103,12 @@ namespace Neptuo.Recollections.Entries.Services
                 entity.Location.Latitude = propertyReader.FindLatitude();
                 entity.Location.Altitude = propertyReader.FindAltitude();
 
-                DateTime? when = propertyReader.FindTakenWhen();
-                if (when != null)
-                    entity.When = when.Value;
+                if (isWhenIncluded)
+                {
+                    DateTime? when = propertyReader.FindTakenWhen();
+                    if (when != null)
+                        entity.When = when.Value;
+                }
             }
         }
 
@@ -139,6 +146,15 @@ namespace Neptuo.Recollections.Entries.Services
             using (FileStream target = File.Create(path))
             using (Stream source = file.OpenReadStream())
                 await source.CopyToAsync(target);
+        }
+
+        public async Task SetLocationFromOriginalAsync(Entry entry, Image image)
+        {
+            var path = new ImagePath(this, entry, image);
+            SetProperties(image, path.Original, isWhenIncluded: false);
+            TryAddLocationToEntry(entry, image);
+
+            await dataContext.SaveChangesAsync();
         }
 
         public void MapEntityToModel(Image entity, ImageModel model)

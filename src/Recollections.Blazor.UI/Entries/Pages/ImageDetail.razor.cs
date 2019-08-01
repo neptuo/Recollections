@@ -41,6 +41,11 @@ namespace Neptuo.Recollections.Entries.Pages
             await base.OnInitAsync();
             await UserState.EnsureAuthenticatedAsync();
 
+            await LoadAsync();
+        }
+
+        private async Task LoadAsync()
+        {
             Model = await Api.GetImageAsync(EntryId, ImageId);
             UpdateOriginal();
         }
@@ -90,6 +95,12 @@ namespace Neptuo.Recollections.Entries.Pages
                 await Api.DeleteImageAsync(EntryId, ImageId);
                 Navigator.OpenEntryDetail(EntryId);
             }
+        }
+
+        protected async Task SetLocationOriginalAsync()
+        {
+            await Api.SetImageLocationFromOriginalAsync(EntryId, ImageId);
+            await LoadAsync();
         }
 
         protected Task DownloadOriginalAsync() => Downloader.FromUrlAsync(Model.Name, Api.ResolveUrl(Model.Original));
