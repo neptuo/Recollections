@@ -50,8 +50,13 @@ window.FileUpload = {
         var uploadIndex = -1;
         function uploadError(statusCode, message) {
             var total = input[0].files.length;
-            form[0].reset();
+            resetForm();
             DotNet.invokeMethodAsync("Recollections.Blazor.Components", "FileUpload_OnError", formId, statusCode, total, uploadIndex);
+        }
+
+        function resetForm() {
+            uploadIndex = -1;
+            form[0].reset();
         }
 
         function uploadCallback(total, completed) {
@@ -73,8 +78,7 @@ window.FileUpload = {
                     uploadError
                 );
             } else {
-                uploadIndex = -1;
-                form[0].reset();
+                resetForm();
             }
         }
 
