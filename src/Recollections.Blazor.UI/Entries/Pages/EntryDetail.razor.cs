@@ -70,18 +70,15 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        protected async Task SaveLocationsAsync(List<LocationModel> value)
-        {
-            Model.Locations.Clear();
-            Model.Locations.AddRange(value);
-            await SaveAsync();
-        }
-
-        private async Task SaveAsync()
+        protected async Task SaveAsync()
         {
             if (original.Equals(Model))
+            {
+                Console.WriteLine("Models are equal.");
                 return;
+            }
 
+            Console.WriteLine("Saving model.");
             await Api.UpdateAsync(Model);
             UpdateOriginal();
         }

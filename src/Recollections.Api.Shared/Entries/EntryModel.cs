@@ -33,13 +33,19 @@ namespace Neptuo.Recollections.Entries
             Text = text;
         }
 
-        public EntryModel Clone() => new EntryModel()
+        public EntryModel Clone()
         {
-            Id = Id,
-            Title = Title,
-            When = When,
-            Text = Text
-        };
+            var clone = new EntryModel()
+            {
+                Id = Id,
+                Title = Title,
+                When = When,
+                Text = Text
+            };
+
+            clone.Locations.AddRange(Locations.Select(l => l.Clone()));
+            return clone;
+        }
 
         public override bool Equals(object obj) => Equals(obj as EntryModel);
 
@@ -48,7 +54,23 @@ namespace Neptuo.Recollections.Entries
             Title == other.Title &&
             When == other.When &&
             Text == other.Text &&
-            EqualityComparer<ICollection<LocationModel>>.Default.Equals(Locations, other.Locations);
+            EqualsLocations(other.Locations);
+
+        protected bool EqualsLocations(List<LocationModel> other)
+        {
+            if (Locations.Count != other.Count)
+                return false;
+
+            for (int i = 0; i < Locations.Count; i++)
+            {
+                var a = Locations[i];
+                var b = other[i];
+                if (!a.Equals(b))
+                    return false;
+            }
+
+            return true;
+        }
 
         public override int GetHashCode()
         {

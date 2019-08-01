@@ -11,7 +11,7 @@
             <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
         </div>
         <div class="gps">
-            <InlineGpsList Value="@Model.Locations" ValueChanged="@(async value => await SaveLocationsAsync(value))" />
+            <InlineGpsList Value="@Model.Locations" ValueChanged="@(async value => await SaveAsync())" />
         </div>
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(async value => await SaveTextAsync(value))" />
@@ -43,6 +43,10 @@
             <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
                 <Icon Identifier="trash" />
                 Delete Entry
+            </button>
+            <button type="button" class="btn btn-sm" @onclick="@(() => Model.Locations.Add(new LocationModel()))" title="Add GPS">
+                <Icon Identifier="location" />
+                Add GPS
             </button>
         </div>
     </div>
