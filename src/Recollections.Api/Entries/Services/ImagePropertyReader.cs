@@ -49,8 +49,8 @@ namespace Neptuo.Recollections.Entries.Services
 
             if (reader.GetTagValue(ExifTags.GPSAltitude, out uint[] value))
             {
-                if (value != null && value.Length == 2)
-                    return value[1];
+                if (value != null)
+                    return value.FirstOrDefault();
             }
 
             return null;
