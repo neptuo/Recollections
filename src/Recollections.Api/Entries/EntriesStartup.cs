@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,6 +28,7 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddTransient<ImageService>()
                 .AddTransient<ImageResizeService>()
+                .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"))
                 .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
                 .Configure<StorageOptions>(configuration.GetSection("Storage"));
 

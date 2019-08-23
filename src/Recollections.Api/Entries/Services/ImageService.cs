@@ -38,8 +38,8 @@ namespace Neptuo.Recollections.Entries.Services
             return storagePath;
         }
 
-        public string GetThumbnailFileExtension() => ImageResizeService.ImageExtension;
-        public string GetPreviewFileExtension() => ImageResizeService.ImageExtension;
+        public string GetThumbnailFileExtension() => resizeService.ImageExtension;
+        public string GetPreviewFileExtension() => resizeService.ImageExtension;
 
         public async Task<Image> CreateAsync(Entry entry, IFormFile file)
         {

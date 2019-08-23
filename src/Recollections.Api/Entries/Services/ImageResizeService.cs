@@ -5,7 +5,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DrImage = System.Drawing.Image;
 
@@ -13,8 +12,15 @@ namespace Neptuo.Recollections.Entries.Services
 {
     public class ImageResizeService
     {
-        private ImageFormat ImageFormat => ImageFormat.Png;
-        public static string ImageExtension = ".png";
+        private readonly ImageFormatDefinition formatDefinition;
+
+        public string ImageExtension => formatDefinition.FileExtension;
+
+        public ImageResizeService(ImageFormatDefinition formatDefinition)
+        {
+            Ensure.NotNull(formatDefinition, "formatDefinition");
+            this.formatDefinition = formatDefinition;
+        }
 
         public void Thumbnail(string inputPath, string outputPath, int width, int height)
         {
@@ -55,10 +61,13 @@ namespace Neptuo.Recollections.Entries.Services
                 }
                 else
                 {
-                    input.Save(outputPath, ImageFormat);
+                    SaveImage(outputPath, input);
                 }
             }
         }
+
+        private void SaveImage(string outputPath, DrImage target) 
+            => target.Save(outputPath, formatDefinition.Codec, formatDefinition.EncoderParameters);
 
         private void Resize(DrImage input, string outputPath, Rectangle? inputRect, int width, int height)
         {
@@ -70,7 +79,7 @@ namespace Neptuo.Recollections.Entries.Services
                 targetGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 targetGraphics.DrawImage(input, new Rectangle(0, 0, width, height), inputRect ?? new Rectangle(0, 0, input.Width, input.Height), GraphicsUnit.Pixel);
 
-                target.Save(outputPath, ImageFormat);
+                SaveImage(outputPath, target);
             }
         }
 
