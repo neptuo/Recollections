@@ -112,7 +112,7 @@ namespace Neptuo.Recollections.Entries.Services
             }
         }
 
-        private Task ComputeOtherSizesAsync(Entry entry, Image image)
+        public Task ComputeOtherSizesAsync(Entry entry, Image image)
         {
             var path = new ImagePath(this, entry, image);
 
@@ -131,7 +131,7 @@ namespace Neptuo.Recollections.Entries.Services
 
         public async Task DeleteAsync(Entry entry, Image entity)
         {
-            ImagePath path = new ImagePath(this, entry, entity);
+            ImagePath path = GetPath(entry, entity);
 
             dataContext.Images.Remove(entity);
             await dataContext.SaveChangesAsync();
@@ -140,6 +140,9 @@ namespace Neptuo.Recollections.Entries.Services
             File.Delete(path.Preview);
             File.Delete(path.Thumbnail);
         }
+
+        public ImagePath GetPath(Entry entry, Image entity) 
+            => new ImagePath(this, entry, entity);
 
         private static async Task CopyFileAsync(IFormFile file, string path)
         {
