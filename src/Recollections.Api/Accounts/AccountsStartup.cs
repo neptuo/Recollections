@@ -38,6 +38,10 @@ namespace Neptuo.Recollections.Accounts
                 .AddEntityFrameworkStores<DataContext>();
 
             services
+                .AddHealthChecks()
+                .AddDbContextCheck<DataContext>("Accounts.DataContext");
+
+            services
                 .AddTransient<JwtSecurityTokenHandler>()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

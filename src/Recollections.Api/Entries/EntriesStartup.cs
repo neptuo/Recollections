@@ -34,6 +34,10 @@ namespace Neptuo.Recollections.Entries
                 .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
                 .Configure<StorageOptions>(configuration.GetSection("Storage"));
 
+            services
+                .AddHealthChecks()
+                .AddDbContextCheck<DataContext>("Entries.DataContext");
+
             EnsureDatabase(services);
         }
 

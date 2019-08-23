@@ -68,6 +68,8 @@ namespace Neptuo.Recollections
                 p.AllowAnyHeader();
                 p.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
             });
+
+            app.UseHealthChecks("/health");
         }
     }
 }
