@@ -46,6 +46,9 @@
 .inline-editor .oi-x, .inline-editor .fa-times {
   color: var(--danger); }
 
+.inline-editor .editor-toolbar:after {
+  clear: both; }
+
 .inline-editor .input-group-append button:hover .oi-check {
   color: white; }
 
