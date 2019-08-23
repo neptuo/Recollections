@@ -14,7 +14,7 @@
             <InlineGpsEdit Value="@Model.Location" ValueChanged="@(async value => await SaveLocationAsync(value))" />
         </div>
         <div class="text">
-            <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description provided..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
+            <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
         </div>
         <div class="image">
             <img src="@Api.ResolveUrl(Model.Preview)" />

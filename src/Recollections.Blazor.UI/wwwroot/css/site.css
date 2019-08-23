@@ -101,6 +101,14 @@ h2 .inline-editor-viewmode .oi {
 .actions .right-actions {
   text-align: right; }
 
+.actions button {
+  margin-bottom: 4px; }
+
+@media (max-width: 575px) {
+  .actions button, .actions form {
+    width: 100%;
+    display: block; } }
+
 .component-login form {
   width: 100%;
   max-width: 330px;

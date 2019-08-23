@@ -14,7 +14,7 @@
             <InlineGpsList Value="@Model.Locations" ValueChanged="@(async value => await SaveAsync())" />
         </div>
         <div class="text">
-            <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description provided..." ValueChanged="@(async value => await SaveTextAsync(value))" />
+            <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
         </div>
         <div class="images">
             @if (!string.IsNullOrEmpty(UploadError))
