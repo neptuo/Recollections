@@ -9,4 +9,4 @@ RUN dotnet publish -c Release -r linux-arm -o /app
 FROM neptuo/aspnet-system-drawing:2.2-stretch-slim-arm32v7
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "Recollections.Api.dll"]
+ENTRYPOINT ["./Recollections.Api"]
