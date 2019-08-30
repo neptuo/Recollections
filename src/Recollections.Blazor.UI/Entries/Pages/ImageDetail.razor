@@ -11,36 +11,9 @@
             <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
         </div>
         <div class="gps">
-            <a @onclick="@(() => IsMapVisible = !IsMapVisible)">
-                <Icon Identifier="location" />
-                @if (IsMapVisible)
-                {
-                    if (Model.Location.HasValue())
-                    {
-                        <span>@Model.Location</span>
-                    }
-                    else
-                    {
-                        <span>Add Location on Map</span>
-                    }
-                }
-                else
-                {
-                    if (Model.Location.HasValue())
-                    {
-                        <span>Show Location on Map</span>
-                    }
-                    else
-                    {
-                        <span>Add Location on Map</span>
-                    }
-                }
-            </a>
-
-            @if (IsMapVisible)
-            {
+            <MapToggle ToggleChanged="@GetMapDescription">
                 <Neptuo.Recollections.Components.Map Markers="@(new LocationModel[] { Model.Location })" MarkersChanged="@(async () => await SaveLocationAsync())" Zoom="13" IsEditable="true" />
-            }
+            </MapToggle>
         </div>
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />

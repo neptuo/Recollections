@@ -35,7 +35,6 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private ImageModel original;
         protected ImageModel Model { get; set; }
-        protected bool IsMapVisible { get; set; }
 
         protected async override Task OnInitAsync()
         {
@@ -108,5 +107,23 @@ namespace Neptuo.Recollections.Entries.Pages
         }
 
         protected Task DownloadOriginalAsync() => Downloader.FromUrlAsync(Model.Name, Api.ResolveUrl(Model.Original));
+
+        protected string GetMapDescription(bool isVisible)
+        {
+            if (isVisible)
+            {
+                if (Model.Location.HasValue())
+                    return Model.Location.ToString();
+                else
+                    return "Add Location on Map";
+            }
+            else
+            {
+                if (Model.Location.HasValue())
+                    return "Show Location on Map";
+                else
+                    return "Add Location on Map";
+            }
+        }
     }
 }

@@ -1,0 +1,11 @@
+﻿@inherits MapToggleModel
+
+<a @onclick="@OnToggle">
+    <Icon Identifier="location" />
+    <span>@Text</span>
+</a>
+
+@if (IsVisible)
+{
+    @ChildContent
+}
