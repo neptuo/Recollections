@@ -18,15 +18,14 @@ namespace Neptuo.Recollections.Components
         internal protected int Zoom { get; set; } = 10;
 
         [Parameter]
-        internal protected bool IsEditable { get; set; }
-
-        [Parameter]
         internal protected IList<LocationModel> Markers { get; set; }
 
         [Parameter]
         protected Action MarkersChanged { get; set; }
 
         internal ElementRef Container { get; set; }
+
+        internal bool IsEditable => MarkersChanged != null;
 
         protected async override Task OnAfterRenderAsync()
         {
