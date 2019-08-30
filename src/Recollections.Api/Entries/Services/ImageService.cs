@@ -65,20 +65,12 @@ namespace Neptuo.Recollections.Entries.Services
 
             await CopyFileAsync(file, path);
             SetProperties(entity, path);
-            TryAddLocationToEntry(entry, entity);
 
             await dataContext.SaveChangesAsync();
 
             await ComputeOtherSizesAsync(entry, entity);
 
             return entity;
-        }
-
-        private static void TryAddLocationToEntry(Entry entry, Image entity)
-        {
-            OrderedLocation location = new OrderedLocation(entry.Locations.Count, entity.Location);
-            if (entity.Location.HasValue() && !entry.Locations.Contains(location))
-                entry.Locations.Add(location);
         }
 
         private void Validate(IFormFile file)
@@ -155,7 +147,6 @@ namespace Neptuo.Recollections.Entries.Services
         {
             var path = new ImagePath(this, entry, image);
             SetProperties(image, path.Original, isWhenIncluded: false);
-            TryAddLocationToEntry(entry, image);
 
             await dataContext.SaveChangesAsync();
         }
