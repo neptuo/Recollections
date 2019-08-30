@@ -18,7 +18,13 @@ namespace Neptuo.Recollections.Components
         internal protected int Zoom { get; set; } = 10;
 
         [Parameter]
-        protected ICollection<LocationModel> Markers { get; set; }
+        internal protected bool IsEditable { get; set; }
+
+        [Parameter]
+        internal protected IList<LocationModel> Markers { get; set; }
+
+        [Parameter]
+        protected Action MarkersChanged { get; set; }
 
         internal ElementRef Container { get; set; }
 
@@ -28,9 +34,13 @@ namespace Neptuo.Recollections.Components
             await Interop.InitializeAsync(this);
 
             Console.WriteLine("Map.OnAfterRenderAsync");
+        }
 
-            if (Markers != null)
-                await Interop.SetMarkers(Markers);
+        internal void MoveMaker(int index, double latitude, double longitude)
+        {
+            Markers[index].Latitude = latitude;
+            Markers[index].Longitude = longitude;
+            MarkersChanged?.Invoke();
         }
     }
 }

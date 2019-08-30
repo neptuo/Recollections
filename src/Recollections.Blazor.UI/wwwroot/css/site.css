@@ -10,6 +10,9 @@
 .hidden, .inline-editor .hidden {
   display: none; }
 
+a {
+  cursor: pointer; }
+
 .loading-bar {
   display: inline-block;
   position: relative;

@@ -35,6 +35,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private ImageModel original;
         protected ImageModel Model { get; set; }
+        protected bool IsMapVisible { get; set; }
 
         protected async override Task OnInitAsync()
         {
@@ -71,10 +72,13 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        protected async Task SaveLocationAsync(LocationModel value)
+        protected async Task SaveLocationAsync(LocationModel value = null)
         {
-            Model.Location = value;
+            if (value != null)
+                Model.Location = value;
+
             await SaveAsync();
+            StateHasChanged();
         }
 
         private async Task SaveAsync()

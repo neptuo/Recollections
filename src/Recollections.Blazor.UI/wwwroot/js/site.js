@@ -314,39 +314,78 @@ window.Downloader = {
 };
 
 window.Map = {
-    Initialize: function (container, interop, zoom) {
+    Initialize: function (container, interop, zoom, isEditable, markers) {
+        var isInitialization = false;
+
         $container = $(container);
         if ($container.data('map') == null) {
+            isInitialization = true;
+
             var map = new SMap(container);
             map.addDefaultLayer(SMap.DEF_BASE).enable();
             map.addDefaultControls();
+            map.setZoom(zoom);
 
             var layer = new SMap.Layer.Marker();
             map.addLayer(layer).enable();
 
-            $container.data('map', map);
-            $container.data('layer', layer);
-            $container.data('interop', interop);
+            $container.data('map', {
+                map: map,
+                layer: layer,
+                interop: interop,
+                isEditable: isEditable
+            });
+
+            if (isEditable) {
+                function start(e) {
+                    var node = e.target.getContainer();
+                    node[SMap.LAYER_MARKER].style.cursor = "help";
+                }
+
+                function stop(e) {
+                    var node = e.target.getContainer();
+                    node[SMap.LAYER_MARKER].style.cursor = "";
+                    var coords = e.target.getCoords();
+
+                    var id = Number.parseInt(e.target.getId());
+                    var latitude = coords.y;
+                    var longitude = coords.x;
+                    interop.invokeMethodAsync("MarkerMoved", id, latitude, longitude);
+
+                    //alert("Cílová pozice: " + coords.toWGS84(2).reverse().join(" "));
+                }
+
+                var signals = map.getSignals();
+                signals.addListener(window, "marker-drag-stop", stop);
+                signals.addListener(window, "marker-drag-start", start);
+            }
         }
 
-        map.setZoom(zoom);
+        var model = $container.data('map');
+        var points = Map.SetMarkers(model, markers);
+
+        if (isInitialization) {
+            var centerZoom = model.map.computeCenterZoom(points);
+            model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
+        }
     },
-    SetMarkers: function (container, markers) {
-        $container = $(container);
-
-        var map = $container.data('map');
-        var layer = $container.data('layer');
-
-        layer.removeAll();
+    SetMarkers: function (model, markers) {
+        model.layer.removeAll();
+        var points = [];
         for (var i = 0; i < markers.length; i++) {
             var options = {};
             var point = SMap.Coords.fromWGS84(markers[i].longitude, markers[i].latitude);
-            var marker = new SMap.Marker(point, "...", options);
-            layer.addMarker(marker);
+            var marker = new SMap.Marker(point, "" + i, options);
 
-            if (layer.getMarkers().length == 1) {
-                map.setCenter(point);
+            if (model.isEditable) {
+                marker.decorate(SMap.Marker.Feature.Draggable);
             }
+
+            model.layer.addMarker(marker);
+
+            points.push(point);
         }
+
+        return points;
     }
 };

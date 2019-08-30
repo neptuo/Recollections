@@ -16,6 +16,10 @@ blockquote {
     display: none;
 }
 
+a {
+    cursor: pointer;
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";

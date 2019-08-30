@@ -37,5 +37,14 @@ namespace Neptuo.Recollections.Entries
             hashCode = hashCode * -1521134295 + EqualityComparer<double?>.Default.GetHashCode(Altitude);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            string result = $"{Latitude}, {Longitude}";
+            if (Altitude != null)
+                result += $" ({Altitude})";
+
+            return result;
+        }
     }
 }

@@ -13,17 +13,5 @@ namespace Neptuo.Recollections.Components.Editors
     {
         [Parameter]
         protected Action<LocationModel> Delete { get; set; }
-
-        protected string FormatToString()
-        {
-            if (Value == null)
-                return null;
-
-            string result = $"{Value.Latitude}, {Value.Longitude}";
-            if (Value.Altitude != null)
-                result += $" ({Value.Altitude})";
-
-            return result;
-        }
     }
 }
