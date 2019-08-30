@@ -316,6 +316,7 @@ window.Downloader = {
 window.Map = {
     Initialize: function (container, interop, zoom, isEditable, markers) {
         var isInitialization = false;
+        var model = null;
 
         $container = $(container);
         if ($container.data('map') == null) {
@@ -329,50 +330,74 @@ window.Map = {
             var layer = new SMap.Layer.Marker();
             map.addLayer(layer).enable();
 
-            $container.data('map', {
+            model = {
                 map: map,
                 layer: layer,
                 interop: interop,
-                isEditable: isEditable
-            });
+                isEditable: isEditable,
+                isEmptyPoint: false
+            };
+            $container.data('map', model);
 
             if (isEditable) {
-                function start(e) {
+                function dragStart(e) {
                     var node = e.target.getContainer();
                     node[SMap.LAYER_MARKER].style.cursor = "help";
                 }
 
-                function stop(e) {
+                function dragStop(e) {
                     var node = e.target.getContainer();
                     node[SMap.LAYER_MARKER].style.cursor = "";
                     var coords = e.target.getCoords();
 
                     var id = Number.parseInt(e.target.getId());
+                    moverMarkerOnCoords(id, coords);
+                }
+
+                function click(e) {
+                    if (model.isEmptyPoint) {
+                        var coords = SMap.Coords.fromEvent(e.data.event, map);
+                        moverMarkerOnCoords(0, coords);
+                    }
+                }
+
+                function moverMarkerOnCoords(id, coords) {
                     var latitude = coords.y;
                     var longitude = coords.x;
-                    interop.invokeMethodAsync("MarkerMoved", id, latitude, longitude);
 
-                    //alert("Cílová pozice: " + coords.toWGS84(2).reverse().join(" "));
+                    coords.getAltitude().then(function (altitude) {
+                        interop.invokeMethodAsync("MarkerMoved", id, latitude, longitude, altitude);
+                    });
                 }
 
                 var signals = map.getSignals();
-                signals.addListener(window, "marker-drag-stop", stop);
-                signals.addListener(window, "marker-drag-start", start);
+                signals.addListener(window, "marker-drag-start", dragStart);
+                signals.addListener(window, "marker-drag-stop", dragStop);
+                signals.addListener(window, "map-click", click);
             }
         }
 
-        var model = $container.data('map');
+        model = $container.data('map');
         var points = Map.SetMarkers(model, markers);
 
         if (isInitialization) {
-            var centerZoom = model.map.computeCenterZoom(points);
-            model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
+            model.isEmptyPoint = points.length == 0;
+            if (model.isEmptyPoint) {
+                model.map.setZoom(1);
+            } else {
+                var centerZoom = model.map.computeCenterZoom(points);
+                model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
+            }
         }
     },
     SetMarkers: function (model, markers) {
         model.layer.removeAll();
         var points = [];
         for (var i = 0; i < markers.length; i++) {
+            if (markers[i].longitude == null && markers[i].latitude == null) {
+                continue;
+            }
+
             var options = {};
             var point = SMap.Coords.fromWGS84(markers[i].longitude, markers[i].latitude);
             var marker = new SMap.Marker(point, "" + i, options);

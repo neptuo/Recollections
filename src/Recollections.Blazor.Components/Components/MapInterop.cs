@@ -29,7 +29,7 @@ namespace Neptuo.Recollections.Components
         }
 
         [JSInvokable]
-        public void MarkerMoved(int index, double latitude, double longitude) 
-            => model.MoveMaker(index, latitude, longitude);
+        public void MarkerMoved(int index, double latitude, double longitude, double? altitude) 
+            => model.MoveMaker(index, latitude, longitude, altitude);
     }
 }

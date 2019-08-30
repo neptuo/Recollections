@@ -36,10 +36,12 @@ namespace Neptuo.Recollections.Components
             Console.WriteLine("Map.OnAfterRenderAsync");
         }
 
-        internal void MoveMaker(int index, double latitude, double longitude)
+        internal void MoveMaker(int index, double latitude, double longitude, double? altitude)
         {
-            Markers[index].Latitude = latitude;
-            Markers[index].Longitude = longitude;
+            LocationModel marker = Markers[index];
+            marker.Latitude = latitude;
+            marker.Longitude = longitude;
+            marker.Altitude = altitude;
             MarkersChanged?.Invoke();
         }
     }
