@@ -1,4 +1,5 @@
 ﻿using Neptuo;
+using Neptuo.Recollections.Entries;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,15 +11,25 @@ namespace Neptuo.Recollections.Components
 {
     public class FileUploadProgress
     {
-        public int Total { get; }
-        public int Completed { get; }
+        public string Status { get; set; }
+        public int StatusCode { get; set; }
+        public string ResponseText { get; set; }
 
-        public FileUploadProgress(int total, int completed)
+        public int Size { get; set; }
+        public int Uploaded { get; set; }
+
+        public int Precentual
         {
-            Ensure.NotNull(total, "total");
-            Ensure.NotNull(completed, "completed");
-            Total = total;
-            Completed = completed;
+            get
+            {
+                Console.WriteLine($"Current: {Uploaded} / {Size}");
+
+                int percentual = 0;
+                if (Size > 0)
+                    percentual = (int)Math.Floor(Uploaded / (decimal)Size * 100);
+
+                return percentual;
+            }
         }
     }
 }

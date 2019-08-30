@@ -1,0 +1,41 @@
+﻿@inject Navigator Navigator
+@inject Entries.Api Api
+
+<div class="col-sm-4 col-md-3 col-lg-2 image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
+    <a href="@GetLinkUrl()">
+        <img src="@GetImageUrl()" />
+    </a>
+    @if (PlaceHolder != null)
+    {
+        <span>@PlaceHolder</span>
+    }
+</div>
+
+@code
+{
+    [Parameter]
+    [CascadingParameter]
+    protected EntryModel Entry { get; set; }
+
+    [Parameter]
+    protected ImageModel Image { get; set; }
+
+    [Parameter]
+    protected string PlaceHolder { get; set; }
+
+    protected string GetImageUrl()
+    {
+        if (Entry == null || Image == null)
+            return "/img/thumbnail-placeholder.png";
+
+        return Api.ResolveUrl(Image.Thumbnail);
+    }
+
+    protected string GetLinkUrl()
+    {
+        if (Entry == null || Image == null)
+            return null;
+
+        return Navigator.UrlImageDetail(Entry.Id, Image.Id);
+    }
+}

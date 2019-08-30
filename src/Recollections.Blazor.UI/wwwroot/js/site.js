@@ -43,31 +43,69 @@ window.Recollections = {
 };
 
 window.FileUpload = {
-    Initialize: function (formId, bearerToken) {
-        var form = $("#" + formId);
+    Initialize: function (interop, form, bearerToken) {
+        form = $(form);
+
+        if (form.data('fileUpload') != null)
+            return;
+
+        var fileUpload = {};
+        form.data('fileUpload', fileUpload);
+
         var input = form.find("input[type=file]");
 
         var uploadIndex = -1;
+        var progress = [];
+        var files = [];
+
         function uploadError(statusCode, message) {
-            var total = input[0].files.length;
-            resetForm();
-            DotNet.invokeMethodAsync("Recollections.Blazor.Components", "FileUpload_OnError", formId, statusCode, total, uploadIndex);
+            progress[uploadIndex].status = "error";
+            progress[uploadIndex].statusCode = statusCode;
+            progress[uploadIndex].responseText = message;
+            raiseProgress();
+            uploadStep(null);
+        }
+
+        function raiseProgress() {
+            interop.invokeMethodAsync("OnCompleted", progress);
         }
 
         function resetForm() {
             uploadIndex = -1;
+            progress = [];
+            files = [];
             form[0].reset();
         }
 
-        function uploadCallback(total, completed) {
-            DotNet.invokeMethodAsync("Recollections.Blazor.Components", "FileUpload_OnCompleted", formId, total, completed);
+        function uploadCallback(imagesCount, imagesCompleted, currentSize, currentUploaded, responseText) {
+            for (var i = 0; i < imagesCount; i++) {
+                if (progress[i].status != "done" && progress[i].status != "error") {
+                    if (imagesCompleted > i) {
+                        progress[i].status = "done";
+                        progress[i].statusCode = 200;
+                    }
+
+                    if (imagesCompleted == i) {
+                        progress[i].status = "current";
+                        progress[i].uploaded = currentUploaded;
+                    } else if (imagesCompleted - 1 == i) {
+                        if (responseText != null) {
+                            progress[i].responseText = responseText;
+                        }
+                    }
+                }
+            }
+
+            raiseProgress();
         }
 
-        function uploadStep() {
-            var files = input[0].files;
+        function uploadProgress(loaded, total) {
+            uploadCallback(input[0].files.length, uploadIndex, total, loaded, null);
+        }
 
+        function uploadStep(responseText) {
             uploadIndex++;
-            uploadCallback(files.length, uploadIndex);
+            uploadCallback(files.length, uploadIndex, 0, 0, responseText);
 
             if (files.length > uploadIndex) {
                 FileUpload.UploadFile(
@@ -75,7 +113,8 @@ window.FileUpload = {
                     form[0].action,
                     bearerToken,
                     uploadStep,
-                    uploadError
+                    uploadError,
+                    uploadProgress
                 );
             } else {
                 resetForm();
@@ -87,7 +126,21 @@ window.FileUpload = {
             e.preventDefault();
         });
         input.change(function () {
-            uploadStep();
+            for (var i = 0; i < input[0].files.length; i++) {
+                var file = input[0].files[i];
+                files.push(file);
+                progress.push({
+                    status: "pending",
+                    statusCode: 0,
+                    responseText: null,
+                    uploaded: 0,
+                    size: file.size
+                });
+            }
+
+            if (uploadIndex == -1) {
+                uploadStep();
+            }
         });
     },
     UploadFile: function (file, url, bearerToken, onCompleted, onError, onProgress) {

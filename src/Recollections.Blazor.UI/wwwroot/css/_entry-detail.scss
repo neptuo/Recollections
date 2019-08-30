@@ -25,6 +25,19 @@
                 max-height: 160px;
             }
         }
+
+
+        .image-placeholder {
+            justify-content: center;
+
+            img {
+                opacity: 0.2;
+            }
+
+            span {
+                position: absolute;
+            }
+        }
     }
 
     .placeholder {

@@ -29,6 +29,7 @@ namespace Neptuo.Recollections
                 .AddComponents()
                 .AddUiOptions()
                 .AddHttpClientFactory()
+                .AddSingleton<Json>()
                 .AddSingleton<UrlResolver>(Resolve)
                 .AddTransient<Navigator>();
 

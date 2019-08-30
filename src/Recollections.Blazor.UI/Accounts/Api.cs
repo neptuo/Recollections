@@ -17,6 +17,7 @@ namespace Neptuo.Recollections.Accounts
     {
         private readonly HttpClient http;
         private readonly UrlResolver urlResolver;
+        private readonly Json json;
 
         public AuthenticationHeaderValue Authorization
         {
@@ -24,12 +25,14 @@ namespace Neptuo.Recollections.Accounts
             set => http.DefaultRequestHeaders.Authorization = value;
         }
 
-        public Api(IFactory<HttpClient> httpFactory, UrlResolver urlResolver)
+        public Api(IFactory<HttpClient> httpFactory, UrlResolver urlResolver, Json json)
         {
             Ensure.NotNull(httpFactory, "httpFactory");
             Ensure.NotNull(urlResolver, "urlResolver");
+            Ensure.NotNull(json, "json");
             this.http = httpFactory.Create();
             this.urlResolver = urlResolver;
+            this.json = json;
         }
 
         public Task<LoginResponse> LoginAsync(LoginRequest request) 
@@ -45,7 +48,7 @@ namespace Neptuo.Recollections.Accounts
                 throw new UnauthorizedAccessException();
 
             string responseContent = await response.Content.ReadAsStringAsync();
-            UserInfoResponse responseModel = SimpleJson.SimpleJson.DeserializeObject<UserInfoResponse>(responseContent);
+            UserInfoResponse responseModel = json.Deserialize<UserInfoResponse>(responseContent);
             return responseModel;
         }
 

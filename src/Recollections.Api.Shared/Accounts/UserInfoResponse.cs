@@ -9,6 +9,6 @@ namespace Neptuo.Recollections.Accounts
 {
     public class UserInfoResponse
     {
-        public string username { get; set; }
+        public string UserName { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Ensure.NotNull(services, "services");
             services.AddSingleton<ModalNative>();
-            services.AddSingleton<FileUploadInterop>();
+            services.AddTransient<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<InlineTextEditInterop>();
             services.AddTransient<DatePickerInterop>();

@@ -177,6 +177,12 @@ h2 .inline-editor-viewmode .oi {
       .entry-detail .images .image img {
         max-width: 100%;
         max-height: 160px; }
+    .entry-detail .images .image-placeholder {
+      justify-content: center; }
+      .entry-detail .images .image-placeholder img {
+        opacity: 0.2; }
+      .entry-detail .images .image-placeholder span {
+        position: absolute; }
   .entry-detail .placeholder {
     color: #aaaaaa; }
 

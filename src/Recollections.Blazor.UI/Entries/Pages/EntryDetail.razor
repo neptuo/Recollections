@@ -3,58 +3,64 @@
 
 @if (Model != null)
 {
-    <div class="entry-detail">
-        <h2 class="title">
-            <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
-        </h2>
-        <div class="datetime">
-            <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
-        </div>
-        <div class="gps">
-            <InlineGpsList Value="@Model.Locations" ValueChanged="@(async value => await SaveAsync())" />
-        </div>
-        <div class="text">
-            <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
-        </div>
-        <div class="images">
-            @if (!string.IsNullOrEmpty(UploadError))
-            {
-                <Alert Message="@UploadError" Mode="AlertMode.Error" />
-            }
-
-            <div class="row">
-                @if (Images != null)
-                {
-                    @foreach (var image in Images)
+    <CascadingValue Value="@Model">
+        <div class="entry-detail">
+            <h2 class="title">
+                <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
+            </h2>
+            <div class="datetime">
+                <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
+            </div>
+            <div class="gps">
+                <InlineGpsList Value="@Model.Locations" ValueChanged="@(async value => await SaveAsync())" />
+            </div>
+            <div class="text">
+                <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
+            </div>
+            <div class="images">
+                <div class="row">
+                    @if (Images != null)
                     {
-                        <div class="col-sm-4 col-md-3 col-lg-2 image">
-                            <a href="@Navigator.UrlImageDetail(Model.Id, image.Id)">
-                                <img src="@Api.ResolveUrl(image.Thumbnail)" />
-                            </a>
-                        </div>
+                        @foreach (var image in Images)
+                        {
+                            <EntryImage Image="@image" />
+                        }
                     }
-                }
+
+                    @if (UploadProgress != null)
+                    {
+                        foreach (var upload in UploadProgress)
+                        {
+                            @if (upload.IsSuccess)
+                            {
+                                <EntryImage Image="@upload.Image" />
+                            }
+                            else
+                            {
+                                <EntryImage PlaceHolder="@upload.Description" />
+                            }
+                        }
+                    }
+                </div>
+
             </div>
 
+            <ActionPanel>
+
+                <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
+                            BearerToken="@UserState.BearerToken"
+                            Progress="@(async e => await OnUploadProgressAsync(e))" />
+
+                <button type="button" class="btn btn-sm" @onclick="@(() => Model.Locations.Add(new LocationModel()))" title="Add GPS">
+                    <Icon Identifier="location" />
+                    Add Location
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
+                    <Icon Identifier="trash" />
+                    Delete Entry
+                </button>
+
+            </ActionPanel>
         </div>
-
-        <ActionPanel>
-                
-            <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
-                        BearerToken="@UserState.BearerToken"
-                        Text="@UploadButtonText"
-                        Progress="@(async e => await OnUploadProgressAsync(e))"
-                        Error="@(async e => await OnUploadErrorAsync(e))" />
-
-            <button type="button" class="btn btn-sm" @onclick="@(() => Model.Locations.Add(new LocationModel()))" title="Add GPS">
-                <Icon Identifier="location" />
-                Add Location
-            </button>
-            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
-                <Icon Identifier="trash" />
-                Delete Entry
-            </button>
-
-        </ActionPanel>
-    </div>
+    </CascadingValue>
 }

@@ -87,7 +87,7 @@ namespace Neptuo.Recollections.Accounts.Components
             {
                 UserInfoResponse response = await Api.GetInfoAsync();
 
-                UserName = response.username;
+                UserName = response.UserName;
                 UserInfoChanged?.Invoke();
             }
             catch (UnauthorizedAccessException)

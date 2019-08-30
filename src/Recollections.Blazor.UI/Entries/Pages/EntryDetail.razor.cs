@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using System;
@@ -21,6 +22,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected UiOptions UiOptions { get; set; }
 
+        [Inject]
+        protected Json Json { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
@@ -30,13 +34,10 @@ namespace Neptuo.Recollections.Entries.Pages
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected List<ImageModel> Images { get; set; }
-        protected string UploadButtonText { get; set; }
-        protected string UploadError { get; set; }
+        protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
 
         protected async override Task OnInitAsync()
         {
-            ResetUploadButtonText();
-
             await base.OnInitAsync();
             await UserState.EnsureAuthenticatedAsync();
 
@@ -86,58 +87,36 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private void UpdateOriginal() => original = Model.Clone();
 
-        protected async Task OnUploadProgressAsync(FileUploadProgress e)
+        protected async Task OnUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
         {
-            SetUploadError(null);
-
-            if (e.Completed == e.Total)
+            UploadProgress.Clear();
+            if (progresses.All(p => p.Status == "done" || p.Status == "error"))
             {
                 await LoadImagesAsync();
-                ResetUploadButtonText();
             }
             else
             {
-                UploadButtonText = $"{FileUploadModel.DefaultText} - {e.Completed} / {e.Total}";
-            }
-
-            StateHasChanged();
-        }
-
-        private void ResetUploadButtonText()
-        {
-            UploadButtonText = FileUploadModel.DefaultText;
-        }
-
-        protected async Task OnUploadErrorAsync(FileUploadError e)
-        {
-            ResetUploadButtonText();
-            SetUploadError(e);
-
-            await LoadImagesAsync();
-
-            StateHasChanged();
-        }
-
-        private void SetUploadError(FileUploadError e)
-        {
-            if (e != null)
-            {
-                string reason;
-                switch (e.StatusCode)
+                foreach (var progress in progresses)
                 {
-                    case 400:
-                        reason = "File is of not supported type or too large.";
-                        break;
-                    default:
-                        reason = "Unknown reason.";
-                        break;
-                }
+                    ImageModel image = null;
+                    if (progress.Status == "done" && progress.ResponseText != null)
+                        image = Json.Deserialize<ImageModel>(progress.ResponseText);
 
-                UploadError = $"Error during file upload ({e.Completed + 1} / {e.Total}): {reason}";
+                    UploadProgress.Add(new UploadImageModel(progress, image));
+                }
             }
-            else
+
+            StateHasChanged();
+        }
+
+        protected string GetUploadErrorMessage(int statusCode)
+        {
+            switch (statusCode)
             {
-                UploadError = null;
+                case 400:
+                    return "File is of not supported type or too large.";
+                default:
+                    return "Unknown reason.";
             }
         }
 
@@ -149,12 +128,37 @@ namespace Neptuo.Recollections.Entries.Pages
                 Navigator.OpenTimeline();
             }
         }
+    }
 
-        protected void TestGps()
+    public class UploadImageModel
+    {
+        public FileUploadProgress Progress { get; }
+        public ImageModel Image { get; }
+
+        public bool IsSuccess => Progress.Status == "done" && Image != null;
+
+        public string Description
         {
-            Model.Locations.RemoveAt(0);
+            get
+            {
+                if (Progress.Status == "done")
+                    return "Uploaded";
+                else if (Progress.Status == "current")
+                    return $"{Progress.Precentual}%";
+                else if (Progress.Status == "error")
+                    return "Error";
+                else if (Progress.Status == "pending")
+                    return "Waiting";
+                else
+                    return "Unknown...";
+            }
+        }
 
-            SaveAsync();
+        public UploadImageModel(FileUploadProgress progress, ImageModel image)
+        {
+            Ensure.NotNull(progress, "progress");
+            Progress = progress;
+            Image = image;
         }
     }
 }
