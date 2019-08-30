@@ -312,3 +312,41 @@ window.Downloader = {
         link.click();
     }
 };
+
+window.Map = {
+    Initialize: function (container, interop, zoom) {
+        $container = $(container);
+        if ($container.data('map') == null) {
+            var map = new SMap(container);
+            map.addDefaultLayer(SMap.DEF_BASE).enable();
+            map.addDefaultControls();
+
+            var layer = new SMap.Layer.Marker();
+            map.addLayer(layer).enable();
+
+            $container.data('map', map);
+            $container.data('layer', layer);
+            $container.data('interop', interop);
+        }
+
+        map.setZoom(zoom);
+    },
+    SetMarkers: function (container, markers) {
+        $container = $(container);
+
+        var map = $container.data('map');
+        var layer = $container.data('layer');
+
+        layer.removeAll();
+        for (var i = 0; i < markers.length; i++) {
+            var options = {};
+            var point = SMap.Coords.fromWGS84(markers[i].longitude, markers[i].latitude);
+            var marker = new SMap.Marker(point, "...", options);
+            layer.addMarker(marker);
+
+            if (layer.getMarkers().length == 1) {
+                map.setCenter(point);
+            }
+        }
+    }
+};

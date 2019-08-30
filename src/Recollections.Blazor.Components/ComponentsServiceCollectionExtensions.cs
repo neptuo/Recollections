@@ -25,6 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<DatePickerInterop>();
             services.AddTransient<MarkdownConverter>();
             services.AddTransient<Downloader>();
+            services.AddTransient<MapInterop>();
             services.TryAdd(ServiceDescriptor.Singleton<IUniqueNameProvider, GuidUniqueNameProvider>());
 
             return services;

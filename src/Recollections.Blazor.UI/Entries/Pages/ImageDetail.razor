@@ -12,6 +12,12 @@
         </div>
         <div class="gps">
             <InlineGpsEdit Value="@Model.Location" ValueChanged="@(async value => await SaveLocationAsync(value))" />
+
+            @if  (Model.Location.HasValue())
+            {
+                <Neptuo.Recollections.Components.Map Markers="@(new LocationModel[] { Model.Location })" Zoom="13" />
+            }
+
         </div>
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />

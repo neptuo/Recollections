@@ -92,6 +92,9 @@ h2 .inline-editor-viewmode .oi {
 .inline-markdown .inline-submit {
   margin-top: -60px; }
 
+.map {
+  height: 300px; }
+
 .file-upload {
   float: left;
   margin-right: 4px; }
