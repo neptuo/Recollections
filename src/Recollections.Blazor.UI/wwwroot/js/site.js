@@ -380,11 +380,15 @@ window.Map = {
         model = $container.data('map');
         var points = Map.SetMarkers(model, markers);
 
-        if (isInitialization) {
-            model.isEmptyPoint = points.length == 0;
-            if (model.isEmptyPoint) {
+        model.isEmptyPoint = points.length == 0;
+        if (model.isEmptyPoint) {
+            model.map.setCursor("pointer");
+            if (isInitialization) {
                 model.map.setZoom(1);
-            } else {
+            }
+        } else {
+            model.map.setCursor(null);
+            if (isInitialization) {
                 var centerZoom = model.map.computeCenterZoom(points);
                 model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
             }
