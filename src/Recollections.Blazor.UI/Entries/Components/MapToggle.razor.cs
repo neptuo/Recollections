@@ -24,9 +24,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
-
-            if (Text == null)
-                UpdateText();
+            UpdateText();
         }
 
         protected void OnToggle()
