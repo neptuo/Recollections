@@ -95,8 +95,15 @@ h2 .inline-editor-viewmode .oi {
 .inline-markdown .inline-submit {
   margin-top: -60px; }
 
-.map {
-  height: 500px; }
+.map-container {
+  position: relative; }
+  .map-container .map {
+    height: 500px; }
+  .map-container .map-controls {
+    position: absolute;
+    top: 10px;
+    z-index: 1;
+    left: 10px; }
 
 .file-upload {
   float: left;

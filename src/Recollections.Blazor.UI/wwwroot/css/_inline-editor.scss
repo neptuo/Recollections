@@ -83,6 +83,17 @@ h2 {
     }
 }
 
-.map {
-    height: 500px;
+.map-container {
+    position: relative;
+
+    .map {
+        height: 500px;
+    }
+
+    .map-controls {
+        position: absolute;
+        top: 10px;
+        z-index: 1;
+        left: 10px;
+    }
 }

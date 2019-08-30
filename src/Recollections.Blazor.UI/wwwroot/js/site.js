@@ -322,7 +322,7 @@ window.Map = {
         if ($container.data('map') == null) {
             isInitialization = true;
 
-            var map = new SMap(container);
+            var map = new SMap($container.find('.map')[0]);
             map.addDefaultLayer(SMap.DEF_BASE).enable();
             map.addDefaultControls();
             map.setZoom(zoom);
@@ -335,14 +335,15 @@ window.Map = {
                 layer: layer,
                 interop: interop,
                 isEditable: isEditable,
-                isEmptyPoint: false
+                isEmptyPoint: false,
+                isAdding: false
             };
             $container.data('map', model);
 
             if (isEditable) {
                 function dragStart(e) {
                     var node = e.target.getContainer();
-                    node[SMap.LAYER_MARKER].style.cursor = "help";
+                    node[SMap.LAYER_MARKER].style.cursor = "grab";
                 }
 
                 function dragStop(e) {
@@ -355,9 +356,14 @@ window.Map = {
                 }
 
                 function click(e) {
-                    if (model.isEmptyPoint) {
+                    if (model.isEmptyPoint || model.isAdding) {
+                        var index = null;
+                        if (model.isEmptyPoint) {
+                            index = 0;
+                        }
+
                         var coords = SMap.Coords.fromEvent(e.data.event, map);
-                        moverMarkerOnCoords(0, coords);
+                        moverMarkerOnCoords(index, coords);
                     }
                 }
 
@@ -374,20 +380,26 @@ window.Map = {
                 signals.addListener(window, "marker-drag-start", dragStart);
                 signals.addListener(window, "marker-drag-stop", dragStop);
                 signals.addListener(window, "map-click", click);
+
+                $container.find(".btn-add-location").click(function () {
+                    model.isAdding = true;
+                    model.map.setCursor("crosshair");
+                });
             }
         }
 
         model = $container.data('map');
         var points = Map.SetMarkers(model, markers);
 
+        model.isAdding = false;
         model.isEmptyPoint = points.length == 0;
         if (model.isEmptyPoint) {
-            model.map.setCursor("pointer");
+            model.map.setCursor("grab");
             if (isInitialization) {
                 model.map.setZoom(1);
             }
         } else {
-            model.map.setCursor(null);
+            model.map.setCursor("move");
             if (isInitialization) {
                 var centerZoom = model.map.computeCenterZoom(points);
                 model.map.setCenterZoom(centerZoom[0], centerZoom[1]);

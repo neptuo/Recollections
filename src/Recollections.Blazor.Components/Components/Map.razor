@@ -1,3 +1,15 @@
 ﻿@inherits MapModel
 
-<div @ref="Container" class="map"></div>
+<div @ref="Container" class="map-container">
+    <div class="map"></div>
+
+    <div class="map-controls">
+        @if (IsAdditive)
+        {
+            <button class="btn btn-sm btn-light btn-add-location">
+                <Icon Identifier="plus" />
+                Add Location
+            </button>
+        }
+    </div>
+</div>

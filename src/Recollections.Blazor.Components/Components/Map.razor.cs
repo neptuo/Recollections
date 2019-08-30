@@ -23,6 +23,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         protected Action MarkersChanged { get; set; }
 
+        [Parameter]
+        protected bool IsAdditive { get; set; }
+
         internal ElementRef Container { get; set; }
 
         internal bool IsEditable => MarkersChanged != null;
@@ -35,9 +38,16 @@ namespace Neptuo.Recollections.Components
             Console.WriteLine("Map.OnAfterRenderAsync");
         }
 
-        internal void MoveMaker(int index, double latitude, double longitude, double? altitude)
+        internal void MoveMarker(int? index, double latitude, double longitude, double? altitude)
         {
-            LocationModel marker = Markers[index];
+            Console.WriteLine($"MoveMarker: {index}, {latitude}, {longitude}, {altitude}");
+
+            LocationModel marker = null;
+            if (index == null)
+                Markers.Add(marker = new LocationModel());
+            else
+                marker = Markers[index.Value];
+
             marker.Latitude = latitude;
             marker.Longitude = longitude;
             marker.Altitude = altitude;
