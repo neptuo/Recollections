@@ -21,10 +21,22 @@ namespace Neptuo.Recollections.Entries.Components
 
         protected bool IsVisible { get; set; }
 
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            if (Text == null)
+                UpdateText();
+        }
+
         protected void OnToggle()
         {
             IsVisible = !IsVisible;
+            UpdateText();
+        }
 
+        private void UpdateText()
+        {
             if (ToggleChanged != null)
             {
                 string text = ToggleChanged(IsVisible);
