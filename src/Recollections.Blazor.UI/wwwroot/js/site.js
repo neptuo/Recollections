@@ -1,21 +1,10 @@
 ﻿window.Bootstrap = {
     Modal: {
-        Register: function (id) {
-            var target = $("#" + id);
-            target.on('shown.bs.modal', function (e) {
-                $(e.currentTarget).find('[data-autofocus]').select().focus();
-            });
-            target.on('hidden.bs.modal', function (e) {
-                DotNet.invokeMethodAsync("Recollections.Blazor.Components", "Bootstrap_ModalHidden", e.currentTarget.id);
-            });
-
-            return true;
+        Show: function (container) {
+            $(container).modal('show');
         },
-        Toggle: function (id, isVisible) {
-            var target = $("#" + id);
-            target.modal(isVisible ? 'show' : 'hide');
-
-            return true;
+        Hide: function (container) {
+            $(container).modal('hide');
         }
     }
 };
@@ -317,6 +306,7 @@ window.Map = {
     Initialize: function (container, interop, zoom, isEditable, markers) {
         var isInitialization = false;
         var model = null;
+        var onDelete = null;
 
         $container = $(container);
         if ($container.data('map') == null) {
@@ -335,6 +325,7 @@ window.Map = {
                 layer: layer,
                 interop: interop,
                 isEditable: isEditable,
+                isAdditive: false,
                 isEmptyPoint: false,
                 isAdding: false
             };
@@ -352,10 +343,10 @@ window.Map = {
                     var coords = e.target.getCoords();
 
                     var id = Number.parseInt(e.target.getId());
-                    moverMarkerOnCoords(id, coords);
+                    moveMarkerOnCoords(id, coords);
                 }
 
-                function click(e) {
+                function mapClick(e) {
                     if (model.isEmptyPoint || model.isAdding) {
                         var index = null;
                         if (model.isEmptyPoint) {
@@ -363,11 +354,16 @@ window.Map = {
                         }
 
                         var coords = SMap.Coords.fromEvent(e.data.event, map);
-                        moverMarkerOnCoords(index, coords);
+                        moveMarkerOnCoords(index, coords);
                     }
                 }
 
-                function moverMarkerOnCoords(id, coords) {
+                function markerClick(e) {
+                    var id = Number.parseInt(e.target.getId());
+                    interop.invokeMethodAsync("MarkerSelected", id);
+                }
+
+                function moveMarkerOnCoords(id, coords) {
                     var latitude = coords.y;
                     var longitude = coords.x;
 
@@ -379,12 +375,17 @@ window.Map = {
                 var signals = map.getSignals();
                 signals.addListener(window, "marker-drag-start", dragStart);
                 signals.addListener(window, "marker-drag-stop", dragStop);
-                signals.addListener(window, "map-click", click);
+                signals.addListener(window, "map-click", mapClick);
+                signals.addListener(window, "marker-click", markerClick);
 
-                $container.find(".btn-add-location").click(function () {
+                var $addButton = $container.find(".btn-add-location");
+
+                $addButton.click(function () {
                     model.isAdding = true;
                     model.map.setCursor("crosshair");
                 });
+
+                model.isAdditive = $addButton.length > 0;
             }
         }
 

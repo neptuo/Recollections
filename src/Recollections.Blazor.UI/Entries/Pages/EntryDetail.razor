@@ -13,7 +13,7 @@
             </div>
             <div class="gps">
                 <MapToggle Text="@($"Show Locations on Map ({Model.Locations.Count})")">
-                    <Neptuo.Recollections.Components.Map Markers="@Model.Locations" MarkersChanged="@(async () => await SaveAsync())" IsAdditive="true" />
+                    <Neptuo.Recollections.Components.Map Markers="@Model.Locations" MarkersChanged="@(async () => await SaveAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
                 </MapToggle>
             </div>
             <div class="text">
@@ -65,4 +65,33 @@
             </ActionPanel>
         </div>
     </CascadingValue>
+
+    <Modal @ref="@LocationEdit" Title="Location" FormSubmit="@(async () => await SaveAsync())">
+        <ChildContent>
+            @if (SelectedLocation != null)
+            {
+                <div class="form-group">
+                    <label for="latitude">Latitude:</label>
+                    <input type="text" class="form-control" id="latitude" @bind="@SelectedLocation.Latitude" />
+                </div>
+                <div class="form-group">
+                    <label for="latitude">Longitude:</label>
+                    <input type="text" class="form-control" id="longitude" @bind="@SelectedLocation.Longitude" />
+                </div>
+                <div class="form-group">
+                    <label for="latitude">Altitude:</label>
+                    <input type="text" class="form-control" id="altitude" @bind="@SelectedLocation.Altitude" />
+                </div>
+            }
+        </ChildContent>
+        <Buttons>
+            <button type="button" class="btn btn-sm btn-primary" @onclick="@(async () => { await SaveAsync(); LocationEdit.Hide(); })" title="Save Location">
+                Save
+            </button>
+            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteSelectedLocationAsync())" title="Delete Location">
+                <Icon Identifier="trash" />
+                Delete
+            </button>
+        </Buttons>
+    </Modal>
 }

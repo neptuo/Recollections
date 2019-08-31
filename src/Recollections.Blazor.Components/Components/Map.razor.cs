@@ -26,6 +26,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         protected bool IsAdditive { get; set; }
 
+        [Parameter]
+        internal protected Action<int> MarkerSelected { get; set; }
+
         internal ElementRef Container { get; set; }
 
         internal bool IsEditable => MarkersChanged != null;

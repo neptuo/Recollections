@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using Neptuo;
-using Neptuo.Recollections.Entries;
+﻿using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,5 +28,11 @@ namespace Neptuo.Recollections.Components
         [JSInvokable]
         public void MarkerMoved(int? index, double latitude, double longitude, double? altitude) 
             => model.MoveMarker(index, latitude, longitude, altitude);
+
+        [JSInvokable]
+        public void MarkerDeleted(int index) => Console.WriteLine($"MarkerDeleted: {index}");
+
+        [JSInvokable]
+        public void MarkerSelected(int index) => model.MarkerSelected?.Invoke(index);
     }
 }

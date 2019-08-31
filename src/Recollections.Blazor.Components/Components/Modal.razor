@@ -1,12 +1,12 @@
 ﻿@inherits ModalModel
 
-<div class="modal fade" id="@Id" tabindex="-1" role="dialog">
+<div @ref="Container" class="modal fade" tabindex="-1" role="dialog">
     <div class="@DialogCssClass" role="document">
         <form @onsubmit="@OnFormSubmit">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">@Title</h4>
-                    <button class="close" @onclick="@(() => IsVisible = false)">
+                    <h4 class="modal-title">@Title</h4>
+                    <button class="close" @onclick="@Hide">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -14,11 +14,8 @@
                     @ChildContent
                 </div>
                 <div class="modal-footer">
-                    @if (!String.IsNullOrEmpty(PrimaryButtonText))
-                    {
-                        <button class="btn btn-primary" @onclick="@OnPrimaryButtonClick">@PrimaryButtonText</button>
-                    }
-                    <button class="btn btn-default" @onclick="@OnCloseButtonClick">@CloseButtonText</button>
+                    @Buttons
+                    <button class="btn btn-default btn-sm" @onclick="@OnCloseButtonClick">@CloseButtonText</button>
                 </div>
             </div>
         </form>

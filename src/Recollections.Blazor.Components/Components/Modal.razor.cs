@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class ModalModel : ComponentBase, IDisposable
+    public class ModalModel : ComponentBase
     {
         [Inject]
-        internal ModalNative Native { get; set; }
-
-        public string Id { get; private set; } = "BM" + Guid.NewGuid().ToString().Replace("-", String.Empty);
+        internal ModalInterop Interop { get; set; }
 
         [Parameter]
         protected string Title { get; set; }
@@ -22,47 +20,16 @@ namespace Neptuo.Recollections.Components
         protected RenderFragment ChildContent { get; set; }
 
         [Parameter]
-        protected string PrimaryButtonText { get; set; }
-
-        /// <summary>
-        /// Ivoked when user clicks on primary button.
-        /// When <c>true</c> is returned, modal is closed.
-        /// </summary>
-        [Parameter]
-        protected Func<bool> PrimaryButtonClick { get; set; }
+        protected RenderFragment Buttons { get; set; }
 
         [Parameter]
         protected string CloseButtonText { get; set; } = "Close";
 
-        /// <summary>
-        /// Invoken when user clicks on close button.
-        /// When <c>true</c> is returned, modal is closed.
-        /// </summary>
         [Parameter]
-        protected Func<bool> CloseButtonClick { get; set; }
+        protected Action FormSubmit { get; set; }
 
         [Parameter]
-        protected Action<bool> IsVisibleChanged { get; set; }
-
-        private bool isVisible;
-        private bool isVisibleChanged;
-
-        [Parameter]
-        protected bool IsVisible
-        {
-            get { return isVisible; }
-            set
-            {
-                Console.WriteLine($"IsVisible: Current: {isVisible}, New: {value}.");
-                if (isVisible != value)
-                {
-                    isVisible = value;
-
-                    IsVisibleChanged?.Invoke(isVisible);
-                    isVisibleChanged = true;
-                }
-            }
-        }
+        protected Action CloseButtonClick { get; set; }
 
         protected string DialogCssClass { get; set; }
 
@@ -71,6 +38,8 @@ namespace Neptuo.Recollections.Components
 
         [Parameter]
         protected Action Closed { get; set; }
+
+        protected ElementRef Container { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -92,51 +61,18 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        protected void OnPrimaryButtonClick()
-        {
-            Console.WriteLine("Primary button click raised.");
-            if (IsVisible)
-            {
-                Console.WriteLine("Visibility constraint passed.");
-                IsVisible = !PrimaryButtonClick();
-            }
-        }
-
-        protected void OnFormSubmit(UIEventArgs e)
-        {
-            Console.WriteLine("Form onsubmit raised.");
-            if (IsVisible)
-            {
-                Console.WriteLine("Visibility constraint passed.");
-                IsVisible = !PrimaryButtonClick();
-            }
-        }
+        protected void OnFormSubmit(UIEventArgs e) => FormSubmit?.Invoke();
 
         protected void OnCloseButtonClick()
         {
             if (CloseButtonClick != null)
-                IsVisible = !CloseButtonClick();
+                CloseButtonClick();
             else
-                IsVisible = false;
+                Hide();
         }
 
-        protected override void OnAfterRender()
-        {
-            base.OnAfterRender();
-            Native.AddModal(Id, this);
+        public void Show() => Interop.Show(Container);
 
-            if (isVisibleChanged)
-                Native.ToggleModal(Id, isVisible);
-        }
-
-        public void Dispose()
-        {
-            Native.RemoveModal(Id);
-        }
-
-        internal void MarkAsHidden()
-        {
-            IsVisible = false;
-        }
+        public void Hide() => Interop.Hide(Container);
     }
 }

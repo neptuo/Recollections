@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddComponents(this IServiceCollection services)
         {
             Ensure.NotNull(services, "services");
-            services.AddSingleton<ModalNative>();
+            services.AddSingleton<ModalInterop>();
             services.AddTransient<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<InlineTextEditInterop>();

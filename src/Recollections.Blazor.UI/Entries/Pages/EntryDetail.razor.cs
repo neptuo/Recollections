@@ -128,6 +128,23 @@ namespace Neptuo.Recollections.Entries.Pages
                 Navigator.OpenTimeline();
             }
         }
+
+        protected LocationModel SelectedLocation { get; set; }
+        protected Modal LocationEdit { get; set; }
+
+        protected void OnLocationSelected(int index)
+        {
+            SelectedLocation = Model.Locations[index];
+            LocationEdit.Show();
+            StateHasChanged();
+        }
+
+        protected async Task DeleteSelectedLocationAsync()
+        {
+            Model.Locations.Remove(SelectedLocation);
+            await SaveAsync();
+            LocationEdit.Hide();
+        }
     }
 
     public class UploadImageModel

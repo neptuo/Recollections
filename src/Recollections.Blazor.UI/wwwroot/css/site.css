@@ -104,6 +104,11 @@ h2 .inline-editor-viewmode .oi {
     top: 10px;
     z-index: 1;
     left: 10px; }
+  .map-container .card .card-header,
+  .map-container .card .card-footer {
+    display: none; }
+  .map-container .card .card-body {
+    padding: 4px; }
 
 .file-upload {
   float: left;
