@@ -22,15 +22,12 @@ namespace Neptuo.Recollections.Components
         public Task InitializeAsync(MapModel model)
         {
             this.model = model;
-            return jsRuntime.InvokeAsync<object>("Map.Initialize", model.Container, DotNetObjectRef.Create(this), model.Zoom, model.IsEditable, model.Markers);
+            return jsRuntime.InvokeAsync<object>("Map.Initialize", model.Container, DotNetObjectRef.Create(this), model.Zoom, model.Markers);
         }
 
         [JSInvokable]
         public void MarkerMoved(int? index, double latitude, double longitude, double? altitude) 
             => model.MoveMarker(index, latitude, longitude, altitude);
-
-        [JSInvokable]
-        public void MarkerDeleted(int index) => Console.WriteLine($"MarkerDeleted: {index}");
 
         [JSInvokable]
         public void MarkerSelected(int index) => model.MarkerSelected?.Invoke(index);

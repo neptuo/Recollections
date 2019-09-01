@@ -12,8 +12,8 @@
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
             </div>
             <div class="gps">
-                <MapToggle Text="@($"Show Locations on Map ({Model.Locations.Count})")">
-                    <Neptuo.Recollections.Components.Map Markers="@Model.Locations" MarkersChanged="@(async () => await SaveAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
+                <MapToggle Text="@($"Show Locations on Map ({Markers.Count})")">
+                    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
                 </MapToggle>
             </div>
             <div class="text">

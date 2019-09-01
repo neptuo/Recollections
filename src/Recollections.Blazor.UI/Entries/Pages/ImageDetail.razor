@@ -12,7 +12,7 @@
         </div>
         <div class="gps">
             <MapToggle ToggleChanged="@GetMapDescription">
-                <Neptuo.Recollections.Components.Map Markers="@(new LocationModel[] { Model.Location })" MarkersChanged="@(async () => await SaveLocationAsync())" Zoom="13" />
+                <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" Zoom="13" />
             </MapToggle>
         </div>
         <div class="text">

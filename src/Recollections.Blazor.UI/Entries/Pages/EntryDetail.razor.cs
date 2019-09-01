@@ -34,6 +34,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected List<ImageModel> Images { get; set; }
+        protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
 
         protected async override Task OnInitAsync()
@@ -41,14 +42,44 @@ namespace Neptuo.Recollections.Entries.Pages
             await base.OnInitAsync();
             await UserState.EnsureAuthenticatedAsync();
 
-            Model = await Api.GetDetailAsync(EntryId);
-            UpdateOriginal();
-
+            await LoadAsync();
             await LoadImagesAsync();
         }
 
+        private async Task LoadAsync()
+        {
+            Model = await Api.GetDetailAsync(EntryId);
+            UpdateOriginal();
+
+            Markers.Clear();
+            foreach (var location in Model.Locations)
+            {
+                Markers.Add(new MapMarkerModel
+                {
+                    Latitude = location.Latitude,
+                    Longitude = location.Longitude,
+                    Altitude = location.Altitude,
+                    IsEditable = true
+                });
+            }
+        }
+
         private async Task LoadImagesAsync()
-            => Images = await Api.GetImagesAsync(EntryId);
+        {
+            Images = await Api.GetImagesAsync(EntryId);
+
+            Markers.RemoveRange(Model.Locations.Count, Markers.Count - Model.Locations.Count);
+            foreach (var image in Images)
+            {
+                Markers.Add(new MapMarkerModel
+                {
+                    Latitude = image.Location.Latitude,
+                    Longitude = image.Location.Longitude,
+                    Altitude = image.Location.Altitude,
+                    DropColor = "blue"
+                });
+            }
+        }
 
         protected async Task SaveTitleAsync(string value)
         {
@@ -69,6 +100,36 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Model.When = value;
             await SaveAsync();
+        }
+
+        protected Task SaveLocationsAsync()
+        {
+            void Map(MapMarkerModel marker, LocationModel location)
+            {
+                location.Latitude = marker.Latitude;
+                location.Longitude = marker.Longitude;
+                location.Altitude = marker.Altitude;
+            }
+
+            int existingCount = Model.Locations.Count + Images.Count;
+            for (int i = 0; i < Markers.Count; i++)
+            {
+                if (i < Model.Locations.Count)
+                {
+                    MapMarkerModel marker = Markers[i];
+                    LocationModel location = Model.Locations[i];
+                    Map(marker, location);
+                }
+                else if (i >= existingCount)
+                {
+                    MapMarkerModel marker = Markers[i];
+                    LocationModel location = new LocationModel();
+                    Model.Locations.Add(location);
+                    Map(marker, location);
+                }
+            }
+
+            return SaveAsync();
         }
 
         protected async Task SaveAsync()
@@ -109,17 +170,6 @@ namespace Neptuo.Recollections.Entries.Pages
             StateHasChanged();
         }
 
-        protected string GetUploadErrorMessage(int statusCode)
-        {
-            switch (statusCode)
-            {
-                case 400:
-                    return "File is of not supported type or too large.";
-                default:
-                    return "Unknown reason.";
-            }
-        }
-
         public async Task DeleteAsync()
         {
             if (await Navigator.AskAsync($"Do you really want to delete entry '{Model.Title}'?"))
@@ -129,21 +179,27 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
+        protected int SelectedLocationIndex { get; set; }
         protected LocationModel SelectedLocation { get; set; }
         protected Modal LocationEdit { get; set; }
 
         protected void OnLocationSelected(int index)
         {
-            SelectedLocation = Model.Locations[index];
-            LocationEdit.Show();
-            StateHasChanged();
+            if (index < Model.Locations.Count)
+            {
+                SelectedLocationIndex = index;
+                SelectedLocation = Model.Locations[index];
+                LocationEdit.Show();
+                StateHasChanged();
+            }
         }
 
         protected async Task DeleteSelectedLocationAsync()
         {
             Model.Locations.Remove(SelectedLocation);
-            await SaveAsync();
+            Markers.RemoveAt(SelectedLocationIndex);
             LocationEdit.Hide();
+            await SaveAsync();
         }
     }
 

@@ -21,7 +21,17 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Watch Remove="Components\Map.razor" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\Recollections.Api.Shared\Recollections.Api.Shared.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Components\Map.razor.cs">
+      <DependentUpon>Map.razor</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

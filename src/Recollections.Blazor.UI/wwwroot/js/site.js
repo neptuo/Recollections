@@ -303,10 +303,9 @@ window.Downloader = {
 };
 
 window.Map = {
-    Initialize: function (container, interop, zoom, isEditable, markers) {
+    Initialize: function (container, interop, zoom, markers) {
         var isInitialization = false;
         var model = null;
-        var onDelete = null;
 
         $container = $(container);
         if ($container.data('map') == null) {
@@ -324,76 +323,20 @@ window.Map = {
                 map: map,
                 layer: layer,
                 interop: interop,
-                isEditable: isEditable,
                 isAdditive: false,
                 isEmptyPoint: false,
                 isAdding: false
             };
             $container.data('map', model);
 
-            if (isEditable) {
-                function dragStart(e) {
-                    var node = e.target.getContainer();
-                    node[SMap.LAYER_MARKER].style.cursor = "grab";
-                }
-
-                function dragStop(e) {
-                    var node = e.target.getContainer();
-                    node[SMap.LAYER_MARKER].style.cursor = "";
-                    var coords = e.target.getCoords();
-
-                    var id = Number.parseInt(e.target.getId());
-                    moveMarkerOnCoords(id, coords);
-                }
-
-                function mapClick(e) {
-                    if (model.isEmptyPoint || model.isAdding) {
-                        var index = null;
-                        if (model.isEmptyPoint) {
-                            index = 0;
-                        }
-
-                        var coords = SMap.Coords.fromEvent(e.data.event, map);
-                        moveMarkerOnCoords(index, coords);
-                    }
-                }
-
-                function markerClick(e) {
-                    var id = Number.parseInt(e.target.getId());
-                    interop.invokeMethodAsync("MarkerSelected", id);
-                }
-
-                function moveMarkerOnCoords(id, coords) {
-                    var latitude = coords.y;
-                    var longitude = coords.x;
-
-                    coords.getAltitude().then(function (altitude) {
-                        interop.invokeMethodAsync("MarkerMoved", id, latitude, longitude, altitude);
-                    });
-                }
-
-                var signals = map.getSignals();
-                signals.addListener(window, "marker-drag-start", dragStart);
-                signals.addListener(window, "marker-drag-stop", dragStop);
-                signals.addListener(window, "map-click", mapClick);
-                signals.addListener(window, "marker-click", markerClick);
-
-                var $addButton = $container.find(".btn-add-location");
-
-                $addButton.click(function () {
-                    model.isAdding = true;
-                    model.map.setCursor("crosshair");
-                });
-
-                model.isAdditive = $addButton.length > 0;
-            }
+            Map._BindEvents(model);
         }
 
         model = $container.data('map');
-        var points = Map.SetMarkers(model, markers);
+        var points = Map._SetMarkers(model, markers);
 
         model.isAdding = false;
-        model.isEmptyPoint = points.length == 0;
+        model.isEmptyPoint = points.length == 0 && !model.isAdditive;
         if (model.isEmptyPoint) {
             model.map.setCursor("grab");
             if (isInitialization) {
@@ -407,7 +350,63 @@ window.Map = {
             }
         }
     },
-    SetMarkers: function (model, markers) {
+    _BindEvents: function (model) {
+        function dragStart(e) {
+            var node = e.target.getContainer();
+            node[SMap.LAYER_MARKER].style.cursor = "grab";
+        }
+
+        function dragStop(e) {
+            var node = e.target.getContainer();
+            node[SMap.LAYER_MARKER].style.cursor = "";
+            var coords = e.target.getCoords();
+
+            var id = Number.parseInt(e.target.getId());
+            moveMarkerOnCoords(id, coords);
+        }
+
+        function mapClick(e) {
+            if (model.isEmptyPoint || model.isAdding) {
+                var index = null;
+                if (model.isEmptyPoint) {
+                    index = 0;
+                }
+
+                var coords = SMap.Coords.fromEvent(e.data.event, model.map);
+                moveMarkerOnCoords(index, coords);
+            }
+        }
+
+        function markerClick(e) {
+            var id = Number.parseInt(e.target.getId());
+            model.interop.invokeMethodAsync("MarkerSelected", id);
+        }
+
+        function moveMarkerOnCoords(id, coords) {
+            var latitude = coords.y;
+            var longitude = coords.x;
+
+            coords.getAltitude().then(function (altitude) {
+                model.interop.invokeMethodAsync("MarkerMoved", id, latitude, longitude, altitude);
+            });
+        }
+
+        var signals = model.map.getSignals();
+        signals.addListener(window, "marker-drag-start", dragStart);
+        signals.addListener(window, "marker-drag-stop", dragStop);
+        signals.addListener(window, "map-click", mapClick);
+        signals.addListener(window, "marker-click", markerClick);
+
+        var $addButton = $container.find(".btn-add-location");
+
+        $addButton.click(function () {
+            model.isAdding = true;
+            model.map.setCursor("crosshair");
+        });
+
+        model.isAdditive = $addButton.length > 0;
+    },
+    _SetMarkers: function (model, markers) {
         model.layer.removeAll();
         var points = [];
         for (var i = 0; i < markers.length; i++) {
@@ -415,11 +414,19 @@ window.Map = {
                 continue;
             }
 
-            var options = {};
+            var dropColor = markers[i].dropColor;
+            if (dropColor == null) {
+                dropColor = "red";
+            }
+
+            var options = {
+                title: markers[i].title,
+                url: SMap.CONFIG.img + "/marker/drop-" + dropColor + ".png"
+            };
             var point = SMap.Coords.fromWGS84(markers[i].longitude, markers[i].latitude);
             var marker = new SMap.Marker(point, "" + i, options);
 
-            if (model.isEditable) {
+            if (markers[i].isEditable) {
                 marker.decorate(SMap.Marker.Feature.Draggable);
             }
 

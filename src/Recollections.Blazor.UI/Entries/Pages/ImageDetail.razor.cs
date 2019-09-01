@@ -35,6 +35,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private ImageModel original;
         protected ImageModel Model { get; set; }
+        protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         protected async override Task OnInitAsync()
         {
@@ -48,6 +49,15 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Model = await Api.GetImageAsync(EntryId, ImageId);
             UpdateOriginal();
+
+            Markers.Clear();
+            Markers.Add(new MapMarkerModel
+            {
+                Latitude = Model.Location.Latitude,
+                Longitude = Model.Location.Longitude,
+                Altitude = Model.Location.Altitude,
+                IsEditable = true
+            });
         }
 
         protected async Task SaveNameAsync(string value)
@@ -71,10 +81,11 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        protected async Task SaveLocationAsync(LocationModel value = null)
+        protected async Task SaveLocationAsync()
         {
-            if (value != null)
-                Model.Location = value;
+            Model.Location.Latitude = Markers[0].Latitude;
+            Model.Location.Longitude = Markers[0].Longitude;
+            Model.Location.Altitude = Markers[0].Altitude;
 
             await SaveAsync();
             StateHasChanged();

@@ -137,20 +137,27 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Title = model.Title;
             entity.When = model.When;
             entity.Text = model.Text;
-            entity.Locations.Clear();
 
             for (int i = 0; i < model.Locations.Count; i++)
             {
+                if (i >= entity.Locations.Count)
+                {
+                    entity.Locations.Add(new OrderedLocation()
+                    {
+                        Order = i
+                    });
+                }
+
+                OrderedLocation locationEntity = entity.Locations.First(l => l.Order == i);
                 LocationModel location = model.Locations[i];
 
-                entity.Locations.Add(new OrderedLocation()
-                {
-                    Order = i,
-                    Longitude = location.Longitude,
-                    Latitude = location.Latitude,
-                    Altitude = location.Altitude
-                });
+                locationEntity.Longitude = location.Longitude;
+                locationEntity.Latitude = location.Latitude;
+                locationEntity.Altitude = location.Altitude;
             }
+
+            if (entity.Locations.Count > model.Locations.Count)
+                entity.Locations.RemoveAt(entity.Locations.Count - 1);
         }
     }
 }
