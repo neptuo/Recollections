@@ -76,7 +76,8 @@ namespace Neptuo.Recollections.Entries.Pages
                     Latitude = image.Location.Latitude,
                     Longitude = image.Location.Longitude,
                     Altitude = image.Location.Altitude,
-                    DropColor = "blue"
+                    DropColor = "blue",
+                    Title = image.Name
                 });
             }
         }
