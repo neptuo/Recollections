@@ -53,10 +53,6 @@
                             BearerToken="@UserState.BearerToken"
                             Progress="@(async e => await OnUploadProgressAsync(e))" />
 
-                <button type="button" class="btn btn-sm" @onclick="@(() => Model.Locations.Add(new LocationModel()))" title="Add GPS">
-                    <Icon Identifier="location" />
-                    Add Location
-                </button>
                 <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
                     <Icon Identifier="trash" />
                     Delete Entry
