@@ -39,7 +39,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             {
                 ImagePath path = service.GetPath(image.Entry, image);
 
-                if (DeleteFileIfDifferentExtension(path.Preview, service.GetPreviewFileExtension()) || DeleteFileIfDifferentExtension(path.Thumbnail, service.GetThumbnailFileExtension()))
+                if (DeleteFileIfDifferentExtension(path.Preview, ".png") | DeleteFileIfDifferentExtension(path.Thumbnail, ".png"))
                     await service.ComputeOtherSizesAsync(image.Entry, image);
             }
 
@@ -49,11 +49,15 @@ namespace Neptuo.Recollections.Entries.Controllers
 
         private bool IsRemoteRequest() => Request.Host.Host != "localhost" && Request.Host.Host != "127.0.0.1";
 
-        private bool DeleteFileIfDifferentExtension(string path, string extension)
+        private bool DeleteFileIfDifferentExtension(string newPath, string oldExtension)
         {
-            if (Path.GetExtension(path) != extension)
+            if (System.IO.File.Exists(newPath))
+                return false;
+
+            string currentPath = Path.Combine(Path.GetDirectoryName(newPath), Path.GetFileNameWithoutExtension(newPath)) + oldExtension;
+            if (System.IO.File.Exists(currentPath))
             {
-                System.IO.File.Delete(path);
+                System.IO.File.Delete(currentPath);
                 return true;
             }
 
