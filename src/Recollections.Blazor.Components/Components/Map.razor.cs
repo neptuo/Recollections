@@ -35,6 +35,8 @@ namespace Neptuo.Recollections.Components
 
         protected async override Task OnAfterRenderAsync()
         {
+            Console.WriteLine("Map.OnAfterRenderAsync");
+
             await base.OnAfterRenderAsync();
             await Interop.InitializeAsync(this);
         }

@@ -343,7 +343,7 @@ window.Map = {
         model.isAdding = false;
         model.isEmptyPoint = points.length == 0 && !model.isAdditive;
         if (model.isEmptyPoint) {
-            model.map.setCursor("grab");
+            model.map.setCursor("crosshair");
             if (isInitialization) {
                 model.map.setZoom(1);
             }
@@ -351,6 +351,10 @@ window.Map = {
             model.map.setCursor("move");
             if (isInitialization) {
                 var centerZoom = model.map.computeCenterZoom(points);
+                if (centerZoom[1] > 13) {
+                    centerZoom[1] = 13;
+                }
+
                 model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
             }
         }
