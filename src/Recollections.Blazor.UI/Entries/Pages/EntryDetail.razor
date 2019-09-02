@@ -66,7 +66,7 @@
         </div>
     </CascadingValue>
 
-    <Modal @ref="@LocationEdit" Title="Location" FormSubmit="@(async () => await SaveAsync())">
+    <Modal @ref="@LocationEdit" Title="Location" FormSubmit="@(async () => await SaveSelectedLocationAsync())">
         <ChildContent>
             @if (SelectedLocation != null)
             {
@@ -85,7 +85,7 @@
             }
         </ChildContent>
         <Buttons>
-            <button type="button" class="btn btn-sm btn-primary" @onclick="@(async () => { await SaveAsync(); LocationEdit.Hide(); })" title="Save Location">
+            <button type="button" class="btn btn-sm btn-primary" @onclick="@(async () => await SaveSelectedLocationAsync())" title="Save Location">
                 Save
             </button>
             <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteSelectedLocationAsync())" title="Delete Location">

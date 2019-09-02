@@ -202,6 +202,16 @@ namespace Neptuo.Recollections.Entries.Pages
             LocationEdit.Hide();
             await SaveAsync();
         }
+
+        protected Task SaveSelectedLocationAsync()
+        {
+            MapMarkerModel marker = Markers[SelectedLocationIndex];
+            marker.Latitude = SelectedLocation.Latitude;
+            marker.Longitude = SelectedLocation.Longitude;
+            marker.Altitude = SelectedLocation.Altitude;
+            LocationEdit.Hide();
+            return SaveAsync();
+        }
     }
 
     public class UploadImageModel
