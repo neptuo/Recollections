@@ -303,7 +303,7 @@ window.Downloader = {
 };
 
 window.Map = {
-    Initialize: function (container, interop, zoom, markers) {
+    Initialize: function (container, interop, zoom, markers, isResizable) {
         var isInitialization = false;
         var model = null;
 
@@ -318,6 +318,11 @@ window.Map = {
 
             var layer = new SMap.Layer.Marker();
             map.addLayer(layer).enable();
+
+            if (isResizable) {
+                var sync = new SMap.Control.Sync();
+                map.addControl(sync);
+            }
 
             model = {
                 map: map,

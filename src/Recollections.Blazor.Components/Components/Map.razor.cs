@@ -28,6 +28,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         protected bool IsAdditive { get; set; }
 
+        [Parameter]
+        internal protected bool IsResizable { get; set; }
+
         internal ElementRef Container { get; set; }
 
         protected async override Task OnAfterRenderAsync()
