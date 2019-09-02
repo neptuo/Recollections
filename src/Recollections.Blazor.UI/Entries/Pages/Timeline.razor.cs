@@ -46,7 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
-            TimelineListResponse response = await Api.GetListAsync(offset);
+            TimelineListResponse response = await Api.GetTimelineListAsync(offset);
             Entries.AddRange(response.Entries);
             HasMore = response.HasMore;
             offset = Entries.Count;

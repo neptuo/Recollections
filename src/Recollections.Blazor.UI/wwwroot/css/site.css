@@ -177,6 +177,17 @@ h2 .inline-editor-viewmode .oi {
   border-radius: 4px;
   border: 1px solid #e5e5e5; }
 
+.mappage {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  bottom: 0;
+  right: 0; }
+  .mappage .map-container {
+    height: 100%; }
+    .mappage .map-container .map {
+      height: 100%; }
+
 .entry-detail {
   padding: 24px;
   margin: 24px 0; }

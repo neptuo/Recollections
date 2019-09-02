@@ -1,0 +1,7 @@
+﻿@inherits MapPageModel
+@layout Layouts.HeadLayout
+@page "/map"
+
+<div class="mappage">
+    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkerSelected="OnMarkerSelected" IsResizable="true" />
+</div>

@@ -1,25 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@inject Navigator Navigator
+@layout HeadLayout
 
-<nav class="navbar navbar-inverse navbar-fixed-top navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="@Navigator.UrlTimeline()">Recollections</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-menu-items">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="main-menu-items">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="@Navigator.UrlTimeline()">Timeline</a>
-                </li>
-            </ul>
-            <span class="navbar-text">
-                <UserInfo />
-            </span>
-        </div>
-    </div>
-</nav>
 <div class="container body-content">
     @Body
 

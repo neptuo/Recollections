@@ -40,6 +40,12 @@ namespace Neptuo.Recollections
         public void OpenTimeline()
             => uri.NavigateTo(UrlTimeline());
 
+        public string UrlMap()
+            => "/map";
+
+        public void OpenMap()
+            => uri.NavigateTo(UrlMap());
+
         public string UrlEntryDetail(string entryId)
             => $"/entry/{entryId}";
 

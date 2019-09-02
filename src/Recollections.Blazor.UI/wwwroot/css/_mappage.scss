@@ -1,0 +1,15 @@
+﻿.mappage {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    .map-container {
+        height: 100%;
+
+        .map {
+            height: 100%;
+        }
+    }
+}
