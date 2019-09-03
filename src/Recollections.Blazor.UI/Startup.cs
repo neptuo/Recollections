@@ -26,6 +26,7 @@ namespace Neptuo.Recollections
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .AddLogging()
                 .AddComponents()
                 .AddUiOptions()
                 .AddHttpClientFactory()
