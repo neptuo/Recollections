@@ -303,7 +303,7 @@ window.Downloader = {
 };
 
 window.Map = {
-    Initialize: function (container, interop, zoom, markers, isResizable) {
+    Initialize: function (container, interop, markers, isZoomed, isResizable) {
         var isInitialization = false;
         var model = null;
 
@@ -314,7 +314,6 @@ window.Map = {
             var map = new SMap($container.find('.map')[0]);
             map.addDefaultLayer(SMap.DEF_BASE).enable();
             map.addDefaultControls();
-            map.setZoom(zoom);
 
             var layer = new SMap.Layer.Marker();
             map.addLayer(layer).enable();
@@ -344,12 +343,12 @@ window.Map = {
         model.isEmptyPoint = points.length == 0 && !model.isAdditive;
         if (model.isEmptyPoint) {
             model.map.setCursor("crosshair");
-            if (isInitialization) {
+            if (!isZoomed) {
                 model.map.setZoom(1);
             }
         } else {
             model.map.setCursor("move");
-            if (isInitialization) {
+            if (!isZoomed) {
                 var centerZoom = model.map.computeCenterZoom(points);
                 if (centerZoom[1] > 13) {
                     centerZoom[1] = 13;
