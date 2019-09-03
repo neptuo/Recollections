@@ -130,6 +130,9 @@ h2 .inline-editor-viewmode .oi {
     width: 100%;
     display: block; } }
 
+.exception-panel {
+  margin-top: 24px; }
+
 .component-login form {
   width: 100%;
   max-width: 330px;

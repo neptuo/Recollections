@@ -27,6 +27,7 @@ namespace Neptuo.Recollections
         {
             services
                 .AddLogging()
+                .AddExceptions()
                 .AddComponents()
                 .AddUiOptions()
                 .AddHttpClientFactory()
