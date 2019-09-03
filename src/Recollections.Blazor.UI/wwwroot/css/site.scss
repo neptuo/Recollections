@@ -24,6 +24,10 @@ a {
 @import "_inline-editor.scss";
 @import "_file-upload.scss";
 
+.main-navbar {
+    z-index: 2;
+}
+
 .actions {
     .right-actions {
         text-align: right;
