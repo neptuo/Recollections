@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Identifiers;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,9 @@ namespace Neptuo.Recollections.Components.Editors
 
         [Inject]
         protected InlineTextEditInterop Interop { get; set; }
+
+        [Inject]
+        protected ILog<InlineTextEditModel> Log { get; set; }
 
         public string InputId { get; private set; }
 
@@ -48,7 +52,7 @@ namespace Neptuo.Recollections.Components.Editors
         {
             await OnResetAsync();
             StateHasChanged();
-            Console.WriteLine($"Cancel completed, IsEditMode: {IsEditMode}");
+            Log.Debug($"Cancel completed, IsEditMode: {IsEditMode}");
         }
     }
 }

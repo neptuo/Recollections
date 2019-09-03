@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,9 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Inject]
         protected UiOptions UiOptions { get; set; }
 
+        [Inject]
+        protected ILog<MeModel> Log { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
@@ -32,7 +36,7 @@ namespace Neptuo.Recollections.Accounts.Pages
             await base.OnInitAsync();
             await UserState.EnsureAuthenticatedAsync();
 
-            Console.WriteLine("Me.GetDetail");
+            Log.Debug("Me.GetDetail");
             UserDetailResponse response = await Api.GetDetailAsync();
             UserName = response.UserName;
             Created = response.Created;

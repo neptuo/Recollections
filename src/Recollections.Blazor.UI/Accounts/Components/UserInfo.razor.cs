@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,9 @@ namespace Neptuo.Recollections.Accounts.Components
 {
     public class UserInfoModel : ComponentBase, IDisposable
     {
+        [Inject]
+        protected ILog<UserInfoModel> Log { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
@@ -27,7 +31,7 @@ namespace Neptuo.Recollections.Accounts.Components
 
         private void OnUserInfoChanged()
         {
-            Console.WriteLine("Raised OnUserInfoChanged.");
+            Log.Debug("Raised OnUserInfoChanged.");
             StateHasChanged();
         }
 

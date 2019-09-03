@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using System;
@@ -24,6 +25,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected Json Json { get; set; }
+
+        [Inject]
+        protected ILog<EntryDetailModel> Log { get; set; }
 
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
@@ -72,14 +76,14 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Images = await Api.GetImagesAsync(EntryId);
 
-            Console.WriteLine($"LoadImages, previous images: {imagesCount}, markers: {Markers.Count}, entry locations: {Model.Locations.Count}.");
-            Console.WriteLine(Json.Serialize(Markers));
+            Log.Debug($"LoadImages, previous images: {imagesCount}, markers: {Markers.Count}, entry locations: {Model.Locations.Count}.");
+            Log.Debug(Json.Serialize(Markers));
 
             if (imagesCount > 0)
                 Markers.RemoveRange(Model.Locations.Count, imagesCount);
 
-            Console.WriteLine($"LoadImages.Cleared, markers: {Markers.Count}.");
-            Console.WriteLine(Json.Serialize(Markers));
+            Log.Debug($"LoadImages.Cleared, markers: {Markers.Count}.");
+            Log.Debug(Json.Serialize(Markers));
 
             foreach (var image in Images)
             {
@@ -93,8 +97,8 @@ namespace Neptuo.Recollections.Entries.Pages
                 });
             }
 
-            Console.WriteLine($"LoadImages.Final, markers: {Markers.Count}.");
-            Console.WriteLine(Json.Serialize(Markers));
+            Log.Debug($"LoadImages.Final, markers: {Markers.Count}.");
+            Log.Debug(Json.Serialize(Markers));
         }
 
         protected async Task SaveTitleAsync(string value)
@@ -127,8 +131,8 @@ namespace Neptuo.Recollections.Entries.Pages
                 location.Altitude = marker.Altitude;
             }
 
-            Console.WriteLine(Json.Serialize(Markers));
-            Console.WriteLine($"Model: {Model.Locations.Count}, Images: {Images.Count}.");
+            Log.Debug(Json.Serialize(Markers));
+            Log.Debug($"Model: {Model.Locations.Count}, Images: {Images.Count}.");
 
             int existingCount = Model.Locations.Count + Images.Count;
             for (int i = 0; i < Markers.Count; i++)
@@ -145,7 +149,7 @@ namespace Neptuo.Recollections.Entries.Pages
                     int newIndex = Model.Locations.Count;
                     if (i != newIndex)
                     {
-                        Console.WriteLine($"SaveLocations, removing marker at '{i}' and inserting at '{newIndex}'.");
+                        Log.Debug($"SaveLocations, removing marker at '{i}' and inserting at '{newIndex}'.");
                         Markers.RemoveAt(i);
                         Markers.Insert(newIndex, marker);
                     }
@@ -156,7 +160,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 }
             }
 
-            Console.WriteLine(Json.Serialize(Model.Locations));
+            Log.Debug(Json.Serialize(Model.Locations));
             return SaveAsync();
         }
 
@@ -164,11 +168,11 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             if (original.Equals(Model))
             {
-                Console.WriteLine("Models are equal.");
+                Log.Debug("Models are equal.");
                 return;
             }
 
-            Console.WriteLine("Saving model.");
+            Log.Debug("Saving model.");
             await Api.UpdateAsync(Model);
             UpdateOriginal();
             StateHasChanged();
@@ -215,7 +219,7 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             if (index < Model.Locations.Count)
             {
-                Console.WriteLine($"Selected location '{index}': {Model.Locations[index]}.");
+                Log.Debug($"Selected location '{index}': {Model.Locations[index]}.");
 
                 SelectedLocationIndex = index;
                 SelectedLocation = Model.Locations[index];

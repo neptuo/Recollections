@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,9 @@ namespace Neptuo.Recollections.Components
     {
         [Inject]
         protected MapInterop Interop { get; set; }
+
+        [Inject]
+        protected ILog<MapModel> Log { get; set; }
 
         [Parameter]
         internal protected int Zoom { get; set; } = 10;
@@ -35,7 +39,7 @@ namespace Neptuo.Recollections.Components
 
         protected async override Task OnAfterRenderAsync()
         {
-            Console.WriteLine("Map.OnAfterRenderAsync");
+            Log.Debug("Map.OnAfterRenderAsync");
 
             await base.OnAfterRenderAsync();
             await Interop.InitializeAsync(this);
@@ -43,7 +47,7 @@ namespace Neptuo.Recollections.Components
 
         internal void MoveMarker(int? index, double latitude, double longitude, double? altitude)
         {
-            Console.WriteLine($"MoveMarker: {index?.ToString() ?? "<null>"}, {latitude}, {longitude}, {altitude}");
+            Log.Debug($"MoveMarker: {index?.ToString() ?? "<null>"}, {latitude}, {longitude}, {altitude}");
 
             MapMarkerModel marker;
             if (index == null)

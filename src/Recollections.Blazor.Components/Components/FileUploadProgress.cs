@@ -22,8 +22,6 @@ namespace Neptuo.Recollections.Components
         {
             get
             {
-                Console.WriteLine($"Current: {Uploaded} / {Size}");
-
                 int percentual = 0;
                 if (Size > 0)
                     percentual = (int)Math.Floor(Uploaded / (decimal)Size * 100);

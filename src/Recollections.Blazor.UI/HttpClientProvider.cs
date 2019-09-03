@@ -1,5 +1,6 @@
 ﻿using Neptuo;
 using Neptuo.Activators;
+using Neptuo.Logging;
 using Neptuo.Recollections;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,12 @@ namespace Neptuo.Recollections
     {
         private readonly HttpClient http;
 
-        public HttpClientProvider(HttpClient http)
+        public HttpClientProvider(HttpClient http, ILog<HttpClientProvider> log)
         {
             Ensure.NotNull(http, "http");
             this.http = http;
 
-            Console.WriteLine("HttpClientProvider");
+            log.Debug("HttpClientProvider.ctor");
         }
 
         public HttpClient Create() => http;

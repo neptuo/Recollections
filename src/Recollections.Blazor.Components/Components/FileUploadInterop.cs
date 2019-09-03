@@ -1,4 +1,6 @@
 ﻿using Microsoft.JSInterop;
+using Neptuo;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,13 +13,16 @@ namespace Neptuo.Recollections.Components
     public class FileUploadInterop
     {
         private readonly IJSRuntime jsRuntime;
+        private readonly ILog<FileUploadInterop> log;
 
         public FileUploadModel Model { get; set; }
 
-        public FileUploadInterop(IJSRuntime jsRuntime)
+        public FileUploadInterop(IJSRuntime jsRuntime, ILog<FileUploadInterop> log)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
+            Ensure.NotNull(log, "log");
             this.jsRuntime = jsRuntime;
+            this.log = log;
         }
 
         public Task InitializeAsync(FileUploadModel model, string bearerToken)
@@ -29,7 +34,7 @@ namespace Neptuo.Recollections.Components
         [JSInvokable]
         public void OnCompleted(FileUploadProgress[] progresses)
         {
-            Console.WriteLine($"FileUploadInterop.OnCompleted");
+            log.Debug($"FileUploadInterop.OnCompleted");
             Model.OnCompleted(progresses);
         }
     }

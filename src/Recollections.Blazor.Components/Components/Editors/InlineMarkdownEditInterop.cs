@@ -1,5 +1,6 @@
 ﻿using Microsoft.JSInterop;
 using Neptuo;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,12 +13,15 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineMarkdownEditInterop
     {
         private readonly IJSRuntime jsRuntime;
+        private static ILog<InlineMarkdownEditInterop> log;
         private static Dictionary<string, InlineMarkdownEditModel> models = new Dictionary<string, InlineMarkdownEditModel>();
 
-        public InlineMarkdownEditInterop(IJSRuntime jsRuntime)
+        public InlineMarkdownEditInterop(IJSRuntime jsRuntime, ILog<InlineMarkdownEditInterop> log)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
+            Ensure.NotNull(log, "log");
             this.jsRuntime = jsRuntime;
+            InlineMarkdownEditInterop.log = log;
         }
 
         public Task InitializeAsync(InlineMarkdownEditModel model)
@@ -44,10 +48,10 @@ namespace Neptuo.Recollections.Components.Editors
         [JSInvokable]
         public static void InlineMarkdownEdit_OnSave(string id, string value)
         {
-            Console.WriteLine($"InlineMarkdownEdit_OnSave, TextAreaId: {id}");
+            log.Debug($"InlineMarkdownEdit_OnSave, TextAreaId: {id}");
             if (models.TryGetValue(id, out InlineMarkdownEditModel model))
             {
-                Console.WriteLine("Model found");
+                log.Debug("Model found");
                 model.OnSave(value);
             }
         }
@@ -55,10 +59,10 @@ namespace Neptuo.Recollections.Components.Editors
         [JSInvokable]
         public static void InlineMarkdownEdit_OnCancel(string id)
         {
-            Console.WriteLine($"InlineMarkdownEdit_OnCancel, TextAreaId: {id}");
+            log.Debug($"InlineMarkdownEdit_OnCancel, TextAreaId: {id}");
             if (models.TryGetValue(id, out InlineMarkdownEditModel model))
             {
-                Console.WriteLine("Model found");
+                log.Debug("Model found");
                 model.OnCancel();
             }
         }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.JSInterop;
+using Neptuo;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,12 +13,15 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineTextEditInterop
     {
         private readonly IJSRuntime jsRuntime;
+        private static ILog<InlineTextEditInterop> log;
         private static Dictionary<string, InlineTextEditModel> models = new Dictionary<string, InlineTextEditModel>();
 
-        public InlineTextEditInterop(IJSRuntime jsRuntime)
+        public InlineTextEditInterop(IJSRuntime jsRuntime, ILog<InlineTextEditInterop> log)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
+            Ensure.NotNull(log, "log");
             this.jsRuntime = jsRuntime;
+            InlineTextEditInterop.log = log;
         }
 
         public Task InitializeAsync(InlineTextEditModel model)
@@ -28,10 +33,10 @@ namespace Neptuo.Recollections.Components.Editors
         [JSInvokable]
         public static void InlineTextEdit_OnCancel(string inputId)
         {
-            Console.WriteLine($"InlineTextEdit_OnCancel, InputId: {inputId}");
+            log.Debug($"InlineTextEdit_OnCancel, InputId: {inputId}");
             if (models.TryGetValue(inputId, out var model))
             {
-                Console.WriteLine("Model found");
+                log.Debug("Model found");
                 model.OnCancel();
             }
         }

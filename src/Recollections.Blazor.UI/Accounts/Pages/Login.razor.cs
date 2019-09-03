@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,9 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected ILog<LoginModel> Log { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
@@ -31,8 +35,8 @@ namespace Neptuo.Recollections.Accounts.Pages
 
         protected async Task LoginAsync()
         {
-            Console.WriteLine($"UserName: '{UserName}'");
-            Console.WriteLine($"Password: '{Password}'");
+            Log.Debug($"UserName: '{UserName}'");
+            Log.Debug($"Password: '{Password}'");
 
             ErrorMessages.Clear();
             if (!await UserState.LoginAsync(UserName, Password, IsPersistent))

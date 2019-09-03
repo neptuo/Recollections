@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Identifiers;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,9 @@ namespace Neptuo.Recollections.Components
 
         [Inject]
         protected FileUploadInterop Interop { get; set; }
+
+        [Inject]
+        protected ILog<FileUploadModel> Log { get; set; }
 
         [Parameter]
         protected string Text { get; set; } = DefaultText;
@@ -32,7 +36,7 @@ namespace Neptuo.Recollections.Components
 
         protected async override Task OnAfterRenderAsync()
         {
-            Console.WriteLine("FileUploadModel.OnAfterRenderAsync");
+            Log.Debug("FileUploadModel.OnAfterRenderAsync");
 
             await base.OnAfterRenderAsync();
             await Interop.InitializeAsync(this, BearerToken);
@@ -40,7 +44,7 @@ namespace Neptuo.Recollections.Components
 
         internal void OnCompleted(FileUploadProgress[] progresses)
         {
-            Console.WriteLine("FileUploadModel.OnCompleted");
+            Log.Debug("FileUploadModel.OnCompleted");
             Progress?.Invoke(progresses);
         }
     }

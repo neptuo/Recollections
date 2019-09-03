@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected MarkdownConverter MarkdownConverter { get; set; }
 
+        [Inject]
+        protected ILog<TimelineModel> Log { get; set; }
+
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
         
@@ -35,12 +39,12 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async override Task OnInitAsync()
         {
-            Console.WriteLine("Timeline.Init");
+            Log.Debug("Timeline.Init");
 
             await base.OnInitAsync();
             await UserState.EnsureAuthenticatedAsync();
 
-            Console.WriteLine("Timeline.Load");
+            Log.Debug("Timeline.Load");
             await LoadAsync();
         }
 

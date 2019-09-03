@@ -37,9 +37,6 @@ namespace Neptuo.Recollections
 
 namespace Neptuo.Logging
 {
-    internal interface ILog<T> : ILog
-    { }
-
     internal class DefaultLog<T> : ILog<T>
     {
         private ILog log;
