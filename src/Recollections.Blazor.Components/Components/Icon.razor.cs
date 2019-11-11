@@ -11,9 +11,9 @@ namespace Neptuo.Recollections.Components
     public class IconModel : ComponentBase
     {
         [Parameter]
-        protected string Identifier { get; set; }
+        public string Identifier { get; set; }
 
         [Parameter]
-        protected Action OnClick { get; set; }
+        public Action OnClick { get; set; }
     }
 }

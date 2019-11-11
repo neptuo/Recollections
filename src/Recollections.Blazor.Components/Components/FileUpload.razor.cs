@@ -21,24 +21,24 @@ namespace Neptuo.Recollections.Components
         protected ILog<FileUploadModel> Log { get; set; }
 
         [Parameter]
-        protected string Text { get; set; } = DefaultText;
+        public string Text { get; set; } = DefaultText;
 
         [Parameter]
-        protected string Url { get; set; }
+        public string Url { get; set; }
 
         [Parameter]
-        protected string BearerToken { get; set; }
+        public string BearerToken { get; set; }
 
         [Parameter]
-        protected Action<IReadOnlyCollection<FileUploadProgress>> Progress { get; set; }
+        public Action<IReadOnlyCollection<FileUploadProgress>> Progress { get; set; }
 
-        public ElementRef FormElement { get; protected set; }
+        public ElementReference FormElement { get; protected set; }
 
-        protected async override Task OnAfterRenderAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("FileUploadModel.OnAfterRenderAsync");
 
-            await base.OnAfterRenderAsync();
+            await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this, BearerToken);
         }
 

@@ -29,11 +29,11 @@ namespace Neptuo.Recollections.Accounts.Pages
 
         public ChangePasswordViewModel ChangePassword { get; private set; }
 
-        protected async override Task OnInitAsync()
+        protected async override Task OnInitializedAsync()
         {
             ChangePassword = new ChangePasswordViewModel(Api);
 
-            await base.OnInitAsync();
+            await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
             Log.Debug("Me.GetDetail");

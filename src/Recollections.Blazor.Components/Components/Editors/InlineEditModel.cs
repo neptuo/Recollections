@@ -13,13 +13,13 @@ namespace Neptuo.Recollections.Components.Editors
         private T originalValue;
 
         [Parameter]
-        protected T Value { get; set; }
+        public T Value { get; set; }
 
         [Parameter]
-        protected Action<T> ValueChanged { get; set; }
+        public Action<T> ValueChanged { get; set; }
 
         [Parameter]
-        protected string PlaceHolder { get; set; }
+        public string PlaceHolder { get; set; }
 
         protected bool IsEditMode { get; set; }
 

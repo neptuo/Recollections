@@ -22,7 +22,7 @@ namespace Neptuo.Recollections.Accounts
         public void SaveToken(string token)
             => jsRuntime.InvokeAsync<bool>("Recollections.SaveToken", token);
 
-        public Task<string> LoadTokenAsync()
+        public ValueTask<string> LoadTokenAsync()
             => jsRuntime.InvokeAsync<string>("Recollections.LoadToken");
     }
 }

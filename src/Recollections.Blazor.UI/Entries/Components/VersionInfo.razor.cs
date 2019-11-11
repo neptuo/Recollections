@@ -16,9 +16,9 @@ namespace Neptuo.Recollections.Entries.Components
         protected VersionModel ApiVersion { get; private set; }
         protected VersionModel ClientVersion { get; private set; }
 
-        protected async override Task OnInitAsync()
+        protected async override Task OnInitializedAsync()
         {
-            await base.OnInitAsync();
+            await base.OnInitializedAsync();
 
             ClientVersion = new VersionModel(typeof(VersionInfoModel).Assembly.GetName().Version);
             ApiVersion = await Api.GetVersionAsync();

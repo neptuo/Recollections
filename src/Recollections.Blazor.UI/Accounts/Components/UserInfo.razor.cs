@@ -17,9 +17,9 @@ namespace Neptuo.Recollections.Accounts.Components
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
-            base.OnInit();
+            base.OnInitialized();
 
             UserState.UserInfoChanged += OnUserInfoChanged;
         }

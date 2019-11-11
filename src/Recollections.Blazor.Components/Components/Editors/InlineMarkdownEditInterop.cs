@@ -24,25 +24,25 @@ namespace Neptuo.Recollections.Components.Editors
             InlineMarkdownEditInterop.log = log;
         }
 
-        public Task InitializeAsync(InlineMarkdownEditModel model)
+        public ValueTask InitializeAsync(InlineMarkdownEditModel model)
         {
             if (!models.ContainsKey(model.TextAreaId))
                 models[model.TextAreaId] = model;
 
 
-            return jsRuntime.InvokeAsync<object>("InlineMarkdownEdit.Initialize", model.TextAreaId);
+            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", model.TextAreaId);
         }
 
-        public Task DestroyAsync(string textAreaId)
+        public ValueTask DestroyAsync(string textAreaId)
         {
             models.Remove(textAreaId);
-            return jsRuntime.InvokeAsync<object>("InlineMarkdownEdit.Destroy", textAreaId);
+            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Destroy", textAreaId);
         }
 
-        internal Task<string> SetValueAsync(string textAreaId, string value)
+        internal ValueTask<string> SetValueAsync(string textAreaId, string value)
             => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.SetValue", textAreaId, value);
 
-        internal Task<string> GetValueAsync(string textAreaId)
+        internal ValueTask<string> GetValueAsync(string textAreaId)
             => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.GetValue", textAreaId);
 
         [JSInvokable]

@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Browser" Version="3.0.0-preview7.19365.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview9.19424.4" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
     <PackageReference Include="Neptuo.Exceptions" Version="1.2.1" />
   </ItemGroup>
@@ -19,6 +19,10 @@
   <ItemGroup>
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Watch Remove="Components\_Imports.razor" />
   </ItemGroup>
   
   <ItemGroup>

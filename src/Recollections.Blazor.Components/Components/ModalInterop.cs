@@ -19,10 +19,10 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        internal void Show(ElementRef element)
-            => jsRuntime.InvokeAsync<object>("Bootstrap.Modal.Show", element);
+        internal void Show(ElementReference element)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Modal.Show", element);
 
-        internal void Hide(ElementRef element)
-            => jsRuntime.InvokeAsync<object>("Bootstrap.Modal.Hide", element);
+        internal void Hide(ElementReference element)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Modal.Hide", element);
     }
 }

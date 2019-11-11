@@ -11,13 +11,13 @@ namespace Neptuo.Recollections.Entries.Components
     public class MapToggleModel : ComponentBase
     {
         [Parameter]
-        protected string Text { get; set; }
+        public string Text { get; set; }
 
         [Parameter]
-        protected Func<bool, string> ToggleChanged { get; set; }
+        public Func<bool, string> ToggleChanged { get; set; }
 
         [Parameter]
-        protected RenderFragment ChildContent { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         protected bool IsVisible { get; set; }
 

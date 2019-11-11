@@ -12,6 +12,6 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineGpsEditModel : InlineEditModel<LocationModel>
     {
         [Parameter]
-        protected Action<LocationModel> Delete { get; set; }
+        public Action<LocationModel> Delete { get; set; }
     }
 }

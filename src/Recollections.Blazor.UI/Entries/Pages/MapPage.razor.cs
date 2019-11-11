@@ -24,9 +24,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<MapEntryModel> Entries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
-        protected async override Task OnInitAsync()
+        protected async override Task OnInitializedAsync()
         {
-            await base.OnInitAsync();
+            await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
             await LoadAsync();

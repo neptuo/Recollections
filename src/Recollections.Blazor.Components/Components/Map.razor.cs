@@ -19,24 +19,24 @@ namespace Neptuo.Recollections.Components
         protected ILog<MapModel> Log { get; set; }
 
         [Parameter]
-        internal protected IList<MapMarkerModel> Markers { get; set; }
+        public IList<MapMarkerModel> Markers { get; set; }
 
         [Parameter]
-        protected Action MarkersChanged { get; set; }
+        public Action MarkersChanged { get; set; }
 
         [Parameter]
-        internal protected Action<int> MarkerSelected { get; set; }
+        public Action<int> MarkerSelected { get; set; }
 
         [Parameter]
-        protected bool IsAdditive { get; set; }
+        public bool IsAdditive { get; set; }
 
         [Parameter]
-        internal protected bool IsResizable { get; set; }
+        public bool IsResizable { get; set; }
 
-        internal ElementRef Container { get; set; }
+        internal ElementReference Container { get; set; }
         internal bool IsZoomed { get; private set; }
 
-        public async override Task SetParametersAsync(ParameterCollection parameters)
+        public async override Task SetParametersAsync(ParameterView parameters)
         {
             Log.Debug("SetParametersAsync");
             await base.SetParametersAsync(parameters);
@@ -44,11 +44,11 @@ namespace Neptuo.Recollections.Components
             Log.Debug($"Markers: '{Markers.Count}', has '{parameters.TryGetValue<IList<MapMarkerModel>>(nameof(Markers), out _)}'");
         }
 
-        protected async override Task OnAfterRenderAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("OnAfterRenderAsync");
 
-            await base.OnAfterRenderAsync();
+            await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this);
 
             if (Markers.Count > 0)

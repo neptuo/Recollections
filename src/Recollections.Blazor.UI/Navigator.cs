@@ -11,10 +11,10 @@ namespace Neptuo.Recollections
 {
     public class Navigator
     {
-        private readonly IUriHelper uri;
+        private readonly NavigationManager uri;
         private readonly IJSRuntime jsRuntime;
 
-        public Navigator(IUriHelper uri, IJSRuntime jsRuntime)
+        public Navigator(NavigationManager uri, IJSRuntime jsRuntime)
         {
             Ensure.NotNull(uri, "uri");
             Ensure.NotNull(jsRuntime, "jsRuntime");
@@ -22,10 +22,10 @@ namespace Neptuo.Recollections
             this.jsRuntime = jsRuntime;
         }
 
-        public Task<bool> AskAsync(string message)
+        public ValueTask<bool> AskAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.confirm", message);
 
-        public Task MessageAsync(string message)
+        public ValueTask<bool> MessageAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.alert", message);
 
         public string UrlRegister()

@@ -24,10 +24,10 @@ namespace Neptuo.Recollections.Components.Editors
             InlineTextEditInterop.log = log;
         }
 
-        public Task InitializeAsync(InlineTextEditModel model)
+        public ValueTask InitializeAsync(InlineTextEditModel model)
         {
             models[model.InputId] = model;
-            return jsRuntime.InvokeAsync<object>("InlineTextEdit.Initialize", model.InputId);
+            return jsRuntime.InvokeVoidAsync("InlineTextEdit.Initialize", model.InputId);
         }
 
         [JSInvokable]

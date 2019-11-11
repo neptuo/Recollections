@@ -38,9 +38,9 @@ namespace Neptuo.Recollections.Entries.Components
             When = DateTime.Today;
         }
 
-        protected async override Task OnAfterRenderAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync();
+            await base.OnAfterRenderAsync(firstRender);
             await DatePickerInterop.InitializeAsync(WhenInputId, UiOptions.DateFormat);
         }
 

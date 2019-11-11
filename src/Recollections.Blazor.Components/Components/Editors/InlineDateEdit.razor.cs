@@ -21,17 +21,17 @@ namespace Neptuo.Recollections.Components.Editors
         public string InputId { get; private set; }
 
         [Parameter]
-        protected string Format { get; set; }
+        public string Format { get; set; }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
-            base.OnInit();
+            base.OnInitialized();
             InputId = NameProvider.Next();
         }
 
-        protected async override Task OnAfterRenderAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync();
+            await base.OnAfterRenderAsync(firstRender);
 
             if (IsEditMode)
                 await Interop.InitializeAsync(InputId, Format);

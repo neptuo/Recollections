@@ -19,13 +19,13 @@ namespace Neptuo.Recollections.Accounts.Components
         protected Api Api { get; set; }
 
         [Inject]
-        protected IUriHelper Uri { get; set; }
+        protected NavigationManager Uri { get; set; }
 
         [Inject]
         protected Interop Interop { get; set; }
 
         [Parameter]
-        protected RenderFragment ChildContent { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         public event Action UserChanged;
         public event Action UserInfoChanged;
@@ -62,7 +62,7 @@ namespace Neptuo.Recollections.Accounts.Components
             }
         }
 
-        protected override async Task OnInitAsync()
+        protected override async Task OnInitializedAsync()
         {
             if (BearerToken == null)
             {

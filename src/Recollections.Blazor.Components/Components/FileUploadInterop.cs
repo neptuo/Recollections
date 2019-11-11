@@ -25,10 +25,10 @@ namespace Neptuo.Recollections.Components
             this.log = log;
         }
 
-        public Task InitializeAsync(FileUploadModel model, string bearerToken)
+        public async Task InitializeAsync(FileUploadModel model, string bearerToken)
         {
             Model = model;
-            return jsRuntime.InvokeAsync<object>("FileUpload.Initialize", DotNetObjectRef.Create(this), model.FormElement, bearerToken);
+            await jsRuntime.InvokeVoidAsync("FileUpload.Initialize", DotNetObjectReference.Create(this), model.FormElement, bearerToken);
         }
 
         [JSInvokable]

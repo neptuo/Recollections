@@ -14,32 +14,32 @@ namespace Neptuo.Recollections.Components
         internal ModalInterop Interop { get; set; }
 
         [Parameter]
-        protected string Title { get; set; }
+        public string Title { get; set; }
 
         [Parameter]
-        protected RenderFragment ChildContent { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         [Parameter]
-        protected RenderFragment Buttons { get; set; }
+        public RenderFragment Buttons { get; set; }
 
         [Parameter]
-        protected string CloseButtonText { get; set; } = "Close";
+        public string CloseButtonText { get; set; } = "Close";
 
         [Parameter]
-        protected Action FormSubmit { get; set; }
+        public Action FormSubmit { get; set; }
 
         [Parameter]
-        protected Action CloseButtonClick { get; set; }
+        public Action CloseButtonClick { get; set; }
 
         protected string DialogCssClass { get; set; }
 
         [Parameter]
-        protected ModalSize Size { get; set; } = ModalSize.Normal;
+        public ModalSize Size { get; set; } = ModalSize.Normal;
 
         [Parameter]
-        protected Action Closed { get; set; }
+        public Action Closed { get; set; }
 
-        protected ElementRef Container { get; set; }
+        protected ElementReference Container { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -61,7 +61,7 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        protected void OnFormSubmit(UIEventArgs e) => FormSubmit?.Invoke();
+        protected void OnFormSubmit(EventArgs e) => FormSubmit?.Invoke();
 
         protected void OnCloseButtonClick()
         {

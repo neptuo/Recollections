@@ -23,9 +23,9 @@ namespace Neptuo.Recollections.Components.Editors
 
         public string InputId { get; private set; }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
-            base.OnInit();
+            base.OnInitialized();
             InputId = NameProvider.Next();
         }
 
@@ -37,9 +37,9 @@ namespace Neptuo.Recollections.Components.Editors
             isEditSwitched = true;
         }
 
-        protected async override Task OnAfterRenderAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync();
+            await base.OnAfterRenderAsync(firstRender);
 
             if (isEditSwitched)
             {

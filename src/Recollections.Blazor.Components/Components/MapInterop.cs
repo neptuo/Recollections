@@ -19,10 +19,10 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public Task InitializeAsync(MapModel model)
+        public ValueTask InitializeAsync(MapModel model)
         {
             this.model = model;
-            return jsRuntime.InvokeAsync<object>("Map.Initialize", model.Container, DotNetObjectRef.Create(this), model.Markers, model.IsZoomed, model.IsResizable);
+            return jsRuntime.InvokeVoidAsync("Map.Initialize", model.Container, DotNetObjectReference.Create(this), model.Markers, model.IsZoomed, model.IsResizable);
         }
 
         [JSInvokable]

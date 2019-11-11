@@ -21,10 +21,10 @@ namespace Neptuo.Recollections.Components
         protected string Title { get; private set; }
         protected string Message { get; private set; }
 
-        protected override Task OnInitAsync()
+        protected override Task OnInitializedAsync()
         {
             ExceptionHandlerBuilder.Handler(this);
-            return base.OnInitAsync();
+            return base.OnInitializedAsync();
         }
 
         void IExceptionHandler<Exception>.Handle(Exception exception)

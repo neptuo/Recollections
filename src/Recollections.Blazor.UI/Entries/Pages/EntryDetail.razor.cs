@@ -33,7 +33,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected UserStateModel UserState { get; set; }
 
         [Parameter]
-        protected string EntryId { get; set; }
+        public string EntryId { get; set; }
 
         private EntryModel original;
         protected EntryModel Model { get; set; }
@@ -41,9 +41,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
 
-        protected async override Task OnInitAsync()
+        protected async override Task OnInitializedAsync()
         {
-            await base.OnInitAsync();
+            await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
             await LoadAsync();

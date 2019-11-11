@@ -40,21 +40,21 @@ namespace Neptuo.Recollections.Components.Editors
             }
         }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
-            base.OnInit();
+            base.OnInitialized();
             TextAreaId = NameProvider.Next();
         }
 
-        public async override Task SetParametersAsync(ParameterCollection parameters)
+        public async override Task SetParametersAsync(ParameterView parameters)
         {
             await base.SetParametersAsync(parameters);
             markdownValue = null;
         }
 
-        protected async override Task OnAfterRenderAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnAfterRenderAsync();
+            await base.OnAfterRenderAsync(firstRender);
 
             if (IsEditMode)
             {

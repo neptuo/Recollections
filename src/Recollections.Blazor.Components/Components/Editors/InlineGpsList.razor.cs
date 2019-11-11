@@ -12,10 +12,10 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineGpsListModel : ComponentBase
     {
         [Parameter]
-        protected List<LocationModel> Value { get; set; }
+        public List<LocationModel> Value { get; set; }
 
         [Parameter]
-        protected Action<List<LocationModel>> ValueChanged { get; set; }
+        public Action<List<LocationModel>> ValueChanged { get; set; }
 
         protected void OnValueChanged(LocationModel newValue, LocationModel oldValue)
         {

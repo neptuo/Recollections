@@ -25,10 +25,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Downloader Downloader { get; set; }
 
         [Parameter]
-        protected string EntryId { get; set; }
+        public string EntryId { get; set; }
 
         [Parameter]
-        protected string ImageId { get; set; }
+        public string ImageId { get; set; }
 
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
@@ -37,9 +37,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected ImageModel Model { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
-        protected async override Task OnInitAsync()
+        protected async override Task OnInitializedAsync()
         {
-            await base.OnInitAsync();
+            await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
             await LoadAsync();
@@ -117,7 +117,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadAsync();
         }
 
-        protected Task DownloadOriginalAsync() => Downloader.FromUrlAsync(Model.Name, Api.ResolveUrl(Model.Original));
+        protected async Task DownloadOriginalAsync() => await Downloader.FromUrlAsync(Model.Name, Api.ResolveUrl(Model.Original));
 
         protected string GetMapDescription(bool isVisible)
         {

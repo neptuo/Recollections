@@ -18,13 +18,13 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public Task InitializeAsync(string inputId, string format)
-            => jsRuntime.InvokeAsync<object>("DatePicker.Initialize", inputId, format);
+        public ValueTask InitializeAsync(string inputId, string format)
+            => jsRuntime.InvokeVoidAsync("DatePicker.Initialize", inputId, format);
 
-        public Task DestroyAsync(string inputId)
-            => jsRuntime.InvokeAsync<object>("DatePicker.Destroy", inputId);
+        public ValueTask DestroyAsync(string inputId)
+            => jsRuntime.InvokeVoidAsync("DatePicker.Destroy", inputId);
 
-        public Task<string> GetValueAsync(string inputId)
+        public ValueTask<string> GetValueAsync(string inputId)
             => jsRuntime.InvokeAsync<string>("DatePicker.GetValue", inputId);
     }
 }

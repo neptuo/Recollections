@@ -37,11 +37,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected bool IsEditTextVisible { get; set; }
 
-        protected async override Task OnInitAsync()
+        protected async override Task OnInitializedAsync()
         {
             Log.Debug("Timeline.Init");
 
-            await base.OnInitAsync();
+            await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
             Log.Debug("Timeline.Load");

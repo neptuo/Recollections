@@ -15,13 +15,13 @@
 {
     [Parameter]
     [CascadingParameter]
-    protected EntryModel Entry { get; set; }
+    public EntryModel Entry { get; set; }
 
     [Parameter]
-    protected ImageModel Image { get; set; }
+    public ImageModel Image { get; set; }
 
     [Parameter]
-    protected string PlaceHolder { get; set; }
+    public string PlaceHolder { get; set; }
 
     protected string GetImageUrl()
     {

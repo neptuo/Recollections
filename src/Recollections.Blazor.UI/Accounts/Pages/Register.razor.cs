@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected Api Api { get; set; }
 
         [Inject]
-        protected IUriHelper Uri { get; set; }
+        protected NavigationManager Uri { get; set; }
 
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
