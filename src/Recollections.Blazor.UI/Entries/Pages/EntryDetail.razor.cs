@@ -66,6 +66,12 @@ namespace Neptuo.Recollections.Entries.Pages
                     IsEditable = true
                 });
             }
+
+            if (Log.IsDebugEnabled())
+            {
+                Log.Debug($"Load, markers: {Markers.Count}, entry locations: {Model.Locations.Count}.");
+                Log.Debug(Json.Serialize(Markers));
+            }
         }
 
         private async Task LoadImagesAsync()
@@ -76,18 +82,26 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Images = await Api.GetImagesAsync(EntryId);
 
-            Log.Debug($"LoadImages, previous images: {imagesCount}, markers: {Markers.Count}, entry locations: {Model.Locations.Count}.");
-            Log.Debug(Json.Serialize(Markers));
+            if (Log.IsDebugEnabled())
+            {
+                Log.Debug($"LoadImages, previous images: {imagesCount}, markers: {Markers.Count}, entry locations: {Model.Locations.Count}.");
+                Log.Debug(Json.Serialize(Markers));
+            }
 
             if (imagesCount > 0)
-                Markers.RemoveRange(Model.Locations.Count, imagesCount);
+                Markers.RemoveRange(0, imagesCount);
 
-            Log.Debug($"LoadImages.Cleared, markers: {Markers.Count}.");
-            Log.Debug(Json.Serialize(Markers));
-
-            foreach (var image in Images)
+            if (Log.IsDebugEnabled())
             {
-                Markers.Add(new MapMarkerModel
+                Log.Debug($"LoadImages.Cleared, markers: {Markers.Count}.");
+                Log.Debug(Json.Serialize(Markers));
+            }
+
+            for (int i = 0; i < Images.Count; i++)
+            {
+                var image = Images[i];
+
+                Markers.Insert(i, new MapMarkerModel
                 {
                     Latitude = image.Location.Latitude,
                     Longitude = image.Location.Longitude,
@@ -97,8 +111,11 @@ namespace Neptuo.Recollections.Entries.Pages
                 });
             }
 
-            Log.Debug($"LoadImages.Final, markers: {Markers.Count}.");
-            Log.Debug(Json.Serialize(Markers));
+            if (Log.IsDebugEnabled())
+            {
+                Log.Debug($"LoadImages.Final, markers: {Markers.Count}.");
+                Log.Debug(Json.Serialize(Markers));
+            }
         }
 
         protected async Task SaveTitleAsync(string value)
@@ -131,36 +148,32 @@ namespace Neptuo.Recollections.Entries.Pages
                 location.Altitude = marker.Altitude;
             }
 
-            Log.Debug(Json.Serialize(Markers));
-            Log.Debug($"Model: {Model.Locations.Count}, Images: {Images.Count}.");
-
-            int existingCount = Model.Locations.Count + Images.Count;
-            for (int i = 0; i < Markers.Count; i++)
+            if (Log.IsDebugEnabled())
             {
-                if (i < Model.Locations.Count)
-                {
-                    MapMarkerModel marker = Markers[i];
-                    LocationModel location = Model.Locations[i];
-                    Map(marker, location);
-                }
-                else if (i >= existingCount)
-                {
-                    MapMarkerModel marker = Markers[i];
-                    int newIndex = Model.Locations.Count;
-                    if (i != newIndex)
-                    {
-                        Log.Debug($"SaveLocations, removing marker at '{i}' and inserting at '{newIndex}'.");
-                        Markers.RemoveAt(i);
-                        Markers.Insert(newIndex, marker);
-                    }
-
-                    LocationModel location = new LocationModel();
-                    Model.Locations.Add(location);
-                    Map(marker, location);
-                }
+                Log.Debug($"SaveLocations, Model: {Model.Locations.Count}, Images: {Images.Count}.");
+                Log.Debug(Json.Serialize(Markers));
             }
 
-            Log.Debug(Json.Serialize(Model.Locations));
+            for (int i = Images.Count; i < Markers.Count; i++)
+            {
+                MapMarkerModel marker = Markers[i];
+                LocationModel location;
+
+                int modelIndex = i - Images.Count;
+                if (modelIndex < Model.Locations.Count)
+                    location = Model.Locations[modelIndex];
+                else
+                    Model.Locations.Add(location = new LocationModel());
+
+                Map(marker, location);
+            }
+
+            if (Log.IsDebugEnabled())
+            {
+                Log.Debug($"SaveLocations.Final, Model: {Model.Locations.Count}.");
+                Log.Debug(Json.Serialize(Model.Locations));
+            }
+
             return SaveAsync();
         }
 
@@ -217,6 +230,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void OnLocationSelected(int index)
         {
+            index -= Images.Count;
             if (index < Model.Locations.Count)
             {
                 Log.Debug($"Selected location '{index}': {Model.Locations[index]}.");
@@ -231,7 +245,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task DeleteSelectedLocationAsync()
         {
             Model.Locations.Remove(SelectedLocation);
-            Markers.RemoveAt(SelectedLocationIndex);
+            Markers.RemoveAt(SelectedLocationIndex + Images.Count);
             LocationEdit.Hide();
             await SaveAsync();
         }

@@ -14,7 +14,7 @@ namespace Neptuo.Recollections.Entries
         public DateTime When { get; set; }
         public string Text { get; set; }
 
-        public List<LocationModel> Locations { get; } = new List<LocationModel>();
+        public List<LocationModel> Locations { get; set; } = new List<LocationModel>();
 
         public EntryModel()
         { }
