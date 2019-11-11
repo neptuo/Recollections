@@ -260,8 +260,10 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 if (Progress.Status == "done")
                     return "Uploaded";
+                else if (Progress.Status == "current" && Progress.Percentual == 100)
+                    return $"Saving...";
                 else if (Progress.Status == "current")
-                    return $"{Progress.Precentual}%";
+                    return $"{Progress.Percentual}%";
                 else if (Progress.Status == "error")
                     return "Error";
                 else if (Progress.Status == "pending")

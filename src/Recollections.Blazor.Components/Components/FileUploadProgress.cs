@@ -18,7 +18,7 @@ namespace Neptuo.Recollections.Components
         public int Size { get; set; }
         public int Uploaded { get; set; }
 
-        public int Precentual
+        public int Percentual
         {
             get
             {
