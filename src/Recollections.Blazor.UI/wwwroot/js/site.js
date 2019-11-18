@@ -145,7 +145,7 @@ window.FileUpload = {
                     var responseText = currentRequest.responseText;
                     onCompleted(responseText);
                 }
-                else if (onError != null) {
+                else if (request.status != 0 && onError != null) {
                     onError(currentRequest.status, currentRequest.statusText);
                 }
             }
