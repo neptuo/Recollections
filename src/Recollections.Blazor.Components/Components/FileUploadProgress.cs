@@ -11,6 +11,8 @@ namespace Neptuo.Recollections.Components
 {
     public class FileUploadProgress
     {
+        public string Name { get; set; }
+
         public string Status { get; set; }
         public int StatusCode { get; set; }
         public string ResponseText { get; set; }

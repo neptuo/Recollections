@@ -90,4 +90,36 @@
             </button>
         </Buttons>
     </Modal>
+
+    <Modal @ref="@UploadError" Title="Upload Error">
+        <ChildContent>
+            @{
+                var message = $"Some uploads ({UploadErrors.Count}) finished with errors.";
+            }
+            <Alert Mode="AlertMode.Warning" Message="@message" />
+
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">File</th>
+                        <th scope="col">Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var error in UploadErrors)
+                    {
+                        <tr>
+                            <td>
+                                @error.Progress.Name
+                            </td>
+                            <td>
+                                @error.Description (@error.Progress.StatusCode)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </ChildContent>
+    </Modal>
 }

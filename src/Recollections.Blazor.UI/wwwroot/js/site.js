@@ -121,6 +121,7 @@ window.FileUpload = {
                 progress.push({
                     status: "pending",
                     statusCode: 0,
+                    name: file.name,
                     responseText: null,
                     uploaded: 0,
                     size: file.size

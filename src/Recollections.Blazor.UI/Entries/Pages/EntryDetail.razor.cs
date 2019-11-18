@@ -40,6 +40,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<ImageModel> Images { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
+        protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
 
         protected async override Task OnInitializedAsync()
         {
@@ -193,11 +194,20 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private void UpdateOriginal() => original = Model.Clone();
 
+        protected Modal UploadError { get; set; }
+
         protected async Task OnUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
         {
+            Console.WriteLine("OnUploadProgressAsync: " + Json.Serialize(progresses));
+
             UploadProgress.Clear();
             if (progresses.All(p => p.Status == "done" || p.Status == "error"))
             {
+                UploadErrors.Clear();
+                UploadErrors.AddRange(progresses.Where(p => p.Status == "error").Select(p => new UploadErrorModel(p)));
+                if (UploadErrors.Count > 0)
+                    UploadError.Show();
+
                 await LoadImagesAsync();
             }
             else
@@ -292,6 +302,28 @@ namespace Neptuo.Recollections.Entries.Pages
             Ensure.NotNull(progress, "progress");
             Progress = progress;
             Image = image;
+        }
+    }
+
+    public class UploadErrorModel
+    {
+        public FileUploadProgress Progress { get; }
+
+        public UploadErrorModel(FileUploadProgress progress)
+        {
+            Ensure.NotNull(progress, "progress");
+            Progress = progress;
+        }
+
+        public string Description
+        {
+            get
+            {
+                if (Progress.StatusCode == 400)
+                    return "File is too large.";
+                else
+                    return "Unexpected server error.";
+            }
         }
     }
 }
