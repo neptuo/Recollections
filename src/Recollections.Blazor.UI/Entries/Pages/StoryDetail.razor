@@ -12,7 +12,26 @@
                 <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
             </div>
 
+            <div class="chapters">
+                @foreach (var chapter in Model.Chapters)
+                {
+                    <div class="chapter">
+                        <h4>
+                            <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" />
+                        </h4>
+                        <div class="text">
+                            <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
+                        </div>
+                    </div>
+                }
+            </div>
+
             <ActionPanel>
+
+                <button type="button" class="btn btn-sm btn-primary" @onclick="@AddChapter" title="Add Chapter">
+                    <Icon Identifier="book" />
+                    Add Chapter
+                </button>
 
                 <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
                     <Icon Identifier="trash" />

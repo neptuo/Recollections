@@ -59,5 +59,26 @@ namespace Neptuo.Recollections.Entries.Pages
             await Api.DeleteStoryAsync(Model.Id);
             Navigator.OpenStories();
         }
+
+        protected void AddChapter()
+        {
+            Model.Chapters.Add(new ChapterModel()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = "New Chapter"
+            });
+        }
+
+        protected Task SaveChapterTitleAsync(ChapterModel chapter, string title)
+        {
+            chapter.Title = title;
+            return SaveAsync();
+        }
+
+        protected Task SaveChapterTextAsync(ChapterModel chapter, string text)
+        {
+            chapter.Text = text;
+            return SaveAsync();
+        }
     }
 }

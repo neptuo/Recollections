@@ -121,7 +121,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (id != model.Id)
                 return BadRequest();
 
-            Story entity = await dataContext.Stories.FindAsync(id);
+            Story entity = await dataContext.Stories.Include(s => s.Chapters).FirstOrDefaultAsync(s => s.Id == id);
             if (entity == null)
                 return NotFound();
 

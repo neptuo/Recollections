@@ -95,6 +95,9 @@ a {
 h2 .inline-editor-viewmode .oi {
   top: 14px; }
 
+h4 .inline-editor-viewmode .oi {
+  top: 8px; }
+
 .inline-markdown .inline-submit {
   margin-top: -60px; }
 

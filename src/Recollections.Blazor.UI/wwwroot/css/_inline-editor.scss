@@ -76,6 +76,14 @@ h2 {
     }
 }
 
+h4 {
+    .inline-editor-viewmode {
+        .oi {
+            top: 8px;
+        }
+    }
+}
+
 
 .inline-markdown {
     .inline-submit {
@@ -98,7 +106,7 @@ h2 {
     }
 
     .card {
-        .card-header, 
+        .card-header,
         .card-footer {
             display: none;
         }
