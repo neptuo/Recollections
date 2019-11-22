@@ -229,7 +229,10 @@ h2 .inline-editor-viewmode .oi {
         margin: 0 auto; }
       .entry-detail .images .image img {
         width: 200px;
-        height: 160px; }
+        height: 160px;
+        transition: all 0.5s; }
+      .entry-detail .images .image img:hover {
+        transform: scale(1.05); }
     .entry-detail .images .image-placeholder {
       justify-content: center; }
       .entry-detail .images .image-placeholder img {

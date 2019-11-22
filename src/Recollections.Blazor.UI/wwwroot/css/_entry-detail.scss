@@ -39,6 +39,12 @@
             img {
                 width: 200px;
                 height: 160px;
+
+                transition: all 0.5s;
+            }
+
+            img:hover {
+                transform: scale(1.05);
             }
         }
 
