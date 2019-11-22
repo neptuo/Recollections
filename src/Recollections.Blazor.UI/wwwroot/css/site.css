@@ -262,6 +262,8 @@ h2 .inline-editor-viewmode .oi {
 .stories .story {
   padding: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+  .stories .story .dates, .stories .story .entries, .stories .story .chapters {
+    padding-right: .5rem; }
 
 .stories .story-new {
   padding: 1rem 0;

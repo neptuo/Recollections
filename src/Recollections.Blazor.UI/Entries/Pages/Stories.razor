@@ -28,7 +28,7 @@
 
             @if (story.MinDate != null || story.MaxDate != null)
             {
-                <div>
+                <span class="dates">
                     <Icon Identifier="calendar" />
 
                     @if (story.MinDate != null)
@@ -45,18 +45,18 @@
                     {
                         <span>@story.MaxDate.Value.ToString(UiOptions.DateFormat)</span>
                     }
-                </div>
+                </span>
             }
 
-            <div>
+            <span class="chapters">
                 <Icon Identifier="book" />
                 @story.Chapters chapters
-            </div>
+            </span>
 
-            <div>
+            <span class="entries">
                 <Icon Identifier="comment-square" />
                 @story.Entries entries
-            </div>
+            </span>
         </div>
     }
 </div>
