@@ -259,5 +259,17 @@ h2 .inline-editor-viewmode .oi {
   .image-detail .placeholder {
     color: #aaaaaa; }
 
+.stories .story {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+
+.stories .story-new {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+
+.stories .story:last-child {
+  padding-bottom: 0;
+  border-bottom-width: 0; }
+
 .version {
   color: #aaaaaa; }

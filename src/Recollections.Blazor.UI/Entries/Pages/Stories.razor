@@ -1,1 +1,60 @@
 ﻿@page "/stories"
+@inherits StoriesModel
+
+<div class="stories">
+    <div class="story-new">
+        <Validation ErrorMessages="ErrorMessages" />
+
+        <form @onsubmit="@CreateAsync">
+            <div class="row">
+                <div class="col-md col-sm-12">
+                    <input class="form-control" type="text" placeholder="Story title..." @bind="Title" />
+                </div>
+                <div class="col-md-auto col-sm-12">
+                    <button class="btn btn-primary" type="submit">Create new story</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @foreach (var story in Stories)
+    {
+        <div class="story">
+            <h2>
+                    @story.Title
+            </h2>
+
+            @if (story.MinDate != null || story.MaxDate != null)
+            {
+                <div>
+                    <Icon Identifier="calendar" />
+
+                    @if (story.MinDate != null)
+                    {
+                        <span>@story.MinDate.Value.ToString(UiOptions.DateFormat)</span>
+                    }
+
+                    @if (story.MinDate != null || story.MaxDate != null)
+                    {
+                        <span>-</span>
+                    }
+
+                    @if (story.MaxDate != null)
+                    {
+                        <span>@story.MaxDate.Value.ToString(UiOptions.DateFormat)</span>
+                    }
+                </div>
+            }
+
+            <div>
+                <Icon Identifier="book" />
+                @story.Chapters chapters
+            </div>
+
+            <div>
+                <Icon Identifier="comment-square" />
+                @story.Entries entries
+            </div>
+        </div>
+    }
+</div>
