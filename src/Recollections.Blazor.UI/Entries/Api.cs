@@ -4,6 +4,7 @@ using Neptuo.Activators;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -52,6 +53,9 @@ namespace Neptuo.Recollections.Entries
 
         public Task<ImageModel> GetImageAsync(string entryId, string imageId)
             => faultHandler.Wrap(http.GetJsonAsync<ImageModel>(urlResolver($"/entries/{entryId}/images/{imageId}")));
+
+        public Task<byte[]> GetImageDataAsync(string url)
+            => faultHandler.Wrap(http.GetByteArrayAsync(ResolveUrl(url)));
 
         public Task UpdateImageAsync(string entryId, ImageModel model)
             => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{entryId}/images/{model.Id}"), model));
