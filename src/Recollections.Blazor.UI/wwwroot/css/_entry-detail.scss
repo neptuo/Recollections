@@ -8,12 +8,28 @@
 
     .images {
         margin: 24px 0;
+        display: grid;
+        grid-gap: 15px;
+
+        @media (min-width:520px) {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @media (min-width:768px) {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        @media (min-width:992px) {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+
+        @media (min-width:1200px) {
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+        }
 
         .image {
             display: flex;
             align-items: center;
-            padding-top: 15px;
-            padding-bottom: 15px;
 
             a {
                 display: block;
@@ -21,8 +37,8 @@
             }
 
             img {
-                max-width: 100%;
-                max-height: 160px;
+                width: 200px;
+                height: 160px;
             }
         }
 

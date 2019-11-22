@@ -20,31 +20,30 @@
                 <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
             </div>
             <div class="images">
-                <div class="row">
-                    @if (Images != null)
+                @if (Images != null)
+                {
+                    @foreach (var image in Images)
                     {
-                        @foreach (var image in Images)
+                        <EntryImage Image="@image" />
+                    }
+                }
+
+                @if (UploadProgress != null)
+                {
+                    foreach (var upload in UploadProgress)
+                    {
+                        @if (upload.IsSuccess)
                         {
-                            <EntryImage Image="@image" />
+                            <EntryImage Image="@upload.Image" />
+                        }
+                        else
+                        {
+                            <EntryImage PlaceHolder="@upload.Description" />
                         }
                     }
+                }
 
-                    @if (UploadProgress != null)
-                    {
-                        foreach (var upload in UploadProgress)
-                        {
-                            @if (upload.IsSuccess)
-                            {
-                                <EntryImage Image="@upload.Image" />
-                            }
-                            else
-                            {
-                                <EntryImage PlaceHolder="@upload.Description" />
-                            }
-                        }
-                    }
-                </div>
-
+                <div class="clear"></div>
             </div>
 
             <ActionPanel>
