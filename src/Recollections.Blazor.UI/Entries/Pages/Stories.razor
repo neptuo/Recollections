@@ -21,7 +21,9 @@
     {
         <div class="story">
             <h2>
+                <a href="@Navigator.UrlStoryDetail(story.Id)">
                     @story.Title
+                </a>
             </h2>
 
             @if (story.MinDate != null || story.MaxDate != null)

@@ -1,0 +1,25 @@
+﻿@page "/story/{id}"
+@inherits StoryDetailModel
+
+@if (Model != null)
+{
+    <CascadingValue Value="@Model">
+        <div class="entry-detail">
+            <h2 class="title">
+                <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
+            </h2>
+            <div class="text">
+                <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
+            </div>
+
+            <ActionPanel>
+
+                <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
+                    <Icon Identifier="trash" />
+                    Delete Story
+                </button>
+
+            </ActionPanel>
+        </div>
+    </CascadingValue>
+}

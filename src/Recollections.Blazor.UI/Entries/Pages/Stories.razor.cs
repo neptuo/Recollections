@@ -28,6 +28,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Stories.Add(new StoryListModel()
             {
+                Id = Guid.NewGuid().ToString(),
                 Title = "My second story",
                 MinDate = DateTime.Today.AddDays(-3),
                 MaxDate = DateTime.Today,
@@ -37,6 +38,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Stories.Add(new StoryListModel()
             {
+                Id = Guid.NewGuid().ToString(),
                 Title = "My first story",
                 MinDate = DateTime.Today.AddDays(-7),
                 MaxDate = DateTime.Today.AddDays(-12),
