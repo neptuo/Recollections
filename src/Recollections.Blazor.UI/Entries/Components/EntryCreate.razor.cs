@@ -50,7 +50,7 @@ namespace Neptuo.Recollections.Entries.Components
 
             if (Validate())
             {
-                EntryModel model = await Api.CreateAsync(new EntryModel(Title, When));
+                EntryModel model = await Api.CreateEntryAsync(new EntryModel(Title, When));
                 Navigator.OpenEntryDetail(model.Id);
             }
         }

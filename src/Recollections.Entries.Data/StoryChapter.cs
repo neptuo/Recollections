@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Stories
+namespace Neptuo.Recollections.Entries
 {
-    public class StoryModel
+    public class StoryChapter
     {
+        [Key]
         public string Id { get; set; }
+
+        public int Order { get; set; }
+
         public string Title { get; set; }
         public string Text { get; set; }
 
-        public List<ChapterModel> Chapters { get; set; } = new List<ChapterModel>();
+        public DateTime Created { get; set; }
     }
 }

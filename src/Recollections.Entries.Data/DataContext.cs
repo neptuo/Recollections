@@ -13,6 +13,8 @@ namespace Neptuo.Recollections.Entries
         public DbSet<Entry> Entries { get; set; }
         public DbSet<Image> Images { get; set; }
 
+        public DbSet<Story> Stories { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options)
             : base(options)
         { }

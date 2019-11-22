@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,12 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected Api Api { get; set; }
+
+        [CascadingParameter]
+        protected UserStateModel UserState { get; set; }
+
         public string Title { get; set; }
         public List<string> ErrorMessages { get; } = new List<string>();
 
@@ -25,38 +32,29 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await UserState.EnsureAuthenticatedAsync();
 
-            Stories.Add(new StoryListModel()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Title = "My second story",
-                MinDate = DateTime.Today.AddDays(-3),
-                MaxDate = DateTime.Today,
-                Entries = 4,
-                Chapters = 2
-            });
-
-            Stories.Add(new StoryListModel()
-            {
-                Id = Guid.NewGuid().ToString(),
-                Title = "My first story",
-                MinDate = DateTime.Today.AddDays(-7),
-                MaxDate = DateTime.Today.AddDays(-12),
-                Entries = 9,
-                Chapters = 6
-            });
+            await LoadDataAsync();
         }
 
-        protected Task CreateAsync()
+        protected async Task LoadDataAsync()
         {
-            Stories.Add(new StoryListModel()
+            Stories.Clear();
+            Stories.AddRange(await Api.GetStoryListAsync());
+        }
+
+        protected async Task CreateAsync()
+        {
+            var model = new StoryModel()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = Title
-            });
-            Title = null;
+            };
 
-            return Task.CompletedTask;
+            await Api.CreateStoryAsync(model);
+            await LoadDataAsync();
+
+            Title = null;
         }
     }
 }

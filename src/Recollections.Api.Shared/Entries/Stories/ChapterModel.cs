@@ -12,7 +12,5 @@ namespace Neptuo.Recollections.Entries.Stories
         public string Id { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
-
-        public List<ChapterModel> Chapters { get; set; } = new List<ChapterModel>();
     }
 }

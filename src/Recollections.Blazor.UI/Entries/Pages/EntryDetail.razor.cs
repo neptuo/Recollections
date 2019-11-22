@@ -187,7 +187,7 @@ namespace Neptuo.Recollections.Entries.Pages
             }
 
             Log.Debug("Saving model.");
-            await Api.UpdateAsync(Model);
+            await Api.UpdateEntryAsync(Model);
             UpdateOriginal();
             StateHasChanged();
         }
@@ -229,7 +229,7 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             if (await Navigator.AskAsync($"Do you really want to delete entry '{Model.Title}'?"))
             {
-                await Api.DeleteAsync(Model.Id);
+                await Api.DeleteEntryAsync(Model.Id);
                 Navigator.OpenTimeline();
             }
         }

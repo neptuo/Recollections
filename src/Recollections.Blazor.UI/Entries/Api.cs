@@ -3,6 +3,7 @@ using Neptuo;
 using Neptuo.Activators;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
+using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
@@ -36,13 +37,13 @@ namespace Neptuo.Recollections.Entries
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetJsonAsync<List<MapEntryModel>>(urlResolver("/map/list")));
 
-        public Task<EntryModel> CreateAsync(EntryModel model)
+        public Task<EntryModel> CreateEntryAsync(EntryModel model)
             => faultHandler.Wrap(http.PostJsonAsync<EntryModel>(urlResolver("/entries"), model));
 
-        public Task UpdateAsync(EntryModel model)
+        public Task UpdateEntryAsync(EntryModel model)
             => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{model.Id}"), model));
 
-        public Task DeleteAsync(string entryId)
+        public Task DeleteEntryAsync(string entryId)
             => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/entries/{entryId}")));
 
         public Task<EntryModel> GetDetailAsync(string entryId)
@@ -67,6 +68,21 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.PostAsync(urlResolver($"/entries/{entryId}/images/{imageId}/set-location-from-original"), new StringContent(String.Empty)));
 
         public string ImageUploadUrl(string entryId) => urlResolver($"/entries/{entryId}/images");
+
+        public Task<List<StoryListModel>> GetStoryListAsync()
+            => faultHandler.Wrap(http.GetJsonAsync<List<StoryListModel>>(ResolveUrl("/stories")));
+
+        public Task<StoryModel> GetStoryAsync(string storyId)
+            => faultHandler.Wrap(http.GetJsonAsync<StoryModel>(ResolveUrl($"/stories/{storyId}")));
+
+        public Task<StoryModel> CreateStoryAsync(StoryModel model)
+            => faultHandler.Wrap(http.PostJsonAsync<StoryModel>(ResolveUrl($"/stories"), model));
+
+        public Task UpdateStoryAsync(StoryModel model)
+            => faultHandler.Wrap(http.PutJsonAsync(ResolveUrl($"/stories/{model.Id}"), model));
+
+        public Task DeleteStoryAsync(string storyId)
+            => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/entries/{storyId}")));
 
         public string ResolveUrl(string relativeUrl) => urlResolver(relativeUrl).Replace("apiapi", "api");
 

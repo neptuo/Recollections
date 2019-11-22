@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,15 @@ namespace Neptuo.Recollections.Entries.Pages
 {
     public class StoryDetailModel : ComponentBase
     {
+        [Inject]
+        protected Api Api { get; set; }
+
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
+        [CascadingParameter]
+        protected UserStateModel UserState { get; set; }
+
         [Parameter]
         public string Id { get; set; }
 
@@ -19,18 +29,18 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await UserState.EnsureAuthenticatedAsync();
 
-            Model = new StoryModel()
-            {
-                Id = Id,
-                Title = "My First Story",
-            };
+            await LoadAsync();
+        }
+
+        protected async Task LoadAsync()
+        {
+            Model = await Api.GetStoryAsync(Id);
         }
 
         protected Task SaveAsync()
-        {
-            return Task.CompletedTask;
-        }
+            => Api.UpdateStoryAsync(Model);
 
         protected Task SaveTitleAsync(string title)
         {
@@ -44,9 +54,10 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
-        protected Task DeleteAsync()
+        protected async Task DeleteAsync()
         {
-            return Task.CompletedTask;
+            await Api.DeleteStoryAsync(Model.Id);
+            Navigator.OpenStories();
         }
     }
 }
