@@ -46,6 +46,12 @@ namespace Neptuo.Recollections
         public void OpenMap()
             => uri.NavigateTo(UrlMap());
 
+        public string UrlStories()
+            => "/stories";
+
+        public void OpenStories()
+            => uri.NavigateTo(UrlStories());
+
         public string UrlEntryDetail(string entryId)
             => $"/entry/{entryId}";
 
