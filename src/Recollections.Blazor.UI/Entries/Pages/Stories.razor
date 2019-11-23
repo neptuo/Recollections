@@ -26,28 +26,6 @@
                 </a>
             </h2>
 
-            @if (story.MinDate != null || story.MaxDate != null)
-            {
-                <span class="dates">
-                    <Icon Identifier="calendar" />
-
-                    @if (story.MinDate != null)
-                    {
-                        <span>@story.MinDate.Value.ToString(UiOptions.DateFormat)</span>
-                    }
-
-                    @if (story.MinDate != null || story.MaxDate != null)
-                    {
-                        <span>-</span>
-                    }
-
-                    @if (story.MaxDate != null)
-                    {
-                        <span>@story.MaxDate.Value.ToString(UiOptions.DateFormat)</span>
-                    }
-                </span>
-            }
-
             <span class="chapters">
                 <Icon Identifier="book" />
                 @story.Chapters chapters
@@ -57,6 +35,31 @@
                 <Icon Identifier="comment-square" />
                 @story.Entries entries
             </span>
+
+            @if (story.MinDate != null || story.MaxDate != null)
+            {
+                <span class="dates">
+                    <Icon Identifier="calendar" />
+
+                    @if (story.MinDate != null)
+                    {
+                        @story.MinDate.Value.ToString(UiOptions.DateFormat)
+                    }
+
+                    @if (story.MinDate != story.MaxDate)
+                    {
+                        if (story.MinDate != null && story.MaxDate != null)
+                        {
+                            @: -
+                        }
+
+                        if (story.MaxDate != null)
+                        {
+                            @story.MaxDate.Value.ToString(UiOptions.DateFormat)
+                        }
+                    }
+                </span>
+            }
         </div>
     }
 </div>
