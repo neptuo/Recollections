@@ -52,9 +52,7 @@ namespace Neptuo.Recollections.Entries.Pages
             };
 
             await Api.CreateStoryAsync(model);
-            await LoadDataAsync();
-
-            Title = null;
+            Navigator.OpenStoryDetail(model.Id);
         }
     }
 }
