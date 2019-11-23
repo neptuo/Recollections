@@ -17,7 +17,7 @@
                     <Icon Identifier="book" />
                     Add Chapter
                 </button>
-                <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EntryPicker.Show())" title="Add Story Entry">
+                <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
                     <Icon Identifier="comment-square" />
                     Add Story Entry
                 </button>
@@ -37,6 +37,17 @@
                         <div class="text">
                             <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                         </div>
+
+                        <ActionPanel>
+                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
+                                <Icon Identifier="comment-square" />
+                                Add Chapter Entry
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
+                                <Icon Identifier="trash" />
+                                Delete Chapter
+                            </button>
+                        </ActionPanel>
                     </div>
                 }
             </div>

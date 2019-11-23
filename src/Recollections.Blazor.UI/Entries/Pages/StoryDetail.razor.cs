@@ -86,9 +86,30 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
+        protected Task DeleteChapterAsync(ChapterModel chapter)
+        {
+            Model.Chapters.Remove(chapter);
+            return SaveAsync();
+        }
+
+        private ChapterModel entrySelectionChapter;
+
+        protected void SelectEntry(ChapterModel chapter)
+        {
+            entrySelectionChapter = chapter;
+            EntryPicker.Show();
+        }
+
         protected void EntrySelected(TimelineEntryModel entry)
         {
+            if (entrySelectionChapter == null)
+            {
 
+            }
+            else
+            {
+
+            }
         }
     }
 }
