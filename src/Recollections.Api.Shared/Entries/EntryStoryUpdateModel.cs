@@ -11,5 +11,14 @@ namespace Neptuo.Recollections.Entries
     {
         public string StoryId { get; set; }
         public string ChapterId { get; set; }
+
+        public EntryStoryUpdateModel()
+        {
+        }
+
+        public EntryStoryUpdateModel(string storyId)
+        {
+            StoryId = storyId;
+        }
     }
 }

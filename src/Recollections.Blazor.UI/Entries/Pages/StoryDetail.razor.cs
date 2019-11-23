@@ -102,14 +102,13 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void EntrySelected(TimelineEntryModel entry)
         {
-            if (entrySelectionChapter == null)
-            {
+            var model = new EntryStoryUpdateModel(Model.Id);
 
-            }
-            else
-            {
+            if (entrySelectionChapter != null)
+                model.ChapterId = entrySelectionChapter.Id;
 
-            }
+            entrySelectionChapter = null;
+            _ = Api.UpdateEntryStoryAsync(entry.Id, model);
         }
     }
 }
