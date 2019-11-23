@@ -183,6 +183,44 @@ namespace Neptuo.Recollections.Entries.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            Story entity = await dataContext.Stories
+                .Include(s => s.Chapters)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (entity == null)
+                return NotFound();
+
+            if (entity.UserId != userId)
+                return Unauthorized();
+
+            foreach (var entry in await dataContext.Entries.Where(e => e.Story.Id == id).ToListAsync())
+            {
+                entry.Story = null;
+                dataContext.Entries.Update(entry);
+            }
+
+            foreach (var entry in await dataContext.Entries.Where(e => e.Chapter.Story.Id == id).ToListAsync())
+            {
+                entry.Chapter = null;
+                dataContext.Entries.Update(entry);
+            }
+
+            foreach (var chapter in entity.Chapters)
+                dataContext.Remove(chapter);
+
+            dataContext.Stories.Remove(entity);
+            await dataContext.SaveChangesAsync();
+
+            return Ok();
+        }
+
         private void MapEntityToModel(Story entity, StoryListModel model)
         {
             model.Id = entity.Id;
