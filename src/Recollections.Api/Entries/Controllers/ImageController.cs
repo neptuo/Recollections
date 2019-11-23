@@ -22,19 +22,13 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly ImageService service;
         private readonly DataContext dataContext;
-        private readonly StorageOptions configuration;
-        private readonly PathResolver pathResolver;
 
-        public ImageController(ImageService service, DataContext dataContext, PathResolver pathResolver, IOptions<StorageOptions> configuration)
+        public ImageController(ImageService service, DataContext dataContext)
         {
             Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
-            Ensure.NotNull(pathResolver, "pathResolver");
-            Ensure.NotNull(configuration, "configuration");
             this.service = service;
             this.dataContext = dataContext;
-            this.pathResolver = pathResolver;
-            this.configuration = configuration.Value;
         }
 
         private async Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
