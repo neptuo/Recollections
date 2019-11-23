@@ -52,16 +52,31 @@ namespace Neptuo.Recollections.Entries.Controllers
                     .SelectMany(s => s.Chapters)
                     .CountAsync();
 
-                int entries = 0;
-                //int entries = await dataContext.Stories
-                //    .Where(s => s.Id == entity.Id)
-                //    .SelectMany(s => s.Chapters)
-                //    .SelectMany(c => c.Entries)
-                //    .CountAsync();
+                int entries = await dataContext.Entries
+                    .Where(e => e.Story.Id == entity.Id)
+                    .CountAsync();
+
+                entries += await dataContext.Entries
+                    .Where(e => e.Chapter.Story.Id == entity.Id)
+                    .CountAsync();
 
                 model.Chapters = chapters;
                 model.Entries = entries;
 
+                if (entries > 0)
+                {
+                    DateTime minDate = await dataContext.Entries
+                        .Where(e => e.Story.Id == entity.Id)
+                        .MinAsync(e => e.When);
+
+                    DateTime maxDate = await dataContext.Entries
+                        .Where(e => e.Story.Id == entity.Id)
+                        .MaxAsync(e => e.When);
+
+                    model.MinDate = minDate;
+                    model.MaxDate = maxDate;
+                }
+            }
 
             return Ok(models);
         }
