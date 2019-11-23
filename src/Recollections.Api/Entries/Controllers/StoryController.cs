@@ -103,6 +103,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             MapModelToEntity(model, entity);
             entity.UserId = userId;
             entity.Order = await dataContext.Stories.CountAsync(s => s.UserId == userId) + 1;
+            entity.Created = DateTime.Now;
 
             await dataContext.Stories.AddAsync(entity);
             await dataContext.SaveChangesAsync();
