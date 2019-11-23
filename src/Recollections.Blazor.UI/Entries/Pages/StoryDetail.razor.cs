@@ -58,8 +58,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task DeleteAsync()
         {
-            await Api.DeleteStoryAsync(Model.Id);
-            Navigator.OpenStories();
+            if (await Navigator.AskAsync($"Do you really want to delete story '{Model.Title}'?"))
+            {
+                await Api.DeleteStoryAsync(Model.Id);
+                Navigator.OpenStories();
+            }
         }
 
         protected void AddChapter()
