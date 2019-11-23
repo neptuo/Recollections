@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Entries.Components;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string Id { get; set; }
 
+        protected EntryPickerModel EntryPicker { get; set; }
         protected StoryModel Model { get; set; }
 
         protected async override Task OnInitializedAsync()
@@ -79,6 +81,11 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             chapter.Text = text;
             return SaveAsync();
+        }
+
+        protected void EntrySelected(TimelineEntryModel entry)
+        {
+
         }
     }
 }

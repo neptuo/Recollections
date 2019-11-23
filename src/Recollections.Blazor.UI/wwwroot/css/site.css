@@ -245,6 +245,22 @@ h4 .inline-editor-viewmode .oi {
   .entry-detail .placeholder {
     color: #aaaaaa; }
 
+.entry-picker .entry {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+  .entry-picker .entry .title {
+    display: block;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
+  .entry-picker .entry .date {
+    padding-right: .5rem; }
+
+.entry-picker .entry:last-child {
+  padding-bottom: 0;
+  border-bottom-width: 0; }
+
 .image-detail {
   padding: 24px;
   margin: 24px 0; }

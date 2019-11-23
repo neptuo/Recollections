@@ -33,6 +33,11 @@
                     Add Chapter
                 </button>
 
+                <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EntryPicker.Show())" title="Add Story Entry">
+                    <Icon Identifier="comment-square" />
+                    Add Story Entry
+                </button>
+
                 <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
                     <Icon Identifier="trash" />
                     Delete Story
@@ -41,4 +46,6 @@
             </ActionPanel>
         </div>
     </CascadingValue>
+
+    <EntryPicker @ref="EntryPicker" Selected="EntrySelected" />
 }

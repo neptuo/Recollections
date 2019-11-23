@@ -1,0 +1,28 @@
+﻿@inherits EntryPickerModel
+
+<Modal @ref="Modal" Title="Select Entry">
+    <ChildContent>
+        <div class="entry-picker">
+            @foreach (var entry in Entries)
+            {
+                <div class="entry">
+                    <a @onclick="@(() => { Hide(); Selected?.Invoke(entry); })">
+                        <span class="title">
+                            @entry.Title
+                        </span>
+                        <span class="date">
+                            <Icon Identifier="calendar" />
+                            @entry.When.ToString(UiOptions.DateFormat)
+                        </span>
+                    </a>
+                </div>
+            }
+        </div>
+    </ChildContent>
+    <Buttons>
+        @if (HasMore)
+        {
+            <button class="btn btn-outline-primary" @onclick="@LoadMoreAsync">More...</button>
+        }
+    </Buttons>
+</Modal>
