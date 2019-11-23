@@ -93,6 +93,12 @@ namespace Neptuo.Recollections.Entries
         public Task UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
             => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{entryId}/story"), model));
 
+        public Task<List<StoryEntryModel>> GetStoryEntryListAsync(string storyId)
+            => faultHandler.Wrap(http.GetJsonAsync<List<StoryEntryModel>>(urlResolver($"/stories/{storyId}/entries")));
+
+        public Task<List<StoryEntryModel>> GetStoryChapterEntryListAsync(string storyId, string chapterId)
+            => faultHandler.Wrap(http.GetJsonAsync<List<StoryEntryModel>>(urlResolver($"/stories/{storyId}/chapters/{chapterId}/entries")));
+
         public string ResolveUrl(string relativeUrl) => urlResolver(relativeUrl).Replace("apiapi", "api");
 
         public Task<VersionModel> GetVersionAsync()

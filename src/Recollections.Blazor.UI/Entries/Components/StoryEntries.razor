@@ -1,0 +1,11 @@
+﻿@inherits StoryEntriesModel
+
+@foreach (var entry in Models)
+{
+    <div>
+        <Icon Identifier="comment-square" />
+        <a href="@Navigator.UrlEntryDetail(entry.Id)">
+            @entry.Title
+        </a>
+    </div>
+}

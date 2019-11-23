@@ -295,6 +295,9 @@ h4 .inline-editor-viewmode .oi {
 .entry-detail .chapter {
   margin-top: 1.5rem !important; }
 
+.entry-detail .entries {
+  margin-bottom: 1.5rem; }
+
 .story-picker .story {
   padding: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
