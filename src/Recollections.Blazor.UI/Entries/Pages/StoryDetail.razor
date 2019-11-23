@@ -12,6 +12,21 @@
                 <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
             </div>
 
+            <ActionPanel>
+                <button type="button" class="btn btn-sm btn-primary" @onclick="@AddChapter" title="Add Chapter">
+                    <Icon Identifier="book" />
+                    Add Chapter
+                </button>
+                <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EntryPicker.Show())" title="Add Story Entry">
+                    <Icon Identifier="comment-square" />
+                    Add Story Entry
+                </button>
+                <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
+                    <Icon Identifier="trash" />
+                    Delete Story
+                </button>
+            </ActionPanel>
+
             <div class="chapters">
                 @foreach (var chapter in Model.Chapters)
                 {
@@ -25,25 +40,6 @@
                     </div>
                 }
             </div>
-
-            <ActionPanel>
-
-                <button type="button" class="btn btn-sm btn-primary" @onclick="@AddChapter" title="Add Chapter">
-                    <Icon Identifier="book" />
-                    Add Chapter
-                </button>
-
-                <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => EntryPicker.Show())" title="Add Story Entry">
-                    <Icon Identifier="comment-square" />
-                    Add Story Entry
-                </button>
-
-                <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
-                    <Icon Identifier="trash" />
-                    Delete Story
-                </button>
-
-            </ActionPanel>
         </div>
     </CascadingValue>
 
