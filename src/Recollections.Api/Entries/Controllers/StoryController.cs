@@ -212,6 +212,12 @@ namespace Neptuo.Recollections.Entries.Controllers
                 dataContext.Entries.Update(entry);
             }
 
+            foreach (var story in await dataContext.Stories.Where(e => e.UserId == userId && e.Order > entity.Order).ToListAsync())
+            {
+                story.Order--;
+                dataContext.Stories.Update(story);
+            }
+
             foreach (var chapter in entity.Chapters)
                 dataContext.Remove(chapter);
 
