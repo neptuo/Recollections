@@ -11,6 +11,25 @@
             <div class="datetime">
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
             </div>
+            <div class="story">
+                <a @onclick="SelectStory">
+                    <Icon Identifier="book" />
+                    @if (Story != null && Story.StoryId != null)
+                    {
+                        @Story.StoryTitle
+                        @if (Story.ChapterId != null)
+                        {
+                            <span>
+                                - @Story.ChapterTitle
+                            </span>
+                        }
+                    }
+                    else
+                    {
+                        @: Select Story
+                    }
+                </a>
+            </div>
             <div class="gps">
                 <MapToggle Text="@($"Show Locations on Map ({Markers.Count(m => m.Longitude != null && m.Latitude != null)})")">
                     <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
@@ -121,4 +140,6 @@
 
         </ChildContent>
     </Modal>
+
+    <StoryPicker @ref="StoryPicker" Selected="StorySelected" />
 }

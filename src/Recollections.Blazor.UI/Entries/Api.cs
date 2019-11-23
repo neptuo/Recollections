@@ -72,6 +72,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<StoryListModel>> GetStoryListAsync()
             => faultHandler.Wrap(http.GetJsonAsync<List<StoryListModel>>(ResolveUrl("/stories")));
 
+        public Task<List<StoryChapterListModel>> GetStoryChapterListAsync(string storyId)
+            => faultHandler.Wrap(http.GetJsonAsync<List<StoryChapterListModel>>(ResolveUrl($"/stories/{storyId}/chapters")));
+
         public Task<StoryModel> GetStoryAsync(string storyId)
             => faultHandler.Wrap(http.GetJsonAsync<StoryModel>(ResolveUrl($"/stories/{storyId}")));
 
@@ -82,7 +85,13 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.PutJsonAsync(ResolveUrl($"/stories/{model.Id}"), model));
 
         public Task DeleteStoryAsync(string storyId)
-            => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/entries/{storyId}")));
+            => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/stories/{storyId}")));
+
+        public Task<EntryStoryModel> GetEntryStoryAsync(string entryId)
+            => faultHandler.Wrap(http.GetJsonAsync<EntryStoryModel>(urlResolver($"/entries/{entryId}/story")));
+
+        public Task UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
+            => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{entryId}/story"), model));
 
         public string ResolveUrl(string relativeUrl) => urlResolver(relativeUrl).Replace("apiapi", "api");
 

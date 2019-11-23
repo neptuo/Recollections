@@ -61,6 +61,37 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 model.Chapters = chapters;
                 model.Entries = entries;
+
+
+            return Ok(models);
+        }
+
+        [HttpGet("{storyId}/chapters")]
+        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<StoryChapterListModel>>> GetChapterList(string storyId)
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            List<StoryChapter> entities = await dataContext.Stories
+                .Where(s => s.UserId == userId)
+                .Where(s => s.Id == storyId)
+                .SelectMany(s => s.Chapters)
+                .OrderBy(c => c.Order)
+                .ToListAsync();
+
+            List<StoryChapterListModel> models = new List<StoryChapterListModel>();
+            foreach (StoryChapter entity in entities)
+            {
+                models.Add(new StoryChapterListModel()
+                {
+                    Id = entity.Id,
+                    Title = entity.Title
+                });
             }
 
             return Ok(models);

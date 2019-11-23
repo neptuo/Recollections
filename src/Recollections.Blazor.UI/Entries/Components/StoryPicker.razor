@@ -1,0 +1,44 @@
+﻿@using Neptuo.Recollections.Entries.Stories;
+@inherits StoryPickerModel
+
+<Modal @ref="Modal" Title="Select Story or Chapter">
+    <ChildContent>
+        <div class="story-picker">
+            @foreach (var story in Stories)
+            {
+                <div class="story">
+                    <a @onclick="@(() => Select(story, null))">
+                        <span class="title">
+                            @story.Title
+                        </span>
+                    </a>
+                    <div class="chapters">
+                        @if (Chapters.TryGetValue(story.Id, out var chapters))
+                        {
+                            <ul>
+                                @foreach (var chapter in chapters)
+                                {
+                                    <li>
+                                        <a @onclick="@(() => Select(story, chapter))">
+                                            @chapter.Title
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <a @onclick="@(async () => await LoadChaptersAsync(story))">
+                                <Icon Identifier="book" />
+                                @story.Chapters chapters
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </ChildContent>
+    <Buttons>
+        <button class="btn btn-sm btn-outline-primary" title="Remove Story/Chapter from Entry" @onclick="(() => Select(null, null))">Clear</button>
+    </Buttons>
+</Modal>

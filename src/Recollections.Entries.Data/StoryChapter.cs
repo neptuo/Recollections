@@ -13,6 +13,8 @@ namespace Neptuo.Recollections.Entries
         [Key]
         public string Id { get; set; }
 
+        public Story Story { get; set; }
+
         public int Order { get; set; }
 
         public string Title { get; set; }

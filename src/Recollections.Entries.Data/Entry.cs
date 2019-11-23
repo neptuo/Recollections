@@ -18,6 +18,7 @@ namespace Neptuo.Recollections.Entries
         public string Title { get; set; }
         public string Text { get; set; }
 
+        public Story Story { get; set; }
         public StoryChapter Chapter { get; set; }
 
         public IList<OrderedLocation> Locations { get; set; } = new List<OrderedLocation>();

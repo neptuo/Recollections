@@ -3,6 +3,7 @@ using Neptuo;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,6 +39,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected List<ImageModel> Images { get; set; }
+        protected EntryStoryModel Story { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
         protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
@@ -49,7 +51,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
             await LoadAsync();
             await LoadImagesAsync();
+            await LoadStoryAsync();
         }
+
+        private async Task LoadStoryAsync() 
+            => Story = await Api.GetEntryStoryAsync(EntryId);
 
         private async Task LoadAsync()
         {
@@ -268,6 +274,20 @@ namespace Neptuo.Recollections.Entries.Pages
             marker.Altitude = SelectedLocation.Altitude;
             LocationEdit.Hide();
             return SaveAsync();
+        }
+
+        protected StoryPickerModel StoryPicker { get; set; }
+
+        protected void SelectStory()
+        {
+            StoryPicker.Show();
+        }
+
+        protected async void StorySelected(EntryStoryModel model)
+        {
+            await Api.UpdateEntryStoryAsync(EntryId, model);
+            await LoadStoryAsync();
+            StateHasChanged();
         }
     }
 
