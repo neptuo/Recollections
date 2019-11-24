@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Events;
+using Neptuo.Events.Handlers;
+using Neptuo.Recollections.Entries.Events;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
@@ -9,13 +12,16 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class StoryEntriesModel : ComponentBase
+    public class StoryEntriesModel : ComponentBase, IDisposable, IEventHandler<StoryEntriesChanged>
     {
         [Inject]
         protected Api Api { get; set; }
 
         [Inject]
         protected Navigator Navigator { get; set; }
+
+        [Inject]
+        protected IEventHandlerCollection EventHandlers { get; set; }
 
         [Parameter]
         public string StoryId { get; set; }
@@ -28,7 +34,11 @@ namespace Neptuo.Recollections.Entries.Components
         protected async override Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
+            await LoadDataAsync();
+        }
 
+        private async Task LoadDataAsync()
+        {
             Models.Clear();
             if (StoryId != null)
             {
@@ -37,6 +47,24 @@ namespace Neptuo.Recollections.Entries.Components
                 else
                     Models.AddRange(await Api.GetStoryChapterEntryListAsync(StoryId, ChapterId));
             }
+        }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+
+            EventHandlers.Add<StoryEntriesChanged>(this);
+        }
+
+        public void Dispose()
+        {
+            EventHandlers.Remove<StoryEntriesChanged>(this);
+        }
+
+        async Task IEventHandler<StoryEntriesChanged>.HandleAsync(StoryEntriesChanged payload)
+        {
+            await LoadDataAsync();
+            StateHasChanged();
         }
     }
 }

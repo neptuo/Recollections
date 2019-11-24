@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Events;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Entries.Components;
+using Neptuo.Recollections.Entries.Events;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected Navigator Navigator { get; set; }
+
+        [Inject]
+        protected IEventDispatcher EventDispatcher { get; set; }
 
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
@@ -100,7 +105,7 @@ namespace Neptuo.Recollections.Entries.Pages
             EntryPicker.Show();
         }
 
-        protected void EntrySelected(TimelineEntryModel entry)
+        protected async void EntrySelected(TimelineEntryModel entry)
         {
             var model = new EntryStoryUpdateModel(Model.Id);
 
@@ -108,7 +113,8 @@ namespace Neptuo.Recollections.Entries.Pages
                 model.ChapterId = entrySelectionChapter.Id;
 
             entrySelectionChapter = null;
-            _ = Api.UpdateEntryStoryAsync(entry.Id, model);
+            await Api.UpdateEntryStoryAsync(entry.Id, model);
+            await EventDispatcher.PublishAsync(new StoryEntriesChanged(model.StoryId, model.ChapterId));
         }
     }
 }
