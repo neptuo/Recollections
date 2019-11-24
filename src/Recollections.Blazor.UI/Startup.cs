@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Neptuo.Activators;
+using Neptuo.Events;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries;
@@ -25,12 +26,16 @@ namespace Neptuo.Recollections
 
         public void ConfigureServices(IServiceCollection services)
         {
+            DefaultEventManager eventManager = new DefaultEventManager();
+
             services
                 .AddLogging()
                 .AddExceptions()
                 .AddComponents()
                 .AddUiOptions()
                 .AddHttpClientFactory()
+                .AddSingleton<IEventDispatcher>(eventManager)
+                .AddSingleton<IEventHandlerCollection>(eventManager)
                 .AddSingleton<Json>()
                 .AddSingleton<UrlResolver>(Resolve)
                 .AddTransient<Navigator>();
