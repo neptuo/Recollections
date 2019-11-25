@@ -66,11 +66,11 @@ namespace Neptuo.Recollections.Entries.Controllers
                 if (entries > 0)
                 {
                     DateTime minDate = await dataContext.Entries
-                        .Where(e => e.Story.Id == entity.Id)
+                        .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MinAsync(e => e.When);
 
                     DateTime maxDate = await dataContext.Entries
-                        .Where(e => e.Story.Id == entity.Id)
+                        .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MaxAsync(e => e.When);
 
                     model.MinDate = minDate;
