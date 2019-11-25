@@ -17,8 +17,7 @@
         </form>
     </div>
 
-    @foreach (var story in Stories)
-    {
+    <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
         <div class="story">
             <h2>
                 <a href="@Navigator.UrlStoryDetail(story.Id)">
@@ -61,5 +60,5 @@
                 </span>
             }
         </div>
-    }
+    </ListView>
 </div>

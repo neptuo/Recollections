@@ -24,6 +24,8 @@ namespace Neptuo.Recollections.Entries.Pages
         [CascadingParameter]
         protected UserStateModel UserState { get; set; }
 
+        protected bool IsLoading { get; set; }
+
         public string Title { get; set; }
         public List<string> ErrorMessages { get; } = new List<string>();
 
@@ -31,6 +33,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async override Task OnInitializedAsync()
         {
+            IsLoading = true;
+
             await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
@@ -39,8 +43,10 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadDataAsync()
         {
+            IsLoading = true;
             Stories.Clear();
             Stories.AddRange(await Api.GetStoryListAsync());
+            IsLoading = false;
         }
 
         protected async Task CreateAsync()

@@ -1,0 +1,18 @@
+﻿@typeparam T
+@inherits ListViewModel<T>
+
+@if (IsLoading)
+{
+    <span>Loading...</span>
+}
+else if (Items.Count == 0)
+{
+    <Alert Mode="@AlertMode.Warning" Message="You don't have any story..." />
+}
+else
+{
+    foreach (var item in Items)
+    {
+        @ChildContent(item);
+    }
+}
