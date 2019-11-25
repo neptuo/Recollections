@@ -63,8 +63,11 @@ namespace Neptuo.Recollections.Entries.Components
 
         async Task IEventHandler<StoryEntriesChanged>.HandleAsync(StoryEntriesChanged payload)
         {
-            await LoadDataAsync();
-            StateHasChanged();
+            if (payload.StoryId == StoryId && payload.ChapterId == ChapterId || Models.Any(e => e.Id == payload.EntryId))
+            {
+                await LoadDataAsync();
+                StateHasChanged();
+            }
         }
     }
 }

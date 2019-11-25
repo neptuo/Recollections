@@ -114,7 +114,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             entrySelectionChapter = null;
             await Api.UpdateEntryStoryAsync(entry.Id, model);
-            await EventDispatcher.PublishAsync(new StoryEntriesChanged(model.StoryId, model.ChapterId));
+            await EventDispatcher.PublishAsync(new StoryEntriesChanged(model.StoryId, model.ChapterId, entry.Id));
         }
     }
 }

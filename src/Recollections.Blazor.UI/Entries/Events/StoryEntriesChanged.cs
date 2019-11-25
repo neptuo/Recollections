@@ -12,13 +12,15 @@ namespace Neptuo.Recollections.Entries.Events
     {
         public string StoryId { get; }
         public string ChapterId { get; }
+        public string EntryId { get; }
 
-        public StoryEntriesChanged(string storyId, string chapterId)
+        public StoryEntriesChanged(string storyId, string chapterId, string entryId)
         {
             Ensure.NotNull(storyId, "storyId");
-            Ensure.NotNull(chapterId, "chapterId");
+            Ensure.NotNull(entryId, "entryId");
             StoryId = storyId;
             ChapterId = chapterId;
+            EntryId = entryId;
         }
     }
 }
