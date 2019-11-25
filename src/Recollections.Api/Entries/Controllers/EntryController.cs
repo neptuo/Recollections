@@ -63,6 +63,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             Entry entity = new Entry();
             MapModelToEntity(model, entity);
             entity.UserId = userId;
+            entity.Created = DateTime.Now;
 
             await dataContext.Entries.AddAsync(entity);
             await dataContext.SaveChangesAsync();
