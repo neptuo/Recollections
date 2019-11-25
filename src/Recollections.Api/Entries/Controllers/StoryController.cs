@@ -175,7 +175,15 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.UserId != userId)
                 return Unauthorized();
 
-            MapModelToEntity(model, entity);
+            var removedChapters = MapModelToEntity(model, entity);
+            foreach (var chapter in removedChapters)
+            {
+                foreach (var entry in await dataContext.Entries.Where(e => e.Chapter.Id == chapter.Id).ToListAsync())
+                {
+                    entry.Chapter = null;
+                    dataContext.Entries.Update(entry);
+                }
+            }
 
             dataContext.Stories.Update(entity);
             await dataContext.SaveChangesAsync();
@@ -250,7 +258,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             }
         }
 
-        private void MapModelToEntity(StoryModel model, Story entity)
+        private IReadOnlyCollection<StoryChapter> MapModelToEntity(StoryModel model, Story entity)
         {
             entity.Id = model.Id;
             entity.Title = model.Title;
@@ -284,6 +292,8 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             foreach (var chapterEntity in toRemove)
                 entity.Chapters.Remove(chapterEntity);
+
+            return toRemove;
         }
     }
 }
