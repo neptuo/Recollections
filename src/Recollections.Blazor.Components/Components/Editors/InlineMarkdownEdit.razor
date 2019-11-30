@@ -4,7 +4,7 @@
     @if (IsEditMode)
     {
         <form @onsubmit="@OnSaveValueAsync">
-            <textarea id="@TextAreaId" class="form-control" />
+            <textarea @ref="TextArea" class="form-control" />
         </form>
     }
     else

@@ -175,14 +175,14 @@ window.FileUpload = {
 };
 
 window.InlineMarkdownEdit = {
-    editors: {},
-    Initialize: function (textAreaId) {
-        if (InlineMarkdownEdit.editors[textAreaId] != null) {
+    Initialize: function (interop, textArea) {
+        $textArea = $(textArea);
+        if ($textArea.data("easymde") != null) {
             return;
         }
 
         var editor = new EasyMDE({
-            element: document.getElementById(textAreaId),
+            element: textArea,
             autofocus: true,
             forceSync: true,
             spellChecker: false,
@@ -204,7 +204,7 @@ window.InlineMarkdownEdit = {
                     className: "fa fa-times pull-right",
                     title: "Close Editor",
                     action: function (editor) {
-                        DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineMarkdownEdit_OnCancel", textAreaId);
+                        interop.invokeMethodAsync("OnCancel");
                     }
                 },
                 {
@@ -213,38 +213,41 @@ window.InlineMarkdownEdit = {
                     title: "Save",
                     action: function (editor) {
                         var value = editor.value();
-                        DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineMarkdownEdit_OnSave", textAreaId, value);
+                        interop.invokeMethodAsync("OnSave", value);
                     }
-                },
+                }
             ],
             shortcuts: {
                 "save": "Ctrl-Enter",
                 "cancel": "Escape"
             }
         });
-        InlineMarkdownEdit.editors[textAreaId] = editor;
-    },
-    Destroy: function (textAreaId) {
-        if (InlineMarkdownEdit.editors[textAreaId] != null) {
-            InlineMarkdownEdit.editors[textAreaId].toTextArea();
-            InlineMarkdownEdit.editors[textAreaId] = null;
-        }
-    },
-    SetValue: function (textAreaId, value) {
-        if (InlineMarkdownEdit.editors[textAreaId] != null) {
-            if (value == null) {
-                value = "";
-            }
 
-            return InlineMarkdownEdit.editors[textAreaId].value(value);
+        $textArea.data("easymde", editor);
+    },
+    Destroy: function (textArea) {
+        var editor = $(textArea).data("easymde");
+        if (editor != null) {
+            editor.toTextArea();
         }
     },
-    GetValue: function (textAreaId) {
-        if (InlineMarkdownEdit.editors[textAreaId] != null) {
-            return InlineMarkdownEdit.editors[textAreaId].value();
+    SetValue: function (textArea, value) {
+        if (value === null) {
+            value = "";
+        }
+
+        var editor = $(textArea).data("easymde");
+        if (editor != null) {
+            editor.value(value);
+        }
+    },
+    GetValue: function (textArea) {
+        var editor = $(textArea).data("easymde");
+        if (editor != null) {
+            return editor.value();
         }
     }
-}
+};
 
 window.InlineTextEdit = {
     Initialize: function (inputId) {

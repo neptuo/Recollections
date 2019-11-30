@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Neptuo;
 using Neptuo.Logging;
 using System;
@@ -13,58 +14,39 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineMarkdownEditInterop
     {
         private readonly IJSRuntime jsRuntime;
-        private static ILog<InlineMarkdownEditInterop> log;
-        private static Dictionary<string, InlineMarkdownEditModel> models = new Dictionary<string, InlineMarkdownEditModel>();
+        private readonly ILog<InlineMarkdownEditInterop> log;
+
+        public InlineMarkdownEditModel Model { get; set; }
 
         public InlineMarkdownEditInterop(IJSRuntime jsRuntime, ILog<InlineMarkdownEditInterop> log)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
             Ensure.NotNull(log, "log");
             this.jsRuntime = jsRuntime;
-            InlineMarkdownEditInterop.log = log;
+            this.log = log;
         }
 
         public ValueTask InitializeAsync(InlineMarkdownEditModel model)
         {
-            if (!models.ContainsKey(model.TextAreaId))
-                models[model.TextAreaId] = model;
-
-
-            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", model.TextAreaId);
+            Model = model;
+            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", DotNetObjectReference.Create(this), model.TextArea);
         }
 
-        public ValueTask DestroyAsync(string textAreaId)
-        {
-            models.Remove(textAreaId);
-            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Destroy", textAreaId);
-        }
+        public ValueTask DestroyAsync(ElementReference textArea)
+            => jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Destroy", textArea);
 
-        internal ValueTask<string> SetValueAsync(string textAreaId, string value)
-            => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.SetValue", textAreaId, value);
+        internal ValueTask<string> SetValueAsync(ElementReference textArea, string value)
+            => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.SetValue", textArea, value);
 
-        internal ValueTask<string> GetValueAsync(string textAreaId)
-            => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.GetValue", textAreaId);
+        internal ValueTask<string> GetValueAsync(ElementReference textArea)
+            => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.GetValue", textArea);
 
         [JSInvokable]
-        public static void InlineMarkdownEdit_OnSave(string id, string value)
-        {
-            log.Debug($"InlineMarkdownEdit_OnSave, TextAreaId: {id}");
-            if (models.TryGetValue(id, out InlineMarkdownEditModel model))
-            {
-                log.Debug("Model found");
-                model.OnSave(value);
-            }
-        }
+        public void OnSave(string value) 
+            => Model.OnSave(value);
 
         [JSInvokable]
-        public static void InlineMarkdownEdit_OnCancel(string id)
-        {
-            log.Debug($"InlineMarkdownEdit_OnCancel, TextAreaId: {id}");
-            if (models.TryGetValue(id, out InlineMarkdownEditModel model))
-            {
-                log.Debug("Model found");
-                model.OnCancel();
-            }
-        }
+        public void OnCancel() 
+            => Model.OnCancel();
     }
 }

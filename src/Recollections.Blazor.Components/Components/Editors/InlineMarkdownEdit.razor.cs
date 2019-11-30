@@ -17,15 +17,12 @@ namespace Neptuo.Recollections.Components.Editors
         protected InlineMarkdownEditInterop Interop { get; set; }
 
         [Inject]
-        protected IUniqueNameProvider NameProvider { get; set; }
-
-        [Inject]
         protected MarkdownConverter MarkdownConverter { get; set; }
 
         [Inject]
         protected ILog<InlineMarkdownEditModel> Log { get; set; }
 
-        public string TextAreaId { get; private set; }
+        public ElementReference TextArea { get; protected set; }
 
         private MarkupString? markdownValue;
 
@@ -38,12 +35,6 @@ namespace Neptuo.Recollections.Components.Editors
 
                 return markdownValue.Value;
             }
-        }
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            TextAreaId = NameProvider.Next();
         }
 
         public async override Task SetParametersAsync(ParameterView parameters)
@@ -59,17 +50,17 @@ namespace Neptuo.Recollections.Components.Editors
             if (IsEditMode)
             {
                 await Interop.InitializeAsync(this);
-                await Interop.SetValueAsync(TextAreaId, Value);
+                await Interop.SetValueAsync(TextArea, Value);
             }
             else
             {
-                await Interop.DestroyAsync(TextAreaId);
+                await Interop.DestroyAsync(TextArea);
             }
         }
 
         protected async override Task OnValueChangedAsync()
         {
-            Value = await Interop.GetValueAsync(TextAreaId);
+            Value = await Interop.GetValueAsync(TextArea);
             markdownValue = null;
 
             await base.OnValueChangedAsync();
