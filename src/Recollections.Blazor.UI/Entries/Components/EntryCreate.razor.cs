@@ -29,7 +29,7 @@ namespace Neptuo.Recollections.Entries.Components
 
         public List<string> ErrorMessages { get; } = new List<string>();
 
-        protected string WhenInputId { get; } = "entry-create-when";
+        protected ElementReference WhenInput { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -41,7 +41,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            await DatePickerInterop.InitializeAsync(WhenInputId, UiOptions.DateFormat);
+            await DatePickerInterop.InitializeAsync(WhenInput, UiOptions.DateFormat);
         }
 
         public async Task CreateAsync()
@@ -57,7 +57,7 @@ namespace Neptuo.Recollections.Entries.Components
 
         private async Task BindWhenFromUi()
         {
-            string rawWhen = await DatePickerInterop.GetValueAsync(WhenInputId);
+            string rawWhen = await DatePickerInterop.GetValueAsync(WhenInput);
             if (DateTime.TryParseExact(rawWhen, UiOptions.DateFormat, CultureInfo.CurrentCulture, DateTimeStyles.None, out var when))
                 When = when;
             else

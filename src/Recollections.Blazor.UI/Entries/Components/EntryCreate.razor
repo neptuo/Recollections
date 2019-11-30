@@ -11,7 +11,7 @@
             </div>
             <div class="col-md-auto col-sm-12">
                 <label for="entry-create-title">When:</label>
-                <input id="@WhenInputId" class="form-control" type="text" placeholder="When it happend..." @bind="When" @bind:format="@UiOptions.DateFormat" />
+                <input @ref="WhenInput" class="form-control" type="text" placeholder="When it happend..." @bind="When" @bind:format="@UiOptions.DateFormat" />
             </div>
         </div>
         <div class="form-row">

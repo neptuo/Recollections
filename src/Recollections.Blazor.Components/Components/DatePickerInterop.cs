@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,13 +19,13 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public ValueTask InitializeAsync(string inputId, string format)
-            => jsRuntime.InvokeVoidAsync("DatePicker.Initialize", inputId, format);
+        public ValueTask InitializeAsync(ElementReference input, string format)
+            => jsRuntime.InvokeVoidAsync("DatePicker.Initialize", input, format);
 
-        public ValueTask DestroyAsync(string inputId)
-            => jsRuntime.InvokeVoidAsync("DatePicker.Destroy", inputId);
+        public ValueTask DestroyAsync(ElementReference input)
+            => jsRuntime.InvokeVoidAsync("DatePicker.Destroy", input);
 
-        public ValueTask<string> GetValueAsync(string inputId)
-            => jsRuntime.InvokeAsync<string>("DatePicker.GetValue", inputId);
+        public ValueTask<string> GetValueAsync(ElementReference input)
+            => jsRuntime.InvokeAsync<string>("DatePicker.GetValue", input);
     }
 }

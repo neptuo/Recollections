@@ -260,36 +260,36 @@ window.InlineTextEdit = {
 };
 
 window.InlineDateEdit = {
-    Initialize: function (inputId, format) {
-        $('#' + inputId).datepicker({
+    Initialize: function (input, format) {
+        $(input).datepicker({
             format: format.toLowerCase(),
             autoclose: true,
             todayHighlight: true,
             todayBtn: "linked"
         });
     },
-    Destroy: function (inputId) {
-        $('#' + inputId).datepicker("destroy");
+    Destroy: function (input) {
+        $(input).datepicker("destroy");
     },
-    GetValue: function (inputId) {
-        return $('#' + inputId).val();
+    GetValue: function (input) {
+        return $(input).val();
     }
 };
 
 window.DatePicker = {
-    Initialize: function (inputId, format) {
-        $('#' + inputId).datepicker({
+    Initialize: function (input, format) {
+        $(input).datepicker({
             format: format.toLowerCase(),
             autoclose: true,
             todayHighlight: true,
             todayBtn: "linked"
         });
     },
-    Destroy: function (inputId) {
-        $('#' + inputId).datepicker("destroy");
+    Destroy: function (input) {
+        $(input).datepicker("destroy");
     },
-    GetValue: function (inputId) {
-        return $('#' + inputId).val();
+    GetValue: function (input) {
+        return $(input).val();
     }
 }
 
