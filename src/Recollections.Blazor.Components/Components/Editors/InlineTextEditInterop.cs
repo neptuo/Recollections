@@ -13,32 +13,26 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineTextEditInterop
     {
         private readonly IJSRuntime jsRuntime;
-        private static ILog<InlineTextEditInterop> log;
-        private static Dictionary<string, InlineTextEditModel> models = new Dictionary<string, InlineTextEditModel>();
+        private ILog<InlineTextEditInterop> log;
+
+        protected InlineTextEditModel Model { get; set; }
 
         public InlineTextEditInterop(IJSRuntime jsRuntime, ILog<InlineTextEditInterop> log)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
             Ensure.NotNull(log, "log");
             this.jsRuntime = jsRuntime;
-            InlineTextEditInterop.log = log;
+            this.log = log;
         }
 
         public ValueTask InitializeAsync(InlineTextEditModel model)
         {
-            models[model.InputId] = model;
-            return jsRuntime.InvokeVoidAsync("InlineTextEdit.Initialize", model.InputId);
+            Model = model;
+            return jsRuntime.InvokeVoidAsync("InlineTextEdit.Initialize", DotNetObjectReference.Create(this), model.Input);
         }
 
         [JSInvokable]
-        public static void InlineTextEdit_OnCancel(string inputId)
-        {
-            log.Debug($"InlineTextEdit_OnCancel, InputId: {inputId}");
-            if (models.TryGetValue(inputId, out var model))
-            {
-                log.Debug("Model found");
-                model.OnCancel();
-            }
-        }
+        public void OnCancel() 
+            => Model.OnCancel();
     }
 }

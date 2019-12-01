@@ -13,21 +13,12 @@ namespace Neptuo.Recollections.Components.Editors
     public class InlineTextEditModel : InlineEditModel<string>
     {
         [Inject]
-        protected IUniqueNameProvider NameProvider { get; set; }
-
-        [Inject]
         protected InlineTextEditInterop Interop { get; set; }
 
         [Inject]
         protected ILog<InlineTextEditModel> Log { get; set; }
 
-        public string InputId { get; private set; }
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            InputId = NameProvider.Next();
-        }
+        public ElementReference Input { get; protected set; }
 
         private bool isEditSwitched = false;
 

@@ -5,7 +5,7 @@
     {
         <form @onsubmit="@OnSaveValueAsync">
             <div class="input-group">
-                <input id="@InputId" type="text" class="form-control" @bind="Value" />
+                <input @ref="Input" type="text" class="form-control" @bind="Value" />
                 <div class="input-group-append">
                     <button class="btn btn-outline-success btn-save" title="Save changes">
                         <Icon Identifier="check" />

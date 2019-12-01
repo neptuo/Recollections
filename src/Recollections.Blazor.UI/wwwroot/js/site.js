@@ -254,12 +254,12 @@ window.InlineMarkdownEdit = {
 };
 
 window.InlineTextEdit = {
-    Initialize: function (inputId) {
-        $('#' + inputId).focus().keyup(function (e) {
+    Initialize: function (interop, input) {
+        $(input).focus().keyup(function (e) {
             if (e.keyCode == 27) {
                 $(this).blur();
                 setTimeout(function () {
-                    DotNet.invokeMethodAsync("Recollections.Blazor.Components", "InlineTextEdit_OnCancel", inputId);
+                    interop.invokeMethodAsync("OnCancel");
                 }, 1);
             }
         });
