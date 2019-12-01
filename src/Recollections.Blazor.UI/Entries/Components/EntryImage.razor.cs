@@ -30,6 +30,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public string PlaceHolder { get; set; }
 
+        [Parameter]
+        public string PlaceHolderCssClass { get; set; }
+
         protected string GetLinkUrl()
         {
             if (Entry == null || Image == null)
