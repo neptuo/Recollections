@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Components.Editors
         [Inject]
         protected DatePickerInterop Interop { get; set; }
 
-        protected ElementReference Input { get; set; }
+        protected ElementReference? Input { get; set; }
 
         [Parameter]
         public string Format { get; set; }
@@ -25,16 +25,17 @@ namespace Neptuo.Recollections.Components.Editors
             await base.OnAfterRenderAsync(firstRender);
 
             if (IsEditMode)
-                await Interop.InitializeAsync(Input, Format);
-            else
-                await Interop.DestroyAsync(Input);
+                await Interop.InitializeAsync(Input.Value, Format);
         }
 
         protected async override Task OnValueChangedAsync()
         {
-            string rawValue = await Interop.GetValueAsync(Input);
-            if (DateTime.TryParseExact(rawValue, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var value))
-                Value = value;
+            if (Input != null)
+            {
+                string rawValue = await Interop.GetValueAsync(Input.Value);
+                if (DateTime.TryParseExact(rawValue, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var value))
+                    Value = value;
+            }
 
             await base.OnValueChangedAsync();
         }

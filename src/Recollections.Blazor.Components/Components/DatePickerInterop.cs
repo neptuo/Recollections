@@ -22,7 +22,7 @@ namespace Neptuo.Recollections.Components
         public ValueTask InitializeAsync(ElementReference input, string format)
             => jsRuntime.InvokeVoidAsync("DatePicker.Initialize", input, format);
 
-        public ValueTask DestroyAsync(ElementReference input)
+        public ValueTask DestroyAsync(ElementReference? input)
             => jsRuntime.InvokeVoidAsync("DatePicker.Destroy", input);
 
         public ValueTask<string> GetValueAsync(ElementReference input)

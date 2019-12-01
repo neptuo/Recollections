@@ -175,7 +175,7 @@ window.FileUpload = {
 };
 
 window.InlineMarkdownEdit = {
-    Initialize: function (interop, textArea) {
+    Initialize: function (interop, textArea, value) {
         $textArea = $(textArea);
         if ($textArea.data("easymde") != null) {
             return;
@@ -224,6 +224,10 @@ window.InlineMarkdownEdit = {
         });
 
         $textArea.data("easymde", editor);
+
+        if (value !== null) {
+            InlineMarkdownEdit.SetValue(textArea, value);
+        }
     },
     Destroy: function (textArea) {
         var editor = $(textArea).data("easymde");
@@ -289,7 +293,9 @@ window.DatePicker = {
         });
     },
     Destroy: function (input) {
-        $(input).datepicker("destroy");
+        if (input != null) {
+            $(input).datepicker("destroy");
+        }
     },
     GetValue: function (input) {
         return $(input).val();

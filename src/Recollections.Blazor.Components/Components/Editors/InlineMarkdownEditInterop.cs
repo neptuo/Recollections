@@ -26,14 +26,11 @@ namespace Neptuo.Recollections.Components.Editors
             this.log = log;
         }
 
-        public ValueTask InitializeAsync(InlineMarkdownEditModel model)
+        public ValueTask InitializeAsync(InlineMarkdownEditModel model, string value = null)
         {
             Model = model;
-            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", DotNetObjectReference.Create(this), model.TextArea);
+            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", DotNetObjectReference.Create(this), model.TextArea, value);
         }
-
-        public ValueTask DestroyAsync(ElementReference textArea)
-            => jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Destroy", textArea);
 
         internal ValueTask<string> SetValueAsync(ElementReference textArea, string value)
             => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.SetValue", textArea, value);

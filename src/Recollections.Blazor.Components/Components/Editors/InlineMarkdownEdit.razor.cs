@@ -48,14 +48,7 @@ namespace Neptuo.Recollections.Components.Editors
             await base.OnAfterRenderAsync(firstRender);
 
             if (IsEditMode)
-            {
-                await Interop.InitializeAsync(this);
-                await Interop.SetValueAsync(TextArea, Value);
-            }
-            else
-            {
-                await Interop.DestroyAsync(TextArea);
-            }
+                await Interop.InitializeAsync(this, Value);
         }
 
         protected async override Task OnValueChangedAsync()
