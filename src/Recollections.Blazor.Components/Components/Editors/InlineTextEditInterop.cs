@@ -31,7 +31,7 @@ namespace Neptuo.Recollections.Components.Editors
             return jsRuntime.InvokeVoidAsync("InlineTextEdit.Initialize", DotNetObjectReference.Create(this), model.Input);
         }
 
-        [JSInvokable]
+        [JSInvokable("TextEdit.OnCancel")]
         public void OnCancel() 
             => Model.OnCancel();
     }

@@ -31,7 +31,7 @@ namespace Neptuo.Recollections.Components
             await jsRuntime.InvokeVoidAsync("FileUpload.Initialize", DotNetObjectReference.Create(this), model.FormElement, bearerToken);
         }
 
-        [JSInvokable]
+        [JSInvokable("FileUpload.OnCompleted")]
         public void OnCompleted(FileUploadProgress[] progresses)
         {
             log.Debug($"FileUploadInterop.OnCompleted");

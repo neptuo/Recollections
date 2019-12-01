@@ -38,11 +38,11 @@ namespace Neptuo.Recollections.Components.Editors
         internal ValueTask<string> GetValueAsync(ElementReference textArea)
             => jsRuntime.InvokeAsync<string>("InlineMarkdownEdit.GetValue", textArea);
 
-        [JSInvokable]
+        [JSInvokable("Markdown.OnSave")]
         public void OnSave(string value) 
             => Model.OnSave(value);
 
-        [JSInvokable]
+        [JSInvokable("Markdown.OnCancel")]
         public void OnCancel() 
             => Model.OnCancel();
     }

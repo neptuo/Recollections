@@ -56,7 +56,7 @@ window.FileUpload = {
         }
 
         function raiseProgress() {
-            interop.invokeMethodAsync("OnCompleted", progress);
+            interop.invokeMethodAsync("FileUpload.OnCompleted", progress);
         }
 
         function resetForm() {
@@ -204,7 +204,7 @@ window.InlineMarkdownEdit = {
                     className: "fa fa-times pull-right",
                     title: "Close Editor",
                     action: function (editor) {
-                        interop.invokeMethodAsync("OnCancel");
+                        interop.invokeMethodAsync("Markdown.OnCancel");
                     }
                 },
                 {
@@ -213,7 +213,7 @@ window.InlineMarkdownEdit = {
                     title: "Save",
                     action: function (editor) {
                         var value = editor.value();
-                        interop.invokeMethodAsync("OnSave", value);
+                        interop.invokeMethodAsync("Markdown.OnSave", value);
                     }
                 }
             ],
@@ -259,7 +259,7 @@ window.InlineTextEdit = {
             if (e.keyCode == 27) {
                 $(this).blur();
                 setTimeout(function () {
-                    interop.invokeMethodAsync("OnCancel");
+                    interop.invokeMethodAsync("TextEdit.OnCancel");
                 }, 1);
             }
         });
@@ -268,7 +268,7 @@ window.InlineTextEdit = {
 
 window.InlineDateEdit = {
     Initialize: function (input, format) {
-        $(input).datepicker({
+        $(input).focus().datepicker({
             format: format.toLowerCase(),
             autoclose: true,
             todayHighlight: true,
@@ -397,7 +397,7 @@ window.Map = {
 
         function markerClick(e) {
             var id = Number.parseInt(e.target.getId());
-            model.interop.invokeMethodAsync("MarkerSelected", id);
+            model.interop.invokeMethodAsync("Map.MarkerSelected", id);
         }
 
         function moveMarkerOnCoords(id, coords) {
@@ -405,7 +405,7 @@ window.Map = {
             var longitude = coords.x;
 
             coords.getAltitude().then(function (altitude) {
-                model.interop.invokeMethodAsync("MarkerMoved", id, latitude, longitude, altitude);
+                model.interop.invokeMethodAsync("Map.MarkerMoved", id, latitude, longitude, altitude);
             });
         }
 

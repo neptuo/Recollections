@@ -25,11 +25,11 @@ namespace Neptuo.Recollections.Components
             return jsRuntime.InvokeVoidAsync("Map.Initialize", model.Container, DotNetObjectReference.Create(this), model.Markers, model.IsZoomed, model.IsResizable);
         }
 
-        [JSInvokable]
+        [JSInvokable("Map.MarkerMoved")]
         public void MarkerMoved(int? index, double latitude, double longitude, double? altitude) 
             => model.MoveMarker(index, latitude, longitude, altitude);
 
-        [JSInvokable]
+        [JSInvokable("Map.MarkerSelected")]
         public void MarkerSelected(int index) => model.MarkerSelected?.Invoke(index);
     }
 }
