@@ -51,6 +51,12 @@ a {
     }
 }
 
+@media (max-width:480px) {
+    footer {
+        font-size: 13px;
+    }
+}
+
 @import "_exception-panel.scss";
 @import "_accounts.scss";
 @import "_timeline.scss";
