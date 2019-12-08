@@ -12,7 +12,8 @@ namespace Neptuo.Recollections.Entries
         public string Id { get; set; }
         public string Title { get; set; }
         public DateTime When { get; set; }
-
-        public string Text { get; set; }
+        
+        public int ImageCount { get; set; }
+        public int GpsCount { get; set; }
     }
 }

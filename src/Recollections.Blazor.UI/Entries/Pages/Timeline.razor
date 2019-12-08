@@ -9,19 +9,32 @@
     {
         <TimelineItem>
             <div class="entry">
-                <div class="title">
-                    <h2>
-                        <a href="@Navigator.UrlEntryDetail(entry.Id)">
-                            @entry.Title
-                        </a>
-                    </h2>
-                </div>
-                <div class="datetime">
+                <h2>
+                    <a href="@Navigator.UrlEntryDetail(entry.Id)">
+                        @entry.Title
+                    </a>
+                </h2>
+
+                <span class="datetime">
+                    <Icon Identifier="calendar" />
                     @entry.When.ToString(UiOptions.DateFormat)
-                </div>
-                <div class="text">
-                    @ConvertMarkdown(entry.Text)
-                </div>
+                </span>
+
+                @if(entry.GpsCount > 0)
+                {
+                    <span class="gps">
+                        <Icon Identifier="location" />
+                        @entry.GpsCount
+                    </span>
+                }
+
+                @if(entry.ImageCount > 0)
+                {
+                    <span class="gps">
+                        <Icon Identifier="image" />
+                        @entry.ImageCount
+                    </span>
+                }
             </div>
         </TimelineItem>
     }

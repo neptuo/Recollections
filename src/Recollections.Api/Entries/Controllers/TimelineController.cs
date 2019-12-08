@@ -45,9 +45,12 @@ namespace Neptuo.Recollections.Entries.Controllers
                     Id = e.Id,
                     Title = e.Title,
                     When = e.When,
-                    Text = e.Text
+                    GpsCount = e.Locations.Count
                 })
                 .ToListAsync();
+
+            foreach (var entry in result)
+                entry.ImageCount = await dataContext.Images.CountAsync(i => i.Entry.Id == entry.Id);
 
             return Ok(new TimelineListResponse(result, result.Count == PageSize));
         }
