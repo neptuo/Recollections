@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,9 @@ namespace Neptuo.Recollections.Components
     {
         [Inject]
         internal ModalInterop Interop { get; set; }
+
+        [Inject]
+        internal ILog<Modal> Log { get; set; }
 
         [Parameter]
         public string Title { get; set; }
@@ -65,6 +69,8 @@ namespace Neptuo.Recollections.Components
 
         protected void OnCloseButtonClick()
         {
+            Log.Debug("Modal.OnCloseButtonClick");
+
             if (CloseButtonClick != null)
                 CloseButtonClick();
             else

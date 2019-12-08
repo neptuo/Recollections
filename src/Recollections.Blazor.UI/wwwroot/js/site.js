@@ -1,11 +1,22 @@
 ﻿window.Bootstrap = {
     Modal: {
         Show: function (container) {
-            $(container).modal('show');
+            $(container).modal({
+                "show": true,
+                "focus": true
+            }).on('shown.bs.modal', function () {
+                $(container).find("input").first().trigger('focus');
+            })
         },
         Hide: function (container) {
             $(container).modal('hide');
         }
+    }
+};
+
+window.ElementReference = {
+    Focus: function (element) {
+        element.focus();
     }
 };
 
@@ -314,13 +325,10 @@ window.Downloader = {
 
 window.Map = {
     Initialize: function (container, interop, markers, isZoomed, isResizable) {
-        var isInitialization = false;
         var model = null;
 
         $container = $(container);
         if ($container.data('map') == null) {
-            isInitialization = true;
-
             var map = new SMap($container.find('.map')[0]);
             map.addDefaultLayer(SMap.DEF_BASE).enable();
             map.addDefaultControls();
@@ -360,13 +368,17 @@ window.Map = {
             model.map.setCursor("move");
             if (!isZoomed) {
                 var centerZoom = model.map.computeCenterZoom(points);
-                if (centerZoom[1] > 13) {
-                    centerZoom[1] = 13;
-                }
-
+                centerZoom[1] = Map._EnsureMaxCenterZoom(centerZoom[1]);
                 model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
             }
         }
+    },
+    _EnsureMaxCenterZoom(zoom) {
+        if (zoom > 13) {
+            zoom = 13;
+        }
+
+        return zoom;
     },
     _BindEvents: function (model) {
         function dragStart(e) {
@@ -454,5 +466,26 @@ window.Map = {
         }
 
         return points;
+    },
+    Search: function (container, query) {
+        model = $(container).data('map');
+        new SMap.Geocoder(query, function (geocoder) {
+            var data = [];
+            var results = geocoder.getResults()[0].results;
+            for (var i = 0; i < results.length; i++) {
+                var result = results[i];
+                data.push({
+                    label: result.label,
+                    longitude: result.coords.x,
+                    latitude: result.coords.y
+                });
+            }
+
+            model.interop.invokeMethodAsync("Map.SearchCompleted", data);
+        });
+    },
+    CenterAt: function (container, latitude, longitude) {
+        model = $(container).data('map');
+        model.map.setCenterZoom(SMap.Coords.fromWGS84(longitude, latitude), 15);
     }
 };

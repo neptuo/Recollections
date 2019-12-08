@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddComponents(this IServiceCollection services)
         {
             Ensure.NotNull(services, "services");
-            services.AddSingleton<ModalInterop>();
+            services.AddTransient<ModalInterop>();
             services.AddTransient<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<InlineTextEditInterop>();
@@ -26,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<MarkdownConverter>();
             services.AddTransient<Downloader>();
             services.AddTransient<MapInterop>();
+            services.AddTransient<ElementReferenceInterop>();
 
             return services;
         }

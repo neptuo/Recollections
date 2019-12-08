@@ -11,7 +11,6 @@ namespace Neptuo.Recollections.Components
 {
     public partial class Map : ComponentBase
     {
-
         [Inject]
         protected MapInterop Interop { get; set; }
 
@@ -35,6 +34,11 @@ namespace Neptuo.Recollections.Components
 
         internal ElementReference Container { get; set; }
         internal bool IsZoomed { get; private set; }
+
+        protected Modal SearchModal { get; set; }
+        protected ElementReference SearchInput { get; set; }
+        protected string SearchQuery { get; set; }
+        protected List<MapSearchModel> SearchResults { get; } = new List<MapSearchModel>();
 
         public async override Task SetParametersAsync(ParameterView parameters)
         {
@@ -79,6 +83,29 @@ namespace Neptuo.Recollections.Components
                 marker.Altitude = altitude;
                 MarkersChanged?.Invoke();
             }
+        }
+
+        protected async Task SearchLocationAsync()
+        {
+            SearchModal.Show();
+            SearchResults.Clear();
+            if (!String.IsNullOrEmpty(SearchQuery))
+            {
+                var results = await Interop.SearchAsync(SearchQuery);
+                SearchResults.AddRange(results);
+
+                Log.Debug($"Search, results: {SearchResults.Count}.");
+
+                StateHasChanged();
+            }
+        }
+
+        protected async ValueTask SearchResultSelectedAsync(MapSearchModel selected)
+        {
+            if (selected != null)
+                await Interop.CenterAtAsync(selected.Latitude, selected.Longitude);
+
+            SearchModal.Hide();
         }
     }
 }

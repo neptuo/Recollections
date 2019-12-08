@@ -26,10 +26,30 @@ namespace Neptuo.Recollections.Components
         }
 
         [JSInvokable("Map.MarkerMoved")]
-        public void MarkerMoved(int? index, double latitude, double longitude, double? altitude) 
+        public void MarkerMoved(int? index, double latitude, double longitude, double? altitude)
             => editor.MoveMarker(index, latitude, longitude, altitude);
 
         [JSInvokable("Map.MarkerSelected")]
         public void MarkerSelected(int index) => editor.MarkerSelected?.Invoke(index);
+
+        private TaskCompletionSource<IEnumerable<MapSearchModel>> searchCompletion;
+
+        public Task<IEnumerable<MapSearchModel>> SearchAsync(string searchQuery)
+        {
+            searchCompletion = new TaskCompletionSource<IEnumerable<MapSearchModel>>();
+            _ = jsRuntime.InvokeVoidAsync("Map.Search", editor.Container, searchQuery);
+
+            return searchCompletion.Task;
+        }
+
+        [JSInvokable("Map.SearchCompleted")]
+        public void SearchCompleted(IEnumerable<MapSearchModel> results)
+        {
+            searchCompletion.TrySetResult(results);
+            searchCompletion = null;
+        }
+
+        public ValueTask CenterAtAsync(double latitude, double longitude)
+            => jsRuntime.InvokeVoidAsync("Map.CenterAt", editor.Container, latitude, longitude);
     }
 }
