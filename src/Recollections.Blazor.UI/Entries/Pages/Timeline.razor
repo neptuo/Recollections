@@ -20,6 +20,21 @@
                     @entry.When.ToString(UiOptions.DateFormat)
                 </span>
 
+                @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
+                {
+                    <span class="story">
+                        <Icon Identifier="book" />
+
+                        @entry.StoryTitle
+                        @if (!String.IsNullOrEmpty(entry.ChapterTitle))
+                        {
+                            <span>
+                                - @entry.ChapterTitle
+                            </span>
+                        }
+                    </span>
+                }
+
                 @if(entry.GpsCount > 0)
                 {
                     <span class="gps">

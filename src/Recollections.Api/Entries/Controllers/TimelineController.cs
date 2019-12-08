@@ -45,6 +45,8 @@ namespace Neptuo.Recollections.Entries.Controllers
                     Id = e.Id,
                     Title = e.Title,
                     When = e.When,
+                    StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
+                    ChapterTitle = e.Chapter.Title,
                     GpsCount = e.Locations.Count
                 })
                 .ToListAsync();
