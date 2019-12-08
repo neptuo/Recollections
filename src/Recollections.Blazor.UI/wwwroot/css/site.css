@@ -382,19 +382,19 @@ h4 .inline-editor-viewmode .oi {
   .image-detail .placeholder {
     color: #aaaaaa; }
 
-.stories .story {
-  padding: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-  .stories .story .dates, .stories .story .entries, .stories .story .chapters {
-    padding-right: .5rem; }
-
-.stories .story-new {
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-
-.stories .story:last-child {
-  padding-bottom: 0;
-  border-bottom-width: 0; }
+.stories {
+  margin-bottom: 1rem; }
+  .stories .story {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+    .stories .story .dates, .stories .story .entries, .stories .story .chapters {
+      padding-right: .5rem; }
+  .stories .story-new {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+  .stories .story:last-child {
+    padding-bottom: 0;
+    border-bottom-width: 0; }
 
 .entry-detail .chapter {
   margin-top: 1.5rem !important; }
