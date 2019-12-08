@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Exceptions.Handlers;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,9 @@ namespace Neptuo.Recollections.Components
 
         [Inject]
         protected ExceptionHandlerBuilder ExceptionHandlerBuilder { get; set; }
+
+        [Inject]
+        protected ILog<ExceptionPanel> Log { get; set; }
 
         protected bool IsVisible { get; private set; }
         protected string Title { get; private set; }
@@ -39,15 +43,25 @@ namespace Neptuo.Recollections.Components
             if (exception is AggregateException aggregateException)
                 exception = aggregateException.InnerException;
 
+            Log.Debug(exception.ToString());
+
             if (exception == null)
             {
                 Title = "Unspecified weird error";
-                Message = "We didn't get any details about problem that occurred. So we can't show you. Apologies for inconvenience.";
+                Message = "We didn't get any details about the problem that occurred. So we can't show you. Apologies for inconvenience.";
             }
-            else if (exception is HttpRequestException)
+            else if (exception is HttpRequestException httpException)
             {
-                Title = "Network Error";
-                Message = "There was an error during communication with the server. Please reload the page and try again.";
+                if (IsHttpResponseStatusCode(httpException, 503))
+                {
+                    Title = "Server Update";
+                    Message = "The server part of the application is currently being updated. Please come back later.";
+                }
+                else
+                {
+                    Title = "Network Error";
+                    Message = "There was an error during communication with the server. Please reload the page and try again.";
+                }
             }
             else
             {
@@ -57,6 +71,9 @@ namespace Neptuo.Recollections.Components
 
             StateHasChanged();
         }
+
+        private static bool IsHttpResponseStatusCode(HttpRequestException exception, int statusCode)
+            => exception.Message.Contains($"Response status code does not indicate success: {statusCode}");
 
         private static bool IsSkipped(Exception exception)
         {
