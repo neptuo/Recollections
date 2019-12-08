@@ -4,6 +4,11 @@ body {
     min-width: 400px;
 }
 
+footer {
+    border-top: 1px solid rgba(0,0,0,.1);
+    padding-top: 0.5rem;
+}
+
 blockquote {
     color: $placeholder-color;
 }

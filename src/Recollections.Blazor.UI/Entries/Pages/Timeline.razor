@@ -1,63 +1,60 @@
 ﻿@page "/"
 
 <div class="timeline">
-    <TimelineItem>
-        <EntryCreate />
-    </TimelineItem>
+    <EntryCreate />
 
     @foreach (var entry in Entries)
     {
-        <TimelineItem>
-            <div class="entry">
+        <div class="entry">
+            <div class="title">
+                <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
+            </div>
+            <div class="body">
                 <h2>
                     <a href="@Navigator.UrlEntryDetail(entry.Id)">
                         @entry.Title
                     </a>
                 </h2>
+                <p>
+                    @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
+                    {
+                        <span class="information">
+                            <Icon Identifier="book" />
 
-                <span class="datetime">
-                    <Icon Identifier="calendar" />
-                    @entry.When.ToString(UiOptions.DateFormat)
-                </span>
+                            @entry.StoryTitle
+                            @if (!String.IsNullOrEmpty(entry.ChapterTitle))
+                            {
+                                <span>
+                                    - @entry.ChapterTitle
+                                </span>
+                            }
+                        </span>
+                    }
 
-                @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
-                {
-                    <span class="story">
-                        <Icon Identifier="book" />
+                    @if (entry.GpsCount > 0)
+                    {
+                        <span class="information">
+                            <Icon Identifier="location" />
+                            @entry.GpsCount
+                        </span>
+                    }
 
-                        @entry.StoryTitle
-                        @if (!String.IsNullOrEmpty(entry.ChapterTitle))
-                        {
-                            <span>
-                                - @entry.ChapterTitle
-                            </span>
-                        }
-                    </span>
-                }
-
-                @if(entry.GpsCount > 0)
-                {
-                    <span class="gps">
-                        <Icon Identifier="location" />
-                        @entry.GpsCount
-                    </span>
-                }
-
-                @if(entry.ImageCount > 0)
-                {
-                    <span class="gps">
-                        <Icon Identifier="image" />
-                        @entry.ImageCount
-                    </span>
-                }
+                    @if (entry.ImageCount > 0)
+                    {
+                        <span class="information">
+                            <Icon Identifier="image" />
+                            @entry.ImageCount
+                        </span>
+                    }
+                </p>
             </div>
-        </TimelineItem>
-    }
-
-    @if (HasMore)
-    {
-        <div class="center">
-            <button class="btn btn-outline-primary" @onclick="@LoadMoreAsync">More...</button>
         </div>
     }
 </div>
+
+@if (HasMore)
+{
+    <div class="entry-more">
+        <button class="btn btn-outline-salmon" @onclick="@LoadMoreAsync">More...</button>
+    </div>
+}

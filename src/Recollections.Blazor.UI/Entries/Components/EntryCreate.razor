@@ -1,21 +1,21 @@
-﻿<div class="entry entry-new">
-    <Validation ErrorMessages="ErrorMessages" />
-
-    <form @onsubmit="@CreateAsync">
-        <div class="form-row form-group">
-            <div class="col-md col-sm-12">
-                <label for="entry-create-title">Title:</label>
-                <input id="entry-create-title" class="form-control" type="text" placeholder="Entry title..." @bind="Title" />
-            </div>
-            <div class="col-md-auto col-sm-12">
-                <label for="entry-create-title">When:</label>
-                <input @ref="WhenInput" class="form-control" type="text" placeholder="When it happend..." @bind="When" @bind:format="@UiOptions.DateFormat" />
+﻿<form @onsubmit="@CreateAsync">
+    <div class="entry entry-new">
+        <div class="title">
+            <input @ref="WhenInput" class="form-control date-box" type="text" placeholder="Today..." @bind="When" @bind:format="@UiOptions.DateFormat" />
+        </div>
+        <div class="body">
+            <div class="form-row form-group">
+                <div class="col">
+                    <Validation ErrorMessages="ErrorMessages" />
+                    <input class="form-control" type="text" placeholder="Title..." @bind="Title" />
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary" type="submit">
+                        <Icon Identifier="plus" />
+                        Create
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="form-row">
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Create entry</button>
-            </div>
-        </div>
-    </form>
-</div>
+    </div>
+</form>
