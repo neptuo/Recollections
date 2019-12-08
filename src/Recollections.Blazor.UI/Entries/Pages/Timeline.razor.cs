@@ -14,7 +14,7 @@ namespace Neptuo.Recollections.Entries.Pages
     {
         [Inject]
         protected Api Api { get; set; }
-        
+
         [Inject]
         protected Navigator Navigator { get; set; }
 
@@ -29,13 +29,12 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [CascadingParameter]
         protected UserState UserState { get; set; }
-        
+
         private int offset;
 
-        public List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
-        public bool HasMore { get; private set; }
-
-        protected bool IsEditTextVisible { get; set; }
+        protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
+        protected bool HasMore { get; private set; }
+        protected bool IsLoading { get; private set; } = true;
 
         protected async override Task OnInitializedAsync()
         {
@@ -50,27 +49,25 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
-            TimelineListResponse response = await Api.GetTimelineListAsync(offset);
-            Entries.AddRange(response.Entries);
-            HasMore = response.HasMore;
-            offset = Entries.Count;
+            try
+            {
+                IsLoading = true;
+
+                TimelineListResponse response = await Api.GetTimelineListAsync(offset);
+                Entries.AddRange(response.Entries);
+                HasMore = response.HasMore;
+                offset = Entries.Count;
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         public async Task LoadMoreAsync()
         {
-            if (HasMore)
+            if (HasMore && !IsLoading)
                 await LoadAsync();
-        }
-
-        protected MarkupString ConvertMarkdown(string text)
-        {
-            if (text == null)
-                return new MarkupString();
-
-            if (text.Length > UiOptions.TextPreviewLength)
-                text = text.Substring(0, UiOptions.TextPreviewLength - 3) + "...";
-
-            return new MarkupString(MarkdownConverter.Convert(text));
         }
     }
 }
