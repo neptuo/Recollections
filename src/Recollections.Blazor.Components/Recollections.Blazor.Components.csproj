@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    
-    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>7.3</LangVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
     <IsPackable>true</IsPackable>
@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview9.19424.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.1.0-preview4.19579.2" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
     <PackageReference Include="Neptuo.Exceptions" Version="1.2.1" />
   </ItemGroup>
