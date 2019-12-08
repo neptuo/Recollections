@@ -31,7 +31,7 @@ namespace Neptuo.Recollections.Accounts.Components
 
         private void OnUserInfoChanged()
         {
-            Log.Debug("Raised OnUserInfoChanged.");
+            Log.Debug($"Raised OnUserInfoChanged, UserName: '{UserState.UserName}'.");
             StateHasChanged();
         }
 
