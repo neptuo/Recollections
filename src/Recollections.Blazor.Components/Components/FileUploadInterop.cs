@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Components
         private readonly IJSRuntime jsRuntime;
         private readonly ILog<FileUploadInterop> log;
 
-        public FileUploadModel Model { get; set; }
+        public FileUpload Editor { get; set; }
 
         public FileUploadInterop(IJSRuntime jsRuntime, ILog<FileUploadInterop> log)
         {
@@ -25,17 +25,17 @@ namespace Neptuo.Recollections.Components
             this.log = log;
         }
 
-        public async Task InitializeAsync(FileUploadModel model, string bearerToken)
+        public async Task InitializeAsync(FileUpload editor, string bearerToken)
         {
-            Model = model;
-            await jsRuntime.InvokeVoidAsync("FileUpload.Initialize", DotNetObjectReference.Create(this), model.FormElement, bearerToken);
+            Editor = editor;
+            await jsRuntime.InvokeVoidAsync("FileUpload.Initialize", DotNetObjectReference.Create(this), editor.FormElement, bearerToken);
         }
 
         [JSInvokable("FileUpload.OnCompleted")]
         public void OnCompleted(FileUploadProgress[] progresses)
         {
             log.Debug($"FileUploadInterop.OnCompleted");
-            Model.OnCompleted(progresses);
+            Editor.OnCompleted(progresses);
         }
     }
 }

@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components.Editors
 {
-    public class InlineTextEditModel : InlineEditModel<string>
+    public partial class InlineTextEdit
     {
         [Inject]
         protected InlineTextEditInterop Interop { get; set; }
 
         [Inject]
-        protected ILog<InlineTextEditModel> Log { get; set; }
+        protected ILog<InlineTextEdit> Log { get; set; }
 
         public ElementReference Input { get; protected set; }
 

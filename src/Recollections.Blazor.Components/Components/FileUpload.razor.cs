@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class FileUploadModel : ComponentBase
+    public partial class FileUpload : ComponentBase
     {
         public const string DefaultText = "Upload Images";
 
@@ -18,7 +18,7 @@ namespace Neptuo.Recollections.Components
         protected FileUploadInterop Interop { get; set; }
 
         [Inject]
-        protected ILog<FileUploadModel> Log { get; set; }
+        protected ILog<FileUpload> Log { get; set; }
 
         [Parameter]
         public string Text { get; set; } = DefaultText;

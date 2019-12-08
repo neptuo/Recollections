@@ -1,4 +1,5 @@
-﻿@inherits InlineGpsEditModel
+﻿@using Neptuo.Recollections.Entries
+@inherits InlineEdit<LocationModel>
 
 <div class="inline-editor @GetModeCssClass()">
     @if (IsEditMode)

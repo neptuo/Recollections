@@ -11,7 +11,7 @@ namespace Neptuo.Recollections.Components
     public class MapInterop
     {
         private readonly IJSRuntime jsRuntime;
-        private MapModel model;
+        private Map editor;
 
         public MapInterop(IJSRuntime jsRuntime)
         {
@@ -19,17 +19,17 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public ValueTask InitializeAsync(MapModel model)
+        public ValueTask InitializeAsync(Map editor)
         {
-            this.model = model;
-            return jsRuntime.InvokeVoidAsync("Map.Initialize", model.Container, DotNetObjectReference.Create(this), model.Markers, model.IsZoomed, model.IsResizable);
+            this.editor = editor;
+            return jsRuntime.InvokeVoidAsync("Map.Initialize", editor.Container, DotNetObjectReference.Create(this), editor.Markers, editor.IsZoomed, editor.IsResizable);
         }
 
         [JSInvokable("Map.MarkerMoved")]
         public void MarkerMoved(int? index, double latitude, double longitude, double? altitude) 
-            => model.MoveMarker(index, latitude, longitude, altitude);
+            => editor.MoveMarker(index, latitude, longitude, altitude);
 
         [JSInvokable("Map.MarkerSelected")]
-        public void MarkerSelected(int index) => model.MarkerSelected?.Invoke(index);
+        public void MarkerSelected(int index) => editor.MarkerSelected?.Invoke(index);
     }
 }

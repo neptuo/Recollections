@@ -1,6 +1,4 @@
-﻿using CommonMark;
-using Microsoft.AspNetCore.Components;
-using Neptuo.Identifiers;
+﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
@@ -11,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components.Editors
 {
-    public class InlineMarkdownEditModel : InlineEditModel<string>
+    public partial class InlineMarkdownEdit
     {
         [Inject]
         protected InlineMarkdownEditInterop Interop { get; set; }
@@ -20,7 +18,7 @@ namespace Neptuo.Recollections.Components.Editors
         protected MarkdownConverter MarkdownConverter { get; set; }
 
         [Inject]
-        protected ILog<InlineMarkdownEditModel> Log { get; set; }
+        protected ILog<InlineMarkdownEdit> Log { get; set; }
 
         public ElementReference TextArea { get; protected set; }
 

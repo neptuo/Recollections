@@ -1,6 +1,4 @@
-﻿@inherits InlineGpsListModel
-
-@foreach (var item in Value)
+﻿@foreach (var item in Value)
 {
     var x = item;
     <InlineGpsEdit Value="@item" ValueChanged="@(newValue => ValueChanged?.Invoke(Value))" Delete="OnItemRemoved" /> 

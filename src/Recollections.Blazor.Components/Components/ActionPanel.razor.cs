@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    partial class Icon : ComponentBase
+    public partial class ActionPanel : ComponentBase
     {
         [Parameter]
-        public string Identifier { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         [Parameter]
-        public Action OnClick { get; set; }
+        public RenderFragment LeftContent { get; set; }
+
+        [Parameter]
+        public RenderFragment RightContent { get; set; }
     }
 }

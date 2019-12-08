@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components.Editors
 {
-    public class InlineDateEditModel : InlineEditModel<DateTime>
+    public partial class InlineDateEdit
     {
         [Inject]
         protected DatePickerInterop Interop { get; set; }

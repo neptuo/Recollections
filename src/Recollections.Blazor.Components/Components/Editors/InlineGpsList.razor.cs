@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components.Editors
 {
-    public class InlineGpsListModel : ComponentBase
+    public partial class InlineGpsList : ComponentBase
     {
         [Parameter]
         public List<LocationModel> Value { get; set; }

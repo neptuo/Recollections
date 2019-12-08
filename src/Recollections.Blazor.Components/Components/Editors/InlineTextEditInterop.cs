@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Components.Editors
         private readonly IJSRuntime jsRuntime;
         private ILog<InlineTextEditInterop> log;
 
-        protected InlineTextEditModel Model { get; set; }
+        protected InlineTextEdit Editor { get; set; }
 
         public InlineTextEditInterop(IJSRuntime jsRuntime, ILog<InlineTextEditInterop> log)
         {
@@ -25,14 +25,14 @@ namespace Neptuo.Recollections.Components.Editors
             this.log = log;
         }
 
-        public ValueTask InitializeAsync(InlineTextEditModel model)
+        public ValueTask InitializeAsync(InlineTextEdit editor)
         {
-            Model = model;
-            return jsRuntime.InvokeVoidAsync("InlineTextEdit.Initialize", DotNetObjectReference.Create(this), model.Input);
+            Editor = editor;
+            return jsRuntime.InvokeVoidAsync("InlineTextEdit.Initialize", DotNetObjectReference.Create(this), editor.Input);
         }
 
         [JSInvokable("TextEdit.OnCancel")]
         public void OnCancel() 
-            => Model.OnCancel();
+            => Editor.OnCancel();
     }
 }

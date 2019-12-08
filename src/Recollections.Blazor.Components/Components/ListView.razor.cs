@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class ListViewModel<T> : ComponentBase
+    public partial class ListView<T> : ComponentBase
     {
         [Parameter]
         public bool IsLoading { get; set; }

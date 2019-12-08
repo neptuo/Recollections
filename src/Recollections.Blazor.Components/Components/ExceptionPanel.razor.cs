@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class ExceptionPanelModel : ComponentBase, IExceptionHandler<Exception>
+    public partial class ExceptionPanel : ComponentBase, IExceptionHandler<Exception>
     {
         public static IReadOnlyCollection<Type> SkippedExceptions { get; } = new[] { typeof(UnauthorizedAccessException) };
 

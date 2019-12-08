@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components.Editors
 {
-    public class InlineEditModel<T> : ComponentBase
+    public class InlineEdit<T> : ComponentBase
     {
         private T originalValue;
 

@@ -16,7 +16,7 @@ namespace Neptuo.Recollections.Components.Editors
         private readonly IJSRuntime jsRuntime;
         private readonly ILog<InlineMarkdownEditInterop> log;
 
-        public InlineMarkdownEditModel Model { get; set; }
+        public InlineMarkdownEdit Editor { get; set; }
 
         public InlineMarkdownEditInterop(IJSRuntime jsRuntime, ILog<InlineMarkdownEditInterop> log)
         {
@@ -26,10 +26,10 @@ namespace Neptuo.Recollections.Components.Editors
             this.log = log;
         }
 
-        public ValueTask InitializeAsync(InlineMarkdownEditModel model, string value = null)
+        public ValueTask InitializeAsync(InlineMarkdownEdit editor, string value = null)
         {
-            Model = model;
-            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", DotNetObjectReference.Create(this), model.TextArea, value);
+            Editor = editor;
+            return jsRuntime.InvokeVoidAsync("InlineMarkdownEdit.Initialize", DotNetObjectReference.Create(this), editor.TextArea, value);
         }
 
         internal ValueTask<string> SetValueAsync(ElementReference textArea, string value)
@@ -40,10 +40,10 @@ namespace Neptuo.Recollections.Components.Editors
 
         [JSInvokable("Markdown.OnSave")]
         public void OnSave(string value) 
-            => Model.OnSave(value);
+            => Editor.OnSave(value);
 
         [JSInvokable("Markdown.OnCancel")]
         public void OnCancel() 
-            => Model.OnCancel();
+            => Editor.OnCancel();
     }
 }

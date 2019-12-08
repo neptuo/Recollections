@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class MapModel : ComponentBase
+    public partial class Map : ComponentBase
     {
 
         [Inject]
         protected MapInterop Interop { get; set; }
 
         [Inject]
-        protected ILog<MapModel> Log { get; set; }
+        protected ILog<Map> Log { get; set; }
 
         [Parameter]
         public IList<MapMarkerModel> Markers { get; set; }

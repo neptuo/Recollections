@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class ModalModel : ComponentBase
+    public partial class Modal
     {
         [Inject]
         internal ModalInterop Interop { get; set; }

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace $namespace$
 {
-    public class $itemcontainername$Model : ComponentBase
+    public partial class $itemcontainername$ : ComponentBase
     {
         $end$
     }

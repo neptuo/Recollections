@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components.Editors
 {
-    public class InlineGpsEditModel : InlineEditModel<LocationModel>
+    public partial class InlineGpsEdit
     {
         [Parameter]
         public Action<LocationModel> Delete { get; set; }
