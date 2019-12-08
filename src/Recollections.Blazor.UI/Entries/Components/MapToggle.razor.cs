@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class MapToggleModel : ComponentBase
+    public partial class MapToggle
     {
         [Parameter]
         public string Text { get; set; }

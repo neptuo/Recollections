@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class EntryImageModel : ComponentBase
+    public partial class EntryImage
     {
         private string previousUrl;
 

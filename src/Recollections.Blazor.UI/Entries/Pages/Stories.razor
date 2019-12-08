@@ -1,5 +1,4 @@
 ﻿@page "/stories"
-@inherits StoriesModel
 
 <div class="stories">
     <div class="story-new">
@@ -17,7 +16,7 @@
         </form>
     </div>
 
-    <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
+    <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
         <div class="story">
             <h2>
                 <a href="@Navigator.UrlStoryDetail(story.Id)">

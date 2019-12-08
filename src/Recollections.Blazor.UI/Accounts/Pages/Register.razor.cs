@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Pages
 {
-    public class RegisterModel : ComponentBase
+    public partial class Register
     {
         [Inject]
         protected Api Api { get; set; }
@@ -18,7 +18,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected NavigationManager Uri { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         public List<string> ErrorMessages { get; } = new List<string>();
 

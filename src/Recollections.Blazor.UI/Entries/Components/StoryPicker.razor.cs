@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class StoryPickerModel : ComponentBase
+    public partial class StoryPicker
     {
         [Inject]
         protected Api Api { get; set; }
@@ -21,7 +21,7 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public Action<EntryStoryModel> Selected { get; set; }
 
-        protected ModalModel Modal { get; set; }
+        protected Modal Modal { get; set; }
 
         private bool isFirstShow = true;
 

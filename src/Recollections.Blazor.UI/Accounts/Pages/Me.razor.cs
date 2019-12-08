@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Pages
 {
-    public class MeModel : ComponentBase
+    public partial class Me
     {
         [Inject]
         protected Api Api { get; set; }
@@ -19,10 +19,10 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected UiOptions UiOptions { get; set; }
 
         [Inject]
-        protected ILog<MeModel> Log { get; set; }
+        protected ILog<Me> Log { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         public string UserName { get; set; }
         public DateTime Created { get; set; }

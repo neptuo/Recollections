@@ -1,6 +1,4 @@
-﻿@inherits EntryImageModel
-
-<div class="image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
+﻿<div class="image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
     <a href="@GetLinkUrl()">
         <img src="@Url" class="rounded" />
     </a>

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class StoryEntriesModel : ComponentBase, IDisposable, IEventHandler<StoryEntriesChanged>
+    public partial class StoryEntries : IDisposable, IEventHandler<StoryEntriesChanged>
     {
         [Inject]
         protected Api Api { get; set; }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public class ImageDetailModel : ComponentBase
+    public partial class ImageDetail
     {
         [Inject]
         protected Navigator Navigator { get; set; }
@@ -31,7 +31,7 @@ namespace Neptuo.Recollections.Entries.Pages
         public string ImageId { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         private ImageModel original;
         protected ImageModel Model { get; set; }

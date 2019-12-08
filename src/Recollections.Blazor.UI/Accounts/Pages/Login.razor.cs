@@ -12,16 +12,16 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Pages
 {
-    public class LoginModel : ComponentBase
+    public partial class Login
     {
         [Inject]
         protected Navigator Navigator { get; set; }
 
         [Inject]
-        protected ILog<LoginModel> Log { get; set; }
+        protected ILog<Login> Log { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         [Required]
         public string UserName { get; set; }

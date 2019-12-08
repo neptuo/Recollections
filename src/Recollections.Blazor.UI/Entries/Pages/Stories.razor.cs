@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public class StoriesModel : ComponentBase
+    public partial class Stories
     {
         [Inject]
         protected UiOptions UiOptions { get; set; }
@@ -22,14 +22,14 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Api Api { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         protected bool IsLoading { get; set; }
 
         public string Title { get; set; }
         public List<string> ErrorMessages { get; } = new List<string>();
 
-        public List<StoryListModel> Stories { get; } = new List<StoryListModel>();
+        public List<StoryListModel> Items { get; } = new List<StoryListModel>();
 
         protected async override Task OnInitializedAsync()
         {
@@ -44,8 +44,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task LoadDataAsync()
         {
             IsLoading = true;
-            Stories.Clear();
-            Stories.AddRange(await Api.GetStoryListAsync());
+            Items.Clear();
+            Items.AddRange(await Api.GetStoryListAsync());
             IsLoading = false;
         }
 

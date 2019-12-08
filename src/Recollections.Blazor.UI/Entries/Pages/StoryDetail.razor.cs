@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public class StoryDetailModel : ComponentBase
+    public partial class StoryDetail
     {
         [Inject]
         protected Api Api { get; set; }
@@ -25,12 +25,12 @@ namespace Neptuo.Recollections.Entries.Pages
         protected IEventDispatcher EventDispatcher { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         [Parameter]
         public string Id { get; set; }
 
-        protected EntryPickerModel EntryPicker { get; set; }
+        protected EntryPicker EntryPicker { get; set; }
         protected StoryModel Model { get; set; }
 
         protected async override Task OnInitializedAsync()

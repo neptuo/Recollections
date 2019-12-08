@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class EntryCreateModel : ComponentBase
+    public partial class EntryCreate
     {
         [Inject]
         protected Api Api { get; set; }

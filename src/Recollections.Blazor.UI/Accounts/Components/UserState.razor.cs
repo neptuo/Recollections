@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Components
 {
-    public class UserStateModel : ComponentBase
+    public partial class UserState
     {
         private TaskCompletionSource<string> authenticationSource = new TaskCompletionSource<string>();
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public class TimelineModel : ComponentBase
+    public partial class Timeline
     {
         [Inject]
         protected Api Api { get; set; }
@@ -25,10 +25,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected MarkdownConverter MarkdownConverter { get; set; }
 
         [Inject]
-        protected ILog<TimelineModel> Log { get; set; }
+        protected ILog<Timeline> Log { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
         
         private int offset;
 

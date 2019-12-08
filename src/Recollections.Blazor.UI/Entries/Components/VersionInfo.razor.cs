@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class VersionInfoModel : ComponentBase
+    public partial class VersionInfo
     {
         [Inject]
         protected Api Api { get; set; }
@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Entries.Components
         {
             await base.OnInitializedAsync();
 
-            ClientVersion = new VersionModel(typeof(VersionInfoModel).Assembly.GetName().Version);
+            ClientVersion = new VersionModel(typeof(VersionInfo).Assembly.GetName().Version);
             ApiVersion = await Api.GetVersionAsync();
         }
     }

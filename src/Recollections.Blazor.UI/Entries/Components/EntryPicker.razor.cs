@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public class EntryPickerModel : ComponentBase
+    public partial class EntryPicker
     {
         [Inject]
         protected Api Api { get; set; }
@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public Action<TimelineEntryModel> Selected { get; set; }
 
-        protected ModalModel Modal { get; set; }
+        protected Modal Modal { get; set; }
 
         private int offset;
         private bool isFirstShow = true;

@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Components
 {
-    public class UserInfoModel : ComponentBase, IDisposable
+    public partial class UserInfo : IDisposable
     {
         [Inject]
-        protected ILog<UserInfoModel> Log { get; set; }
+        protected ILog<UserInfo> Log { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         protected override void OnInitialized()
         {

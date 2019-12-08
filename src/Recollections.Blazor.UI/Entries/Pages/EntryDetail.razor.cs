@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Neptuo;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public class EntryDetailModel : ComponentBase
+    public partial class EntryDetail
     {
         [Inject]
         protected Api Api { get; set; }
@@ -28,10 +27,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Json Json { get; set; }
 
         [Inject]
-        protected ILog<EntryDetailModel> Log { get; set; }
+        protected ILog<EntryDetail> Log { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         [Parameter]
         public string EntryId { get; set; }
@@ -276,7 +275,7 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
-        protected StoryPickerModel StoryPicker { get; set; }
+        protected StoryPicker StoryPicker { get; set; }
 
         protected void SelectStory()
         {

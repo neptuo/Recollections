@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public class MapPageModel : ComponentBase
+    public partial class MapPage
     {
         [Inject]
         protected Api Api { get; set; }
@@ -19,7 +19,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Navigator Navigator { get; set; }
 
         [CascadingParameter]
-        protected UserStateModel UserState { get; set; }
+        protected UserState UserState { get; set; }
 
         protected List<MapEntryModel> Entries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
