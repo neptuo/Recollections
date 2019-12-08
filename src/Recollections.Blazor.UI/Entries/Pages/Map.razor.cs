@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class MapPage
+    public partial class Map
     {
         [Inject]
         protected Api Api { get; set; }
