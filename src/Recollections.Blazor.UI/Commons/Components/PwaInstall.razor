@@ -1,6 +1,6 @@
 ﻿@if (IsInstallable)
 {
-    <button class="btn btn-outline-secondary" @onclick="InstallAsync">
+    <button @ref="Button" class="btn btn-outline-secondary" @onclick="InstallAsync" title="Install as application to your device" data-toggle="tooltip" data-placement="bottom">
         <Icon Identifier="cloud-download" />
     </button>
 }

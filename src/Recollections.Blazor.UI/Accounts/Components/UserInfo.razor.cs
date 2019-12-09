@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,14 +15,28 @@ namespace Neptuo.Recollections.Accounts.Components
         [Inject]
         protected ILog<UserInfo> Log { get; set; }
 
+        [Inject]
+        protected TooltipInterop TooltipInterop { get; set; }
+
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
+        protected ElementReference MeButton { get; set; }
+        protected ElementReference LogoutButton { get; set; }
 
+        protected async override Task OnInitializedAsync()
+        {
             UserState.UserInfoChanged += OnUserInfoChanged;
+
+            await base.OnInitializedAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            await TooltipInterop.InitializeAsync(MeButton);
+            await TooltipInterop.InitializeAsync(LogoutButton);
         }
 
         public void Dispose()

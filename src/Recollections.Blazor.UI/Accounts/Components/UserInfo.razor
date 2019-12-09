@@ -1,6 +1,6 @@
-﻿<a class="btn btn-outline-info" href="/me" title="About me">
+﻿<a @ref="MeButton" class="btn btn-outline-info" href="/me" title="About me" data-toggle="tooltip" data-placement="bottom">
     <Icon Identifier="person" />
 </a>
-<button type="button" class="btn btn-outline-danger" @onclick="@LogoutAsync" title="Log out">
+<button @ref="LogoutButton" type="button" class="btn btn-outline-danger" @onclick="@LogoutAsync" title="Log out" data-toggle="tooltip" data-placement="bottom">
     <Icon Identifier="account-logout" />
 </button>

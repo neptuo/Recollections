@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,8 +16,12 @@ namespace Neptuo.Recollections.Commons.Components
         internal PwaInstallInterop Interop { get; set; }
 
         [Inject]
+        internal TooltipInterop Tooltip { get; set; }
+
+        [Inject]
         internal ILog<PwaInstall> Log { get; set; }
 
+        protected ElementReference Button { get; set; }
         protected bool IsInstallable { get; set; }
 
         protected override void OnInitialized()
@@ -25,6 +30,14 @@ namespace Neptuo.Recollections.Commons.Components
 
             base.OnInitialized();
             Interop.Initialize(this);
+        }
+
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (IsInstallable)
+                await Tooltip.InitializeAsync(Button);
         }
 
         public void MakeInstallable()

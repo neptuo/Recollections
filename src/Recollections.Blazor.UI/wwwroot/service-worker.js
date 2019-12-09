@@ -71,6 +71,7 @@ const requiredFiles = [
 "/js/bootstrap/bootstrap.min.js",
 "/js/easymde/easymde.min.js",
 "/js/jquery/jquery.min.js",
+"/js/popper/popper.min.js",
 "/js/simplemde/simplemde.min.js",
 "/js/site.js",
 "/service-worker-update.js",

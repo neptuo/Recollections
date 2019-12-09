@@ -26,6 +26,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<MarkdownConverter>();
             services.AddTransient<Downloader>();
             services.AddTransient<MapInterop>();
+            services.AddTransient<TooltipInterop>();
+            services.AddTransient<PopoverInterop>();
             services.AddTransient<ElementReferenceInterop>();
 
             return services;

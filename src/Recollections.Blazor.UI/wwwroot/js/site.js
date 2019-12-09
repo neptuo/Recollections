@@ -11,6 +11,21 @@
         Hide: function (container) {
             $(container).modal('hide');
         }
+    },
+    Tooltip: {
+        Init: function (container) {
+            $(container).tooltip();
+        }
+    },
+    Popover: {
+        Show: function(container, title, body) {
+            $(container).popover({
+                content: body,
+                title: title,
+                placement: "bottom",
+                show: true
+            });
+        }
     }
 };
 
