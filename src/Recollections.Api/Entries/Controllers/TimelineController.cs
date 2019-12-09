@@ -29,8 +29,6 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpGet]
         public async Task<IActionResult> List(int offset)
         {
-            return StatusCode(503);
-
             Ensure.PositiveOrZero(offset, "offset");
 
             string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
