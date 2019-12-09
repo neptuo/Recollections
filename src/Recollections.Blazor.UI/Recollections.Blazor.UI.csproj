@@ -20,6 +20,7 @@
     <ServiceWorkerFileName>service-worker.js</ServiceWorkerFileName>
     <ServiceWorkerRegisterFileName>service-worker-register.js</ServiceWorkerRegisterFileName>
     <ServiceWorkerForce>true</ServiceWorkerForce>
+    <ServiceWorkerCacheVersion Condition="'$(Configuration)' == 'Debug'">0.0.$([System.DateTime]::Now.Ticks)</ServiceWorkerCacheVersion>
     <ServiceWorkerCacheVersion Condition="'$(Configuration)' == 'Release'">$(Version)</ServiceWorkerCacheVersion>
     <ServiceWorkerRegisterInstallableType>installable-blazor</ServiceWorkerRegisterInstallableType>
     <ServiceWorkerBlazorInstallMethod>Pwa.IsInstallable</ServiceWorkerBlazorInstallMethod>
