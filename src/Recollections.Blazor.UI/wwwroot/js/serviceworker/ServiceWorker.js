@@ -73,11 +73,10 @@ const requiredFiles = [
 "/js/bootstrap/bootstrap.min.js",
 "/js/easymde/easymde.min.js",
 "/js/jquery/jquery.min.js",
+"/js/serviceworker/ServiceWorker.js",
+"/js/serviceworker/ServiceWorkerUpdate.js",
 "/js/simplemde/simplemde.min.js",
 "/js/site.js",
-"/ServiceWorker.js",
-"/ServiceWorkerRegister.js",
-"/ServiceWorkerUpdate.js",
 "/js/serviceworker/ServiceWorkerRegister.js",
 "/manifest.json"
 ];

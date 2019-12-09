@@ -32,7 +32,7 @@
         $(WWWRoot)**\*.scss;
       </ServiceWorkerPreCacheExcludeFiles>
     </PropertyGroup>
-    <Message Importance="high" Text="Removing: $(ServiceWorkerPreCacheExcludeFiles)"/>
+    <Message Importance="high" Text="Removing: $(ServiceWorkerPreCacheExcludeFiles)" />
   </Target>
 
   <ItemGroup>
@@ -61,5 +61,17 @@
 
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Common\Components\PwaInstall.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Watch Remove="Common\Components\PwaInstall.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Common\Components\PwaInstall.razor" />
   </ItemGroup>
 </Project>
