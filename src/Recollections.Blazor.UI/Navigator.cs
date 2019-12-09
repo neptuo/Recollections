@@ -22,6 +22,9 @@ namespace Neptuo.Recollections
             this.jsRuntime = jsRuntime;
         }
 
+        public ValueTask ReloadAsync()
+            => jsRuntime.InvokeVoidAsync("window.location.reload");
+
         public ValueTask<bool> AskAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.confirm", message);
 

@@ -32,11 +32,18 @@ namespace Neptuo.Recollections.Commons.Components
             editors.Remove(editor);
         }
 
-        [JSInvokable("Pwa.IsInstallable")]
-        public static void IsInstallable()
+        [JSInvokable("Pwa.Installable")]
+        public static void Installable()
         {
             foreach (var editor in editors)
                 editor.MakeInstallable();
+        }
+
+        [JSInvokable("Pwa.Updateable")]
+        public static void Updateable()
+        {
+            foreach (var editor in editors)
+                editor.MakeUpdateable();
         }
 
         public ValueTask InstallAsync() 

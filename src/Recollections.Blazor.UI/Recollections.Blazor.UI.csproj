@@ -23,7 +23,7 @@
     <ServiceWorkerCacheVersion Condition="'$(Configuration)' == 'Debug'">0.0.$([System.DateTime]::Now.Ticks)</ServiceWorkerCacheVersion>
     <ServiceWorkerCacheVersion Condition="'$(Configuration)' == 'Release'">$(Version)</ServiceWorkerCacheVersion>
     <ServiceWorkerRegisterInstallableType>installable-blazor</ServiceWorkerRegisterInstallableType>
-    <ServiceWorkerBlazorInstallMethod>Pwa.IsInstallable</ServiceWorkerBlazorInstallMethod>
+    <ServiceWorkerBlazorInstallMethod>Pwa.Installable</ServiceWorkerBlazorInstallMethod>
     <ServiceWorkerRegisterUpdateType>update-blazor</ServiceWorkerRegisterUpdateType>
   </PropertyGroup>
   

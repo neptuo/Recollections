@@ -3,7 +3,7 @@ const swInstalledEvent = 'installed';
 const staticCachePrefix = 'blazor-cache-v';
 const updateAlertMessage = 'Update available. Reload the page when convenient.';
 const blazorAssembly = 'Recollections.Blazor.UI';
-const blazorInstallMethod = 'Pwa.IsInstallable';
+const blazorInstallMethod = 'Pwa.Installable';
 window.updateAvailable = new Promise(function (resolve, reject) {
     var { hostname } = window.location;
     if (typeof ignoreHosts !== 'undefined') {

@@ -4,3 +4,9 @@
         <Icon Identifier="cloud-download" />
     </button>
 }
+else if(IsUpdateable)
+{
+    <button @ref="Button" class="btn btn-outline-secondary" @onclick="UpdateAsync" title="Application update is ready. Reload page to complete." data-toggle="tooltip" data-placement="bottom">
+        <Icon Identifier="cloud-download" />
+    </button>
+}

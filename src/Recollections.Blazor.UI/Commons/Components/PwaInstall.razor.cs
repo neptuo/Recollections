@@ -21,8 +21,12 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         internal ILog<PwaInstall> Log { get; set; }
 
+        [Inject]
+        internal Navigator Navigator { get; set; }
+
         protected ElementReference Button { get; set; }
         protected bool IsInstallable { get; set; }
+        protected bool IsUpdateable { get; set; }
 
         protected override void OnInitialized()
         {
@@ -48,11 +52,22 @@ namespace Neptuo.Recollections.Commons.Components
             StateHasChanged();
         }
 
+        public void MakeUpdateable()
+        {
+            Log.Debug("Updateable=True");
+
+            IsUpdateable = true;
+            StateHasChanged();
+        }
+
         protected async Task InstallAsync()
         {
             await Interop.InstallAsync();
             IsInstallable = false;
         }
+
+        protected async Task UpdateAsync() 
+            => await Navigator.ReloadAsync();
 
         public void Dispose()
         {
