@@ -30,9 +30,7 @@ const requiredFiles = [
 "/_framework/_bin/mscorlib.dll",
 "/_framework/_bin/Neptuo.dll",
 "/_framework/_bin/Neptuo.Events.dll",
-"/_framework/_bin/Neptuo.Events.pdb",
 "/_framework/_bin/Neptuo.Exceptions.dll",
-"/_framework/_bin/Neptuo.Exceptions.pdb",
 "/_framework/_bin/Neptuo.pdb",
 "/_framework/_bin/Recollections.Api.Shared.dll",
 "/_framework/_bin/Recollections.Api.Shared.pdb",
@@ -73,11 +71,10 @@ const requiredFiles = [
 "/js/bootstrap/bootstrap.min.js",
 "/js/easymde/easymde.min.js",
 "/js/jquery/jquery.min.js",
-"/js/serviceworker/ServiceWorker.js",
-"/js/serviceworker/ServiceWorkerUpdate.js",
 "/js/simplemde/simplemde.min.js",
 "/js/site.js",
-"/js/serviceworker/ServiceWorkerRegister.js",
+"/service-worker-update.js",
+"/service-worker-register.js",
 "/manifest.json"
 ];
 // * listen for the install event and pre-cache anything in filesToCache * //

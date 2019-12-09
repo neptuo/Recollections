@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Neptuo.Activators;
 using Neptuo.Events;
 using Neptuo.Recollections.Accounts;
-using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Commons;
 using Neptuo.Recollections.Entries;
 using System;
 using System.Collections.Generic;
@@ -15,11 +15,13 @@ namespace Neptuo.Recollections
 {
     public class Startup
     {
+        private readonly CommonStartup common;
         private readonly AccountsStartup accounts;
         private readonly EntriesStartup entries;
 
         public Startup()
         {
+            common = new CommonStartup();
             accounts = new AccountsStartup();
             entries = new EntriesStartup();
         }
@@ -40,6 +42,7 @@ namespace Neptuo.Recollections
                 .AddSingleton<UrlResolver>(Resolve)
                 .AddTransient<Navigator>();
 
+            common.ConfigureServices(services);
             accounts.ConfigureServices(services);
             entries.ConfigureServices(services);
         }

@@ -1,9 +1,9 @@
-const serviceWorkerFileName = '/js/serviceworker/ServiceWorker.js';
+const serviceWorkerFileName = '/service-worker.js';
 const swInstalledEvent = 'installed';
 const staticCachePrefix = 'blazor-cache-v';
 const updateAlertMessage = 'Update available. Reload the page when convenient.';
 const blazorAssembly = 'Recollections.Blazor.UI';
-const blazorInstallMethod = 'IsInstallable';
+const blazorInstallMethod = 'Pwa.IsInstallable';
 window.updateAvailable = new Promise(function (resolve, reject) {
     var { hostname } = window.location;
     if (typeof ignoreHosts !== 'undefined') {

@@ -17,12 +17,12 @@
     <ManifestShortName>Recollections</ManifestShortName>
     <ManifestLongName>Recollections by Neptuo</ManifestLongName>
     
-    <ServiceWorkerFileName>js/serviceworker/ServiceWorker.js</ServiceWorkerFileName>
-    <ServiceWorkerRegisterFileName>js/serviceworker/ServiceWorkerRegister.js</ServiceWorkerRegisterFileName>
+    <ServiceWorkerFileName>service-worker.js</ServiceWorkerFileName>
+    <ServiceWorkerRegisterFileName>service-worker-register.js</ServiceWorkerRegisterFileName>
     <ServiceWorkerForce>true</ServiceWorkerForce>
     <ServiceWorkerCacheVersion Condition="'$(Configuration)' == 'Release'">$(Version)</ServiceWorkerCacheVersion>
     <ServiceWorkerRegisterInstallableType>installable-blazor</ServiceWorkerRegisterInstallableType>
-    <ServiceWorkerBlazorInstallMethod>IsInstallable</ServiceWorkerBlazorInstallMethod>
+    <ServiceWorkerBlazorInstallMethod>Pwa.IsInstallable</ServiceWorkerBlazorInstallMethod>
     <ServiceWorkerRegisterUpdateType>update-blazor</ServiceWorkerRegisterUpdateType>
   </PropertyGroup>
   
@@ -61,17 +61,5 @@
 
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Common\Components\PwaInstall.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Watch Remove="Common\Components\PwaInstall.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Common\Components\PwaInstall.razor" />
   </ItemGroup>
 </Project>
