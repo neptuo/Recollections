@@ -12,6 +12,9 @@
       https://dotnet.myget.org/F/blazor-dev/api/v3/index.json;
     </RestoreAdditionalProjectSources>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'!='Release'">
+    <BlazorLinkOnBuild>false</BlazorLinkOnBuild>
+  </PropertyGroup>
 
   <PropertyGroup>
     <ManifestShortName>Recollections</ManifestShortName>
