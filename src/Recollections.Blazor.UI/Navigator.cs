@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,12 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections
 {
-    public class Navigator
+    public class Navigator : IDisposable
     {
         private readonly NavigationManager uri;
         private readonly IJSRuntime jsRuntime;
+
+        public event Action<string> LocationChanged;
 
         public Navigator(NavigationManager uri, IJSRuntime jsRuntime)
         {
@@ -20,7 +23,17 @@ namespace Neptuo.Recollections
             Ensure.NotNull(jsRuntime, "jsRuntime");
             this.uri = uri;
             this.jsRuntime = jsRuntime;
+
+            uri.LocationChanged += OnLocationChanged;
         }
+
+        public void Dispose()
+        {
+            uri.LocationChanged -= OnLocationChanged;
+        }
+
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+            => LocationChanged?.Invoke(e.Location);
 
         public ValueTask ReloadAsync()
             => jsRuntime.InvokeVoidAsync("window.location.reload");
