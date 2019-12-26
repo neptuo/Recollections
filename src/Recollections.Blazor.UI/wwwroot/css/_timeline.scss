@@ -137,7 +137,7 @@ $dot-diameter: 18px;
     }
 }
 
-@media (max-width: 768px) {
+@mixin narrow() {
     .timeline {
         &:before {
             left: 7px;
@@ -176,4 +176,12 @@ $dot-diameter: 18px;
     .entry-more {
         margin-left: 0;
     }
+}
+
+.entry-picker {
+    @include narrow;
+}
+
+@media (max-width: 768px) {
+    @include narrow;
 }

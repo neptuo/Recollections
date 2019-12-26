@@ -269,6 +269,32 @@ h4 .inline-editor-viewmode .oi {
       color: white;
       background-color: lightsalmon; }
 
+.entry-picker .timeline:before {
+  left: 7px; }
+
+.entry-picker .entry .title {
+  position: initial;
+  width: auto;
+  float: none;
+  padding-right: 0;
+  padding-left: 30px;
+  text-align: left;
+  position: relative; }
+  .entry-picker .entry .title:before {
+    right: auto;
+    left: 0; }
+
+.entry-picker .entry .body {
+  float: none;
+  width: auto; }
+
+.entry-picker .entry-new .date-box {
+  width: 100%;
+  float: none; }
+
+.entry-picker .entry-more {
+  margin-left: 0; }
+
 @media (max-width: 768px) {
   .timeline:before {
     left: 7px; }
