@@ -1,18 +1,51 @@
-﻿<Modal @ref="Modal" Title="Select Entry">
+﻿<Modal @ref="Modal" Title="Select Entry" CssClass="entry-picker">
     <ChildContent>
-        <div class="entry-picker">
+        <div class="timeline">
             @foreach (var entry in Entries)
             {
                 <div class="entry">
-                    <a @onclick="@(() => { Hide(); Selected?.Invoke(entry); })">
-                        <span class="title">
-                            @entry.Title
-                        </span>
-                        <span class="date">
-                            <Icon Identifier="calendar" />
-                            @entry.When.ToString(UiOptions.DateFormat)
-                        </span>
-                    </a>
+                    <div class="title">
+                        <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
+                    </div>
+                    <div class="body">
+                        <h2>
+                            <a @onclick="@(() => { Hide(); Selected?.Invoke(entry); })">
+                                @entry.Title
+                            </a>
+                        </h2>
+                        <p>
+                            @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
+                            {
+                                <span class="information">
+                                    <Icon Identifier="book" />
+
+                                    @entry.StoryTitle
+                                    @if (!String.IsNullOrEmpty(entry.ChapterTitle))
+                                    {
+                                        <span>
+                                            - @entry.ChapterTitle
+                                        </span>
+                                    }
+                                </span>
+                            }
+
+                            @if (entry.GpsCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="location" />
+                                    @entry.GpsCount
+                                </span>
+                            }
+
+                            @if (entry.ImageCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="image" />
+                                    @entry.ImageCount
+                                </span>
+                            }
+                        </p>
+                    </div>
                 </div>
             }
         </div>

@@ -374,15 +374,29 @@ h4 .inline-editor-viewmode .oi {
   .entry-detail .placeholder {
     color: #aaaaaa; }
 
+.entry-picker .modal-body {
+  padding: 0; }
+
+.entry-picker .timeline {
+  padding: 0; }
+  .entry-picker .timeline:before {
+    left: 23px; }
+
 .entry-picker .entry {
-  padding: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+  padding: 1rem; }
   .entry-picker .entry .title {
     display: block;
     font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; }
+  .entry-picker .entry .body {
+    margin-bottom: 0; }
+    .entry-picker .entry .body h2 {
+      font-size: 120%;
+      font-weight: bold;
+      line-height: 1;
+      margin-bottom: 0; }
   .entry-picker .entry .date {
     padding-right: .5rem; }
 
