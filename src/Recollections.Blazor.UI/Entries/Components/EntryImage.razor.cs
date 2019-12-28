@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +13,7 @@ namespace Neptuo.Recollections.Entries.Components
     {
         private string previousUrl;
 
-        protected string Url { get; private set; } = "/img/thumbnail-placeholder.png";
+        protected string Url { get; private set; }
 
         [Inject]
         protected Navigator Navigator { get; set; }
@@ -52,12 +53,19 @@ namespace Neptuo.Recollections.Entries.Components
         {
             await base.OnParametersSetAsync();
 
-            if (previousUrl != Image.Thumbnail)
+            if (Image != null)
             {
-                previousUrl = Image.Thumbnail;
+                if (previousUrl != Image.Thumbnail)
+                {
+                    previousUrl = Image.Thumbnail;
 
-                byte[] content = await Api.GetImageDataAsync(Image.Thumbnail);
-                Url = "data:image/png;base64," + Convert.ToBase64String(content);
+                    byte[] content = await Api.GetImageDataAsync(Image.Thumbnail);
+                    Url = "data:image/png;base64," + Convert.ToBase64String(content);
+                }
+            }
+            else
+            {
+                Url = "/img/thumbnail-placeholder.png";
             }
         }
     }
