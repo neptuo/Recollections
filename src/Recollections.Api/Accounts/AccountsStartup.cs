@@ -93,9 +93,10 @@ namespace Neptuo.Recollections.Accounts
             }
         }
 
-        public void ConfigureAuthentication(IApplicationBuilder app, IHostingEnvironment env)
+        public void ConfigureAuthentication(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseAuthentication();
+            app.UseAuthorization();
         }
     }
 }

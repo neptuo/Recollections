@@ -4,10 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Neptuo;
+using Microsoft.Extensions.Hosting;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries;
 
@@ -17,11 +16,11 @@ namespace Neptuo.Recollections
 
     public class Startup
     {
-        private readonly IHostingEnvironment environment;
+        private readonly IWebHostEnvironment environment;
         private readonly AccountsStartup accountsStartup;
         private readonly EntriesStartup entriesStartup;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Ensure.NotNull(environment, "environment");
             this.environment = environment;
@@ -35,23 +34,34 @@ namespace Neptuo.Recollections
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<PathResolver>(ResolvePath);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services
+                .AddRouting(options => options.LowercaseUrls = true)
+                .AddControllers()
+                .AddNewtonsoftJson();
+
             accountsStartup.ConfigureServices(services);
             entriesStartup.ConfigureServices(services);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (environment.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
                 app.UseStatusCodePages();
 
+            app.UseRouting();
+
             UseCors(app);
 
-            accountsStartup.ConfigureAuthentication(app, env);
+            accountsStartup.ConfigureAuthentication(app, environment);
 
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/health");
+                endpoints.MapControllers();
+            });
         }
 
         private static void UseCors(IApplicationBuilder app)
@@ -68,8 +78,6 @@ namespace Neptuo.Recollections
                 p.AllowAnyHeader();
                 p.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
             });
-
-            app.UseHealthChecks("/health");
         }
     }
 }
