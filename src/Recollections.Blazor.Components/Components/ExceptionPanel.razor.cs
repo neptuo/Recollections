@@ -50,6 +50,10 @@ namespace Neptuo.Recollections.Components
                 Title = "Unspecified weird error";
                 Message = "We didn't get any details about the problem that occurred. So we can't show you. Apologies for inconvenience.";
             }
+            else if (exception.Message == "TypeError: Failed to fetch")
+            {
+                SetNetworkErrorMessage();
+            }
             else if (exception is HttpRequestException httpException)
             {
                 if (IsHttpResponseStatusCode(httpException, 503))
@@ -59,8 +63,7 @@ namespace Neptuo.Recollections.Components
                 }
                 else
                 {
-                    Title = "Network Error";
-                    Message = "There was an error during communication with the server. Please reload the page and try again.";
+                    SetNetworkErrorMessage();
                 }
             }
             else
@@ -70,6 +73,12 @@ namespace Neptuo.Recollections.Components
             }
 
             StateHasChanged();
+        }
+
+        private void SetNetworkErrorMessage()
+        {
+            Title = "Network Error";
+            Message = "There was an error during communication with the server. Please reload the page and try again.";
         }
 
         private static bool IsHttpResponseStatusCode(HttpRequestException exception, int statusCode)
