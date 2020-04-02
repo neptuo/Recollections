@@ -1,8 +1,14 @@
 ﻿@charset "UTF-8";
 body {
-  min-width: 400px; }
+  position: relative;
+  min-width: 400px;
+  min-height: 100vh;
+  padding-bottom: 56px; }
 
-footer {
+footer.navbar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 0.5rem; }
 
