@@ -27,6 +27,7 @@ namespace Neptuo.Recollections.Entries
             {
                 e.ToTable("EntriesLocations");
                 e.Property("EntryId");
+                e.Property("Order").ValueGeneratedNever(); // Based on https://github.com/dotnet/efcore/issues/11162.
                 e.HasKey("EntryId", nameof(OrderedLocation.Order));
             });
         }
