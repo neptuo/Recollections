@@ -4,29 +4,24 @@
     <RootNamespace>Neptuo.Recollections</RootNamespace>
 
     <TargetFramework>netstandard2.1</TargetFramework>
-    <LangVersion>7.3</LangVersion>
     <RazorLangVersion>3.0</RazorLangVersion>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.2.0-preview1.20073.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0-preview3.20168.3" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
     <PackageReference Include="Neptuo.Exceptions" Version="1.2.1" />
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Recollections.Api.Shared\Recollections.Api.Shared.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Watch Remove="Components\_Imports.razor" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Recollections.Api.Shared\Recollections.Api.Shared.csproj" />
   </ItemGroup>
   
 </Project>

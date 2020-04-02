@@ -22,14 +22,14 @@ namespace Neptuo.Recollections.Components
         public ValueTask InitializeAsync(Map editor)
         {
             this.editor = editor;
-            return jsRuntime.InvokeVoidAsync("Map.Initialize", editor.Container, DotNetObjectReference.Create(this), editor.Markers, editor.IsZoomed, editor.IsResizable);
+            return jsRuntime.InvokeVoidAsync("MapInterop.Initialize", editor.Container, DotNetObjectReference.Create(this), editor.Markers, editor.IsZoomed, editor.IsResizable);
         }
 
-        [JSInvokable("Map.MarkerMoved")]
+        [JSInvokable("MapInterop.MarkerMoved")]
         public void MarkerMoved(int? index, double latitude, double longitude, double? altitude)
             => editor.MoveMarker(index, latitude, longitude, altitude);
 
-        [JSInvokable("Map.MarkerSelected")]
+        [JSInvokable("MapInterop.MarkerSelected")]
         public void MarkerSelected(int index) => editor.MarkerSelected?.Invoke(index);
 
         private TaskCompletionSource<IEnumerable<MapSearchModel>> searchCompletion;
@@ -37,12 +37,12 @@ namespace Neptuo.Recollections.Components
         public Task<IEnumerable<MapSearchModel>> SearchAsync(string searchQuery)
         {
             searchCompletion = new TaskCompletionSource<IEnumerable<MapSearchModel>>();
-            _ = jsRuntime.InvokeVoidAsync("Map.Search", editor.Container, searchQuery);
+            _ = jsRuntime.InvokeVoidAsync("MapInterop.Search", editor.Container, searchQuery);
 
             return searchCompletion.Task;
         }
 
-        [JSInvokable("Map.SearchCompleted")]
+        [JSInvokable("MapInterop.SearchCompleted")]
         public void SearchCompleted(IEnumerable<MapSearchModel> results)
         {
             searchCompletion.TrySetResult(results);
@@ -50,6 +50,6 @@ namespace Neptuo.Recollections.Components
         }
 
         public ValueTask CenterAtAsync(double latitude, double longitude)
-            => jsRuntime.InvokeVoidAsync("Map.CenterAt", editor.Container, latitude, longitude);
+            => jsRuntime.InvokeVoidAsync("MapInterop.CenterAt", editor.Container, latitude, longitude);
     }
 }

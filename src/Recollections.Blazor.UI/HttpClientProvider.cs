@@ -35,7 +35,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
         {
             Ensure.NotNull(services, "services");
-            return services.AddSingleton<IFactory<HttpClient>, HttpClientProvider>();
+            return services
+                .AddBaseAddressHttpClient()
+                .AddSingleton<IFactory<HttpClient>, HttpClientProvider>();
         }
     }
 }

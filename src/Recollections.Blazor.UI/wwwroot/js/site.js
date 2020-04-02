@@ -338,7 +338,7 @@ window.Downloader = {
     }
 };
 
-window.Map = {
+window.MapInterop = {
     Initialize: function (container, interop, markers, isZoomed, isResizable) {
         var model = null;
 
@@ -366,11 +366,11 @@ window.Map = {
             };
             $container.data('map', model);
 
-            Map._BindEvents(model);
+            MapInterop._BindEvents(model);
         }
 
         model = $container.data('map');
-        var points = Map._SetMarkers(model, markers);
+        var points = MapInterop._SetMarkers(model, markers);
 
         model.isAdding = false;
         model.isEmptyPoint = points.length == 0 && !model.isAdditive;
@@ -383,7 +383,7 @@ window.Map = {
             model.map.setCursor("move");
             if (!isZoomed) {
                 var centerZoom = model.map.computeCenterZoom(points);
-                centerZoom[1] = Map._EnsureMaxCenterZoom(centerZoom[1]);
+                centerZoom[1] = MapInterop._EnsureMaxCenterZoom(centerZoom[1]);
                 model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
             }
         }
@@ -424,7 +424,7 @@ window.Map = {
 
         function markerClick(e) {
             var id = Number.parseInt(e.target.getId());
-            model.interop.invokeMethodAsync("Map.MarkerSelected", id);
+            model.interop.invokeMethodAsync("MapInterop.MarkerSelected", id);
         }
 
         function moveMarkerOnCoords(id, coords) {
@@ -432,7 +432,7 @@ window.Map = {
             var longitude = coords.x;
 
             coords.getAltitude().then(function (altitude) {
-                model.interop.invokeMethodAsync("Map.MarkerMoved", id, latitude, longitude, altitude);
+                model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude, altitude);
             });
         }
 
@@ -496,7 +496,7 @@ window.Map = {
                 });
             }
 
-            model.interop.invokeMethodAsync("Map.SearchCompleted", data);
+            model.interop.invokeMethodAsync("MapInterop.SearchCompleted", data);
         });
     },
     CenterAt: function (container, latitude, longitude) {
