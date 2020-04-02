@@ -44,6 +44,12 @@ namespace Neptuo.Recollections
         public ValueTask<bool> MessageAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.alert", message);
 
+        public string UrlLogin()
+            => "/login";
+
+        public void OpenLogin()
+            => uri.NavigateTo(UrlLogin());
+
         public string UrlRegister()
             => "/register";
 

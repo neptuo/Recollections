@@ -19,7 +19,7 @@ namespace Neptuo.Recollections.Accounts.Components
         protected Api Api { get; set; }
 
         [Inject]
-        protected NavigationManager Uri { get; set; }
+        protected Navigator Navigator { get; set; }
 
         [Inject]
         protected Interop Interop { get; set; }
@@ -100,7 +100,7 @@ namespace Neptuo.Recollections.Accounts.Components
             return true;
         }
 
-        private void NavigateToLogin() => Uri.NavigateTo("/login");
+        private void NavigateToLogin() => Navigator.OpenLogin();
 
         public async Task<bool> LoginAsync(string username, string password, bool isPersistent = false)
         {
@@ -110,7 +110,7 @@ namespace Neptuo.Recollections.Accounts.Components
                 SetAuthorization(response.BearerToken, isPersistent);
                 await LoadUserInfoAsync();
 
-                Uri.NavigateTo("/");
+                Navigator.OpenTimeline();
 
                 return true;
             }
@@ -121,7 +121,7 @@ namespace Neptuo.Recollections.Accounts.Components
         public Task LogoutAsync()
         {
             ClearAuthorization();
-            Uri.NavigateTo("/login");
+            Navigator.OpenLogin();
             return Task.FromResult(true);
         }
 
