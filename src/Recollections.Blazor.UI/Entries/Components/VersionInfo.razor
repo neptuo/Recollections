@@ -1,7 +1,18 @@
-﻿<span class="version">
-    api-@ApiVersion
-</span>
-- 
-<span class="version">
-    blazor-@ClientVersion
-</span>
+﻿@if (ClientVersion != null)
+{
+    <span class="version">
+        Client-@ClientVersion
+    </span>
+}
+
+@if (ClientVersion != null && ApiVersion != null)
+{
+    @: &#8226;
+}
+
+@if (ApiVersion != null)
+{
+    <span class="version">
+        Api-@ApiVersion
+    </span>
+}
