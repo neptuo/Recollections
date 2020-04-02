@@ -93,6 +93,10 @@ namespace Neptuo.Recollections.Entries.Controllers
 
         private async Task<IActionResult> GetFileContent(string entryId, string imageId, ImageType type)
         {
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
             Entry entry = await dataContext.Entries.FindAsync(entryId);
             if (entry == null)
                 return NotFound();
