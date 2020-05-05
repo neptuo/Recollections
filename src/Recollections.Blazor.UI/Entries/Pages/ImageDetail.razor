@@ -17,9 +17,7 @@
         <div class="text">
             <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
         </div>
-        <div class="image">
-            <img src="@Api.ResolveUrl(Model.Preview)" class="rounded" />
-        </div>
+        <EntryImage EntryId="@EntryId" Image="@Model" ImageType="@ImageType.Preview" />
 
         <ActionPanel>
 

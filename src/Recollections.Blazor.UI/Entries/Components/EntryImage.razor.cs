@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Neptuo;
+using Neptuo.Recollections.Entries.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +26,13 @@ namespace Neptuo.Recollections.Entries.Components
         public EntryModel Entry { get; set; }
 
         [Parameter]
+        public string EntryId { get; set; }
+
+        [Parameter]
         public ImageModel Image { get; set; }
+
+        [Parameter]
+        public ImageType ImageType { get; set; } = ImageType.Thumbnail;
 
         [Parameter]
         public string PlaceHolder { get; set; }
@@ -36,10 +42,13 @@ namespace Neptuo.Recollections.Entries.Components
 
         protected string GetLinkUrl()
         {
-            if (Entry == null || Image == null)
+            if (Entry != null)
+                EntryId = Entry.Id;
+
+            if (EntryId == null || Image == null)
                 return null;
 
-            return Navigator.UrlImageDetail(Entry.Id, Image.Id);
+            return Navigator.UrlImageDetail(EntryId, Image.Id);
         }
 
         protected override void OnInitialized()
@@ -55,17 +64,33 @@ namespace Neptuo.Recollections.Entries.Components
 
             if (Image != null)
             {
-                if (previousUrl != Image.Thumbnail)
+                string imageUrl = GetImageUrl();
+                if (previousUrl != imageUrl)
                 {
-                    previousUrl = Image.Thumbnail;
+                    previousUrl = imageUrl;
 
-                    byte[] content = await Api.GetImageDataAsync(Image.Thumbnail);
+                    byte[] content = await Api.GetImageDataAsync(imageUrl);
                     Url = "data:image/png;base64," + Convert.ToBase64String(content);
                 }
             }
             else
             {
                 Url = "/img/thumbnail-placeholder.png";
+            }
+        }
+
+        private string GetImageUrl()
+        {
+            switch (ImageType)
+            {
+                case ImageType.Original:
+                    return Image.Original;
+                case ImageType.Preview:
+                    return Image.Preview;
+                case ImageType.Thumbnail:
+                    return Image.Thumbnail;
+                default:
+                    throw Ensure.Exception.NotSupported(ImageType);
             }
         }
     }
