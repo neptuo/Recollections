@@ -18,7 +18,7 @@
         }
     },
     Popover: {
-        Show: function(container, title, body) {
+        Show: function (container, title, body) {
             $(container).popover({
                 content: body,
                 title: title,
@@ -334,7 +334,9 @@ window.Downloader = {
         link.target = "_blank";
         link.download = name;
         link.href = url;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     }
 };
 

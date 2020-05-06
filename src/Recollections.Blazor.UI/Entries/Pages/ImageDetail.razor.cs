@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using System;
@@ -23,6 +24,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected Downloader Downloader { get; set; }
+
+        [Inject]
+        protected ILog<ImageDetail> Log { get; set; }
 
         [Parameter]
         public string EntryId { get; set; }
@@ -117,7 +121,14 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadAsync();
         }
 
-        protected async Task DownloadOriginalAsync() => await Downloader.FromUrlAsync(Model.Name, Api.ResolveUrl(Model.Original));
+        protected async Task DownloadOriginalAsync()
+        {
+            byte[] content = await Api.GetImageDataAsync(Model.Original);
+            string url = "data:image/png;base64," + Convert.ToBase64String(content);
+            Log.Debug($"Original downloaded, size '{content.Length}', URL length '{url.Length}'.");
+            await Downloader.FromUrlAsync(Model.Name, url);
+            Log.Debug($"JS interop completed.");
+        }
 
         protected string GetMapDescription(bool isVisible)
         {
