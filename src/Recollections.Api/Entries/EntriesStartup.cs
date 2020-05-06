@@ -29,7 +29,7 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageService>()
                 .AddTransient<ImageResizeService>()
                 .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"))
-                .AddDbContext<DataContext>(options => options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString"))))
+                .AddDbContext<DataContext>(options => options.UseDbServer(configuration, pathResolver))
                 .Configure<StorageOptions>(configuration.GetSection("Storage"));
 
             services
