@@ -15,13 +15,16 @@ namespace Neptuo.Recollections.Entries.Controllers
     public class MigrationController : Controller
     {
         private readonly ImageService service;
+        private readonly SystemIoFileStorage fileStorage;
         private readonly DataContext dbContext;
 
-        public MigrationController(ImageService service, DataContext dbContext)
+        internal MigrationController(ImageService service, SystemIoFileStorage fileStorage, DataContext dbContext)
         {
             Ensure.NotNull(service, "service");
+            Ensure.NotNull(fileStorage, "fileStorage");
             Ensure.NotNull(dbContext, "dbContext");
             this.service = service;
+            this.fileStorage = fileStorage;
             this.dbContext = dbContext;
         }
 
@@ -37,12 +40,11 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             foreach (var image in images)
             {
-                ImagePath path = service.GetPath(image.Entry, image);
+                ImagePath path = fileStorage.GetPath(image.Entry, image);
 
                 if (DeleteFileIfDifferentExtension(path.Preview, ".png") | DeleteFileIfDifferentExtension(path.Thumbnail, ".png"))
                     await service.ComputeOtherSizesAsync(image.Entry, image);
             }
-
 
             return Ok();
         }

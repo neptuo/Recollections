@@ -24,6 +24,18 @@ namespace Neptuo.Recollections.Entries.Services
             }
         }
 
+        public ImagePropertyReader(Stream imageContent)
+        {
+            try
+            {
+                reader = new ExifReader(imageContent);
+            }
+            catch (ExifLibException)
+            {
+                reader = null;
+            }
+        }
+
         public Orientation? FindOrientation()
         {
             ushort? value = Find<ushort>(ExifTags.Orientation);

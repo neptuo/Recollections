@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Neptuo;
 using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
@@ -12,7 +10,6 @@ using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
-using IoFile = System.IO.File;
 
 namespace Neptuo.Recollections.Entries.Controllers
 {
@@ -22,13 +19,16 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly ImageService service;
         private readonly DataContext dataContext;
+        private readonly IFileStorage fileProvider;
 
-        public ImageController(ImageService service, DataContext dataContext)
+        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider)
         {
             Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(fileProvider, "fileProvider");
             this.service = service;
             this.dataContext = dataContext;
+            this.fileProvider = fileProvider;
         }
 
         private async Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
@@ -108,22 +108,22 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.Entry.Id != entryId)
                 return BadRequest();
 
-            ImagePath path = new ImagePath(service, entry, entity);
-            string filePath = path.Get(type);
-            if (!IoFile.Exists(filePath))
+            Stream content = await fileProvider.FindAsync(entry, entity, type);
+            if (content == null)
                 return NotFound();
 
+            string imageName = entity.Name + Path.GetExtension(entity.FileName);
             if (type == ImageType.Original)
             {
                 ContentDisposition header = new ContentDisposition
                 {
-                    FileName = entity.Name + Path.GetExtension(path.Original),
+                    FileName = imageName,
                     Inline = false
                 };
                 Response.Headers.Add("Content-Disposition", header.ToString());
             }
 
-            return File(new FileStream(filePath, FileMode.Open), GetFileContentType(filePath));
+            return File(content, GetFileContentType(imageName));
         }
 
         private static string GetFileContentType(string filePath)

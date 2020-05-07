@@ -26,6 +26,7 @@ namespace Neptuo.Recollections.Entries
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .AddTransient<IFileStorage, SystemIoFileStorage>()
                 .AddTransient<ImageService>()
                 .AddTransient<ImageResizeService>()
                 .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"))

@@ -1,5 +1,4 @@
-﻿using Neptuo;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,24 +7,24 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Services
 {
-    public class ImagePath
+    internal class ImagePath
     {
         public string Original { get; }
         public string Preview { get; }
         public string Thumbnail { get; }
 
-        public ImagePath(ImageService service, Entry entry, Image image)
+        public ImagePath(SystemIoFileStorage storage, ImageResizeService service, Entry entry, Image image)
         {
             Ensure.NotNull(service, "service");
             Ensure.NotNull(entry, "entry");
             Ensure.NotNull(image, "image");
 
-            string storagePath = service.GetStoragePath(entry);
+            string storagePath = storage.GetStoragePath(entry);
             string baseName = Path.GetFileNameWithoutExtension(image.FileName);
 
             Original = Path.Combine(storagePath, image.FileName);
-            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", service.GetThumbnailFileExtension()));
-            Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", service.GetPreviewFileExtension()));
+            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", service.ImageExtension));
+            Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", service.ImageExtension));
         }
 
         public string Get(ImageType type)

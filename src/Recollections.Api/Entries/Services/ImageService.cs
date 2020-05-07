@@ -1,14 +1,14 @@
-﻿using ExifLib;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Neptuo;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Path = System.IO.Path;
+using Stream = System.IO.Stream;
 
 namespace Neptuo.Recollections.Entries.Services
 {
@@ -16,35 +16,24 @@ namespace Neptuo.Recollections.Entries.Services
     {
         private readonly DataContext dataContext;
         private readonly StorageOptions configuration;
-        private readonly PathResolver pathResolver;
+        private readonly IFileStorage fileStorage;
         private readonly ImageResizeService resizeService;
 
-        public ImageService(DataContext dataContext, PathResolver pathResolver, IOptions<StorageOptions> configuration, ImageResizeService resizeService)
+        public ImageService(DataContext dataContext, IFileStorage fileStorage, IOptions<StorageOptions> configuration, ImageResizeService resizeService)
         {
             Ensure.NotNull(dataContext, "dataContext");
-            Ensure.NotNull(pathResolver, "pathResolver");
+            Ensure.NotNull(fileStorage, "fileStorage");
             Ensure.NotNull(configuration, "configuration");
             Ensure.NotNull(resizeService, "resizeService");
             this.dataContext = dataContext;
-            this.pathResolver = pathResolver;
+            this.fileStorage = fileStorage;
             this.configuration = configuration.Value;
             this.resizeService = resizeService;
         }
 
-        public string GetStoragePath(Entry entry)
-        {
-            string storagePath = pathResolver(configuration.GetPath(entry.UserId, entry.Id));
-            Directory.CreateDirectory(storagePath);
-            return storagePath;
-        }
-
-        public string GetThumbnailFileExtension() => resizeService.ImageExtension;
-        public string GetPreviewFileExtension() => resizeService.ImageExtension;
-
         public async Task<Image> CreateAsync(Entry entry, IFormFile file)
         {
             string imageId = Guid.NewGuid().ToString();
-            string fileName = imageId + Path.GetExtension(file.FileName);
 
             Validate(file);
 
@@ -52,7 +41,7 @@ namespace Neptuo.Recollections.Entries.Services
             {
                 Id = imageId,
                 Name = Path.GetFileNameWithoutExtension(file.FileName),
-                FileName = fileName,
+                FileName = imageId + Path.GetExtension(file.FileName),
                 Created = DateTime.Now,
                 When = entry.When,
                 Entry = entry
@@ -60,11 +49,10 @@ namespace Neptuo.Recollections.Entries.Services
 
             await dataContext.Images.AddAsync(entity);
 
-            string storagePath = GetStoragePath(entry);
-            string path = Path.Combine(storagePath, fileName);
-
-            await CopyFileAsync(file, path);
-            SetProperties(entity, path);
+            await CopyFileAsync(file, entry, entity);
+            
+            using (Stream imageContnet = file.OpenReadStream())
+                SetProperties(entity, imageContnet);
 
             await dataContext.SaveChangesAsync();
 
@@ -87,9 +75,9 @@ namespace Neptuo.Recollections.Entries.Services
                 throw new ImageNotSupportedExtensionException();
         }
 
-        private void SetProperties(Image entity, string path, bool isWhenIncluded = true)
+        private void SetProperties(Image entity, Stream imageContent, bool isWhenIncluded = true)
         {
-            using (ImagePropertyReader propertyReader = new ImagePropertyReader(path))
+            using (ImagePropertyReader propertyReader = new ImagePropertyReader(imageContent))
             {
                 entity.Location.Longitude = propertyReader.FindLongitude();
                 entity.Location.Latitude = propertyReader.FindLatitude();
@@ -104,14 +92,30 @@ namespace Neptuo.Recollections.Entries.Services
             }
         }
 
-        public Task ComputeOtherSizesAsync(Entry entry, Image image)
+        public async Task ComputeOtherSizesAsync(Entry entry, Image image)
         {
-            var path = new ImagePath(this, entry, image);
+            var originalContent = await fileStorage.FindAsync(entry, image, ImageType.Original);
+            if (originalContent == null)
+                return;
 
-            resizeService.Thumbnail(path.Original, path.Thumbnail, 200, 150);
-            resizeService.Resize(path.Original, path.Preview, 1024);
+            using (var thumbnailContent = new MemoryStream())
+            {
+                resizeService.Thumbnail(originalContent, thumbnailContent, 200, 150);
+                thumbnailContent.Position = 0;
+                await fileStorage.SaveAsync(entry, image, thumbnailContent, ImageType.Thumbnail);
+            }
 
-            return Task.CompletedTask;
+            if (originalContent.CanSeek)
+                originalContent.Position = 0;
+            else
+                originalContent = await fileStorage.FindAsync(entry, image, ImageType.Original);
+
+            using (var previewContent = new MemoryStream())
+            {
+                resizeService.Resize(originalContent, previewContent, 1024);
+                previewContent.Position = 0;
+                await fileStorage.SaveAsync(entry, image, previewContent, ImageType.Preview);
+            }
         }
 
         public async Task DeleteAllAsync(Entry entry)
@@ -123,30 +127,26 @@ namespace Neptuo.Recollections.Entries.Services
 
         public async Task DeleteAsync(Entry entry, Image entity)
         {
-            ImagePath path = GetPath(entry, entity);
-
             dataContext.Images.Remove(entity);
             await dataContext.SaveChangesAsync();
-
-            File.Delete(path.Original);
-            File.Delete(path.Preview);
-            File.Delete(path.Thumbnail);
+            await fileStorage.DeleteAsync(entry, entity, ImageType.Original);
+            await fileStorage.DeleteAsync(entry, entity, ImageType.Preview);
+            await fileStorage.DeleteAsync(entry, entity, ImageType.Thumbnail);
         }
 
-        public ImagePath GetPath(Entry entry, Image entity) 
-            => new ImagePath(this, entry, entity);
-
-        private static async Task CopyFileAsync(IFormFile file, string path)
+        private async Task CopyFileAsync(IFormFile file, Entry entry, Image image)
         {
-            using (FileStream target = File.Create(path))
             using (Stream source = file.OpenReadStream())
-                await source.CopyToAsync(target);
+                await fileStorage.SaveAsync(entry, image, source, ImageType.Original);
         }
 
         public async Task SetLocationFromOriginalAsync(Entry entry, Image image)
         {
-            var path = new ImagePath(this, entry, image);
-            SetProperties(image, path.Original, isWhenIncluded: false);
+            var imageContent = await fileStorage.FindAsync(entry, image, ImageType.Original);
+            if (imageContent == null)
+                return;
+
+            SetProperties(image, imageContent, isWhenIncluded: false);
 
             await dataContext.SaveChangesAsync();
         }
