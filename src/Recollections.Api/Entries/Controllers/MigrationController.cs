@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Neptuo;
-using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
     public partial class ImagePropertyReader : DisposableBase
     {

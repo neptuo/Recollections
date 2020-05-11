@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DrImage = System.Drawing.Image;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
     public class ImageResizeService
     {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -31,7 +30,8 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageResizeService>()
                 .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"))
                 .AddDbContext<DataContext>(options => options.UseDbServer(configuration, pathResolver))
-                .Configure<StorageOptions>(configuration.GetSection("Storage"));
+                .Configure<StorageOptions>(configuration.GetSection("Storage"))
+                .Configure<SystemIoStorageOptions>(configuration.GetSection("Storage"));
 
             services
                 .AddHealthChecks()

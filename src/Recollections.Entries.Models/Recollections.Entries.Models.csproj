@@ -2,15 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <RootNamespace>Neptuo.Recollections</RootNamespace>
+    <RootNamespace>Neptuo.Recollections.Entries</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Neptuo" Version="6.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Recollections.Entries.Models\Recollections.Entries.Models.csproj" />
   </ItemGroup>
 
 </Project>

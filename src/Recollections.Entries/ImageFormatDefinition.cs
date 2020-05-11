@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
     public class ImageFormatDefinition
     {

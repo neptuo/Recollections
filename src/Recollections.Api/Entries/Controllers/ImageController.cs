@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Neptuo.Recollections.Entries.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -140,7 +139,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             try
             {
-                Image entity = await service.CreateAsync(entry, file);
+                Image entity = await service.CreateAsync(entry, new FormFileInput(file));
 
                 ImageModel model = new ImageModel();
                 service.MapEntityToModel(entity, model);

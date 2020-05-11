@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 using Path = System.IO.Path;
 using Stream = System.IO.Stream;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
     public class ImageService
     {
@@ -31,7 +30,7 @@ namespace Neptuo.Recollections.Entries.Services
             this.resizeService = resizeService;
         }
 
-        public async Task<Image> CreateAsync(Entry entry, IFormFile file)
+        public async Task<Image> CreateAsync(Entry entry, IFileInput file)
         {
             string imageId = Guid.NewGuid().ToString();
 
@@ -61,7 +60,7 @@ namespace Neptuo.Recollections.Entries.Services
             return entity;
         }
 
-        private void Validate(IFormFile file)
+        private void Validate(IFileInput file)
         {
             if (file.Length > configuration.MaxLength)
                 throw new ImageMaxLengthExceededException();
@@ -134,7 +133,7 @@ namespace Neptuo.Recollections.Entries.Services
             await fileStorage.DeleteAsync(entry, entity, ImageType.Thumbnail);
         }
 
-        private async Task CopyFileAsync(IFormFile file, Entry entry, Image image)
+        private async Task CopyFileAsync(IFileInput file, Entry entry, Image image)
         {
             using (Stream source = file.OpenReadStream())
                 await fileStorage.SaveAsync(entry, image, source, ImageType.Original);

@@ -12,8 +12,6 @@ using Neptuo.Recollections.Entries;
 
 namespace Neptuo.Recollections
 {
-    public delegate string PathResolver(string relativePath);
-
     public class Startup
     {
         private readonly IWebHostEnvironment environment;

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
-    internal class ImagePath
+    public class ImagePath
     {
         public string Original { get; }
         public string Preview { get; }

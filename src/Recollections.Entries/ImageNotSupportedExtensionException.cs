@@ -6,12 +6,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
     [Serializable]
-    public class ImageMaxLengthExceededException : ImageUploadValidationException
+    public class ImageNotSupportedExtensionException : ImageUploadValidationException
     {
-        public ImageMaxLengthExceededException()
+        public ImageNotSupportedExtensionException()
         { }
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace Neptuo.Recollections.Entries.Services
         /// </summary>
         /// <param name="info">A serialization info.</param>
         /// <param name="context">A streaming context.</param>
-        protected ImageMaxLengthExceededException(SerializationInfo info, StreamingContext context)
+        protected ImageNotSupportedExtensionException(SerializationInfo info, StreamingContext context)
             : base(info, context) 
         { }
     }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Neptuo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,22 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Services
+namespace Neptuo.Recollections.Entries
 {
-    public interface IFileStorage
+    public class SystemIoFileStorage : IFileStorage
     {
-        Task<Stream> FindAsync(Entry entry, Image image, ImageType type);
-        Task SaveAsync(Entry entry, Image image, Stream content, ImageType type);
-        Task DeleteAsync(Entry entry, Image image, ImageType type);
-    }
-
-    internal class SystemIoFileStorage : IFileStorage
-    {
-        private readonly StorageOptions configuration;
+        private readonly SystemIoStorageOptions configuration;
         private readonly PathResolver pathResolver;
         private readonly ImageResizeService resizeService;
 
-        public SystemIoFileStorage(PathResolver pathResolver, IOptions<StorageOptions> configuration, ImageResizeService resizeService)
+        public SystemIoFileStorage(PathResolver pathResolver, IOptions<SystemIoStorageOptions> configuration, ImageResizeService resizeService)
         {
             Ensure.NotNull(pathResolver, "pathResolver");
             Ensure.NotNull(configuration, "configuration");
