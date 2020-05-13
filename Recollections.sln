@@ -15,19 +15,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Entries.Data"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Blazor.Components", "src\Recollections.Blazor.Components\Recollections.Blazor.Components.csproj", "{59EC1693-4D39-420E-A758-41A6C42C6917}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Entries", "src\Recollections.Entries\Recollections.Entries.csproj", "{CDCA7185-D27F-40D2-9193-E890CBF2BFA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Entries", "src\Recollections.Entries\Recollections.Entries.csproj", "{CDCA7185-D27F-40D2-9193-E890CBF2BFA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Entries.Models", "src\Recollections.Entries.Models\Recollections.Entries.Models.csproj", "{B441B9AE-164A-4126-9B8B-41243DB64BA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Entries.Models", "src\Recollections.Entries.Models\Recollections.Entries.Models.csproj", "{B441B9AE-164A-4126-9B8B-41243DB64BA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Entries.SystemIo", "src\Recollections.Entries.SystemIo\Recollections.Entries.SystemIo.csproj", "{CB2BA74C-A628-4AF1-A7D5-3C2A62CEE971}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Entries.SystemIo", "src\Recollections.Entries.SystemIo\Recollections.Entries.SystemIo.csproj", "{CB2BA74C-A628-4AF1-A7D5-3C2A62CEE971}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.SystemIo", "src\Recollections.SystemIo\Recollections.SystemIo.csproj", "{E13A7749-27EE-4A54-86EC-B7F1FB862BB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.SystemIo", "src\Recollections.SystemIo\Recollections.SystemIo.csproj", "{E13A7749-27EE-4A54-86EC-B7F1FB862BB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Entries", "Entries", "{80DF1D6F-0998-4057-B447-CDE56FB04927}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Accounts", "Accounts", "{38B9D47D-3F13-4777-A204-47F9C3A40E2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Baseline", ".Baseline", "{003E432D-6946-4A88-BC1F-2175B154D3D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Entries.Azure", "src\Recollections.Entries.Azure\Recollections.Entries.Azure.csproj", "{4F2663A0-0BDE-4F95-8883-B648D0D370EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{E13A7749-27EE-4A54-86EC-B7F1FB862BB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E13A7749-27EE-4A54-86EC-B7F1FB862BB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E13A7749-27EE-4A54-86EC-B7F1FB862BB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F2663A0-0BDE-4F95-8883-B648D0D370EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F2663A0-0BDE-4F95-8883-B648D0D370EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F2663A0-0BDE-4F95-8883-B648D0D370EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F2663A0-0BDE-4F95-8883-B648D0D370EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{B441B9AE-164A-4126-9B8B-41243DB64BA9} = {80DF1D6F-0998-4057-B447-CDE56FB04927}
 		{CB2BA74C-A628-4AF1-A7D5-3C2A62CEE971} = {80DF1D6F-0998-4057-B447-CDE56FB04927}
 		{E13A7749-27EE-4A54-86EC-B7F1FB862BB3} = {003E432D-6946-4A88-BC1F-2175B154D3D1}
+		{4F2663A0-0BDE-4F95-8883-B648D0D370EB} = {80DF1D6F-0998-4057-B447-CDE56FB04927}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {087891FB-93D9-4D03-AFE6-11BD7F9A44F7}
