@@ -14,6 +14,8 @@ namespace Neptuo.Recollections.Entries
         private readonly PathResolver pathResolver;
         private readonly ImageResizeService resizeService;
 
+        public bool CanStreamSeek => true;
+
         public SystemIoFileStorage(PathResolver pathResolver, IOptions<SystemIoStorageOptions> configuration, ImageResizeService resizeService)
         {
             Ensure.NotNull(pathResolver, "pathResolver");

@@ -14,6 +14,8 @@ namespace Neptuo.Recollections.Entries
     {
         private readonly AzureStorageOptions options;
 
+        public bool CanStreamSeek => false;
+
         public AzureFileStorage(IOptions<AzureStorageOptions> options)
         {
             Ensure.NotNull(options, "options");

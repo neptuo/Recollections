@@ -49,7 +49,7 @@ namespace Neptuo.Recollections.Entries
             await dataContext.Images.AddAsync(entity);
 
             await CopyFileAsync(file, entry, entity);
-            
+
             using (Stream imageContnet = file.OpenReadStream())
                 SetProperties(entity, imageContnet);
 
@@ -97,22 +97,44 @@ namespace Neptuo.Recollections.Entries
             if (originalContent == null)
                 return;
 
-            using (var thumbnailContent = new MemoryStream())
+            bool canSeek = originalContent.CanSeek && fileStorage.CanStreamSeek;
+            if (!canSeek)
             {
-                resizeService.Thumbnail(originalContent, thumbnailContent, 200, 150);
+                var memoryStream = new MemoryStream();
+                await originalContent.CopyToAsync(memoryStream);
+                await originalContent.DisposeAsync();
+
+                originalContent = memoryStream;
+                originalContent.Position = 0;
+                canSeek = true;
+            }
+
+            using (var thumbnailContent = new MemoryStream())
+            using (var originalCopy = new MemoryStream())
+            {
+                await originalContent.CopyToAsync(originalCopy);
+                originalCopy.Position = 0;
+
+                resizeService.Thumbnail(originalCopy, thumbnailContent, 200, 150);
                 thumbnailContent.Position = 0;
+                
                 await fileStorage.SaveAsync(entry, image, thumbnailContent, ImageType.Thumbnail);
             }
 
-            if (originalContent.CanSeek)
+            if (canSeek)
                 originalContent.Position = 0;
             else
                 originalContent = await fileStorage.FindAsync(entry, image, ImageType.Original);
 
             using (var previewContent = new MemoryStream())
+            using (var originalCopy = new MemoryStream())
             {
-                resizeService.Resize(originalContent, previewContent, 1024);
+                await originalContent.CopyToAsync(originalCopy);
+                originalCopy.Position = 0;
+
+                resizeService.Resize(originalCopy, previewContent, 1024);
                 previewContent.Position = 0;
+                
                 await fileStorage.SaveAsync(entry, image, previewContent, ImageType.Preview);
             }
         }

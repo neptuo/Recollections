@@ -9,6 +9,8 @@ namespace Neptuo.Recollections.Entries
 {
     public interface IFileStorage
     {
+        bool CanStreamSeek { get; }
+
         Task<Stream> FindAsync(Entry entry, Image image, ImageType type);
         Task SaveAsync(Entry entry, Image image, Stream content, ImageType type);
         Task DeleteAsync(Entry entry, Image image, ImageType type);
