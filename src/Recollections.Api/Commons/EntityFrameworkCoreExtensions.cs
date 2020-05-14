@@ -13,7 +13,7 @@ namespace Microsoft.EntityFrameworkCore
     {
         public static void UseDbServer(this DbContextOptionsBuilder options, IConfiguration configuration, PathResolver pathResolver)
         {
-            if (configuration.GetValue("DbServer", DbServer.Sqlite) == DbServer.SqlServer)
+            if (configuration.GetValue("Server", DbServer.Sqlite) == DbServer.SqlServer)
                 options.UseSqlServer(pathResolver(configuration.GetValue<string>("ConnectionString")));
             else
                 options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString")));

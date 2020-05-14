@@ -25,19 +25,42 @@ namespace Neptuo.Recollections.Entries
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddTransient<IFileStorage, SystemIoFileStorage>()
                 .AddTransient<ImageService>()
                 .AddTransient<ImageResizeService>()
-                .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"))
-                .AddDbContext<DataContext>(options => options.UseDbServer(configuration, pathResolver))
-                .Configure<StorageOptions>(configuration.GetSection("Storage"))
-                .Configure<SystemIoStorageOptions>(configuration.GetSection("Storage"));
+                .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"));
+
+            ConfigureDatabase(services);
+            ConfigureStorage(services);
 
             services
                 .AddHealthChecks()
                 .AddDbContextCheck<DataContext>("Entries.DataContext");
 
             EnsureDatabase(services);
+        }
+
+        private void ConfigureDatabase(IServiceCollection services)
+        {
+            services.AddDbContext<DataContext>(options => options.UseDbServer(configuration.GetSection("Database"), pathResolver));
+        }
+
+        private void ConfigureStorage(IServiceCollection services)
+        {
+            services.Configure<StorageOptions>(configuration.GetSection("Storage"));
+
+            var fileSystem = configuration.GetSection("Storage").GetSection("FileSystem");
+            if (fileSystem.GetValue("Server", StorageFileSystem.Local) == StorageFileSystem.Azure)
+            {
+                services
+                    .AddTransient<IFileStorage, AzureFileStorage>()
+                    .Configure<AzureStorageOptions>(fileSystem);
+            }
+            else
+            {
+                services
+                    .AddTransient<IFileStorage, SystemIoFileStorage>()
+                    .Configure<SystemIoStorageOptions>(fileSystem);
+            }
         }
 
         private static void EnsureDatabase(IServiceCollection services)
