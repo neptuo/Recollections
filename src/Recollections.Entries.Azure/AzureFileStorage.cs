@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.File;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,61 +12,91 @@ namespace Neptuo.Recollections.Entries
 {
     public class AzureFileStorage : IFileStorage
     {
-        void Test()
+        private readonly AzureStorageOptions options;
+
+        public AzureFileStorage(IOptions<AzureStorageOptions> options)
         {
-            // Parse the connection string for the storage account.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse("$CONNECTIONSTRING$");
+            Ensure.NotNull(options, "options");
+            this.options = options.Value;
+        }
 
-            // Create a CloudFileClient object for credentialed access to Azure Files.
+        private CloudFileDirectory GetRootDirectory()
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(options.ConnectionString);
+
             CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
-
-            // Get a reference to the file share we created previously.
             CloudFileShare share = fileClient.GetShareReference("entries");
 
-            // Ensure that the share exists.
-            if (share.Exists())
+            if (!share.Exists())
+                throw Ensure.Exception.InvalidOperation("Missing file share.");
+
+            CloudFileDirectory rootDir = share.GetRootDirectoryReference();
+            return rootDir;
+        }
+
+        private async Task<CloudFileDirectory> GetDirectoryAsync(Entry entry)
+        {
+            CloudFileDirectory rootDirectory = GetRootDirectory();
+
+            CloudFileDirectory userDirectory = rootDirectory.GetDirectoryReference(entry.UserId);
+            await userDirectory.CreateIfNotExistsAsync();
+
+            CloudFileDirectory entryDirectory = userDirectory.GetDirectoryReference(entry.Id);
+            await entryDirectory.CreateIfNotExistsAsync();
+
+            return entryDirectory;
+        }
+
+        private string GetImageFileName(Image image, ImageType type)
+        {
+            string AddSuffix(string name, string suffix)
+                => Path.GetFileNameWithoutExtension(name) + suffix + Path.GetExtension(name);
+
+            switch (type)
             {
-                // Get a reference to the root directory for the share.
-                CloudFileDirectory rootDir = share.GetRootDirectoryReference();
-
-                // Get a reference to the directory we created previously.
-                CloudFileDirectory sampleDir = rootDir.GetDirectoryReference("CustomLogs");
-
-                // Ensure that the directory exists.
-                if (sampleDir.Exists())
-                {
-                    // Get a reference to the file we created previously.
-                    CloudFile sourceFile = sampleDir.GetFileReference("Log1.txt");
-
-                    // Ensure that the source file exists.
-                    if (sourceFile.Exists())
-                    {
-                        // Get a reference to the destination file.
-                        CloudFile destFile = sampleDir.GetFileReference("Log1Copy.txt");
-
-                        // Start the copy operation.
-                        destFile.StartCopy(sourceFile);
-
-                        // Write the contents of the destination file to the console window.
-                        Console.WriteLine(destFile.DownloadText());
-                    }
-                }
+                case ImageType.Original:
+                    return image.FileName;
+                case ImageType.Preview:
+                    return AddSuffix(image.FileName, ".preview");
+                case ImageType.Thumbnail:
+                    return AddSuffix(image.FileName, ".thumbnail");
+                default:
+                    throw Ensure.Exception.NotSupported(type);
             }
         }
 
-        public Task DeleteAsync(Entry entry, Image image, ImageType type)
+        private async Task<CloudFile> GetFileAsync(Entry entry, Image image, ImageType type)
         {
-            throw new NotImplementedException();
+            CloudFileDirectory entryDirectory = await GetDirectoryAsync(entry);
+            string fileName = GetImageFileName(image, type);
+
+            CloudFile imageFile = entryDirectory.GetFileReference(fileName);
+            return imageFile;
         }
 
-        public Task<Stream> FindAsync(Entry entry, Image image, ImageType type)
+        public async Task DeleteAsync(Entry entry, Image image, ImageType type)
         {
-            throw new NotImplementedException();
+            CloudFile imageFile = await GetFileAsync(entry, image, type);
+            await imageFile.DeleteIfExistsAsync();
         }
 
-        public Task SaveAsync(Entry entry, Image image, Stream content, ImageType type)
+        public async Task<Stream> FindAsync(Entry entry, Image image, ImageType type)
         {
-            throw new NotImplementedException();
+            CloudFile imageFile = await GetFileAsync(entry, image, type);
+            if (await imageFile.ExistsAsync())
+                return await imageFile.OpenReadAsync();
+
+            return null;
+        }
+
+        public async Task SaveAsync(Entry entry, Image image, Stream content, ImageType type)
+        {
+            CloudFile imageFile = await GetFileAsync(entry, image, type);
+            using (CloudFileStream imageStream = await imageFile.OpenWriteAsync(content.Length))
+            {
+                await content.CopyToAsync(imageStream);
+                await imageStream.CommitAsync();
+            }
         }
     }
 }
