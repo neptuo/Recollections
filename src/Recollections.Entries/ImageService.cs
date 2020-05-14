@@ -198,6 +198,8 @@ namespace Neptuo.Recollections.Entries
             entity.Location.Latitude = model.Location.Latitude;
             entity.Location.Longitude = model.Location.Longitude;
             entity.Location.Altitude = model.Location.Altitude;
+
+            entity.Location.ImageId = entity.Id;
         }
     }
 }

@@ -22,14 +22,6 @@ namespace Neptuo.Recollections.Entries
         public OrderedLocation()
         { }
 
-        public OrderedLocation(int order, Location source)
-        {
-            Order = order;
-            Longitude = source.Longitude;
-            Latitude = source.Latitude;
-            Altitude = source.Altitude;
-        }
-
         public override bool Equals(object obj) => Equals(obj as OrderedLocation);
 
         public bool Equals(OrderedLocation other) => other != null &&

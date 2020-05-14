@@ -9,17 +9,19 @@ using System.Threading.Tasks;
 namespace Neptuo.Recollections.Entries
 {
     [Owned]
-    public class Location : IEquatable<Location>
+    public class ImageLocation : IEquatable<ImageLocation>
     {
+        public string ImageId { get; set; }
+
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
         public double? Altitude { get; set; }
 
         public bool HasValue() => Longitude != null && Latitude != null;
 
-        public override bool Equals(object obj) => Equals(obj as Location);
+        public override bool Equals(object obj) => Equals(obj as ImageLocation);
 
-        public bool Equals(Location other) => other != null &&
+        public bool Equals(ImageLocation other) => other != null &&
             EqualityComparer<double?>.Default.Equals(Longitude, other.Longitude) &&
             EqualityComparer<double?>.Default.Equals(Latitude, other.Latitude);
 
