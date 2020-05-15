@@ -161,7 +161,8 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             service.MapModelToEntity(model, entity);
 
-            dataContext.Images.Update(entity);
+            dataContext.Entry(entity).State = EntityState.Modified;
+            dataContext.Entry(entity.Location).State = EntityState.Modified;
             await dataContext.SaveChangesAsync();
 
             return NoContent();
