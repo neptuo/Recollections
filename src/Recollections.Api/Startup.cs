@@ -27,7 +27,11 @@ namespace Neptuo.Recollections
             entriesStartup = new EntriesStartup(configuration.GetSection("Entries"), ResolvePath);
         }
 
-        private string ResolvePath(string relativePath) => relativePath.Replace("{BasePath}", environment.ContentRootPath);
+        private string ResolvePath(string relativePath)
+        {
+            Ensure.NotNull(relativePath, "relativePath");
+            return relativePath.Replace("{BasePath}", environment.ContentRootPath);
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -69,7 +73,7 @@ namespace Neptuo.Recollections
 #if DEBUG
                 p.WithOrigins("http://localhost:33881");
 #else
-                p.WithOrigins("https://app.recollections.neptuo.com");
+                p.WithOrigins("http://localhost:33881", "https://app.recollections.neptuo.com");
 #endif
                 p.AllowAnyMethod();
                 p.AllowCredentials();
