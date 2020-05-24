@@ -42,8 +42,8 @@ namespace Neptuo.Recollections
 
         private async static Task MigrateAccountsAsync(string sourceConnectionString, string targetConnectionString)
         {
-            using (var source = new AccountsDataContext(new DbContextOptionsBuilder<AccountsDataContext>().UseSqlite(sourceConnectionString).Options))
-            using (var target = new AccountsDataContext(new DbContextOptionsBuilder<AccountsDataContext>().UseSqlServer(targetConnectionString).Options))
+            using (var source = new AccountsDataContext(new DbContextOptionsBuilder<AccountsDataContext>().UseSqlite(sourceConnectionString).Options, new SchemaOptions<AccountsDataContext>()))
+            using (var target = new AccountsDataContext(new DbContextOptionsBuilder<AccountsDataContext>().UseSqlServer(targetConnectionString).Options, new SchemaOptions<AccountsDataContext>() { Name = "Accounts" }))
             {
                 await CopyDbSetAsync(source, target, c => c.Users);
                 await CopyDbSetAsync(source, target, c => c.UserClaims);
@@ -52,16 +52,18 @@ namespace Neptuo.Recollections
                 await CopyDbSetAsync(source, target, c => c.Roles);
                 await CopyDbSetAsync(source, target, c => c.RoleClaims);
                 await CopyDbSetAsync(source, target, c => c.UserRoles);
+
+                await target.SaveChangesAsync();
             }
         }
 
         private async static Task MigrateEntriesAsync(string sourceConnectionString, string targetConnectionString)
         {
-            using (var source = new EntriesDataContext(new DbContextOptionsBuilder<EntriesDataContext>().UseSqlite(sourceConnectionString).Options))
-            using (var target = new EntriesDataContext(new DbContextOptionsBuilder<EntriesDataContext>().UseSqlServer(targetConnectionString).Options))
+            using (var source = new EntriesDataContext(new DbContextOptionsBuilder<EntriesDataContext>().UseSqlite(sourceConnectionString).Options, new SchemaOptions<EntriesDataContext>()))
+            using (var target = new EntriesDataContext(new DbContextOptionsBuilder<EntriesDataContext>().UseSqlServer(targetConnectionString).Options, new SchemaOptions<EntriesDataContext>() { Name = "Entries" }))
             {
                 await CopyDbSetAsync(source, target, c => c.Entries);
-                await CopyDbSetAsync(source, target, c => c.Images, image => target.Entry(image.Location).State = EntityState.Modified);
+                await CopyDbSetAsync(source, target, c => c.Images, image => target.Entry(image.Location).State = EntityState.Added);
                 await CopyDbSetAsync(source, target, c => c.Stories);
 
                 await target.SaveChangesAsync();
