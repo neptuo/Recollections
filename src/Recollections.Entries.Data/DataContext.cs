@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Neptuo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,14 +11,19 @@ namespace Neptuo.Recollections.Entries
 {
     public class DataContext : DbContext
     {
+        private readonly SchemaOptions schema;
+
         public DbSet<Entry> Entries { get; set; }
         public DbSet<Image> Images { get; set; }
 
         public DbSet<Story> Stories { get; set; }
 
-        public DataContext(DbContextOptions<DataContext> options)
+        public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
             : base(options)
-        { }
+        {
+            Ensure.NotNull(schema, "schema");
+            this.schema = schema;
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +36,14 @@ namespace Neptuo.Recollections.Entries
                 e.Property("Order").ValueGeneratedNever(); // Based on https://github.com/dotnet/efcore/issues/11162.
                 e.HasKey("EntryId", nameof(OrderedLocation.Order));
             });
+
+            if (!String.IsNullOrEmpty(schema.Name))
+            {
+                modelBuilder.HasDefaultSchema(schema.Name);
+
+                foreach (var entity in modelBuilder.Model.GetEntityTypes())
+                    entity.SetSchema(schema.Name);
+            }
         }
     }
 }

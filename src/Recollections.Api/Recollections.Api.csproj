@@ -30,4 +30,8 @@
     <ProjectReference Include="..\Recollections.SystemIo\Recollections.SystemIo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commons\" />
+  </ItemGroup>
+
 </Project>

@@ -24,11 +24,7 @@ namespace Neptuo.Recollections.Entries
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddTransient<ImageService>()
-                .AddTransient<ImageResizeService>()
-                .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"));
-
+            ConfigureImages(services);
             ConfigureDatabase(services);
             ConfigureStorage(services);
 
@@ -39,9 +35,17 @@ namespace Neptuo.Recollections.Entries
             EnsureDatabase(services);
         }
 
+        private static void ConfigureImages(IServiceCollection services)
+        {
+            services
+                .AddTransient<ImageService>()
+                .AddTransient<ImageResizeService>()
+                .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"));
+        }
+
         private void ConfigureDatabase(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(options => options.UseDbServer(configuration.GetSection("Database"), pathResolver));
+            services.AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver);
         }
 
         private void ConfigureStorage(IServiceCollection services)

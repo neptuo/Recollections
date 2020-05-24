@@ -12,4 +12,8 @@
     <PackageReference Include="Neptuo" Version="6.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Recollections.Data.Ef\Recollections.Data.Ef.csproj" />
+  </ItemGroup>
+
 </Project>

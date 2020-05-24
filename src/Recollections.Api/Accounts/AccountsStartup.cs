@@ -33,7 +33,7 @@ namespace Neptuo.Recollections.Accounts
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
 
             services
-                .AddDbContext<DataContext>(options => options.UseDbServer(configuration.GetSection("Database"), pathResolver))
+                .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)
                 .AddIdentityCore<ApplicationUser>(options => configuration.GetSection("Identity").GetSection("Password").Bind(options.Password))
                 .AddEntityFrameworkStores<DataContext>();
 
@@ -83,6 +83,7 @@ namespace Neptuo.Recollections.Accounts
                     var userManager = provider.GetService<UserManager<ApplicationUser>>();
                     var db = provider.GetService<DataContext>();
 
+                    //db.Database.EnsureCreated();
                     db.Database.Migrate();
                 }
             }
