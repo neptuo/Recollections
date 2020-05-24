@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neptuo.Recollections.Entries;
 
@@ -14,26 +15,37 @@ namespace Neptuo.Recollections.Entries.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+                .HasDefaultSchema("Entries")
+                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Entry", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ChapterId");
+                    b.Property<string>("ChapterId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("StoryId");
+                    b.Property<string>("StoryId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Text");
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("When");
+                    b.Property<DateTime>("When")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -47,19 +59,25 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.Image", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EntryId");
+                    b.Property<string>("EntryId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("FileName");
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("When");
+                    b.Property<DateTime>("When")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -71,17 +89,22 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.Story", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Order");
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Text");
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId");
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -91,17 +114,22 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.StoryChapter", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("Created");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("Order");
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
 
-                    b.Property<string>("StoryId");
+                    b.Property<string>("StoryId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Text");
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -122,15 +150,20 @@ namespace Neptuo.Recollections.Entries.Migrations
 
                     b.OwnsMany("Neptuo.Recollections.Entries.OrderedLocation", "Locations", b1 =>
                         {
-                            b1.Property<string>("EntryId");
+                            b1.Property<string>("EntryId")
+                                .HasColumnType("nvarchar(450)");
 
-                            b1.Property<int>("Order");
+                            b1.Property<int>("Order")
+                                .HasColumnType("int");
 
-                            b1.Property<double?>("Altitude");
+                            b1.Property<double?>("Altitude")
+                                .HasColumnType("float");
 
-                            b1.Property<double?>("Latitude");
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float");
 
-                            b1.Property<double?>("Longitude");
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float");
 
                             b1.HasKey("EntryId", "Order");
 
@@ -149,15 +182,19 @@ namespace Neptuo.Recollections.Entries.Migrations
                         .WithMany()
                         .HasForeignKey("EntryId");
 
-                    b.OwnsOne("Neptuo.Recollections.Entries.Location", "Location", b1 =>
+                    b.OwnsOne("Neptuo.Recollections.Entries.ImageLocation", "Location", b1 =>
                         {
-                            b1.Property<string>("ImageId");
+                            b1.Property<string>("ImageId")
+                                .HasColumnType("nvarchar(450)");
 
-                            b1.Property<double?>("Altitude");
+                            b1.Property<double?>("Altitude")
+                                .HasColumnType("float");
 
-                            b1.Property<double?>("Latitude");
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float");
 
-                            b1.Property<double?>("Longitude");
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float");
 
                             b1.HasKey("ImageId");
 
