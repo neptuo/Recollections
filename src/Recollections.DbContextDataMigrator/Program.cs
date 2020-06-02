@@ -19,19 +19,30 @@ namespace Neptuo.Recollections
             await MigrateEntriesAsync(entriesSource, entriesTarget);
         }
 
-        private static Task CopyDbSetAsync<TContext, TEntity>(TContext sourceContext, TContext targetContext, Func<TContext, DbSet<TEntity>> dbSetGetter, Action<TEntity> entityHandler = null)
+        private static Task CopyDbSetAsync<TContext, TEntity>(TContext sourceContext, TContext targetContext, Func<TContext, DbSet<TEntity>> dbSetGetter, Action<TEntity> entityHandler = null, params string[] includes)
             where TEntity : class
         {
             var source = dbSetGetter(sourceContext);
             var target = dbSetGetter(targetContext);
-            return CopyDbSetAsync(source, target, entityHandler);
+            return CopyDbSetAsync(source, target, entityHandler, includes);
         }
 
-        private async static Task CopyDbSetAsync<T>(DbSet<T> source, DbSet<T> target, Action<T> entityHandler = null)
+        private async static Task CopyDbSetAsync<T>(DbSet<T> source, DbSet<T> target, Action<T> entityHandler = null, params string[] includes)
             where T : class
         {
-            var entities = await source.ToListAsync();
-            await target.AddRangeAsync(entities);
+            IQueryable<T> query = source;
+            foreach (string include in includes)
+                query = query.Include(include);
+
+            var entities = await query.ToListAsync();
+
+            foreach (var entity in entities)
+            {
+                if (target.Contains(entity))
+                    target.Update(entity);
+                else
+                    target.Add(entity);
+            }
 
             if (entityHandler != null)
             {
@@ -64,7 +75,14 @@ namespace Neptuo.Recollections
             {
                 await CopyDbSetAsync(source, target, c => c.Entries);
                 await CopyDbSetAsync(source, target, c => c.Images, image => target.Entry(image.Location).State = EntityState.Added);
-                await CopyDbSetAsync(source, target, c => c.Stories);
+                await CopyDbSetAsync(source, target, c => c.Stories, story =>
+                {
+                    foreach (var chapter in story.Chapters)
+                    {
+                        if (target.Entry(chapter).State != EntityState.Unchanged && target.Entry(chapter).State != EntityState.Modified)
+                            target.Entry(chapter).State = EntityState.Added;
+                    }
+                }, nameof(Story.Chapters));
 
                 await target.SaveChangesAsync();
             }
