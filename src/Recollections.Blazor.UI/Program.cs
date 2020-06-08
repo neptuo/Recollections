@@ -71,10 +71,7 @@ namespace Neptuo.Recollections
         private static string Resolve(string appRelative)
         {
 #if DEBUG
-            //return $"http://localhost:33880/api{appRelative}";
-            //return $"https://recollections-api-test-code.azurewebsites.net/api{appRelative}";
-            //return $"https://recollections-api-test-container.azurewebsites.net/api{appRelative}";
-            return $"https://azure-api-test.recollections.neptuo.com/api{appRelative}";
+            return $"http://localhost:33880/api{appRelative}";
 #else
             return $"https://api.recollections.neptuo.com/api{appRelative}";
 #endif
