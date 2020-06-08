@@ -34,10 +34,13 @@
     <script src="js/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
     <script src="js/bootstrap-datepicker/bootstrap-datepicker.en-GB.min.js"></script>
     <script src="js/easymde/easymde.min.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
     <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
-    <script type="text/javascript">Loader.load();</script>
+    <script type="text/javascript">
+        Loader.async = true;
+        Loader.load(null, null, function () { });
+    </script>
     <script src="js/site.js"></script>
     <script src="/service-worker.register.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>
