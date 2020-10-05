@@ -32,11 +32,12 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class HttpClientFactoryServiceCollectionExtensions
     {
-        public static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
+        public static IServiceCollection AddHttpClientFactory(this IServiceCollection services, string baseUrl)
         {
             Ensure.NotNull(services, "services");
             return services
-                .AddBaseAddressHttpClient()
+                .Configure<ApiSettings>(s => s.BaseUrl = baseUrl)
+                .AddSingleton(p => new HttpClient() { BaseAddress = new Uri(baseUrl, UriKind.Absolute) })
                 .AddSingleton<IFactory<HttpClient>, HttpClientProvider>();
         }
     }

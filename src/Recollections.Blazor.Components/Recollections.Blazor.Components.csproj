@@ -3,14 +3,14 @@
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
 
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0-preview3.20168.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0-rc.1.20451.17" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
     <PackageReference Include="Neptuo.Exceptions" Version="1.2.1" />
   </ItemGroup>

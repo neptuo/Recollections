@@ -47,11 +47,10 @@ namespace Neptuo.Recollections
                 .AddExceptions()
                 .AddComponents()
                 .AddUiOptions()
-                .AddHttpClientFactory()
+                .AddHttpClientFactory(GetApiBaseUrl())
                 .AddSingleton<IEventDispatcher>(eventManager)
                 .AddSingleton<IEventHandlerCollection>(eventManager)
                 .AddSingleton<Json>()
-                .AddSingleton<UrlResolver>(Resolve)
                 .AddTransient<Navigator>();
 
             common.ConfigureServices(services);
@@ -68,12 +67,12 @@ namespace Neptuo.Recollections
         {
         }
 
-        private static string Resolve(string appRelative)
+        private static string GetApiBaseUrl()
         {
 #if DEBUG
-            return $"http://localhost:33880/api{appRelative}";
+            return "http://localhost:33880/api/";
 #else
-            return $"https://api.recollections.neptuo.com/api{appRelative}";
+            return "https://api.recollections.neptuo.com/api/";
 #endif
         }
     }

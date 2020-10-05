@@ -1,23 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
     <VersionPrefix>0.7.3</VersionPrefix>
 
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <RazorLangVersion>3.0</RazorLangVersion>
-    <RestoreAdditionalProjectSources>
-      https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json;
-      https://dotnet.myget.org/F/blazor-dev/api/v3/index.json;
-    </RestoreAdditionalProjectSources>
+    <PublishDomain>app.recollections.neptuo.com</PublishDomain>
+    <TargetFramework>net5.0</TargetFramework>
+    <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.2.0-preview3.20168.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="3.1.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.0-preview3.20168.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Build" Version="3.2.0-preview3.20168.3" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="3.2.0-preview3.20168.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.0-rc.1.20451.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0-rc.1.20451.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.0-rc.1.20451.17" PrivateAssets="all" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
     <PackageReference Include="Neptuo.Events" Version="1.3.1" />
     <PackageReference Include="Neptuo.Exceptions" Version="1.2.1" />
@@ -28,16 +23,6 @@
     <ProjectReference Include="..\Recollections.Blazor.Components\Recollections.Blazor.Components.csproj" />
   </ItemGroup>
 
-  <!-- PWA -->
-  <PropertyGroup>
-    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
-    <!-- When publishing, swap service-worker.published.js in place of service-worker.js -->
-    <Content Remove="wwwroot\service-worker.js" />
-    <Content Update="wwwroot\service-worker.published.js" Link="wwwroot\service-worker.js" />
-  </ItemGroup>
-
   <ItemGroup>
     <Content Update="wwwroot\index.html" CopyToOutputDirectory="PreserveNewest" />
     <Content Remove="**\*.svg" />
@@ -45,4 +30,40 @@
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
     <Watch Include="**\*.razor" />
   </ItemGroup>
+
+  <!-- PWA -->
+  <PropertyGroup>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <!-- GitHubPages publish -->
+  <Target Name="PublishGitHubFiles" AfterTargets="ComputeFilesToPublish">
+    <!-- Declare -->
+    <PropertyGroup>
+      <Wwwroot>wwwroot</Wwwroot>
+      <CName>$(Wwwroot)\CNAME</CName>
+      <Html404>$(Wwwroot)\404.html</Html404>
+      <NoJekyll>$(Wwwroot)\.nojekyll</NoJekyll>
+    </PropertyGroup>
+
+    <!-- Create content -->
+    <Copy SourceFiles="wwwroot\index.html" DestinationFiles="$(OutputPath)$(Html404)" />
+    <WriteLinesToFile File="$(OutputPath)$(CName)" Lines="$(PublishDomain)" Overwrite="true" />
+    <WriteLinesToFile File="$(OutputPath)$(NoJekyll)" Lines="" Overwrite="true" />
+
+    <!-- Publish -->
+    <ItemGroup>
+      <CustomPublishFile Include="$(OutputPath)$(CName)" RelativePath="$(CName)" />
+      <CustomPublishFile Include="$(OutputPath)$(Html404)" RelativePath="$(Html404)" />
+      <CustomPublishFile Include="$(OutputPath)$(NoJekyll)" RelativePath="$(NoJekyll)" />
+
+      <ResolvedFileToPublish Include="@(CustomPublishFile->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(CustomPublishFile.RelativePath)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
 </Project>

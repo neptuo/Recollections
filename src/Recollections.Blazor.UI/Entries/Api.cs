@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Options;
 using Neptuo;
 using Neptuo.Activators;
 using Neptuo.Exceptions.Handlers;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,90 +20,88 @@ namespace Neptuo.Recollections.Entries
     public class Api
     {
         private readonly HttpClient http;
-        private readonly UrlResolver urlResolver;
+        private readonly ApiSettings settings;
         private readonly TaskFaultHandler faultHandler;
 
-        public Api(IFactory<HttpClient> httpFactory, UrlResolver urlResolver, TaskFaultHandler faultHandler)
+        public Api(IFactory<HttpClient> httpFactory, TaskFaultHandler faultHandler, IOptions<ApiSettings> settings)
         {
             Ensure.NotNull(httpFactory, "httpFactory");
-            Ensure.NotNull(urlResolver, "urlResolver");
+            Ensure.NotNull(settings, "settings");
             Ensure.NotNull(faultHandler, "faultHandler");
             this.http = httpFactory.Create();
-            this.urlResolver = urlResolver;
+            this.settings = settings.Value;
             this.faultHandler = faultHandler;
         }
 
         public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
-            => faultHandler.Wrap(http.GetJsonAsync<TimelineListResponse>(urlResolver($"/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
         public Task<List<MapEntryModel>> GetMapListAsync()
-            => faultHandler.Wrap(http.GetJsonAsync<List<MapEntryModel>>(urlResolver("/map/list")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
         public Task<EntryModel> CreateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(http.PostJsonAsync<EntryModel>(urlResolver("/entries"), model));
+            => faultHandler.Wrap(http.PostJsonAsync("entries", model));
 
         public Task UpdateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{model.Id}"), model));
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{model.Id}", model));
 
         public Task DeleteEntryAsync(string entryId)
-            => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/entries/{entryId}")));
+            => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}"));
 
         public Task<EntryModel> GetDetailAsync(string entryId)
-            => faultHandler.Wrap(http.GetJsonAsync<EntryModel>(urlResolver($"/entries/{entryId}")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<EntryModel>($"entries/{entryId}"));
 
         public Task<List<ImageModel>> GetImagesAsync(string entryId)
-            => faultHandler.Wrap(http.GetJsonAsync<List<ImageModel>>(urlResolver($"/entries/{entryId}/images")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<ImageModel>>($"entries/{entryId}/images"));
 
         public Task<ImageModel> GetImageAsync(string entryId, string imageId)
-            => faultHandler.Wrap(http.GetJsonAsync<ImageModel>(urlResolver($"/entries/{entryId}/images/{imageId}")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<ImageModel>($"entries/{entryId}/images/{imageId}"));
 
         public Task<byte[]> GetImageDataAsync(string url)
-            => faultHandler.Wrap(http.GetByteArrayAsync(ResolveUrl(url)));
+            => faultHandler.Wrap(http.GetByteArrayAsync((settings.BaseUrl + url).Replace("api/api", "api")));
 
         public Task UpdateImageAsync(string entryId, ImageModel model)
-            => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{entryId}/images/{model.Id}"), model));
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/images/{model.Id}", model));
 
         public Task DeleteImageAsync(string entryId, string imageId)
-            => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/entries/{entryId}/images/{imageId}")));
+            => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}/images/{imageId}"));
 
         public Task SetImageLocationFromOriginalAsync(string entryId, string imageId)
-            => faultHandler.Wrap(http.PostAsync(urlResolver($"/entries/{entryId}/images/{imageId}/set-location-from-original"), new StringContent(String.Empty)));
+            => faultHandler.Wrap(http.PostAsync($"entries/{entryId}/images/{imageId}/set-location-from-original", new StringContent(String.Empty)));
 
-        public string ImageUploadUrl(string entryId) => urlResolver($"/entries/{entryId}/images");
+        public string ImageUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/images";
 
         public Task<List<StoryListModel>> GetStoryListAsync()
-            => faultHandler.Wrap(http.GetJsonAsync<List<StoryListModel>>(ResolveUrl("/stories")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryListModel>>("stories"));
 
         public Task<List<StoryChapterListModel>> GetStoryChapterListAsync(string storyId)
-            => faultHandler.Wrap(http.GetJsonAsync<List<StoryChapterListModel>>(ResolveUrl($"/stories/{storyId}/chapters")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryChapterListModel>>($"stories/{storyId}/chapters"));
 
         public Task<StoryModel> GetStoryAsync(string storyId)
-            => faultHandler.Wrap(http.GetJsonAsync<StoryModel>(ResolveUrl($"/stories/{storyId}")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<StoryModel>($"stories/{storyId}"));
 
         public Task<StoryModel> CreateStoryAsync(StoryModel model)
-            => faultHandler.Wrap(http.PostJsonAsync<StoryModel>(ResolveUrl($"/stories"), model));
+            => faultHandler.Wrap(http.PostJsonAsync($"stories", model));
 
         public Task UpdateStoryAsync(StoryModel model)
-            => faultHandler.Wrap(http.PutJsonAsync(ResolveUrl($"/stories/{model.Id}"), model));
+            => faultHandler.Wrap(http.PutAsJsonAsync($"stories/{model.Id}", model));
 
         public Task DeleteStoryAsync(string storyId)
-            => faultHandler.Wrap(http.DeleteAsync(urlResolver($"/stories/{storyId}")));
+            => faultHandler.Wrap(http.DeleteAsync($"stories/{storyId}"));
 
         public Task<EntryStoryModel> GetEntryStoryAsync(string entryId)
-            => faultHandler.Wrap(http.GetJsonAsync<EntryStoryModel>(urlResolver($"/entries/{entryId}/story")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<EntryStoryModel>($"entries/{entryId}/story"));
 
         public Task UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
-            => faultHandler.Wrap(http.PutJsonAsync(urlResolver($"/entries/{entryId}/story"), model));
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/story", model));
 
         public Task<List<StoryEntryModel>> GetStoryEntryListAsync(string storyId)
-            => faultHandler.Wrap(http.GetJsonAsync<List<StoryEntryModel>>(urlResolver($"/stories/{storyId}/entries")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/entries"));
 
         public Task<List<StoryEntryModel>> GetStoryChapterEntryListAsync(string storyId, string chapterId)
-            => faultHandler.Wrap(http.GetJsonAsync<List<StoryEntryModel>>(urlResolver($"/stories/{storyId}/chapters/{chapterId}/entries")));
-
-        public string ResolveUrl(string relativeUrl) => urlResolver(relativeUrl).Replace("apiapi", "api");
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/chapters/{chapterId}/entries"));
 
         public Task<VersionModel> GetVersionAsync()
-            => faultHandler.Wrap(http.GetJsonAsync<VersionModel>(urlResolver($"/entries/version")));
+            => faultHandler.Wrap(http.GetFromJsonAsync<VersionModel>($"entries/version"));
     }
 }
