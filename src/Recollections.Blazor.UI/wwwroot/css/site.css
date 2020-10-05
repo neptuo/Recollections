@@ -136,6 +136,10 @@ h4 .inline-editor-viewmode .oi {
 .main-navbar {
   z-index: 2; }
 
+.main-navbar .navbar-toggler {
+  border: none;
+  outline: none; }
+
 .actions .right-actions {
   text-align: right; }
 
