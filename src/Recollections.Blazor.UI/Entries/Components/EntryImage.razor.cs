@@ -11,6 +11,8 @@ namespace Neptuo.Recollections.Entries.Components
 {
     public partial class EntryImage
     {
+        public const string PlaceholderUrl = "/img/thumbnail-placeholder.png";
+
         private string previousUrl;
 
         protected string Url { get; private set; }
@@ -68,6 +70,7 @@ namespace Neptuo.Recollections.Entries.Components
                 if (previousUrl != imageUrl)
                 {
                     previousUrl = imageUrl;
+                    Url = PlaceholderUrl;
 
                     byte[] content = await Api.GetImageDataAsync(imageUrl);
                     Url = "data:image/png;base64," + Convert.ToBase64String(content);
@@ -75,7 +78,7 @@ namespace Neptuo.Recollections.Entries.Components
             }
             else
             {
-                Url = "/img/thumbnail-placeholder.png";
+                Url = PlaceholderUrl;
             }
         }
 

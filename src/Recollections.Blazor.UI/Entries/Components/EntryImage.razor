@@ -1,7 +1,15 @@
 ﻿<div class="image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
-    <a href="@GetLinkUrl()">
+    @if (ImageType == Models.ImageType.Thumbnail)
+    {
+        <a href="@GetLinkUrl()">
+            <img src="@Url" class="rounded" />
+        </a>
+    }
+    else
+    {
         <img src="@Url" class="rounded" />
-    </a>
+    }
+
     @if (PlaceHolder != null)
     {
         <span class="@PlaceHolderCssClass">@PlaceHolder</span>
