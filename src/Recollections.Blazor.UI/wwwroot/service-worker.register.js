@@ -25,7 +25,7 @@ if ("serviceWorker" in navigator) {
         registration.addEventListener("updatefound", function () {
             if (registration.installing !== null) {
                 registration.installing.addEventListener("statechange", function () {
-                    switch (newWorker.state) {
+                    switch (registration.installing.state) {
                         case 'installed':
                             if (navigator.serviceWorker.controller) {
                                 Pwa.updateable();
