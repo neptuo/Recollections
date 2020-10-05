@@ -19,21 +19,8 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public IEnumerable<string> Messages { get; set; }
 
-        private bool isDismissible;
-
         [Parameter]
-        public bool IsDismissible
-        {
-            get => isDismissible;
-            set
-            {
-                if (isDismissible != value)
-                {
-                    isDismissible = value;
-                    UpdateModeCssClass();
-                }
-            }
-        }
+        public EventCallback OnDismiss { get; set; }
 
         private AlertMode mode;
 
@@ -80,7 +67,7 @@ namespace Neptuo.Recollections.Components
                     throw Ensure.Exception.NotSupported(mode.ToString());
             }
 
-            if (IsDismissible)
+            if (OnDismiss.HasDelegate)
             {
                 ModeCssClass += " alert-dismissible";
             }
