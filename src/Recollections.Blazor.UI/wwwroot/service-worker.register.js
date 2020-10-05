@@ -7,17 +7,38 @@
             });
         }
     },
-    notify: function () {
-        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Installable')
-            .then(function () { }, function () { setTimeout(Pwa.notify, 1000); });
+    installable: function () {
+        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Installable').then(function () { }, function () { setTimeout(Pwa.installable, 1000); });
+    },
+    updateable: function () {
+        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Updateable').then(function () { }, function () { setTimeout(Pwa.updateable, 1000); });
     }
 };
 
 window.addEventListener('beforeinstallprompt', function (e) {
     window.PwaInstallPrompt = e;
-    Pwa.notify();
+    Pwa.installable();
 });
 
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
+    navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+        registration.addEventListener("updatefound", function () {
+            if (registration.installing !== null) {
+                registration.installing.addEventListener("statechange", function () {
+                    switch (newWorker.state) {
+                        case 'installed':
+                            if (navigator.serviceWorker.controller) {
+                                Pwa.updateable();
+                            }
+
+                            break;
+                    }
+                });
+            } else if (registration.waiting !== null) {
+                if (navigator.serviceWorker.controller) {
+                    Pwa.updateable();
+                }
+            }
+        });
+    });
 }
