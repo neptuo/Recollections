@@ -325,7 +325,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 if (Progress.Status == "done")
                     return "text-success";
                 else if (Progress.Status == "current")
-                    return $"text-primary";
+                    return Progress.Percentual == 0 ? "loading-circle" : $"text-primary";
                 else if (Progress.Status == "error")
                     return "text-danger";
                 else if (Progress.Status == "pending")
