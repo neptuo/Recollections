@@ -1,0 +1,45 @@
+﻿{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@2.2.4",
+      "destination": "wwwroot/lib/jquery"
+    },
+    {
+      "provider": "unpkg",
+      "library": "font-awesome@4.7.0",
+      "destination": "wwwroot/lib/fontawesome",
+      "files": [
+        "css/*",
+        "fonts/*"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "easymde@2.12.1",
+      "destination": "wwwroot/lib/easymde",
+      "files": [
+        "dist/*"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap@5.0.0-alpha2",
+      "destination": "wwwroot/lib/bootstrap",
+      "files": [
+        "dist/**"
+      ]
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap-datepicker@1.9.0",
+      "destination": "wwwroot/lib/bootstrap-datepicker",
+      "files": [
+        "dist/css/*",
+        "dist/js/*",
+        "dist/locales/bootstrap-datepicker.en-GB.min.js"
+      ]
+    }
+  ]
+}
