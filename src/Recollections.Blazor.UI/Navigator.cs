@@ -44,6 +44,18 @@ namespace Neptuo.Recollections
         public ValueTask<bool> MessageAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.alert", message);
 
+        public string UrlGithubRepository()
+            => "https://github.com/neptuo/Recollections";
+
+        public string UrlGithubRepositoryIssuesNew()
+            => "https://github.com/neptuo/Recollections/issues/new";
+
+        public string UrlAbout()
+            => "/about";
+
+        public void OpenAbout()
+            => uri.NavigateTo(UrlAbout());
+
         public string UrlLogin()
             => "/login";
 
