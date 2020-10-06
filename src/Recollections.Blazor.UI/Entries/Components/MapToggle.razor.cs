@@ -14,6 +14,9 @@ namespace Neptuo.Recollections.Entries.Components
         public string Text { get; set; }
 
         [Parameter]
+        public string CssClass { get; set; }
+
+        [Parameter]
         public Func<bool, string> ToggleChanged { get; set; }
 
         [Parameter]

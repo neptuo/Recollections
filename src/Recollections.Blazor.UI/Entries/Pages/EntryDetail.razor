@@ -30,8 +30,8 @@
                     }
                 </a>
             </div>
-            <div class="gps @(MarkerCount != 0 ? "" : "placeholder")">
-                <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")">
+            <div class="gps">
+                <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" CssClass="@(MarkerCount != 0 ? "" : "placeholder")">
                     <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
                 </MapToggle>
             </div>

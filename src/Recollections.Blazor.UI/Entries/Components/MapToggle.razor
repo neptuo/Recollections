@@ -1,7 +1,9 @@
-﻿<a @onclick="@OnToggle">
-    <Icon Identifier="location" />
-    <span>@Text</span>
-</a>
+﻿<span class="@CssClass">
+    <a @onclick="@OnToggle">
+        <Icon Identifier="location" />
+        <span>@Text</span>
+    </a>
+</span>
 
 @if (IsVisible)
 {

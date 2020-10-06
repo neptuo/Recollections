@@ -48,6 +48,8 @@ namespace Neptuo.Recollections.Components
             Log.Debug($"Markers: '{Markers.Count}', has '{parameters.TryGetValue<IList<MapMarkerModel>>(nameof(Markers), out _)}'");
         }
 
+        private MapSearchModel selected;
+
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("OnAfterRenderAsync");
@@ -57,6 +59,12 @@ namespace Neptuo.Recollections.Components
 
             if (Markers.Count > 0)
                 IsZoomed = true;
+
+            if (selected != null)
+            {
+                await Interop.CenterAtAsync(selected.Latitude, selected.Longitude);
+                selected = null;
+            }
         }
 
         internal void MoveMarker(int? index, double latitude, double longitude, double? altitude)
@@ -102,9 +110,7 @@ namespace Neptuo.Recollections.Components
 
         protected async ValueTask SearchResultSelectedAsync(MapSearchModel selected)
         {
-            if (selected != null)
-                await Interop.CenterAtAsync(selected.Latitude, selected.Longitude);
-
+            this.selected = selected;
             SearchModal.Hide();
         }
     }
