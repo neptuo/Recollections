@@ -23,9 +23,10 @@ window.addEventListener('beforeinstallprompt', function (e) {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register('service-worker.js').then(function (registration) {
         registration.addEventListener("updatefound", function () {
-            if (registration.installing !== null) {
-                registration.installing.addEventListener("statechange", function () {
-                    switch (registration.installing.state) {
+            var installing = registration.installing;
+            if (installing !== null) {
+                installing.addEventListener("statechange", function () {
+                    switch (installing.state) {
                         case 'installed':
                             if (navigator.serviceWorker.controller) {
                                 Pwa.updateable();
