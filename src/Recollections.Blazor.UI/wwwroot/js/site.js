@@ -1,30 +1,32 @@
 ﻿window.Bootstrap = {
     Modal: {
         Show: function (container) {
-            $(container).modal({
+            new bootstrap.Modal(container, {
                 "show": true,
                 "focus": true
-            }).on('shown.bs.modal', function () {
+            });
+            
+            container.addEventListener('shown.bs.modal', function () {
                 $(container).find("input").first().trigger('focus');
-            })
+            });
         },
         Hide: function (container) {
-            $(container).modal('hide');
+            bootstrap.Modal.getInstance(container).hide();
         }
     },
     Tooltip: {
         Init: function (container) {
-            $(container).tooltip();
+            new bootstrap.Tooltip(container);
         }
     },
     Popover: {
         Show: function (container, title, body) {
-            $(container).popover({
+            var popover = new bootstrap.Popover(container, {
                 content: body,
                 title: title,
-                placement: "bottom",
-                show: true
+                placement: "bottom"
             });
+            popover.show();
         }
     }
 };
