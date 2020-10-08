@@ -22,5 +22,14 @@ namespace Neptuo.Recollections.Components
 
         public ValueTask InitializeAsync(ElementReference element)
             => jsRuntime.InvokeVoidAsync("Bootstrap.Tooltip.Init", element);
+
+        public ValueTask ShowAsync(ElementReference element)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Tooltip.Show", element);
+
+        public ValueTask HideAsync(ElementReference element)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Tooltip.Hide", element);
+
+        public ValueTask DisposeAsync(ElementReference element)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Tooltip.Dispose", element);
     }
 }

@@ -40,6 +40,21 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<ImageModel> Images { get; set; }
         protected EntryStoryModel Story { get; set; }
         protected bool HasStory => Story != null && Story.StoryId != null;
+        protected string StoryTitle
+        {
+            get
+            {
+                string title = null;
+                if (HasStory)
+                {
+                    title = Story.StoryTitle;
+                    if (Story.ChapterId != null)
+                        title += " " + Story.ChapterTitle;
+                }
+
+                return title;
+            }
+        }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();

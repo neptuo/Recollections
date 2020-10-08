@@ -1,9 +1,7 @@
 ﻿<div class="alert @ModeCssClass" role="alert">
     @if (OnDismiss.HasDelegate)
     {
-        <button type="button" class="close" @onclick="@OnDismiss">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" @onclick="@OnDismiss"></button>
     }
 
     @if (Title != null)
@@ -12,7 +10,7 @@
             @Title
         </strong>
     }
-    
+
     @if (Message != null)
     {
         <span>

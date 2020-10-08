@@ -9,36 +9,34 @@
                 <input type="text" class="form-control" @bind="Value.Latitude" placeholder="Latitude" />
                 <input type="text" class="form-control" @bind="Value.Longitude" placeholder="Longitude" />
                 <input type="text" class="form-control" @bind="Value.Altitude" placeholder="Altitude" />
-                <div class="input-group-append">
-                    <button class="btn btn-outline-success btn-save" title="Save changes">
-                        <Icon Identifier="check" />
+                <button class="btn btn-outline-success btn-save" title="Save changes">
+                    <Icon Identifier="check" />
+                </button>
+                <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
+                    <Icon Identifier="times" />
+                </button>
+                @if (Delete != null)
+                {
+                    <button class="btn btn-outline-danger btn-cancel" @onclick="@(() => Delete(Value))" title="Delete">
+                        <Icon Identifier="trash-alt" />
                     </button>
-                    <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
-                        <Icon Identifier="x" />
-                    </button>
-                    @if (Delete != null)
-                    {
-                        <button class="btn btn-outline-danger btn-cancel" @onclick="@(() => Delete(Value))" title="Delete">
-                            <Icon Identifier="trash" />
-                        </button>
-                    }
-                </div>
+                }
             </div>
         </form>
     }
     else
     {
         <a class="inline-editor-value" @onclick="@OnEditAsync">
-            <Icon Identifier="pencil" />
+            <Icon Identifier="pen" />
 
-            <Icon Identifier="location" />
+            <Icon Identifier="location-arrow" />
             @if (Value == null || !Value.HasValue())
             {
-                <span class="inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
+                <span class="ml-1 inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else
             {
-                <span class="inline-editor-content">@Value?.ToString()</span>
+                <span class="ml-1 inline-editor-content">@Value?.ToString()</span>
             }
         </a>
     }

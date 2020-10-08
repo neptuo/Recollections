@@ -1,7 +1,7 @@
 ﻿@foreach (var entry in Models)
 {
     <div>
-        <Icon Identifier="comment-square" />
+        <Icon Prefix="fas" Identifier="comment-alt" />
         <a href="@Navigator.UrlEntryDetail(entry.Id)">
             @entry.Title
         </a>

@@ -4,7 +4,7 @@
 <div class="row body-offset">
     <div class="col-6">
         <h2 class="mb-3">
-            <Icon Identifier="person" />
+            <Icon Identifier="user" />
             @UserName
         </h2>
         <p>
@@ -15,24 +15,22 @@
 <div class="row body-offset">
     <div class="col-md-6 col-lg-4">
         <h2 class="mb-3">
-            <Icon Identifier="lock-locked" />
+            <Icon Identifier="lock" />
             Change password
         </h2>
         <div class="change-password">
             <Validation ErrorMessages="ChangePassword.ErrorMessages" />
             <form @onsubmit="@ChangePassword.ExecuteAsync">
-                <div class="form-group">
+                <div class="mb-3">
                     <input class="form-control" type="password" placeholder="Current password" @bind="ChangePassword.Current" />
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <input class="form-control" type="password" placeholder="New password" @bind="ChangePassword.New" />
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <input class="form-control" type="password" placeholder="Confirm new password" @bind="ChangePassword.ConfirmNew" />
                 </div>
-                <div class="form-group">
-                    <button class="btn btn-primary" type="submit">Change password</button>
-                </div>
+                <button class="btn btn-primary" type="submit">Change password</button>
             </form>
         </div>
     </div>

@@ -1,32 +1,73 @@
 ﻿window.Bootstrap = {
     Modal: {
         Show: function (container) {
-            new bootstrap.Modal(container, {
-                "show": true,
-                "focus": true
-            });
+            var modal = bootstrap.Modal.getInstance(container);
+            if (modal == null) {
+                modal = new bootstrap.Modal(container, {
+                    "show": true,
+                    "focus": true
+                });
             
-            container.addEventListener('shown.bs.modal', function () {
-                $(container).find("input").first().trigger('focus');
-            });
+                container.addEventListener('shown.bs.modal', function () {
+                    $(container).find("input").first().trigger('focus');
+                });
+            }
+
+            modal.show();
         },
         Hide: function (container) {
-            bootstrap.Modal.getInstance(container).hide();
+            var modal = bootstrap.Modal.getInstance(container);
+            if (modal != null) {
+                modal.hide();
+            }
+        },
+        Dispose: function (container) {
+            var modal = bootstrap.Modal.getInstance(container);
+            if (modal != null) {
+                modal.dispose();
+            }
         }
     },
     Tooltip: {
         Init: function (container) {
-            new bootstrap.Tooltip(container);
+            var tooltip = bootstrap.Tooltip.getInstance(container);
+            if (tooltip == null) {
+                tooltip = new bootstrap.Tooltip(container);
+            }
+        },
+        Show: function (container) {
+            var tooltip = bootstrap.Tooltip.getInstance(container);
+            if (tooltip != null) {
+                tooltip.show();
+            }
+        },
+        Hide: function (container) {
+            var tooltip = bootstrap.Tooltip.getInstance(container);
+            if (tooltip != null) {
+                tooltip.hide();
+            }
+        },
+        Dispose: function (container) {
+            var tooltip = bootstrap.Tooltip.getInstance(container);
+            if (tooltip != null) {
+                tooltip.dispose();
+            }
         }
     },
     Popover: {
-        Show: function (container, title, body) {
-            var popover = new bootstrap.Popover(container, {
-                content: body,
-                title: title,
-                placement: "bottom"
-            });
-            popover.show();
+        Show: function (container) {
+            var popover = bootstrap.Popover.getInstance(container);
+            if (popover == null) {
+                popover = new bootstrap.Popover(container, {
+                    placement: "bottom"
+                });
+            }
+        },
+        Dispose: function (container) {
+            var popover = bootstrap.Popover.getInstance(container);
+            if (popover != null) {
+                popover.dispose();
+            }
         }
     }
 };
@@ -210,6 +251,7 @@ window.InlineMarkdownEdit = {
         }
 
         var editor = new EasyMDE({
+            autoDownloadFontAwesome: false,
             element: textArea,
             autofocus: true,
             forceSync: true,
@@ -229,7 +271,7 @@ window.InlineMarkdownEdit = {
                 "horizontal-rule",
                 {
                     name: "cancel",
-                    className: "fa fa-times pull-right",
+                    className: "fa fa-times float-right",
                     title: "Close Editor",
                     action: function (editor) {
                         interop.invokeMethodAsync("Markdown.OnCancel");
@@ -237,7 +279,7 @@ window.InlineMarkdownEdit = {
                 },
                 {
                     name: "save",
-                    className: "fa fa-check pull-right",
+                    className: "fa fa-check float-right",
                     title: "Save",
                     action: function (editor) {
                         var value = editor.value();

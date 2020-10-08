@@ -42,6 +42,9 @@ namespace Neptuo.Recollections.Accounts.Components
         public void Dispose()
         {
             UserState.UserInfoChanged -= OnUserInfoChanged;
+
+            _ = TooltipInterop.DisposeAsync(MeButton);
+            _ = TooltipInterop.DisposeAsync(LogoutButton);
         }
 
         private void OnUserInfoChanged()

@@ -7,19 +7,27 @@
         color: $error-color;
     }
 
+    button.save:hover {
+        background: $ok-color;
+        border: none !important;
+    }
+
+    button.cancel:hover {
+        background: $error-color;
+        border: none !important;
+    }
+
     .editor-toolbar:after {
         clear: both;
     }
 
-    .input-group-append {
-        button:hover {
-            .oi-check {
-                color: white;
-            }
+    button:hover {
+        .oi-check, .fa-check {
+            color: white;
+        }
 
-            .oi-x {
-                color: white;
-            }
+        .oi-x, .fa-times {
+            color: white;
         }
     }
 
@@ -32,6 +40,9 @@
     }
 
     input[type=text] {
+        min-height: unset;
+        padding-top: 0;
+        padding-bottom: 0;
         border-right: none;
     }
 
@@ -52,7 +63,7 @@
         position: relative;
     }
 
-    .oi-pencil {
+    .oi-pencil, .fa-pen {
         display: none;
         color: $placeholder-color;
         font-size: 16px;
@@ -62,7 +73,7 @@
     }
 
     &:hover, &:active {
-        .oi-pencil {
+        .oi-pencil, .fa-pen {
             display: inline-block;
         }
     }
@@ -70,8 +81,8 @@
 
 h2 {
     .inline-editor-viewmode {
-        .oi {
-            top: 14px;
+        .fa {
+            top: 16px;
         }
     }
 }
@@ -84,6 +95,11 @@ h4 {
     }
 }
 
+.inline-date {
+    .input-group {
+        width: 200px;
+    }
+}
 
 .inline-markdown {
     .inline-submit {

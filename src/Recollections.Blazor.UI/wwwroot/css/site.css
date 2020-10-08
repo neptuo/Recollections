@@ -1,4 +1,8 @@
 ﻿@charset "UTF-8";
+a:not([href]):not([tabindex]) {
+  color: inherit;
+  text-decoration: none; }
+
 body {
   position: relative;
   min-width: 400px;
@@ -37,7 +41,7 @@ a {
     position: absolute;
     left: 6px;
     width: 13px;
-    background: var(--purple);
+    background: var(--bs-purple);
     animation: loading-bar 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite; }
   .loading-bar div:nth-child(1) {
     left: 6px;
@@ -73,18 +77,26 @@ a {
     transform: rotate(360deg); } }
 
 .inline-editor .oi-check, .inline-editor .fa-check {
-  color: var(--green); }
+  color: var(--bs-green); }
 
 .inline-editor .oi-x, .inline-editor .fa-times {
-  color: var(--danger); }
+  color: var(--bs-danger); }
+
+.inline-editor button.save:hover {
+  background: var(--bs-green);
+  border: none !important; }
+
+.inline-editor button.cancel:hover {
+  background: var(--bs-danger);
+  border: none !important; }
 
 .inline-editor .editor-toolbar:after {
   clear: both; }
 
-.inline-editor .input-group-append button:hover .oi-check {
+.inline-editor button:hover .oi-check, .inline-editor button:hover .fa-check {
   color: white; }
 
-.inline-editor .input-group-append button:hover .oi-x {
+.inline-editor button:hover .oi-x, .inline-editor button:hover .fa-times {
   color: white; }
 
 .inline-editor .form-control {
@@ -94,6 +106,9 @@ a {
   min-height: 400px; }
 
 .inline-editor input[type=text] {
+  min-height: unset;
+  padding-top: 0;
+  padding-bottom: 0;
   border-right: none; }
 
 .inline-editor .input-group-append button {
@@ -107,7 +122,7 @@ a {
 .inline-editor-viewmode .inline-editor-value {
   position: relative; }
 
-.inline-editor-viewmode .oi-pencil {
+.inline-editor-viewmode .oi-pencil, .inline-editor-viewmode .fa-pen {
   display: none;
   color: #aaaaaa;
   font-size: 16px;
@@ -115,14 +130,17 @@ a {
   position: absolute;
   top: 2px; }
 
-.inline-editor-viewmode:hover .oi-pencil, .inline-editor-viewmode:active .oi-pencil {
+.inline-editor-viewmode:hover .oi-pencil, .inline-editor-viewmode:hover .fa-pen, .inline-editor-viewmode:active .oi-pencil, .inline-editor-viewmode:active .fa-pen {
   display: inline-block; }
 
-h2 .inline-editor-viewmode .oi {
-  top: 14px; }
+h2 .inline-editor-viewmode .fa {
+  top: 16px; }
 
 h4 .inline-editor-viewmode .oi {
   top: 8px; }
+
+.inline-date .input-group {
+  width: 200px; }
 
 .inline-markdown .inline-submit {
   margin-top: -60px; }
@@ -259,14 +277,15 @@ h4 .inline-editor-viewmode .oi {
       margin-top: -6px;
       font-size: 180%; }
       .entry .body h2 a {
-        color: black; }
+        color: black;
+        text-decoration: none; }
         .entry .body h2 a:hover {
           text-decoration: none; }
           .entry .body h2 a:hover::after {
             color: salmon;
             content: "»"; }
     .entry .body .information {
-      margin-right: 6px;
+      margin-right: 12px;
       color: #333; }
     .entry .body .oi {
       font-size: 12px; }

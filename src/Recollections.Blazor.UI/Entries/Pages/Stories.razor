@@ -5,7 +5,7 @@
         <Validation ErrorMessages="ErrorMessages" />
 
         <form @onsubmit="@CreateAsync">
-            <div class="form-row">
+            <div class="row">
                 <div class="col-md col-sm-12">
                     <input class="form-control" type="text" placeholder="Story title..." @bind="Title" />
                 </div>
@@ -30,7 +30,7 @@
             </span>
 
             <span class="entries">
-                <Icon Identifier="comment-square" />
+                <Icon Prefix="fas" Identifier="comment-alt" />
                 @story.Entries entries
             </span>
 
@@ -38,24 +38,25 @@
             {
                 <span class="dates">
                     <Icon Identifier="calendar" />
-
-                    @if (story.MinDate != null)
-                    {
-                        @story.MinDate.Value.ToString(UiOptions.DateFormat)
-                    }
-
-                    @if (story.MinDate != story.MaxDate)
-                    {
-                        if (story.MinDate != null && story.MaxDate != null)
+                    <span class="ml-1">
+                        @if (story.MinDate != null)
                         {
-                            @: -
+                            @story.MinDate.Value.ToString(UiOptions.DateFormat)
                         }
 
-                        if (story.MaxDate != null)
+                        @if (story.MinDate != story.MaxDate)
                         {
-                            @story.MaxDate.Value.ToString(UiOptions.DateFormat)
+                            if (story.MinDate != null && story.MaxDate != null)
+                            {
+                                @: -
+                            }
+
+                            if (story.MaxDate != null)
+                            {
+                                @story.MaxDate.Value.ToString(UiOptions.DateFormat)
+                            }
                         }
-                    }
+                    </span>
                 </span>
             }
         </div>

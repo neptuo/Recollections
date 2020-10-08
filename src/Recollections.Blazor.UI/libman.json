@@ -7,12 +7,11 @@
       "destination": "wwwroot/lib/jquery"
     },
     {
-      "provider": "unpkg",
-      "library": "font-awesome@4.7.0",
+      "library": "font-awesome@5.14.0",
       "destination": "wwwroot/lib/fontawesome",
       "files": [
         "css/*",
-        "fonts/*"
+        "webfonts/*"
       ]
     },
     {
@@ -23,7 +22,7 @@
         "dist/*"
       ]
     },
-    {
+    { 
       "provider": "unpkg",
       "library": "bootstrap@5.0.0-alpha2",
       "destination": "wwwroot/lib/bootstrap",
@@ -39,6 +38,13 @@
         "dist/css/*",
         "dist/js/*",
         "dist/locales/bootstrap-datepicker.en-GB.min.js"
+      ]
+    },
+    {
+      "library": "popper.js@1.16.1",
+      "destination": "wwwroot/lib/popper",
+      "files": [
+        "umd/*"
       ]
     }
   ]

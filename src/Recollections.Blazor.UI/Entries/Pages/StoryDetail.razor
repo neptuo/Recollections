@@ -20,11 +20,11 @@
                     Add Chapter
                 </button>
                 <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
-                    <Icon Identifier="comment-square" />
+                    <Icon Prefix="fas" Identifier="comment-alt" />
                     Add Story Entry
                 </button>
                 <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
-                    <Icon Identifier="trash" />
+                    <Icon Identifier="trash-alt" />
                     Delete Story
                 </button>
             </ActionPanel>
@@ -45,11 +45,11 @@
 
                         <ActionPanel>
                             <button type="button" class="btn btn-sm btn-outline-primary" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
-                                <Icon Identifier="comment-square" />
+                                <Icon Prefix="fas" Identifier="comment-alt" />
                                 Add Chapter Entry
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-danger" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
-                                <Icon Identifier="trash" />
+                                <Icon Identifier="trash-alt" />
                                 Delete Chapter
                             </button>
                         </ActionPanel>

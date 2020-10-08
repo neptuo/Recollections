@@ -21,16 +21,16 @@
 
         <ActionPanel>
 
-            <button type="button" class="btn btn-sm" @onclick="@(async () => await DownloadOriginalAsync())" title="Download Original Image">
+            <button type="button" class="btn btn-sm btn-light" @onclick="@(async () => await DownloadOriginalAsync())" title="Download Original Image">
                 <Icon Identifier="cloud-download" />
                 Download Original
             </button>
-            <button type="button" class="btn btn-sm" @onclick="@(async () => await SetLocationOriginalAsync())" title="Set Location from Original Image">
-                <Icon Identifier="location" />
+            <button type="button" class="btn btn-sm btn-light" @onclick="@(async () => await SetLocationOriginalAsync())" title="Set Location from Original Image">
+                <Icon Prefix="fas" Identifier="location-arrow" />
                 Set Location from Original
             </button>
             <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Image">
-                <Icon Identifier="trash" />
+                <Icon Identifier="trash-alt" />
                 Delete Image
             </button>
 

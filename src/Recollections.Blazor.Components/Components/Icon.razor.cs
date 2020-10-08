@@ -14,6 +14,9 @@ namespace Neptuo.Recollections.Components
         public string Identifier { get; set; }
 
         [Parameter]
+        public string Prefix { get; set; } = "fa";
+
+        [Parameter]
         public Action OnClick { get; set; }
     }
 }
