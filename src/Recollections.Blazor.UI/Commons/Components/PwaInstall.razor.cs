@@ -40,7 +40,7 @@ namespace Neptuo.Recollections.Commons.Components
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (IsInstallable)
+            if (IsInstallable || IsUpdateable)
                 await Tooltip.InitializeAsync(Button);
         }
 
@@ -58,20 +58,28 @@ namespace Neptuo.Recollections.Commons.Components
 
             IsUpdateable = true;
             StateHasChanged();
+
+            _ = Tooltip.ShowAsync(Button);
         }
 
         protected async Task InstallAsync()
         {
+            await Tooltip.HideAsync(Button);
             await Interop.InstallAsync();
             IsInstallable = false;
         }
 
-        protected async Task UpdateAsync() 
-            => await Navigator.ReloadAsync();
+        protected async Task UpdateAsync()
+        {
+            await Tooltip.HideAsync(Button);
+            await Interop.UpdateAsync();
+        }
 
         public void Dispose()
         {
             Interop.Remove(this);
+
+            _ = Tooltip.DisposeAsync(Button);
         }
     }
 }
