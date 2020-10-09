@@ -7,6 +7,10 @@
     <PublishDomain>app.recollections.neptuo.com</PublishDomain>
     <TargetFramework>net5.0</TargetFramework>
     <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
+
+    <RestoreSources>
+      https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json
+    </RestoreSources>
   </PropertyGroup>
 
   <ItemGroup>
