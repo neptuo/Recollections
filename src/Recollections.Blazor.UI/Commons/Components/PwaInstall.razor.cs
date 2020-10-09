@@ -24,6 +24,9 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         internal Navigator Navigator { get; set; }
 
+        [Parameter]
+        public EventCallback OnUpdateAvailable { get; set; }
+
         protected ElementReference Button { get; set; }
         protected bool IsInstallable { get; set; }
         protected bool IsUpdateable { get; set; }
@@ -59,7 +62,13 @@ namespace Neptuo.Recollections.Commons.Components
             IsUpdateable = true;
             StateHasChanged();
 
-            _ = Tooltip.ShowAsync(Button);
+            _ = MakeUpdateableAsync();
+        }
+
+        private async Task MakeUpdateableAsync()
+        {
+            await OnUpdateAvailable.InvokeAsync();
+            await Tooltip.ShowAsync(Button);
         }
 
         protected async Task InstallAsync()
