@@ -80,6 +80,9 @@ namespace Neptuo.Recollections.Entries.Components
             {
                 Url = PlaceholderUrl;
             }
+
+            if (String.IsNullOrEmpty(Url))
+                Url = PlaceholderUrl;
         }
 
         private string GetImageUrl()
