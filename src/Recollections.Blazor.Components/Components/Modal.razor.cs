@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Components
         public string Title { get; set; }
 
         [Parameter]
+        public RenderFragment TitleContent { get; set; }
+
+        [Parameter]
         public string CssClass { get; set; }
 
         [Parameter]

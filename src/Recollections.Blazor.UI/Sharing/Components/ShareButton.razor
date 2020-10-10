@@ -1,0 +1,51 @@
+﻿<button class="btn btn-sm btn-success" @onclick="@OnToggle">
+    <Icon Prefix="fas" Identifier="share-alt" />
+    Share
+</button>
+
+<Modal @ref="@Modal">
+    <TitleContent>
+        <Icon Prefix="fas" Identifier="share-alt" />
+        Share
+    </TitleContent>
+    <ChildContent>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <input @bind="@NewUserName" type="text" class="form-control form-control-sm" placeholder="Username or empty for public..." />
+                </div>
+                <div class="col-3">
+                    <select @bind="@NewPermission" class="form-select form-select-sm">
+                        <option>Read</option>
+                        <option>Write</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-primary" @onclick="OnAddAsync">
+                        <Icon Identifier="plus" />
+                    </button>
+                </div>
+            </div>
+            <hr />
+            <ListView Items="@Items" IsLoading="@AreItemsLoading" Context="model" T="@ShareModel">
+                <div class="row">
+                    <div class="col">
+                        <strong>
+                            @(model.UserName ?? "Everyone")
+                        </strong>
+                    </div>
+                    <div class="col-3">
+                        <span class="ml-2">
+                            @model.Permission
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-sm btn-danger" @onclick="@(async () => await OnDeleteAsync(model))">
+                            <Icon Identifier="times" />
+                        </button>
+                    </div>
+                </div>
+            </ListView>
+        </div>
+    </ChildContent>
+</Modal>

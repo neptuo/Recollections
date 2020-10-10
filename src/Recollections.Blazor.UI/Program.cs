@@ -4,6 +4,7 @@ using Neptuo.Events;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Commons;
 using Neptuo.Recollections.Entries;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +18,7 @@ namespace Neptuo.Recollections
         private static CommonStartup common;
         private static AccountsStartup accounts;
         private static EntriesStartup entries;
+        private static SharingStartup sharing;
 
         public async static Task Main(string[] args)
         {
@@ -24,6 +26,7 @@ namespace Neptuo.Recollections
             common = new CommonStartup();
             accounts = new AccountsStartup();
             entries = new EntriesStartup();
+            sharing = new SharingStartup();
 
             // Configure.
             WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault();
@@ -56,6 +59,7 @@ namespace Neptuo.Recollections
             common.ConfigureServices(services);
             accounts.ConfigureServices(services);
             entries.ConfigureServices(services);
+            sharing.ConfigureServices(services);
         }
 
         private static void ConfigureComponents(RootComponentMappingCollection rootComponents)
