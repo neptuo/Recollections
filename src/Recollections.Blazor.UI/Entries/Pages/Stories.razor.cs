@@ -58,7 +58,7 @@ namespace Neptuo.Recollections.Entries.Pages
             };
 
             await Api.CreateStoryAsync(model);
-            Navigator.OpenStoryDetail(model.Id);
+            Navigator.OpenStoryDetail(UserState.UserId, model.Id);
         }
     }
 }

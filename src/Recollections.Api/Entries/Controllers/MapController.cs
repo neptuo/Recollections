@@ -35,6 +35,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Select(e => new MapEntryModel()
                 {
                     Id = e.Id,
+                    UserId = e.UserId,
                     Title = e.Title,
                     Location = e.Locations.Select(l => new LocationModel()
                     {

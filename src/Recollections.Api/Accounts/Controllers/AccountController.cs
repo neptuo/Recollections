@@ -83,6 +83,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         {
             return Ok(new UserInfoResponse()
             {
+                UserId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier),
                 UserName = HttpContext.User.Identity.Name
             });
         }

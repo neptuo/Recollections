@@ -31,6 +31,7 @@ namespace Neptuo.Recollections.Accounts.Components
         public event Action UserInfoChanged;
 
         public string BearerToken { get; private set; }
+        public string UserId { get; private set; }
         public string UserName { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
 
@@ -86,7 +87,7 @@ namespace Neptuo.Recollections.Accounts.Components
             try
             {
                 UserInfoResponse response = await Api.GetInfoAsync();
-
+                UserId = response.UserId;
                 UserName = response.UserName;
                 UserInfoChanged?.Invoke();
             }

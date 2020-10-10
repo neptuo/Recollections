@@ -49,7 +49,10 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        protected void OnMarkerSelected(int index) 
-            => Navigator.OpenEntryDetail(Entries[index].Id);
+        protected void OnMarkerSelected(int index)
+        {
+            var entry = Entries[index];
+            Navigator.OpenEntryDetail(entry.UserId, entry.Id);
+        }
     }
 }

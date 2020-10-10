@@ -39,6 +39,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Select(e => new StoryEntryModel()
                 {
                     Id = e.Id,
+                    UserId = e.UserId,
                     Title = e.Title
                 })
                 .ToListAsync();
@@ -62,6 +63,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Select(e => new StoryEntryModel()
                 {
                     Id = e.Id,
+                    UserId = e.UserId,
                     Title = e.Title
                 })
                 .ToListAsync();

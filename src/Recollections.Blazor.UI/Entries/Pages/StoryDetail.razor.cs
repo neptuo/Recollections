@@ -28,7 +28,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected UserState UserState { get; set; }
 
         [Parameter]
-        public string Id { get; set; }
+        public string UserId { get; set; }
+
+        [Parameter]
+        public string StoryId { get; set; }
 
         protected EntryPicker EntryPicker { get; set; }
         protected StoryModel Model { get; set; }
@@ -43,7 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
-            Model = await Api.GetStoryAsync(Id);
+            Model = await Api.GetStoryAsync(StoryId);
         }
 
         protected Task SaveAsync()

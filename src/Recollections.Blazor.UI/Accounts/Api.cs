@@ -40,7 +40,10 @@ namespace Neptuo.Recollections.Accounts
             => faultHandler.Wrap(http.PostJsonAsync<LoginRequest, LoginResponse>("accounts/login", request));
 
         public Task<RegisterResponse> RegisterAsync(RegisterRequest request) 
-            => faultHandler.Wrap(http.PostJsonAsync<RegisterRequest, RegisterResponse >("accounts/register", request));
+            => faultHandler.Wrap(http.PostJsonAsync<RegisterRequest, RegisterResponse>("accounts/register", request));
+
+        public Task<UserInfoResponse> GetProfileAsync(string userId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<UserInfoResponse>($"profiles/{userId}"));
 
         public async Task<UserInfoResponse> GetInfoAsync()
         {
@@ -50,8 +53,7 @@ namespace Neptuo.Recollections.Accounts
                 if (response.StatusCode == HttpStatusCode.Unauthorized)
                     throw new UnauthorizedAccessException();
 
-                string responseContent = await response.Content.ReadAsStringAsync();
-                UserInfoResponse responseModel = json.Deserialize<UserInfoResponse>(responseContent);
+                UserInfoResponse responseModel = await response.Content.ReadFromJsonAsync<UserInfoResponse>();
                 return responseModel;
             }
             catch (Exception e)

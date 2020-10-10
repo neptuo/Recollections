@@ -28,6 +28,9 @@ namespace Neptuo.Recollections.Entries.Components
         public EntryModel Entry { get; set; }
 
         [Parameter]
+        public string UserId { get; set; }
+
+        [Parameter]
         public string EntryId { get; set; }
 
         [Parameter]
@@ -50,7 +53,7 @@ namespace Neptuo.Recollections.Entries.Components
             if (EntryId == null || Image == null)
                 return null;
 
-            return Navigator.UrlImageDetail(EntryId, Image.Id);
+            return Navigator.UrlImageDetail(UserId, EntryId, Image.Id);
         }
 
         protected override void OnInitialized()

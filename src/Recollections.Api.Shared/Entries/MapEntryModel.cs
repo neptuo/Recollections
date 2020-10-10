@@ -9,6 +9,8 @@ namespace Neptuo.Recollections.Entries
 {
     public class MapEntryModel
     {
+        public string UserId { get; set; }
+
         public string Id { get; set; }
         public string Title { get; set; }
 

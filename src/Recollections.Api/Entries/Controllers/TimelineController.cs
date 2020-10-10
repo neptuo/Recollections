@@ -43,6 +43,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Select(e => new TimelineEntryModel()
                 {
                     Id = e.Id,
+                    UserId = e.UserId,
                     Title = e.Title,
                     When = e.When,
                     StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,

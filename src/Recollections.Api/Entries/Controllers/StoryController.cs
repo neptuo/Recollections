@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
@@ -238,6 +239,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private void MapEntityToModel(Story entity, StoryListModel model)
         {
             model.Id = entity.Id;
+            model.UserId = entity.UserId;
             model.Title = entity.Title;
         }
 

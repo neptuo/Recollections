@@ -10,7 +10,20 @@ namespace Neptuo.Recollections.Accounts.Pages
 {
     public partial class Profile
     {
+        [Inject]
+        protected Api Api { get; set; }
+
         [Parameter]
-        public string UserName { get; set; }
+        public string UserId { get; set; }
+
+        public string UserName { get; private set; }
+
+        protected async override Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+
+            var response = await Api.GetProfileAsync(UserId);
+            UserName = response.UserName;
+        }
     }
 }

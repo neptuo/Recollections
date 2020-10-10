@@ -119,6 +119,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private void MapEntityToModel(Entry entity, EntryModel model)
         {
             model.Id = entity.Id;
+            model.UserId = entity.UserId;
             model.Title = entity.Title;
             model.When = entity.When;
             model.Text = entity.Text;

@@ -33,6 +33,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected UserState UserState { get; set; }
 
         [Parameter]
+        public string UserId { get; set; }
+
+        [Parameter]
         public string EntryId { get; set; }
 
         private EntryModel original;
