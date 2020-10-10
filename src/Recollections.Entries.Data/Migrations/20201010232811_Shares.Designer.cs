@@ -2,50 +2,48 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neptuo.Recollections.Entries;
 
 namespace Neptuo.Recollections.Entries.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201010232811_Shares")]
+    partial class Shares
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Entries")
-                .HasAnnotation("ProductVersion", "3.1.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "3.1.4");
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Entry", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ChapterId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("StoryId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("When")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -59,25 +57,25 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.Image", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EntryId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("When")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -111,22 +109,22 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.Story", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -136,22 +134,22 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.StoryChapter", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("StoryId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -173,28 +171,26 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.OwnsMany("Neptuo.Recollections.Entries.OrderedLocation", "Locations", b1 =>
                         {
                             b1.Property<string>("EntryId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<int>("Order")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<double?>("Altitude")
-                                .HasColumnType("float");
+                                .HasColumnType("REAL");
 
                             b1.Property<double?>("Latitude")
-                                .HasColumnType("float");
+                                .HasColumnType("REAL");
 
                             b1.Property<double?>("Longitude")
-                                .HasColumnType("float");
+                                .HasColumnType("REAL");
 
                             b1.HasKey("EntryId", "Order");
 
                             b1.ToTable("EntriesLocations");
 
-                            b1.HasOne("Neptuo.Recollections.Entries.Entry")
-                                .WithMany("Locations")
-                                .HasForeignKey("EntryId")
-                                .OnDelete(DeleteBehavior.Cascade);
+                            b1.WithOwner()
+                                .HasForeignKey("EntryId");
                         });
                 });
 
@@ -207,25 +203,23 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.OwnsOne("Neptuo.Recollections.Entries.ImageLocation", "Location", b1 =>
                         {
                             b1.Property<string>("ImageId")
-                                .HasColumnType("nvarchar(450)");
+                                .HasColumnType("TEXT");
 
                             b1.Property<double?>("Altitude")
-                                .HasColumnType("float");
+                                .HasColumnType("REAL");
 
                             b1.Property<double?>("Latitude")
-                                .HasColumnType("float");
+                                .HasColumnType("REAL");
 
                             b1.Property<double?>("Longitude")
-                                .HasColumnType("float");
+                                .HasColumnType("REAL");
 
                             b1.HasKey("ImageId");
 
                             b1.ToTable("Images");
 
-                            b1.HasOne("Neptuo.Recollections.Entries.Image")
-                                .WithOne("Location")
-                                .HasForeignKey("Neptuo.Recollections.Entries.Location", "ImageId")
-                                .OnDelete(DeleteBehavior.Cascade);
+                            b1.WithOwner()
+                                .HasForeignKey("ImageId");
                         });
                 });
 

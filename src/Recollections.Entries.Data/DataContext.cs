@@ -18,6 +18,8 @@ namespace Neptuo.Recollections.Entries
 
         public DbSet<Story> Stories { get; set; }
 
+        public DbSet<Share> Shares { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
             : base(options)
         {
@@ -36,6 +38,8 @@ namespace Neptuo.Recollections.Entries
                 e.Property("Order").ValueGeneratedNever(); // Based on https://github.com/dotnet/efcore/issues/11162.
                 e.HasKey("EntryId", nameof(OrderedLocation.Order));
             });
+
+            modelBuilder.Entity<Share>().HasKey(s => new { s.UserId, s.EntryId, s.StoryId, s.ProfileUserId });
 
             if (!String.IsNullOrEmpty(schema.Name))
             {

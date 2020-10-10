@@ -9,7 +9,7 @@ namespace Neptuo.Recollections.Sharing
 {
     public enum Permission
     {
-        Read,
-        Write
+        Read = 0,
+        Write = 1
     }
 }
