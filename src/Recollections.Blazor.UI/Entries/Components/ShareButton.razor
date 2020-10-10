@@ -1,0 +1,58 @@
+﻿<button class="btn btn-sm btn-success" @onclick="@OnToggle">
+    <Icon Prefix="fas" Identifier="share-alt" />
+    Share
+</button>
+
+<Modal @ref="@Modal">
+    <TitleContent>
+        <Icon Prefix="fas" Identifier="share-alt" />
+        Share
+    </TitleContent>
+    <ChildContent>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control form-control-sm" placeholder="Username or empty for public..." />
+                </div>
+                <div class="col-3">
+                    <select class="form-select form-select-sm">
+                        <option>Read</option>
+                        <option>Write</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-primary">
+                        <Icon Identifier="plus" />
+                    </button>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col">
+                    <strong>Everyone</strong>
+                </div>
+                <div class="col-3">
+                    <span class="ml-2">Read</span>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-danger">
+                        <Icon Identifier="times" />
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <strong>Phoeline</strong>
+                </div>
+                <div class="col-3">
+                    <span class="ml-2">Write</span>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-danger">
+                        <Icon Identifier="times" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    </ChildContent>
+</Modal>
