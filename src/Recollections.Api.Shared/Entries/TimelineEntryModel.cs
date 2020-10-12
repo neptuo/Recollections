@@ -10,6 +10,7 @@ namespace Neptuo.Recollections.Entries
     public class TimelineEntryModel
     {
         public string UserId { get; set; }
+        public string UserName { get; set; }
 
         public string Id { get; set; }
         public string Title { get; set; }

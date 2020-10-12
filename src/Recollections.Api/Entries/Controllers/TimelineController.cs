@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -20,11 +21,14 @@ namespace Neptuo.Recollections.Entries.Controllers
         private const int PageSize = 10;
 
         private readonly DataContext dataContext;
+        private readonly IUserNameProvider userNames;
 
-        public TimelineController(DataContext dataContext)
+        public TimelineController(DataContext dataContext, IUserNameProvider userNames)
         {
             Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(userNames, "userNames");
             this.dataContext = dataContext;
+            this.userNames = userNames;
         }
 
         [HttpGet]
@@ -49,12 +53,14 @@ namespace Neptuo.Recollections.Entries.Controllers
                     When = e.When,
                     StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
                     ChapterTitle = e.Chapter.Title,
-                    GpsCount = e.Locations.Count
+                    GpsCount = e.Locations.Count,
+                    ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id)
                 })
                 .ToListAsync();
 
-            foreach (var entry in result)
-                entry.ImageCount = await dataContext.Images.CountAsync(i => i.Entry.Id == entry.Id);
+            var userNames = await this.userNames.GetUserNamesAsync(result.Select(e => e.UserId).ToArray());
+            for (int i = 0; i < result.Count; i++)
+                result[i].UserName = userNames[i];
 
             return Ok(new TimelineListResponse(result, result.Count == PageSize));
         }

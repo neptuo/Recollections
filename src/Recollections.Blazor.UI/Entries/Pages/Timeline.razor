@@ -46,6 +46,14 @@
                             @entry.ImageCount
                         </span>
                     }
+
+                    @if (UserState.UserId != entry.UserId)
+                    {
+                        <span class="information">
+                            <Icon Identifier="user" />
+                            @entry.UserName
+                        </span>
+                    }
                 </p>
             </div>
         </div>
