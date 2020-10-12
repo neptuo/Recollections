@@ -56,6 +56,22 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.ToTable("Entries");
                 });
 
+            modelBuilder.Entity("Neptuo.Recollections.Entries.EntryShare", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EntryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "EntryId");
+
+                    b.ToTable("EntryShares");
+                });
+
             modelBuilder.Entity("Neptuo.Recollections.Entries.Image", b =>
                 {
                     b.Property<string>("Id")
@@ -84,28 +100,6 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.HasIndex("EntryId");
 
                     b.ToTable("Images");
-                });
-
-            modelBuilder.Entity("Neptuo.Recollections.Entries.Share", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("EntryId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("StoryId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ProfileUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("Permission")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "EntryId", "StoryId", "ProfileUserId");
-
-                    b.ToTable("Shares");
                 });
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Story", b =>
@@ -158,6 +152,22 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.HasIndex("StoryId");
 
                     b.ToTable("StoryChapter");
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Entries.StoryShare", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("StoryId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId", "StoryId");
+
+                    b.ToTable("StoryShares");
                 });
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Entry", b =>

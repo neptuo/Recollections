@@ -14,11 +14,12 @@ namespace Neptuo.Recollections.Entries
         private readonly SchemaOptions schema;
 
         public DbSet<Entry> Entries { get; set; }
+        public DbSet<EntryShare> EntryShares { get; set; }
+
         public DbSet<Image> Images { get; set; }
 
         public DbSet<Story> Stories { get; set; }
-
-        public DbSet<Share> Shares { get; set; }
+        public DbSet<StoryShare> StoryShares { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
             : base(options)
@@ -39,7 +40,11 @@ namespace Neptuo.Recollections.Entries
                 e.HasKey("EntryId", nameof(OrderedLocation.Order));
             });
 
-            modelBuilder.Entity<Share>().HasKey(s => new { s.UserId, s.EntryId, s.StoryId, s.ProfileUserId });
+            modelBuilder.Entity<EntryShare>()
+                .HasKey(s => new { s.UserId, s.EntryId });
+
+            modelBuilder.Entity<StoryShare>()
+                .HasKey(s => new { s.UserId, s.StoryId });
 
             if (!String.IsNullOrEmpty(schema.Name))
             {

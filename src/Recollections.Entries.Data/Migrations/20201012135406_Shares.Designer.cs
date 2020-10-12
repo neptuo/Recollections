@@ -9,7 +9,7 @@ using Neptuo.Recollections.Entries;
 namespace Neptuo.Recollections.Entries.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201010232811_Shares")]
+    [Migration("20201012135406_Shares")]
     partial class Shares
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,22 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.ToTable("Entries");
                 });
 
+            modelBuilder.Entity("Neptuo.Recollections.Entries.EntryShare", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EntryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "EntryId");
+
+                    b.ToTable("EntryShares");
+                });
+
             modelBuilder.Entity("Neptuo.Recollections.Entries.Image", b =>
                 {
                     b.Property<string>("Id")
@@ -82,28 +98,6 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.HasIndex("EntryId");
 
                     b.ToTable("Images");
-                });
-
-            modelBuilder.Entity("Neptuo.Recollections.Entries.Share", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EntryId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("StoryId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProfileUserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Permission")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("UserId", "EntryId", "StoryId", "ProfileUserId");
-
-                    b.ToTable("Shares");
                 });
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Story", b =>
@@ -156,6 +150,22 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.HasIndex("StoryId");
 
                     b.ToTable("StoryChapter");
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Entries.StoryShare", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StoryId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId", "StoryId");
+
+                    b.ToTable("StoryShares");
                 });
 
             modelBuilder.Entity("Neptuo.Recollections.Entries.Entry", b =>

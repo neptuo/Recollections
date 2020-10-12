@@ -7,13 +7,24 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class Share
+    public abstract class ShareBase
     {
         public string UserId { get; set; }
         public int Permission { get; set; }
+    }
 
+    public class EntryShare : ShareBase
+    {
         public string EntryId { get; set; }
+    }
+
+    public class StoryShare : ShareBase
+    {
         public string StoryId { get; set; }
+    }
+
+    public class ProfileShare : ShareBase
+    {
         public string ProfileUserId { get; set; }
     }
 }
