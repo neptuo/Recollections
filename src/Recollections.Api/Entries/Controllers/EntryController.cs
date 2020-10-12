@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Neptuo;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,15 +17,18 @@ namespace Neptuo.Recollections.Entries.Controllers
     [Route("api/entries")]
     public class EntryController : ControllerBase
     {
-        private readonly DataContext dataContext;
+        private readonly DataContext db;
         private readonly ImageService imageService;
+        private readonly ShareStatusService shareStatus;
 
-        public EntryController(DataContext dataContext, ImageService imageService)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus)
         {
-            Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(db, "db");
             Ensure.NotNull(imageService, "imageService");
-            this.dataContext = dataContext;
+            Ensure.NotNull(shareStatus, "shareStatus");
+            this.db = db;
             this.imageService = imageService;
+            this.shareStatus = shareStatus;
         }
 
         [HttpGet("{id}")]
@@ -34,16 +40,16 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             Ensure.NotNullOrEmpty(id, "id");
 
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            Entry entity = await dataContext.Entries.FindAsync(id);
+            Entry entity = await db.Entries.FindAsync(id);
             if (entity == null)
                 return NotFound();
 
+            string userId = HttpContext.User.FindUserId();
             if (entity.UserId != userId)
-                return Unauthorized();
+            {
+                if (!await shareStatus.IsEntrySharedForReadAsync(id, userId))
+                    return Unauthorized();
+            }
 
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
@@ -63,8 +69,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.UserId = userId;
             entity.Created = DateTime.Now;
 
-            await dataContext.Entries.AddAsync(entity);
-            await dataContext.SaveChangesAsync();
+            await db.Entries.AddAsync(entity);
+            await db.SaveChangesAsync();
 
             MapEntityToModel(entity, model);
             return CreatedAtAction(nameof(Get), new { id = entity.Id }, model);
@@ -73,24 +79,24 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<EntryModel>> Update(string id, EntryModel model)
         {
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
             if (id != model.Id)
                 return BadRequest();
 
-            Entry entity = await dataContext.Entries.FindAsync(id);
+            Entry entity = await db.Entries.FindAsync(id);
             if (entity == null)
                 return NotFound();
 
+            string userId = HttpContext.User.FindUserId();
             if (entity.UserId != userId)
-                return Unauthorized();
+            {
+                if (!await shareStatus.IsEntrySharedForWriteAsync(id, userId))
+                    return Unauthorized();
+            }
 
             MapModelToEntity(model, entity);
 
-            dataContext.Entries.Update(entity);
-            await dataContext.SaveChangesAsync();
+            db.Entries.Update(entity);
+            await db.SaveChangesAsync();
 
             return NoContent();
         }
@@ -102,7 +108,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            Entry entity = await dataContext.Entries.FindAsync(id);
+            Entry entity = await db.Entries.FindAsync(id);
             if (entity == null)
                 return NotFound();
 
@@ -110,8 +116,8 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             await imageService.DeleteAllAsync(entity);
-            dataContext.Entries.Remove(entity);
-            await dataContext.SaveChangesAsync();
+            db.Entries.Remove(entity);
+            await db.SaveChangesAsync();
 
             return Ok();
         }

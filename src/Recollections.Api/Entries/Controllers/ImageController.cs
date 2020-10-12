@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,8 +21,8 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext dataContext;
         private readonly IFileStorage fileProvider;
 
-        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider)
-            : base(dataContext)
+        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus)
+            : base(dataContext, shareStatus)
         {
             Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
@@ -32,7 +33,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpGet]
-        public Task<IActionResult> List(string entryId) => RunEntryAsync(entryId, async entry =>
+        public Task<IActionResult> List(string entryId) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
             List<Image> entities = await dataContext.Images.Where(i => i.Entry.Id == entryId).ToListAsync();
             List<ImageModel> result = new List<ImageModel>();
@@ -49,7 +50,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpGet("{imageId}")]
-        public Task<IActionResult> Detail(string entryId, string imageId) => RunEntryAsync(entryId, async entry =>
+        public Task<IActionResult> Detail(string entryId, string imageId) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
             Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)
@@ -73,16 +74,8 @@ namespace Neptuo.Recollections.Entries.Controllers
         public Task<IActionResult> FileContent(string entryId, string imageId)
             => GetFileContent(entryId, imageId, ImageType.Original);
 
-        private async Task<IActionResult> GetFileContent(string entryId, string imageId, ImageType type)
+        private Task<IActionResult> GetFileContent(string entryId, string imageId, ImageType type) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            Entry entry = await dataContext.Entries.FindAsync(entryId);
-            if (entry == null)
-                return NotFound();
-
             Image entity = await dataContext.Images.FindAsync(imageId);
             if (entity == null)
                 return NotFound();
@@ -106,7 +99,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             }
 
             return File(content, GetFileContentType(imageName));
-        }
+        });
 
         private static string GetFileContentType(string filePath)
         {
@@ -118,7 +111,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpPost]
-        public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, async entry =>
+        public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, Permission.Write, async entry =>
         {
             try
             {
@@ -136,7 +129,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPut("{imageId}")]
-        public Task<IActionResult> Update(string entryId, string imageId, ImageModel model) => RunEntryAsync(entryId, async entry =>
+        public Task<IActionResult> Update(string entryId, string imageId, ImageModel model) => RunEntryAsync(entryId, Permission.Write, async entry =>
         {
             Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)
@@ -164,7 +157,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPost("{imageId}/set-location-from-original")]
-        public Task<IActionResult> SetLocationFromOriginal(string entryId, string imageId) => RunEntryAsync(entryId, async entry =>
+        public Task<IActionResult> SetLocationFromOriginal(string entryId, string imageId) => RunEntryAsync(entryId, Permission.Write, async entry =>
         {
             Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)

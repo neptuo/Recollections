@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Neptuo;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,37 +15,23 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/entries/{entryId}/story")]
-    public class EntryStoryController : ControllerBase
+    public class EntryStoryController : EntryControllerBase
     {
         private readonly DataContext dataContext;
 
-        public EntryStoryController(DataContext dataContext)
+        public EntryStoryController(DataContext dataContext, ShareStatusService shareStatus)
+            : base(dataContext, shareStatus, RunEntryModifier)
         {
             Ensure.NotNull(dataContext, "dataContext");
             this.dataContext = dataContext;
         }
 
-        private async Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
+        private static IQueryable<Entry> RunEntryModifier(IQueryable<Entry> query)
         {
-            Ensure.NotNullOrEmpty(entryId, "entryId");
-
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            Entry entity = await dataContext.Entries
+            return query
                 .Include(e => e.Chapter)
                 .Include(e => e.Chapter.Story)
-                .Include(e => e.Story)
-                .FirstOrDefaultAsync(e => e.Id == entryId);
-
-            if (entity == null)
-                return NotFound();
-
-            if (entity.UserId != userId)
-                return Unauthorized();
-
-            return await handler(entity);
+                .Include(e => e.Story);
         }
 
         [HttpGet]
@@ -51,7 +39,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
         [ProducesResponseType(Status404NotFound)]
-        public Task<IActionResult> Get(string entryId) => RunEntryAsync(entryId, entry =>
+        public Task<IActionResult> Get(string entryId) => RunEntryAsync(entryId, Permission.Read, entry =>
         {
             StoryChapter chapter = null;
             Story story = null;

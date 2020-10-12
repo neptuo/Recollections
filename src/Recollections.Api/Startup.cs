@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries;
+using Neptuo.Recollections.Sharing;
 
 namespace Neptuo.Recollections
 {
@@ -17,6 +18,7 @@ namespace Neptuo.Recollections
         private readonly IWebHostEnvironment environment;
         private readonly AccountsStartup accountsStartup;
         private readonly EntriesStartup entriesStartup;
+        private readonly SharingStartup sharingStartup;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -25,6 +27,7 @@ namespace Neptuo.Recollections
 
             accountsStartup = new AccountsStartup(configuration.GetSection("Accounts"), ResolvePath);
             entriesStartup = new EntriesStartup(configuration.GetSection("Entries"), ResolvePath);
+            sharingStartup = new SharingStartup();
         }
 
         private string ResolvePath(string relativePath)
@@ -44,6 +47,7 @@ namespace Neptuo.Recollections
 
             accountsStartup.ConfigureServices(services);
             entriesStartup.ConfigureServices(services);
+            sharingStartup.ConfigureServices(services);
         }
 
         public void Configure(IApplicationBuilder app)

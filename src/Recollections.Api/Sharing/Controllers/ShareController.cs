@@ -18,8 +18,6 @@ namespace Neptuo.Recollections.Sharing.Controllers
     [Route("api")]
     public class ShareController : EntryControllerBase
     {
-        private const string publicUser = "public";
-
         private readonly DataContext db;
         private readonly IUserNameProvider userNames;
 
@@ -44,7 +42,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
 
             if (items.Count > 0)
             {
-                var p = items.FirstOrDefault(s => s.UserName == publicUser);
+                var p = items.FirstOrDefault(s => s.UserName == ShareStatusService.PublicUserName);
                 if (p != null)
                     items.Remove(p);
 
@@ -74,10 +72,10 @@ namespace Neptuo.Recollections.Sharing.Controllers
             where T : ShareBase
         {
             string userId;
-            if (model.UserName != null && model.UserName != publicUser)
+            if (model.UserName != null && model.UserName != ShareStatusService.PublicUserName)
                 userId = (await userNames.GetUserIdsAsync(new[] { model.UserName })).First();
             else
-                userId = publicUser;
+                userId = ShareStatusService.PublicUserId;
 
             T entity = await findQuery(userId).FirstOrDefaultAsync();
             if (entity == null)
@@ -111,10 +109,10 @@ namespace Neptuo.Recollections.Sharing.Controllers
             where T : ShareBase
         {
             string userId;
-            if (userName != null && userName != publicUser)
+            if (userName != null && userName != ShareStatusService.PublicUserName)
                 userId = (await userNames.GetUserIdsAsync(new[] { userName })).First();
             else
-                userId = publicUser;
+                userId = ShareStatusService.PublicUserId;
 
             T entity = await findQuery(userId).FirstOrDefaultAsync();
             if (entity == null)

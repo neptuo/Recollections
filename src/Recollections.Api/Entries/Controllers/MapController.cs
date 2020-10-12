@@ -26,7 +26,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpGet]
         public async Task<IActionResult> List()
         {
-            string userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string userId = HttpContext.User.FindUserId();
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
