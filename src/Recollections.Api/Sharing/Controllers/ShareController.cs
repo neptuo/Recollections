@@ -21,8 +21,8 @@ namespace Neptuo.Recollections.Sharing.Controllers
         private readonly DataContext db;
         private readonly IUserNameProvider userNames;
 
-        public ShareController(DataContext db, IUserNameProvider userNames)
-            : base(db)
+        public ShareController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus)
+            : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(userNames, "userNames");
