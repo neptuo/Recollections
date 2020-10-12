@@ -24,13 +24,21 @@ namespace Neptuo.Recollections.Accounts
             if (userNames.Count == 0)
                 return Array.Empty<string>();
 
-            List<string> userIds = await db.Users
+            var users = await db.Users
                 .Where(u => userNames.Contains(u.UserName))
-                .Select(u => u.Id)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.UserName
+                })
                 .ToListAsync();
 
-            if (userIds.Count != userNames.Count)
+            if (users.Count != userNames.Count)
                 throw Ensure.Exception.InvalidOperation($"Enumeration of userNames contains some not valid '{String.Join(", ", userNames)}'.");
+
+            List<string> userIds = new List<string>();
+            foreach (var userName in userNames)
+                userIds.Add(users.First(u => u.UserName == userName).Id);
 
             return userIds;
         }
@@ -40,13 +48,21 @@ namespace Neptuo.Recollections.Accounts
             if (userIds.Count == 0)
                 return Array.Empty<string>();
 
-            List<string> userNames = await db.Users
+            var users = await db.Users
                 .Where(u => userIds.Contains(u.Id))
-                .Select(u => u.UserName)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.UserName
+                })
                 .ToListAsync();
 
-            if (userNames.Count != userIds.Count)
+            if (users.Count != userIds.Count)
                 throw Ensure.Exception.InvalidOperation($"Enumeration of userIds contains some not valid '{String.Join(", ", userIds)}'.");
+
+            List<string> userNames = new List<string>();
+            foreach (var userId in userIds)
+                userNames.Add(users.First(u => u.Id == userId).UserName);
 
             return userNames;
         }
