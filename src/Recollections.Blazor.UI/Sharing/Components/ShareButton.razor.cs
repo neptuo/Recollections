@@ -23,12 +23,6 @@ namespace Neptuo.Recollections.Sharing.Components
 
         protected ShareModel NewShare { get; } = new ShareModel();
 
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await LoadAsync();
-        }
-
         private async Task LoadAsync()
         {
             AreItemsLoading = true;
@@ -36,8 +30,11 @@ namespace Neptuo.Recollections.Sharing.Components
             AreItemsLoading = false;
         }
 
-        protected void OnToggle()
-            => Modal.Show();
+        protected void OnShow()
+        { 
+            Modal.Show();
+            _ = LoadAsync();
+        }
 
         protected async Task OnAddAsync()
         {
