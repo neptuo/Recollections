@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,7 +37,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             List<TimelineEntryModel> result = await dataContext.Entries
-                .Where(e => e.UserId == userId)
+                .Where(e => e.UserId == userId || dataContext.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId))
                 .OrderByDescending(e => e.When)
                 .Skip(offset)
                 .Take(PageSize)
