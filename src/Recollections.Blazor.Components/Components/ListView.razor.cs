@@ -26,7 +26,7 @@ namespace Neptuo.Recollections.Components
         {
             base.OnParametersSet();
 
-            Console.WriteLine($"LV, count: {Items.Count}");
+            Console.WriteLine($"LV, count: {Items?.Count}");
         }
     }
 }

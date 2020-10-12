@@ -28,6 +28,7 @@ namespace Neptuo.Recollections.Sharing.Components
             AreItemsLoading = true;
             Items = await Api.GetEntryListAsync(EntryId);
             AreItemsLoading = false;
+            StateHasChanged();
         }
 
         protected void OnShow()

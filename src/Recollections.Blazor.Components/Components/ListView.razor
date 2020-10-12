@@ -4,7 +4,7 @@
 {
     <span>Loading...</span>
 }
-else if (Items.Count == 0)
+else if (Items == null || Items.Count == 0)
 {
     <Alert Mode="@AlertMode.Warning" Message="@EmptyMessage" />
 }
