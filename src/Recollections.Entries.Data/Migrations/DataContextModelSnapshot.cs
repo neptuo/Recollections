@@ -89,19 +89,19 @@ namespace Neptuo.Recollections.Entries.Migrations
             modelBuilder.Entity("Neptuo.Recollections.Entries.Share", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("EntryId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("StoryId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProfileUserId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Permission")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "EntryId", "StoryId", "ProfileUserId");
 
@@ -224,7 +224,7 @@ namespace Neptuo.Recollections.Entries.Migrations
 
                             b1.HasOne("Neptuo.Recollections.Entries.Image")
                                 .WithOne("Location")
-                                .HasForeignKey("Neptuo.Recollections.Entries.Location", "ImageId")
+                                .HasForeignKey("Neptuo.Recollections.Entries.ImageLocation", "ImageId")
                                 .OnDelete(DeleteBehavior.Cascade);
                         });
                 });
