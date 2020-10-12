@@ -21,8 +21,7 @@ namespace Neptuo.Recollections.Sharing.Components
         protected Modal Modal { get; set; }
         protected List<ShareModel> Items { get; set; }
 
-        protected string NewUserName { get; set; }
-        protected Permission NewPermission { get; set; }
+        protected ShareModel NewShare { get; } = new ShareModel();
 
         protected async override Task OnInitializedAsync()
         {
@@ -42,11 +41,14 @@ namespace Neptuo.Recollections.Sharing.Components
 
         protected async Task OnAddAsync()
         {
-            if (String.IsNullOrEmpty(NewUserName) || String.IsNullOrWhiteSpace(NewUserName))
-                NewUserName = null;
+            if (String.IsNullOrEmpty(NewShare.UserName) || String.IsNullOrWhiteSpace(NewShare.UserName))
+                NewShare.UserName = null;
 
-            await Api.CreateEntryAsync(EntryId, new ShareModel(NewUserName, NewPermission));
+            await Api.CreateEntryAsync(EntryId, NewShare);
             await LoadAsync();
+
+            NewShare.UserName = null;
+            NewShare.Permission = Permission.Read;
         }
 
         protected async Task OnDeleteAsync(ShareModel model)
