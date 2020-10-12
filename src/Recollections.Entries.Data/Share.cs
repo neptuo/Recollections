@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neptuo;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,11 +17,29 @@ namespace Neptuo.Recollections.Entries
     public class EntryShare : ShareBase
     {
         public string EntryId { get; set; }
+
+        public EntryShare()
+        { }
+
+        public EntryShare(string entryId)
+        {
+            Ensure.NotNull(entryId, "entryId");
+            EntryId = entryId;
+        }
     }
 
     public class StoryShare : ShareBase
     {
         public string StoryId { get; set; }
+
+        public StoryShare()
+        { }
+
+        public StoryShare(string storyId)
+        {
+            Ensure.NotNull(storyId, "storyId");
+            StoryId = storyId;
+        }
     }
 
     public class ProfileShare : ShareBase

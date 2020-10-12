@@ -18,7 +18,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
     [Route("api")]
     public class ShareController : EntryControllerBase
     {
-        private const string publicUserId = "public";
+        private const string publicUser = "public";
 
         private readonly DataContext db;
         private readonly IUserNameProvider userNames;
@@ -32,14 +32,9 @@ namespace Neptuo.Recollections.Sharing.Controllers
             this.userNames = userNames;
         }
 
-        [HttpGet("entries/{entryId}/sharing")]
-        [ProducesDefaultResponseType(typeof(ShareModel))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, async entry =>
+        private async Task<IActionResult> GetItemsAsync(IQueryable<ShareBase> query)
         {
-            var items = await db.EntryShares
-                .Where(s => s.EntryId == entryId)
+            var items = await query
                 .Select(s => new ShareModel()
                 {
                     UserName = s.UserId,
@@ -49,7 +44,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
 
             if (items.Count > 0)
             {
-                var p = items.FirstOrDefault(s => s.UserName == publicUserId);
+                var p = items.FirstOrDefault(s => s.UserName == publicUser);
                 if (p != null)
                     items.Remove(p);
 
@@ -57,36 +52,41 @@ namespace Neptuo.Recollections.Sharing.Controllers
                 for (int i = 0; i < items.Count; i++)
                     items[i].UserName = names[i];
 
+                items.Sort((a, b) => a.UserName.CompareTo(b.UserName));
+
                 if (p != null)
                     items.Insert(0, p);
             }
 
             return Ok(items);
+        }
+
+        [HttpGet("entries/{entryId}/sharing")]
+        [ProducesDefaultResponseType(typeof(ShareModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, entry =>
+        {
+            return GetItemsAsync(db.EntryShares.Where(s => s.EntryId == entryId));
         });
 
-        [HttpPost("entries/{entryId}/sharing")]
-        public Task<IActionResult> CreateEntryAsync(string entryId, ShareModel model) => RunEntryAsync(entryId, async entry =>
+        private async Task<IActionResult> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)
+            where T : ShareBase
         {
-            string userId = null;
-            if (model.UserName != null)
+            string userId;
+            if (model.UserName != null && model.UserName != publicUser)
                 userId = (await userNames.GetUserIdsAsync(new[] { model.UserName })).First();
             else
-                userId = publicUserId;
+                userId = publicUser;
 
-            EntryShare entity = await db.EntryShares
-                .Where(s => s.EntryId == entryId && s.UserId == userId)
-                .FirstOrDefaultAsync();
-
+            T entity = await findQuery(userId).FirstOrDefaultAsync();
             if (entity == null)
             {
-                entity = new EntryShare()
-                {
-                    EntryId = entryId,
-                    UserId = userId,
-                    Permission = (int)model.Permission
-                };
+                entity = entityFactory();
+                entity.UserId = userId;
+                entity.Permission = (int)model.Permission;
 
-                await db.EntryShares.AddAsync(entity);
+                await db.Set<T>().AddAsync(entity);
             }
             else
             {
@@ -95,27 +95,43 @@ namespace Neptuo.Recollections.Sharing.Controllers
 
             await db.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
+        }
+
+        [HttpPost("entries/{entryId}/sharing")]
+        public Task<IActionResult> CreateEntryAsync(string entryId, ShareModel model) => RunEntryAsync(entryId, entry =>
+        {
+            return CreateAsync(
+                model, 
+                userId => db.EntryShares.Where(s => s.EntryId == entryId && s.UserId == userId), 
+                () => new EntryShare(entryId)
+            );
         });
+
+        private async Task<IActionResult> DeleteAsync<T>(string userName, Func<string, IQueryable<T>> findQuery)
+            where T : ShareBase
+        {
+            string userId;
+            if (userName != null && userName != publicUser)
+                userId = (await userNames.GetUserIdsAsync(new[] { userName })).First();
+            else
+                userId = publicUser;
+
+            T entity = await findQuery(userId).FirstOrDefaultAsync();
+            if (entity == null)
+                return NotFound();
+
+            db.Set<T>().Remove(entity);
+            await db.SaveChangesAsync();
+            return Ok();
+        }
 
         [HttpDelete("entries/{entryId}/sharing/{userName}")]
         public Task<IActionResult> DeleteEntryAsync(string entryId, string userName) => RunEntryAsync(entryId, async entry =>
         {
-            string userId = null;
-            if (userName != null)
-                userId = (await userNames.GetUserIdsAsync(new[] { userName })).First();
-            else
-                userId = publicUserId;
-
-            EntryShare entity = await db.EntryShares
-                .Where(s => s.EntryId == entryId && s.UserId == userId)
-                .FirstOrDefaultAsync();
-
-            if (entity == null)
-                return NotFound();
-
-            db.EntryShares.Remove(entity);
-            await db.SaveChangesAsync();
-            return Ok();
+            return await DeleteAsync(
+                userName, 
+                userId => db.EntryShares.Where(s => s.EntryId == entryId && s.UserId == userId)
+            );
         });
     }
 }
