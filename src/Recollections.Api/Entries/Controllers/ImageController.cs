@@ -14,13 +14,14 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/entries/{entryId}/images")]
-    public class ImageController : ControllerBase
+    public class ImageController : EntryControllerBase
     {
         private readonly ImageService service;
         private readonly DataContext dataContext;
         private readonly IFileStorage fileProvider;
 
         public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider)
+            : base(dataContext)
         {
             Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
@@ -28,24 +29,6 @@ namespace Neptuo.Recollections.Entries.Controllers
             this.service = service;
             this.dataContext = dataContext;
             this.fileProvider = fileProvider;
-        }
-
-        private async Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
-        {
-            Ensure.NotNullOrEmpty(entryId, "entryId");
-
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            Entry entity = await dataContext.Entries.FindAsync(entryId);
-            if (entity == null)
-                return NotFound();
-
-            if (entity.UserId != userId)
-                return Unauthorized();
-
-            return await handler(entity);
         }
 
         [HttpGet]

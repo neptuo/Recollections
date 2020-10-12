@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Neptuo.Recollections.Accounts;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -40,6 +41,7 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddTransient<ImageService>()
                 .AddTransient<ImageResizeService>()
+                .AddTransient<IUserNameProvider, DbUserNameProvider>()
                 .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"));
         }
 
