@@ -34,5 +34,10 @@ namespace Neptuo.Recollections.Sharing
             bool isAllowed = await db.EntryShares.AnyAsync(s => s.EntryId == entryId && (s.UserId == userId || s.UserId == PublicUserId) && s.Permission == (int)Permission.Write);
             return isAllowed;
         }
+
+        public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string userId)
+        {
+            return query.Where(e => e.UserId == userId || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId));
+        }
     }
 }

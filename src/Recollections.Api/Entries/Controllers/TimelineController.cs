@@ -22,13 +22,16 @@ namespace Neptuo.Recollections.Entries.Controllers
 
         private readonly DataContext dataContext;
         private readonly IUserNameProvider userNames;
+        private readonly ShareStatusService shareStatus;
 
-        public TimelineController(DataContext dataContext, IUserNameProvider userNames)
+        public TimelineController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(userNames, "userNames");
+            Ensure.NotNull(shareStatus, "shareStatus");
             this.dataContext = dataContext;
             this.userNames = userNames;
+            this.shareStatus = shareStatus;
         }
 
         [HttpGet]
@@ -40,8 +43,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            List<TimelineEntryModel> result = await dataContext.Entries
-                .Where(e => e.UserId == userId || dataContext.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId))
+            List<TimelineEntryModel> result = await shareStatus
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
                 .OrderByDescending(e => e.When)
                 .Skip(offset)
                 .Take(PageSize)
