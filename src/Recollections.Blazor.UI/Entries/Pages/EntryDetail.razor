@@ -59,6 +59,8 @@
                             BearerToken="@UserState.BearerToken"
                             Progress="@(async e => await OnUploadProgressAsync(e))" />
 
+                <ShareButton EntryId="@EntryId" />
+
                 <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Entry">
                     <Icon Identifier="trash-alt" />
                     Delete Entry
