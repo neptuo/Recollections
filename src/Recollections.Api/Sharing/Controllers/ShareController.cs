@@ -77,6 +77,9 @@ namespace Neptuo.Recollections.Sharing.Controllers
             else
                 userId = ShareStatusService.PublicUserId;
 
+            if (userId == ShareStatusService.PublicUserId && model.Permission != Permission.Read)
+                return BadRequest();
+
             T entity = await findQuery(userId).FirstOrDefaultAsync();
             if (entity == null)
             {
