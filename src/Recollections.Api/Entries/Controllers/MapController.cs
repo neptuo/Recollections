@@ -52,7 +52,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 if (HasLocationValue(item))
                 {
                     var location = await dataContext.Images
-                        .Where(i => i.Entry.Id == item.Id)
+                        .Where(i => i.Entry.Id == item.Id && i.Location.Latitude != null && i.Location.Longitude != null)
                         .Select(i => new LocationModel()
                         {
                             Latitude = i.Location.Latitude,
