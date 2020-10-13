@@ -64,10 +64,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
         protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
-        protected FormState FormState { get; } = new FormState();
-        protected Permission UserPermission { get; set; }
-        protected bool IsOwner => UserState.UserId == Model?.UserId;
-        protected bool CanWrite => UserPermission == Permission.Write;
+        protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
         protected async override Task OnInitializedAsync()
         {
@@ -84,10 +81,13 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
-            (Model, UserPermission) = await Api.GetEntryAsync(EntryId);
+            Permission userPermission;
+            (Model, userPermission) = await Api.GetEntryAsync(EntryId);
+
             UpdateOriginal();
 
-            FormState.IsEditable = CanWrite;
+            Permissions.IsEditable = userPermission == Permission.Write;
+            Permissions.IsOwner = UserState.UserId == Model.UserId;
 
             Markers.Clear();
             foreach (var location in Model.Locations)

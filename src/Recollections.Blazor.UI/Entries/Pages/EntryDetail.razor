@@ -3,7 +3,7 @@
 @if (Model != null)
 {
     <CascadingValue Value="@Model">
-        <CascadingValue Value="@FormState">
+        <PermissionContainer State="@Permissions">
             <div class="entry-detail">
                 <h2 class="title">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
@@ -50,25 +50,22 @@
                 </div>
 
                 <ActionPanel>
-                    @if (FormState.IsEditable)
-                    {
+                    <PermissionView Request="@PermissionRequest.Write">
                         <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
                                     BearerToken="@UserState.BearerToken"
                                     Progress="@(async e => await OnUploadProgressAsync(e))" />
+                    </PermissionView>
+                    <PermissionView Request="@PermissionRequest.Owner">
+                        <ShareButton EntryId="@EntryId" />
 
-                        @if (IsOwner)
-                        {
-                            <ShareButton EntryId="@EntryId" />
-
-                            <button type="button" class="btn btn-sm btn-danger" @onclick="@DeleteAsync" title="Delete Entry">
-                                <Icon Identifier="trash-alt" />
-                                Delete Entry
-                            </button>
-                        }
-                    }
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@DeleteAsync" title="Delete Entry">
+                            <Icon Identifier="trash-alt" />
+                            Delete Entry
+                        </button>
+                    </PermissionView>
                 </ActionPanel>
             </div>
-        </CascadingValue>
+        </PermissionContainer>
     </CascadingValue>
 
     <Modal @ref="@LocationEdit" Title="Location" FormSubmit="@(async () => await SaveSelectedLocationAsync())">

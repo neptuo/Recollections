@@ -44,11 +44,12 @@ namespace Neptuo.Recollections.Entries.Pages
         protected ImageModel Model { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
+        protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
+
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
-
             await LoadAsync();
         }
 
