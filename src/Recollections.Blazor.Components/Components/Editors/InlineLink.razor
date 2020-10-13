@@ -1,0 +1,18 @@
+﻿@inherits InlineEdit<string>
+
+<div class="inline-editor inline-link @GetModeCssClass()">
+    <a class="inline-editor-value" @onclick="@OnEditAsync">
+        <Icon Identifier="pen" />
+
+        <Icon Prefix="@IconPrefix" Identifier="@Icon" />
+        @if (String.IsNullOrEmpty(Value))
+        {
+            <span class="ml-1 inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
+        }
+        else
+        {
+            <span class="ml-1 inline-editor-content">@Value</span>
+        }
+    </a>
+</div>
+
