@@ -2,6 +2,7 @@
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Components.Editors;
 using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
@@ -62,6 +63,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
         protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
+        protected FormState FormState { get; } = new FormState();
+        protected bool IsOwner => UserState.UserId == Model?.UserId;
 
         protected async override Task OnInitializedAsync()
         {
