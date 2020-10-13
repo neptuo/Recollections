@@ -4,6 +4,7 @@ using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Components.Editors;
 using Neptuo.Recollections.Entries.Components;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,7 +65,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
         protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
         protected FormState FormState { get; } = new FormState();
+        protected Permission UserPermission { get; set; }
         protected bool IsOwner => UserState.UserId == Model?.UserId;
+        protected bool CanWrite => UserPermission == Permission.Write;
 
         protected async override Task OnInitializedAsync()
         {
@@ -81,8 +84,10 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
-            Model = await Api.GetDetailAsync(EntryId);
+            (Model, UserPermission) = await Api.GetEntryAsync(EntryId);
             UpdateOriginal();
+
+            FormState.IsEditable = CanWrite;
 
             Markers.Clear();
             foreach (var location in Model.Locations)
