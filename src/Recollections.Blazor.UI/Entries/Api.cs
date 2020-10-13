@@ -57,22 +57,40 @@ namespace Neptuo.Recollections.Entries
             HttpResponseMessage responseMessage = await http.GetAsync($"entries/{entryId}");
             responseMessage.EnsureSuccessStatusCode();
 
-            Permission permission = Permission.Write;
             var model = await responseMessage.Content.ReadFromJsonAsync<EntryModel>();
+            var permission = GetPermissionFromResponse(responseMessage);
+
+            return (model, permission);
+        }
+
+        private static Permission GetPermissionFromResponse(HttpResponseMessage responseMessage)
+        {
+            Permission permission = Permission.Write;
             if (responseMessage.Headers.TryGetValues(PermissionHeader.Name, out var permissionHeaderValues))
             {
                 if (!Enum.TryParse(permissionHeaderValues.FirstOrDefault(), out permission))
                     permission = Permission.Write;
             }
-            
-            return (model, permission);
+
+            return permission;
         }
 
         public Task<List<ImageModel>> GetImagesAsync(string entryId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ImageModel>>($"entries/{entryId}/images"));
 
-        public Task<ImageModel> GetImageAsync(string entryId, string imageId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<ImageModel>($"entries/{entryId}/images/{imageId}"));
+        public Task<(ImageModel, Permission)> GetImageAsync(string entryId, string imageId)
+            => faultHandler.Wrap(GetImagePrivateAsync(entryId, imageId));
+        
+        private async Task<(ImageModel, Permission)> GetImagePrivateAsync(string entryId, string imageId)
+        {
+            HttpResponseMessage responseMessage = await http.GetAsync($"entries/{entryId}/images/{imageId}");
+            responseMessage.EnsureSuccessStatusCode();
+
+            var model = await responseMessage.Content.ReadFromJsonAsync<ImageModel>();
+            var permission = GetPermissionFromResponse(responseMessage);
+
+            return (model, permission);
+        }
 
         public Task<byte[]> GetImageDataAsync(string url)
             => faultHandler.Wrap(http.GetByteArrayAsync((settings.BaseUrl + url).Replace("api/api", "api")));

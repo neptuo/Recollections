@@ -172,9 +172,10 @@ namespace Neptuo.Recollections.Entries
             await dataContext.SaveChangesAsync();
         }
 
-        public void MapEntityToModel(Image entity, ImageModel model)
+        public void MapEntityToModel(Image entity, ImageModel model, string userId)
         {
             model.Id = entity.Id;
+            model.UserId = userId;
             model.Name = entity.Name;
             model.Description = entity.Description;
             model.When = entity.When;

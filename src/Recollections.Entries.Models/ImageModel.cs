@@ -10,6 +10,7 @@ namespace Neptuo.Recollections.Entries
     public class ImageModel : ICloneable<ImageModel>, IEquatable<ImageModel>
     {
         public string Id { get; set; }
+        public string UserId { get; set; }
 
         public string Thumbnail { get; set; }
         public string Preview { get; set; }
@@ -24,6 +25,7 @@ namespace Neptuo.Recollections.Entries
         public ImageModel Clone() => new ImageModel()
         {
             Id = Id,
+            UserId = UserId,
             Thumbnail = Thumbnail,
             Preview = Preview,
             Original = Original,
@@ -37,6 +39,7 @@ namespace Neptuo.Recollections.Entries
 
         public bool Equals(ImageModel other) => other != null &&
             Id == other.Id &&
+            UserId == other.UserId && 
             Thumbnail == other.Thumbnail &&
             Preview == other.Preview &&
             Original == other.Original &&
@@ -49,6 +52,7 @@ namespace Neptuo.Recollections.Entries
         {
             var hashCode = 3;
             hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Id);
+            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(UserId);
             hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Thumbnail);
             hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Preview);
             hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Original);

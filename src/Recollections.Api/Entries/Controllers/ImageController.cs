@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Neptuo;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ImageService service;
         private readonly DataContext dataContext;
         private readonly IFileStorage fileProvider;
+        private readonly ShareStatusService shareStatus;
 
         public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus)
             : base(dataContext, shareStatus)
@@ -27,9 +29,11 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(fileProvider, "fileProvider");
+            Ensure.NotNull(shareStatus, "shareStatus");
             this.service = service;
             this.dataContext = dataContext;
             this.fileProvider = fileProvider;
+            this.shareStatus = shareStatus;
         }
 
         [HttpGet]
@@ -41,7 +45,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             foreach (Image entity in entities)
             {
                 var model = new ImageModel();
-                service.MapEntityToModel(entity, model);
+                service.MapEntityToModel(entity, model, entry.UserId);
 
                 result.Add(model);
             }
@@ -57,7 +61,10 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return NotFound();
 
             var model = new ImageModel();
-            service.MapEntityToModel(entity, model);
+            service.MapEntityToModel(entity, model, entry.UserId);
+
+            var permission = model.UserId == User.FindUserId() || await shareStatus.IsEntrySharedForWriteAsync(entryId, User.FindUserId()) ? Permission.Write : Permission.Read;
+            Response.Headers.Add(PermissionHeader.Name, permission.ToString());
 
             return Ok(model);
         });
@@ -118,7 +125,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 Image entity = await service.CreateAsync(entry, new FormFileInput(file));
 
                 ImageModel model = new ImageModel();
-                service.MapEntityToModel(entity, model);
+                service.MapEntityToModel(entity, model, entry.UserId);
 
                 return Ok(model);
             }

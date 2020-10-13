@@ -2,6 +2,7 @@
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,8 +56,13 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
-            Model = await Api.GetImageAsync(EntryId, ImageId);
+            Permission userPermission;
+            (Model, userPermission) = await Api.GetImageAsync(EntryId, ImageId);
+
             UpdateOriginal();
+
+            Permissions.IsOwner = Model.UserId == UserState.UserId;
+            Permissions.IsEditable = userPermission == Permission.Write;
 
             Markers.Clear();
             Markers.Add(new MapMarkerModel
