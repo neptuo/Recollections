@@ -83,6 +83,7 @@ namespace Neptuo.Recollections
                 p.AllowCredentials();
                 p.AllowAnyHeader();
                 p.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+                p.WithExposedHeaders(PermissionHeader.Name);
             });
         }
     }

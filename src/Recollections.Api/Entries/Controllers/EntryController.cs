@@ -44,15 +44,21 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity == null)
                 return NotFound();
 
+            Permission permission = Permission.Write;
             string userId = HttpContext.User.FindUserId();
             if (entity.UserId != userId)
             {
                 if (!await shareStatus.IsEntrySharedForReadAsync(id, userId))
                     return Unauthorized();
+
+                if (!await shareStatus.IsEntrySharedForWriteAsync(id, userId))
+                    permission = Permission.Read;
             }
 
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
+
+            Response.Headers.Add(PermissionHeader.Name, permission.ToString());
 
             return Ok(model);
         }

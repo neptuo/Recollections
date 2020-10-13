@@ -5,6 +5,7 @@ using Neptuo.Activators;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using Neptuo.Recollections.Entries.Stories;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
@@ -48,8 +49,24 @@ namespace Neptuo.Recollections.Entries
         public Task DeleteEntryAsync(string entryId)
             => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}"));
 
-        public Task<EntryModel> GetDetailAsync(string entryId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<EntryModel>($"entries/{entryId}"));
+        public Task<(EntryModel, Permission)> GetEntryAsync(string entryId)
+            => faultHandler.Wrap(GetEntryPrivateAsync(entryId));
+
+        private async Task<(EntryModel, Permission)> GetEntryPrivateAsync(string entryId)
+        {
+            HttpResponseMessage responseMessage = await http.GetAsync($"entries/{entryId}");
+            responseMessage.EnsureSuccessStatusCode();
+
+            Permission permission = Permission.Write;
+            var model = await responseMessage.Content.ReadFromJsonAsync<EntryModel>();
+            if (responseMessage.Headers.TryGetValues(PermissionHeader.Name, out var permissionHeaderValues))
+            {
+                if (!Enum.TryParse(permissionHeaderValues.FirstOrDefault(), out permission))
+                    permission = Permission.Write;
+            }
+            
+            return (model, permission);
+        }
 
         public Task<List<ImageModel>> GetImagesAsync(string entryId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ImageModel>>($"entries/{entryId}/images"));
