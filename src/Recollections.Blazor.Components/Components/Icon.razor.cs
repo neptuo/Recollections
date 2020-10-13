@@ -14,9 +14,17 @@ namespace Neptuo.Recollections.Components
         public string Identifier { get; set; }
 
         [Parameter]
-        public string Prefix { get; set; } = "fa";
+        public string Prefix { get; set; }
 
         [Parameter]
         public Action OnClick { get; set; }
+
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            if (String.IsNullOrEmpty(Prefix))
+                Prefix = "fa";
+        }
     }
 }

@@ -2,7 +2,7 @@
     <div class="map"></div>
 
     <div class="map-controls">
-        @if (IsAdditive)
+        @if (IsEditable && IsAdditive)
         {
             <button class="btn btn-sm btn-light btn-add-location mr-1" title="Add Location">
                 <Icon Identifier="plus" />
@@ -14,7 +14,11 @@
         </button>
     </div>
 
-    <Modal @ref="SearchModal" Title="Search location">
+    <Modal @ref="SearchModal">
+        <TitleContent>
+            <Icon Prefix="fas" Identifier="search-location" />
+            Search location
+        </TitleContent>
         <ChildContent>
             <div class="row">
                 <div class="col">

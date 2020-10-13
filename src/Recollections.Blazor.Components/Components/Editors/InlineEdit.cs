@@ -21,23 +21,37 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public string PlaceHolder { get; set; }
 
+        [CascadingParameter]
+        public FormState FormState { get; set; }
+
         protected bool IsEditMode { get; set; }
+        protected bool IsEditable => FormState?.IsEditable ?? true;
 
         protected virtual Task OnEditAsync()
         {
-            IsEditMode = true;
-            originalValue = Value;
+            if (IsEditable)
+            {
+                IsEditMode = true;
+                originalValue = Value;
+            }
+
             return Task.CompletedTask;
         }
 
         protected Task OnSaveValueAsync()
         {
+            if (!IsEditable)
+                return Task.CompletedTask;
+
             IsEditMode = false;
             return OnValueChangedAsync();
         }
 
         protected Task OnResetAsync()
         {
+            if (!IsEditable)
+                return Task.CompletedTask;
+
             IsEditMode = false;
             Value = originalValue;
             return Task.CompletedTask;
@@ -49,7 +63,16 @@ namespace Neptuo.Recollections.Components.Editors
             return Task.CompletedTask;
         }
 
-        protected string GetModeCssClass() 
-            => IsEditMode ? String.Empty : "inline-editor-viewmode";
+        protected string GetModeCssClass()
+        {
+            List<string> cssClass = new List<string>();
+            if (!IsEditMode)
+                cssClass.Add("inline-editor-viewmode");
+
+            if (IsEditable)
+                cssClass.Add("inline-editable");
+
+            return String.Join(" ", cssClass);
+        }
     }
 }

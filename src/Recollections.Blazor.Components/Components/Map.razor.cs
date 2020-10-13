@@ -32,6 +32,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsResizable { get; set; }
 
+        [CascadingParameter]
+        public FormState FormState { get; set; }
+
         internal ElementReference Container { get; set; }
         internal bool IsZoomed { get; private set; }
 
@@ -39,6 +42,8 @@ namespace Neptuo.Recollections.Components
         protected ElementReference SearchInput { get; set; }
         protected string SearchQuery { get; set; }
         protected List<MapSearchModel> SearchResults { get; } = new List<MapSearchModel>();
+
+        internal bool IsEditable => FormState?.IsEditable ?? true;
 
         public async override Task SetParametersAsync(ParameterView parameters)
         {
@@ -69,6 +74,9 @@ namespace Neptuo.Recollections.Components
 
         internal void MoveMarker(int? index, double latitude, double longitude, double? altitude)
         {
+            if (!IsEditable)
+                return;
+
             Log.Debug($"MoveMarker: {index?.ToString() ?? "<null>"}, {latitude}, {longitude}, {altitude}");
 
             MapMarkerModel marker;

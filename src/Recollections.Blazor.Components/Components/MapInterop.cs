@@ -22,7 +22,15 @@ namespace Neptuo.Recollections.Components
         public ValueTask InitializeAsync(Map editor)
         {
             this.editor = editor;
-            return jsRuntime.InvokeVoidAsync("MapInterop.Initialize", editor.Container, DotNetObjectReference.Create(this), editor.Markers, editor.IsZoomed, editor.IsResizable);
+            return jsRuntime.InvokeVoidAsync(
+                "MapInterop.Initialize", 
+                editor.Container, 
+                DotNetObjectReference.Create(this), 
+                editor.Markers, 
+                editor.IsZoomed, 
+                editor.IsResizable, 
+                editor.IsEditable
+            );
         }
 
         [JSInvokable("MapInterop.MarkerMoved")]

@@ -58,6 +58,13 @@
 }
 
 .inline-editor-viewmode {
+    a.inline-editor-value {
+        cursor: inherit;
+    }
+
+    &.inline-editable a.inline-editor-value {
+        cursor: pointer;
+    }
 
     .inline-editor-value {
         position: relative;
@@ -72,9 +79,11 @@
         top: 2px;
     }
 
-    &:hover, &:active {
-        .oi-pencil, .fa-pen {
-            display: inline-block;
+    &.inline-editable {
+        &:hover, &:active {
+            .oi-pencil, .fa-pen {
+                display: inline-block;
+            }
         }
     }
 }

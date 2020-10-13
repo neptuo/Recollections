@@ -119,6 +119,12 @@ a {
 .inline-editor .input-group-append button:last-of-type {
   border-right-width: 1px; }
 
+.inline-editor-viewmode a.inline-editor-value {
+  cursor: inherit; }
+
+.inline-editor-viewmode.inline-editable a.inline-editor-value {
+  cursor: pointer; }
+
 .inline-editor-viewmode .inline-editor-value {
   position: relative; }
 
@@ -130,7 +136,7 @@ a {
   position: absolute;
   top: 2px; }
 
-.inline-editor-viewmode:hover .oi-pencil, .inline-editor-viewmode:hover .fa-pen, .inline-editor-viewmode:active .oi-pencil, .inline-editor-viewmode:active .fa-pen {
+.inline-editor-viewmode.inline-editable:hover .oi-pencil, .inline-editor-viewmode.inline-editable:hover .fa-pen, .inline-editor-viewmode.inline-editable:active .oi-pencil, .inline-editor-viewmode.inline-editable:active .fa-pen {
   display: inline-block; }
 
 h2 .inline-editor-viewmode .fa {

@@ -385,7 +385,7 @@ window.Downloader = {
 };
 
 window.MapInterop = {
-    Initialize: function (container, interop, markers, isZoomed, isResizable) {
+    Initialize: function (container, interop, markers, isZoomed, isResizable, isEditable) {
         var model = null;
 
         $container = $(container);
@@ -412,11 +412,13 @@ window.MapInterop = {
             };
             $container.data('map', model);
 
-            MapInterop._BindEvents(model);
+            if (isEditable) {
+                MapInterop._BindEvents(model);
+            }
         }
 
         model = $container.data('map');
-        var points = MapInterop._SetMarkers(model, markers);
+        var points = MapInterop._SetMarkers(model, markers, isEditable);
 
         model.isAdding = false;
         model.isEmptyPoint = points.length == 0 && !model.isAdditive;
@@ -497,7 +499,7 @@ window.MapInterop = {
 
         model.isAdditive = $addButton.length > 0;
     },
-    _SetMarkers: function (model, markers) {
+    _SetMarkers: function (model, markers, isEditable) {
         model.layer.removeAll();
         var points = [];
         for (var i = 0; i < markers.length; i++) {
@@ -517,7 +519,7 @@ window.MapInterop = {
             var point = SMap.Coords.fromWGS84(markers[i].longitude, markers[i].latitude);
             var marker = new SMap.Marker(point, "" + i, options);
 
-            if (markers[i].isEditable) {
+            if (isEditable && markers[i].isEditable) {
                 marker.decorate(SMap.Marker.Feature.Draggable);
             }
 
