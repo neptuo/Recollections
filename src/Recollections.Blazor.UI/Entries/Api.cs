@@ -11,6 +11,7 @@ using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -55,6 +56,9 @@ namespace Neptuo.Recollections.Entries
         private async Task<(EntryModel, Permission)> GetEntryPrivateAsync(string entryId)
         {
             HttpResponseMessage responseMessage = await http.GetAsync($"entries/{entryId}");
+            if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                throw new UnauthorizedAccessException();
+
             responseMessage.EnsureSuccessStatusCode();
 
             var model = await responseMessage.Content.ReadFromJsonAsync<EntryModel>();

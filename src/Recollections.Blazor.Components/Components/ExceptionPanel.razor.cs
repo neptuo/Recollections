@@ -21,9 +21,13 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected ILog<ExceptionPanel> Log { get; set; }
 
+        [Parameter]
+        public RenderFragment NotFoundContent { get; set; }
+
         protected bool IsVisible { get; private set; }
         protected string Title { get; private set; }
         protected string Message { get; private set; }
+        protected bool IsNotFound { get; private set; }
 
         protected override Task OnInitializedAsync()
         {
@@ -33,6 +37,7 @@ namespace Neptuo.Recollections.Components
 
         void IExceptionHandler<Exception>.Handle(Exception exception)
         {
+            IsNotFound = false;
             IsVisible = true;
             if (IsSkipped(exception))
             {
@@ -65,6 +70,10 @@ namespace Neptuo.Recollections.Components
                 {
                     SetNetworkErrorMessage();
                 }
+            }
+            else if (exception is UnauthorizedAccessException)
+            {
+                IsNotFound = true;
             }
             else
             {

@@ -1,6 +1,13 @@
 ﻿@if (IsVisible)
 {
     <div class="container exception-panel">
-        <Alert Title="@Title" Message="@Message" Mode="@AlertMode.Error" OnDismiss="@(() => IsVisible = false)" />
+        @if (IsNotFound)
+        {
+            @NotFoundContent
+        }
+        else
+        {
+            <Alert Title="@Title" Message="@Message" Mode="@AlertMode.Error" OnDismiss="@(() => IsVisible = false)" />
+        }
     </div>
 }
