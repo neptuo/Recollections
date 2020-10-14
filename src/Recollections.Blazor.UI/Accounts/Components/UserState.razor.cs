@@ -14,6 +14,7 @@ namespace Neptuo.Recollections.Accounts.Components
     public partial class UserState
     {
         private TaskCompletionSource<string> authenticationSource = new TaskCompletionSource<string>();
+        private TaskCompletionSource<string> initializationSource = new TaskCompletionSource<string>();
 
         [Inject]
         protected Api Api { get; set; }
@@ -52,6 +53,7 @@ namespace Neptuo.Recollections.Accounts.Components
             if (BearerToken != null)
             {
                 BearerToken = null;
+                UserId = null;
                 UserName = null;
                 Api.Authorization = null;
                 Interop.SaveToken(null);
@@ -59,6 +61,7 @@ namespace Neptuo.Recollections.Accounts.Components
                 UserChanged?.Invoke();
                 UserInfoChanged?.Invoke();
 
+                authenticationSource.SetResult(null);
                 authenticationSource = new TaskCompletionSource<string>();
             }
         }
@@ -71,15 +74,11 @@ namespace Neptuo.Recollections.Accounts.Components
                 if (!string.IsNullOrEmpty(bearerToken))
                 {
                     SetAuthorization(bearerToken, false);
-                }
-                else
-                {
-                    NavigateToLogin();
-                    return;
+                    await LoadUserInfoAsync();
                 }
             }
 
-            await LoadUserInfoAsync();
+            initializationSource.SetResult(null);
         }
 
         private async Task<bool> LoadUserInfoAsync()
@@ -112,7 +111,6 @@ namespace Neptuo.Recollections.Accounts.Components
                 await LoadUserInfoAsync();
 
                 Navigator.OpenTimeline();
-
                 return true;
             }
 
@@ -126,6 +124,12 @@ namespace Neptuo.Recollections.Accounts.Components
             return Task.FromResult(true);
         }
 
-        public Task EnsureAuthenticatedAsync() => authenticationSource.Task;
+        public async Task EnsureAuthenticatedAsync()
+        {
+            await initializationSource.Task;
+
+            if (!IsAuthenticated)
+                NavigateToLogin();
+        }
     }
 }
