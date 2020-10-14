@@ -18,6 +18,9 @@ namespace Neptuo.Recollections.Accounts.Components
         [Inject]
         protected TooltipInterop TooltipInterop { get; set; }
 
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
         [CascadingParameter]
         protected UserState UserState { get; set; }
 

@@ -69,8 +69,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
-
             await LoadAsync();
             await LoadImagesAsync();
             await LoadStoryAsync();

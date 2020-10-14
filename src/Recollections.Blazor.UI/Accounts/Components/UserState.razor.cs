@@ -13,7 +13,6 @@ namespace Neptuo.Recollections.Accounts.Components
 {
     public partial class UserState
     {
-        private TaskCompletionSource<string> authenticationSource = new TaskCompletionSource<string>();
         private TaskCompletionSource<string> initializationSource = new TaskCompletionSource<string>();
 
         [Inject]
@@ -45,7 +44,6 @@ namespace Neptuo.Recollections.Accounts.Components
                 Interop.SaveToken(bearerToken);
 
             UserChanged?.Invoke();
-            authenticationSource.SetResult(bearerToken);
         }
 
         private void ClearAuthorization()
@@ -60,9 +58,6 @@ namespace Neptuo.Recollections.Accounts.Components
 
                 UserChanged?.Invoke();
                 UserInfoChanged?.Invoke();
-
-                authenticationSource.SetResult(null);
-                authenticationSource = new TaskCompletionSource<string>();
             }
         }
 

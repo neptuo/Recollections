@@ -1,6 +1,22 @@
-﻿<a @ref="MeButton" class="btn btn-outline-info" href="/me" title="About me" data-toggle="tooltip" data-placement="bottom">
-    <Icon Identifier="user" />
-</a>
-<button @ref="LogoutButton" type="button" class="btn btn-outline-danger" @onclick="@LogoutAsync" title="Log out" data-toggle="tooltip" data-placement="bottom">
-    <Icon Prefix="fas" Identifier="sign-out-alt" />
-</button>
+﻿@if (UserState.IsAuthenticated)
+{
+    <li class="nav-item mr-2">
+        <a @ref="MeButton" class="btn btn-outline-info" href="/me" title="About me" data-toggle="tooltip" data-placement="bottom">
+            <Icon Identifier="user" />
+        </a>
+    </li>
+    <li class="nav-item">
+        <button @ref="LogoutButton" type="button" class="btn btn-outline-danger" @onclick="@LogoutAsync" title="Log out" data-toggle="tooltip" data-placement="bottom">
+            <Icon Prefix="fas" Identifier="sign-out-alt" />
+        </button>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <NavLink class="nav-link" href="@Navigator.UrlLogin()">Login</NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="@Navigator.UrlRegister()">Register</NavLink>
+    </li>
+}
