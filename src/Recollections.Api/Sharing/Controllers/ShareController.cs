@@ -16,7 +16,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
 {
     [ApiController]
     [Route("api")]
-    public class ShareController : EntryControllerBase
+    public class ShareController : Entries.Controllers.ControllerBase
     {
         private readonly DataContext db;
         private readonly IUserNameProvider userNames;
@@ -63,9 +63,20 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesDefaultResponseType(typeof(ShareModel))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, entry =>
         {
             return GetItemsAsync(db.EntryShares.Where(s => s.EntryId == entryId));
+        });
+
+        [HttpGet("stories/{storyId}/sharing")]
+        [ProducesDefaultResponseType(typeof(ShareModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> GetStoryAsync(string storyId) => RunStoryAsync(storyId, story =>
+        {
+            return GetItemsAsync(db.StoryShares.Where(s => s.StoryId == storyId));
         });
 
         private async Task<IActionResult> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)
@@ -99,12 +110,28 @@ namespace Neptuo.Recollections.Sharing.Controllers
         }
 
         [HttpPost("entries/{entryId}/sharing")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> CreateEntryAsync(string entryId, ShareModel model) => RunEntryAsync(entryId, entry =>
         {
             return CreateAsync(
                 model, 
                 userId => db.EntryShares.Where(s => s.EntryId == entryId && s.UserId == userId), 
                 () => new EntryShare(entryId)
+            );
+        });
+
+        [HttpPost("stories/{storyId}/sharing")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> CreateStoryAsync(string storyId, ShareModel model) => RunStoryAsync(storyId, story =>
+        {
+            return CreateAsync(
+                model, 
+                userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId), 
+                () => new StoryShare(storyId)
             );
         });
 
@@ -132,6 +159,15 @@ namespace Neptuo.Recollections.Sharing.Controllers
             return await DeleteAsync(
                 userName, 
                 userId => db.EntryShares.Where(s => s.EntryId == entryId && s.UserId == userId)
+            );
+        });
+
+        [HttpDelete("stories/{storyId}/sharing/{userName}")]
+        public Task<IActionResult> DeleteStoryAsync(string storyId, string userName) => RunStoryAsync(storyId, async story =>
+        {
+            return await DeleteAsync(
+                userName, 
+                userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId)
             );
         });
     }

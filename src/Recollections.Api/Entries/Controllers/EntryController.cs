@@ -22,6 +22,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
 
         public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus)
+            : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(imageService, "imageService");

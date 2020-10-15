@@ -16,7 +16,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/entries/{entryId}/images")]
-    public class ImageController : EntryControllerBase
+    public class ImageController : ControllerBase
     {
         private readonly ImageService service;
         private readonly DataContext dataContext;

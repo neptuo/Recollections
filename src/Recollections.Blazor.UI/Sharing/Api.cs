@@ -31,5 +31,14 @@ namespace Neptuo.Recollections.Sharing
 
         public Task DeleteEntryAsync(string entryId, ShareModel model)
             => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}/sharing/{model.UserName}"));
+
+        public Task<List<ShareModel>> GetStoryListAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"stories/{storyId}/sharing"));
+
+        public Task CreateStoryAsync(string storyId, ShareModel model)
+            => faultHandler.Wrap(http.PostAsJsonAsync($"stories/{storyId}/sharing", model));
+
+        public Task DeleteStoryAsync(string storyId, ShareModel model)
+            => faultHandler.Wrap(http.DeleteAsync($"stories/{storyId}/sharing/{model.UserName}"));
     }
 }

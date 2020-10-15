@@ -28,12 +28,6 @@ namespace Neptuo.Recollections.Entries.Components
         protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
         protected bool HasMore { get; private set; }
 
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await LoadAsync();
-        }
-
         private async Task LoadAsync()
         {
             TimelineListResponse response = await Api.GetTimelineListAsync(offset);

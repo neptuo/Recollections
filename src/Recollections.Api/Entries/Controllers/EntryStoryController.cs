@@ -15,15 +15,18 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/entries/{entryId}/story")]
-    public class EntryStoryController : EntryControllerBase
+    public class EntryStoryController : ControllerBase
     {
-        private readonly DataContext dataContext;
+        private readonly DataContext db;
+        private readonly ShareStatusService shareStatus;
 
-        public EntryStoryController(DataContext dataContext, ShareStatusService shareStatus)
-            : base(dataContext, shareStatus, RunEntryModifier)
+        public EntryStoryController(DataContext db, ShareStatusService shareStatus)
+            : base(db, shareStatus, RunEntryModifier)
         {
-            Ensure.NotNull(dataContext, "dataContext");
-            this.dataContext = dataContext;
+            Ensure.NotNull(db, "db");
+            Ensure.NotNull(shareStatus, "shareStatus");
+            this.db = db;
+            this.shareStatus = shareStatus;
         }
 
         private static IQueryable<Entry> RunEntryModifier(IQueryable<Entry> query)
@@ -65,7 +68,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPut]
-        public Task<IActionResult> Update(string entryId, EntryStoryUpdateModel model) => RunEntryAsync(entryId, async entry =>
+        public Task<IActionResult> Update(string entryId, EntryStoryUpdateModel model) => RunEntryAsync(entryId, Permission.Write, async entry =>
         {
             string userId = HttpContext.User.FindUserId();
             Story story = null;
@@ -73,8 +76,8 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             if (model.StoryId != null)
             {
-                story = await dataContext.Stories
-                    .Where(s => s.UserId == userId && s.Id == model.StoryId)
+                story = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId)
+                    .Where(s => s.Id == model.StoryId)
                     .Include(s => s.Chapters)
                     .FirstOrDefaultAsync();
 
@@ -108,8 +111,8 @@ namespace Neptuo.Recollections.Entries.Controllers
                 entry.Chapter = chapter;
             }
 
-            dataContext.Entries.Update(entry);
-            await dataContext.SaveChangesAsync();
+            db.Entries.Update(entry);
+            await db.SaveChangesAsync();
 
             return NoContent();
         });

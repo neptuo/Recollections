@@ -3,60 +3,69 @@
 @if (Model != null)
 {
     <CascadingValue Value="@Model">
-        <div class="entry-detail">
-            <h2 class="title">
-                <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
-            </h2>
-            <div class="text">
-                <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
-            </div>
-            <div class="entries">
-                <StoryEntries StoryId="@Model.Id" />
-            </div>
+        <PermissionContainer State="@Permissions">
+            <div class="entry-detail">
+                <h2 class="title">
+                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
+                </h2>
+                <div class="text">
+                    <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
+                </div>
+                <div class="entries">
+                    <StoryEntries StoryId="@Model.Id" />
+                </div>
 
-            <ActionPanel>
-                <button type="button" class="btn btn-sm btn-primary" @onclick="@AddChapter" title="Add Chapter">
-                    <Icon Identifier="book" />
-                    Add Chapter
-                </button>
-                <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
-                    <Icon Prefix="fas" Identifier="comment-alt" />
-                    Add Story Entry
-                </button>
-                <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
-                    <Icon Identifier="trash-alt" />
-                    Delete Story
-                </button>
-            </ActionPanel>
+                <ActionPanel>
+                    <PermissionView Request="@PermissionRequest.Write">
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@AddChapter" title="Add Chapter">
+                            <Icon Identifier="book" />
+                            Add Chapter
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
+                            <Icon Prefix="fas" Identifier="comment-alt" />
+                            Add Story Entry
+                        </button>
+                    </PermissionView>
+                    <PermissionView Request="@PermissionRequest.Owner">
+                        <ShareButton StoryId="@Model.Id" />
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
+                            <Icon Identifier="trash-alt" />
+                            Delete Story
+                        </button>
+                    </PermissionView>
+                </ActionPanel>
 
-            <div class="chapters">
-                @foreach (var chapter in Model.Chapters)
-                {
-                    <div class="chapter">
-                        <h4>
-                            <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" />
-                        </h4>
-                        <div class="text">
-                            <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
+                <div class="chapters">
+                    @foreach (var chapter in Model.Chapters)
+                    {
+                        <div class="chapter">
+                            <h4>
+                                <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" />
+                            </h4>
+                            <div class="text">
+                                <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
+                            </div>
+                            <div class="entries">
+                                <StoryEntries StoryId="@Model.Id" ChapterId="@chapter.Id" />
+                            </div>
+
+                            <ActionPanel>
+                                <PermissionView Request="@PermissionRequest.Write">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
+                                        <Icon Prefix="fas" Identifier="comment-alt" />
+                                        Add Chapter Entry
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
+                                        <Icon Identifier="trash-alt" />
+                                        Delete Chapter
+                                    </button>
+                                </PermissionView>
+                            </ActionPanel>
                         </div>
-                        <div class="entries">
-                            <StoryEntries StoryId="@Model.Id" ChapterId="@chapter.Id" />
-                        </div>
-
-                        <ActionPanel>
-                            <button type="button" class="btn btn-sm btn-outline-primary" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
-                                <Icon Prefix="fas" Identifier="comment-alt" />
-                                Add Chapter Entry
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-danger" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
-                                <Icon Identifier="trash-alt" />
-                                Delete Chapter
-                            </button>
-                        </ActionPanel>
-                    </div>
-                }
+                    }
+                </div>
             </div>
-        </div>
+        </PermissionContainer>
     </CascadingValue>
 
     <EntryPicker @ref="EntryPicker" Selected="EntrySelected" />

@@ -59,6 +59,14 @@
                     </span>
                 </span>
             }
+
+            @if (UserState.UserId != story.UserId)
+            {
+                <span class="owner">
+                    <Icon Identifier="user" />
+                    @story.UserName
+                </span>
+            }
         </div>
     </ListView>
 </div>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Neptuo;
 using Neptuo.Recollections.Entries.Stories;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,14 +15,17 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/stories/{storyId}")]
-    public class StoryEntriesController : ControllerBase
+    public class StoryEntriesController : Microsoft.AspNetCore.Mvc.ControllerBase
     {
-        private readonly DataContext dataContext;
+        private readonly DataContext db;
+        private readonly ShareStatusService shareStatus;
 
-        public StoryEntriesController(DataContext dataContext)
+        public StoryEntriesController(DataContext dataContext, ShareStatusService shareStatus)
         {
-            Ensure.NotNull(dataContext, "dataContext");
-            this.dataContext = dataContext;
+            Ensure.NotNull(dataContext, "db");
+            Ensure.NotNull(shareStatus, "shareStatus");
+            this.db = dataContext;
+            this.shareStatus = shareStatus;
         }
 
         [HttpGet("entries")]
@@ -30,11 +35,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         public async Task<ActionResult<List<StoryEntryModel>>> GetStoryEntryList(string storyId)
         {
             string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            var models = await dataContext.Entries
-                .Where(e => e.UserId == userId)
+            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                 .Where(e => e.Story.Id == storyId)
                 .Select(e => new StoryEntryModel()
                 {
@@ -53,11 +54,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         public async Task<ActionResult<List<StoryEntryModel>>> GetChapterEntryList(string storyId, string chapterId)
         {
             string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            var models = await dataContext.Entries
-                .Where(e => e.UserId == userId)
+            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                 .Where(e => e.Chapter.Story.Id == storyId && e.Chapter.Id == chapterId)
                 .Select(e => new StoryEntryModel()
                 {

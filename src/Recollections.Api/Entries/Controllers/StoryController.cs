@@ -2,7 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries.Stories;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,15 +17,25 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/stories")]
-    public class StoryController : Controller
+    public class StoryController : ControllerBase
     {
-        private readonly DataContext dataContext;
+        private readonly DataContext db;
+        private readonly IUserNameProvider userNames;
+        private readonly ShareStatusService shareStatus;
 
-        public StoryController(DataContext dataContext)
+        public StoryController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus)
+            : base(db, shareStatus, runStoryObserver: RunStoryModifier)
         {
-            Ensure.NotNull(dataContext, "dataContext");
-            this.dataContext = dataContext;
+            Ensure.NotNull(db, "db");
+            Ensure.NotNull(userNames, "userNames");
+            Ensure.NotNull(shareStatus, "shareStatus");
+            this.db = db;
+            this.userNames = userNames;
+            this.shareStatus = shareStatus;
         }
+
+        private static IQueryable<Story> RunStoryModifier(IQueryable<Story> query)
+            => query.Include(s => s.Chapters);
 
         [HttpGet]
         [ProducesDefaultResponseType(typeof(EntryModel))]
@@ -35,8 +48,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            List<Story> entities = await dataContext.Stories
-                .Where(s => s.UserId == userId)
+            List<Story> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId)
                 .OrderByDescending(s => s.Order)
                 .ToListAsync();
 
@@ -48,17 +60,13 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 MapEntityToModel(entity, model);
 
-                int chapters = await dataContext.Stories
+                int chapters = await db.Stories
                     .Where(s => s.Id == entity.Id)
                     .SelectMany(s => s.Chapters)
                     .CountAsync();
 
-                int entries = await dataContext.Entries
-                    .Where(e => e.Story.Id == entity.Id)
-                    .CountAsync();
-
-                entries += await dataContext.Entries
-                    .Where(e => e.Chapter.Story.Id == entity.Id)
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
+                    .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                     .CountAsync();
 
                 model.Chapters = chapters;
@@ -66,11 +74,11 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 if (entries > 0)
                 {
-                    DateTime minDate = await dataContext.Entries
+                    DateTime minDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                         .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MinAsync(e => e.When);
 
-                    DateTime maxDate = await dataContext.Entries
+                    DateTime maxDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                         .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MaxAsync(e => e.When);
 
@@ -79,29 +87,22 @@ namespace Neptuo.Recollections.Entries.Controllers
                 }
             }
 
+            var userNames = await this.userNames.GetUserNamesAsync(models.Select(e => e.UserId).ToArray());
+            for (int i = 0; i < models.Count; i++)
+                models[i].UserName = userNames[i];
+
             return Ok(models);
         }
 
         [HttpGet("{storyId}/chapters")]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesDefaultResponseType(typeof(List<StoryChapterListModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<StoryChapterListModel>>> GetChapterList(string storyId)
+        public Task<IActionResult> GetChapterList(string storyId) => RunStoryAsync(storyId, Permission.Read, async story =>
         {
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            List<StoryChapter> entities = await dataContext.Stories
-                .Where(s => s.UserId == userId)
-                .Where(s => s.Id == storyId)
-                .SelectMany(s => s.Chapters)
-                .OrderBy(c => c.Order)
-                .ToListAsync();
-
             List<StoryChapterListModel> models = new List<StoryChapterListModel>();
-            foreach (StoryChapter entity in entities)
+            foreach (StoryChapter entity in story.Chapters.OrderBy(c => c.Order))
             {
                 models.Add(new StoryChapterListModel()
                 {
@@ -111,33 +112,30 @@ namespace Neptuo.Recollections.Entries.Controllers
             }
 
             return Ok(models);
-        }
+        });
 
         [HttpGet("{id}")]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesDefaultResponseType(typeof(StoryModel))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<StoryModel>> Get(string id)
+        public Task<IActionResult> Get(string id) => RunStoryAsync(id, Permission.Read, async entity =>
         {
-            Ensure.NotNullOrEmpty(id, "id");
-
+            Permission permission = Permission.Write;
             string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            Story entity = await dataContext.Stories.Include(s => s.Chapters).FirstOrDefaultAsync(s => s.Id == id);
-            if (entity == null)
-                return NotFound();
-
             if (entity.UserId != userId)
-                return Unauthorized();
+            {
+                if (!await shareStatus.IsStorySharedForWriteAsync(id, userId))
+                    permission = Permission.Read;
+            }
 
             StoryModel model = new StoryModel();
             MapEntityToModel(entity, model);
 
+            Response.Headers.Add(PermissionHeader.Name, permission.ToString());
+
             return Ok(model);
-        }
+        });
 
         [HttpPost]
         public async Task<IActionResult> Create(StoryModel model)
@@ -149,92 +147,70 @@ namespace Neptuo.Recollections.Entries.Controllers
             Story entity = new Story();
             MapModelToEntity(model, entity);
             entity.UserId = userId;
-            entity.Order = await dataContext.Stories.CountAsync(s => s.UserId == userId) + 1;
+            entity.Order = await db.Stories.CountAsync(s => s.UserId == userId) + 1;
             entity.Created = DateTime.Now;
 
-            await dataContext.Stories.AddAsync(entity);
-            await dataContext.SaveChangesAsync();
+            await db.Stories.AddAsync(entity);
+            await db.SaveChangesAsync();
 
             MapEntityToModel(entity, model);
             return CreatedAtAction(nameof(Get), new { id = entity.Id }, model);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<StoryModel>> Update(string id, StoryModel model)
+        [ProducesDefaultResponseType(typeof(StoryModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> Update(string id, StoryModel model) => RunStoryAsync(id, Permission.Write, async story =>
         {
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            if (id != model.Id)
-                return BadRequest();
-
-            Story entity = await dataContext.Stories.Include(s => s.Chapters).FirstOrDefaultAsync(s => s.Id == id);
-            if (entity == null)
-                return NotFound();
-
-            if (entity.UserId != userId)
-                return Unauthorized();
-
-            var removedChapters = MapModelToEntity(model, entity);
+            var removedChapters = MapModelToEntity(model, story);
             foreach (var chapter in removedChapters)
             {
-                foreach (var entry in await dataContext.Entries.Where(e => e.Chapter.Id == chapter.Id).ToListAsync())
+                foreach (var entry in await db.Entries.Where(e => e.Chapter.Id == chapter.Id).ToListAsync())
                 {
                     entry.Chapter = null;
-                    dataContext.Entries.Update(entry);
+                    db.Entries.Update(entry);
                 }
             }
 
-            dataContext.Stories.Update(entity);
-            await dataContext.SaveChangesAsync();
+            db.Stories.Update(story);
+            await db.SaveChangesAsync();
 
             return NoContent();
-        }
+        });
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public Task<IActionResult> Delete(string id) => RunStoryAsync(id, async entity =>
         {
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
+            string userId = User.FindUserId();
 
-            Story entity = await dataContext.Stories
-                .Include(s => s.Chapters)
-                .FirstOrDefaultAsync(s => s.Id == id);
-
-            if (entity == null)
-                return NotFound();
-
-            if (entity.UserId != userId)
-                return Unauthorized();
-
-            foreach (var entry in await dataContext.Entries.Where(e => e.Story.Id == id).ToListAsync())
+            foreach (var entry in await db.Entries.Where(e => e.Story.Id == id).ToListAsync())
             {
                 entry.Story = null;
-                dataContext.Entries.Update(entry);
+                db.Entries.Update(entry);
             }
 
-            foreach (var entry in await dataContext.Entries.Where(e => e.Chapter.Story.Id == id).ToListAsync())
+            foreach (var entry in await db.Entries.Where(e => e.Chapter.Story.Id == id).ToListAsync())
             {
                 entry.Chapter = null;
-                dataContext.Entries.Update(entry);
+                db.Entries.Update(entry);
             }
 
-            foreach (var story in await dataContext.Stories.Where(e => e.UserId == userId && e.Order > entity.Order).ToListAsync())
+            foreach (var story in await db.Stories.Where(e => e.UserId == userId && e.Order > entity.Order).ToListAsync())
             {
                 story.Order--;
-                dataContext.Stories.Update(story);
+                db.Stories.Update(story);
             }
 
             foreach (var chapter in entity.Chapters)
-                dataContext.Remove(chapter);
+                db.Remove(chapter);
 
-            dataContext.Stories.Remove(entity);
-            await dataContext.SaveChangesAsync();
+            db.Stories.Remove(entity);
+            await db.SaveChangesAsync();
 
             return Ok();
-        }
+        });
 
         private void MapEntityToModel(Story entity, StoryListModel model)
         {
@@ -246,6 +222,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private void MapEntityToModel(Story entity, StoryModel model)
         {
             model.Id = entity.Id;
+            model.UserId = entity.UserId;
             model.Title = entity.Title;
             model.Text = entity.Text;
 

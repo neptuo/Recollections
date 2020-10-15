@@ -11,19 +11,21 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Controllers
 {
-    public class EntryControllerBase : ControllerBase
+    public class ControllerBase : Microsoft.AspNetCore.Mvc.ControllerBase
     {
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
         private readonly Func<IQueryable<Entry>, IQueryable<Entry>> runEntryObserver;
+        private readonly Func<IQueryable<Story>, IQueryable<Story>> runStoryObserver;
 
-        protected EntryControllerBase(DataContext db, ShareStatusService shareStatus, Func<IQueryable<Entry>, IQueryable<Entry>> runEntryObserver = null)
+        protected ControllerBase(DataContext db, ShareStatusService shareStatus, Func<IQueryable<Entry>, IQueryable<Entry>> runEntryObserver = null, Func<IQueryable<Story>, IQueryable<Story>> runStoryObserver = null)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             this.db = db;
             this.shareStatus = shareStatus;
             this.runEntryObserver = runEntryObserver;
+            this.runStoryObserver = runStoryObserver;
         }
 
         protected Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
@@ -50,6 +52,36 @@ namespace Neptuo.Recollections.Entries.Controllers
                 else if (sharePermission == Permission.Read && !await shareStatus.IsEntrySharedForReadAsync(entryId, userId))
                     return Unauthorized();
                 else if (sharePermission == Permission.Write && !await shareStatus.IsEntrySharedForWriteAsync(entryId, userId))
+                    return Unauthorized();
+            }
+
+            return await handler(entity);
+        }
+
+        protected Task<IActionResult> RunStoryAsync(string storyId, Func<Story, Task<IActionResult>> handler)
+            => RunStoryAsync(storyId, null, handler);
+
+        protected async Task<IActionResult> RunStoryAsync(string storyId, Permission? sharePermission, Func<Story, Task<IActionResult>> handler)
+        {
+            Ensure.NotNullOrEmpty(storyId, "storyId");
+
+            Story entity;
+            if (runStoryObserver == null)
+                entity = await db.Stories.FindAsync(storyId);
+            else
+                entity = await runStoryObserver(db.Stories).FirstOrDefaultAsync(s => s.Id == storyId);
+
+            if (entity == null)
+                return NotFound();
+
+            string userId = HttpContext.User.FindUserId();
+            if (entity.UserId != userId)
+            {
+                if (sharePermission == null)
+                    return Unauthorized();
+                else if (sharePermission == Permission.Read && !await shareStatus.IsStorySharedForReadAsync(storyId, userId))
+                    return Unauthorized();
+                else if (sharePermission == Permission.Write && !await shareStatus.IsStorySharedForWriteAsync(storyId, userId))
                     return Unauthorized();
             }
 

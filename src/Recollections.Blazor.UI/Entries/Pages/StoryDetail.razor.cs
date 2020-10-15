@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Events;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Components;
 using Neptuo.Recollections.Entries.Events;
 using Neptuo.Recollections.Entries.Stories;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,18 +34,21 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected EntryPicker EntryPicker { get; set; }
         protected StoryModel Model { get; set; }
+        protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
-
             await LoadAsync();
         }
 
         protected async Task LoadAsync()
         {
-            Model = await Api.GetStoryAsync(StoryId);
+            Permission userPermission;
+            (Model, userPermission) = await Api.GetStoryAsync(StoryId);
+
+            Permissions.IsEditable = userPermission == Permission.Write;
+            Permissions.IsOwner = UserState.UserId == Model.UserId;
         }
 
         protected Task SaveAsync()

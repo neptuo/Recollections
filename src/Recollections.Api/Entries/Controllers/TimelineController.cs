@@ -25,6 +25,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
 
         public TimelineController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
+            : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(userNames, "userNames");
