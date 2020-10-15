@@ -1,4 +1,4 @@
-﻿@page "/user/{UserId}/entry/{EntryId}"
+﻿@page "/entry/{EntryId}"
 
 @if (Model != null)
 {
@@ -27,7 +27,7 @@
                     {
                         @foreach (var image in Images)
                         {
-                            <EntryImage UserId="@Model.UserId" Image="@image" />
+                            <EntryImage Image="@image" />
                         }
                     }
 

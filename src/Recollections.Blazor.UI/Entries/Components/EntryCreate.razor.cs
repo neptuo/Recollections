@@ -19,9 +19,6 @@ namespace Neptuo.Recollections.Entries.Components
         [Inject]
         protected Navigator Navigator { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         [Inject]
         protected DatePickerInterop DatePickerInterop { get; set; }
 
@@ -55,7 +52,7 @@ namespace Neptuo.Recollections.Entries.Components
             if (Validate())
             {
                 EntryModel model = await Api.CreateEntryAsync(new EntryModel(Title, When));
-                Navigator.OpenEntryDetail(UserState.UserId, model.Id);
+                Navigator.OpenEntryDetail(model.Id);
             }
         }
 

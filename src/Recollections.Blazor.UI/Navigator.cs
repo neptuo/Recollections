@@ -86,22 +86,22 @@ namespace Neptuo.Recollections
         public void OpenStories()
             => uri.NavigateTo(UrlStories());
 
-        public string UrlStoryDetail(string userId, string storyId)
-            => $"/user/{userId}/story/{storyId}";
+        public string UrlStoryDetail(string storyId)
+            => $"/story/{storyId}";
 
-        public void OpenStoryDetail(string userId, string storyId)
-            => uri.NavigateTo(UrlStoryDetail(userId, storyId));
+        public void OpenStoryDetail(string storyId)
+            => uri.NavigateTo(UrlStoryDetail(storyId));
 
-        public string UrlEntryDetail(string userId, string entryId)
-            => $"/user/{userId}/entry/{entryId}";
+        public string UrlEntryDetail(string entryId)
+            => $"/entry/{entryId}";
 
-        public void OpenEntryDetail(string userId, string entryId)
-            => uri.NavigateTo(UrlEntryDetail(userId, entryId));
+        public void OpenEntryDetail(string entryId)
+            => uri.NavigateTo(UrlEntryDetail(entryId));
 
-        public string UrlImageDetail(string userId, string entryId, string imageId)
-            => $"/user/{userId}/entry/{entryId}/image/{imageId}";
+        public string UrlImageDetail(string entryId, string imageId)
+            => $"/entry/{entryId}/image/{imageId}";
 
-        public void OpenImageDetail(string userId, string entryId, string imageId)
-            => uri.NavigateTo(UrlImageDetail(userId, entryId, imageId));
+        public void OpenImageDetail(string entryId, string imageId)
+            => uri.NavigateTo(UrlImageDetail(entryId, imageId));
     }
 }

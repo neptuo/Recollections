@@ -30,9 +30,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected ILog<ImageDetail> Log { get; set; }
 
         [Parameter]
-        public string UserId { get; set; }
-
-        [Parameter]
         public string EntryId { get; set; }
 
         [Parameter]
@@ -120,7 +117,7 @@ namespace Neptuo.Recollections.Entries.Pages
             if (await Navigator.AskAsync($"Do you really want to delete this image?"))
             {
                 await Api.DeleteImageAsync(EntryId, ImageId);
-                Navigator.OpenEntryDetail(UserId, EntryId);
+                Navigator.OpenEntryDetail(EntryId);
             }
         }
 

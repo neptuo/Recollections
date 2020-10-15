@@ -52,7 +52,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected void OnMarkerSelected(int index)
         {
             var entry = Entries[index];
-            Navigator.OpenEntryDetail(entry.UserId, entry.Id);
+            Navigator.OpenEntryDetail(entry.Id);
         }
     }
 }
