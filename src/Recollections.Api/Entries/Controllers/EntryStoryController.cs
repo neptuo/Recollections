@@ -86,6 +86,10 @@ namespace Neptuo.Recollections.Entries.Controllers
                     model.StoryId = null;
                     model.ChapterId = null;
                 }
+                else if (story.UserId != entry.UserId)
+                {
+                    return BadRequest();
+                }
             }
 
             if (model.ChapterId != null)
