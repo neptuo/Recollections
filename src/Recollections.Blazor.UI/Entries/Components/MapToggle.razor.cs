@@ -14,7 +14,7 @@ namespace Neptuo.Recollections.Entries.Components
         public string Text { get; set; }
 
         [Parameter]
-        public string CssClass { get; set; }
+        public bool IsPlaceHolder { get; set; }
 
         [Parameter]
         public Func<bool, string> ToggleChanged { get; set; }
@@ -23,6 +23,8 @@ namespace Neptuo.Recollections.Entries.Components
         public RenderFragment ChildContent { get; set; }
 
         protected bool IsVisible { get; set; }
+        protected string Value { get; set; }
+        protected string PlaceHolder { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -43,6 +45,17 @@ namespace Neptuo.Recollections.Entries.Components
                 string text = ToggleChanged(IsVisible);
                 if (!String.IsNullOrEmpty(text))
                     Text = text;
+            }
+
+            if (!IsPlaceHolder)
+            {
+                Value = Text;
+                PlaceHolder = null;
+            }
+            else
+            {
+                Value = null;
+                PlaceHolder = Text;
             }
         }
     }

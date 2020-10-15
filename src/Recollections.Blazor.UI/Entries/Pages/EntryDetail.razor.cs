@@ -66,6 +66,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await UserState.EnsureInitializedAsync();
             await LoadAsync();
             await LoadImagesAsync();
             await LoadStoryAsync();
@@ -81,6 +82,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             UpdateOriginal();
 
+            Log.Debug($"Entry user permission '{userPermission}'.");
             Permissions.IsEditable = userPermission == Permission.Write;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
 

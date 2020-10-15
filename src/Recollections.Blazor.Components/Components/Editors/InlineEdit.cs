@@ -25,7 +25,7 @@ namespace Neptuo.Recollections.Components.Editors
         public FormState FormState { get; set; }
 
         protected bool IsEditMode { get; set; }
-        protected bool IsEditable => FormState?.IsEditable ?? true;
+        protected virtual bool IsEditable => FormState?.IsEditable ?? true;
 
         protected virtual Task OnEditAsync()
         {

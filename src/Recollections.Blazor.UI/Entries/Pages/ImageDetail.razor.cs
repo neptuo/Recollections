@@ -47,6 +47,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await UserState.EnsureInitializedAsync();
             await LoadAsync();
         }
 
@@ -138,19 +139,26 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected string GetMapDescription(bool isVisible)
         {
+            const string addLocationText = "Add Location on Map";
+            const string noLocationText = "No location...";
+
             if (isVisible)
             {
                 if (Model.Location.HasValue())
-                    return Model.Location.ToString();
+                    return Model.Location.ToRoundedString();
+                else if (Permissions.IsEditable)
+                    return addLocationText;
                 else
-                    return "Add Location on Map";
+                    return noLocationText;
             }
             else
             {
                 if (Model.Location.HasValue())
                     return "Show Location on Map";
+                else if (Permissions.IsEditable)
+                    return addLocationText;
                 else
-                    return "Add Location on Map";
+                    return noLocationText;
             }
         }
     }

@@ -15,7 +15,7 @@
                     <InlineLink Value="@StoryTitle" PlaceHolder="No story..." Icon="book" OnClick="@SelectStory" />
                 </div>
                 <div class="gps">
-                    <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" CssClass="@(MarkerCount != 0 ? "" : "placeholder")">
+                    <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)">
                         <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
                     </MapToggle>
                 </div>

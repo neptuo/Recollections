@@ -17,7 +17,12 @@ namespace Neptuo.Recollections.Components.Editors
         public string IconPrefix { get; set; }
 
         [Parameter]
+        public bool? IsClickable { get; set; }
+
+        [Parameter]
         public EventCallback OnClick { get; set; }
+
+        protected override bool IsEditable => IsClickable ?? base.IsEditable;
 
         protected async override Task OnEditAsync()
         {

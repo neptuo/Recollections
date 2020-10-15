@@ -39,12 +39,26 @@ namespace Neptuo.Recollections.Entries
         }
 
         public override string ToString()
+            => ToString(Longitude, Latitude, Altitude);
+
+        public string ToRoundedString()
+            => ToString(Round(Longitude, 5), Round(Latitude, 5), Round(Altitude, 0));
+
+        private string ToString(double? longitude, double? latitude, double? altitude)
         {
-            string result = $"{Latitude}, {Longitude}";
+            string result = $"{latitude}, {longitude}";
             if (Altitude != null)
-                result += $" ({Altitude})";
+                result += $" ({altitude})";
 
             return result;
+        }
+
+        private double? Round(double? value, int decimals)
+        {
+            if (value == null)
+                return null;
+
+            return Math.Round(value.Value, decimals);
         }
     }
 }

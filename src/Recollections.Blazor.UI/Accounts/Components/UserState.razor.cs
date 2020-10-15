@@ -119,9 +119,12 @@ namespace Neptuo.Recollections.Accounts.Components
             return Task.FromResult(true);
         }
 
+        public Task EnsureInitializedAsync()
+            => initializationSource.Task;
+
         public async Task EnsureAuthenticatedAsync()
         {
-            await initializationSource.Task;
+            await EnsureInitializedAsync();
 
             if (!IsAuthenticated)
                 NavigateToLogin();
