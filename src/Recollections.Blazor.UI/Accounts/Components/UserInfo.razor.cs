@@ -38,8 +38,11 @@ namespace Neptuo.Recollections.Accounts.Components
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            await TooltipInterop.InitializeAsync(MeButton);
-            await TooltipInterop.InitializeAsync(LogoutButton);
+            if (UserState.IsAuthenticated)
+            {
+                await TooltipInterop.InitializeAsync(MeButton);
+                await TooltipInterop.InitializeAsync(LogoutButton);
+            }
         }
 
         public void Dispose()
