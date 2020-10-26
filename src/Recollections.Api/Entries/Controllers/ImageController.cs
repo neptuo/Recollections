@@ -39,9 +39,12 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpGet]
         public Task<IActionResult> List(string entryId) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
-            List<Image> entities = await dataContext.Images.Where(i => i.Entry.Id == entryId).ToListAsync();
-            List<ImageModel> result = new List<ImageModel>();
+            List<Image> entities = await dataContext.Images
+                .Where(i => i.Entry.Id == entryId)
+                .OrderBy(i => i.When)
+                .ToListAsync();
 
+            List<ImageModel> result = new List<ImageModel>();
             foreach (Image entity in entities)
             {
                 var model = new ImageModel();
