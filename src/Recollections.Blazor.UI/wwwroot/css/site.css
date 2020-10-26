@@ -173,6 +173,7 @@ h4 .inline-editor-viewmode .oi {
     display: none; }
 
 .main-navbar {
+  height: 70px;
   z-index: 2; }
 
 .main-navbar .navbar-toggler {
