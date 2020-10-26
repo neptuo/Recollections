@@ -37,6 +37,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             string userId = HttpContext.User.FindUserId();
             var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                 .Where(e => e.Story.Id == storyId)
+                .OrderBy(e => e.When)
                 .Select(e => new StoryEntryModel()
                 {
                     Id = e.Id,
@@ -56,6 +57,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             string userId = HttpContext.User.FindUserId();
             var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                 .Where(e => e.Chapter.Story.Id == storyId && e.Chapter.Id == chapterId)
+                .OrderBy(e => e.When)
                 .Select(e => new StoryEntryModel()
                 {
                     Id = e.Id,
