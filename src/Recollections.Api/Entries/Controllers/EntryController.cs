@@ -20,16 +20,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext db;
         private readonly ImageService imageService;
         private readonly ShareStatusService shareStatus;
+        private readonly ShareDeleter shareDeleter;
 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(imageService, "imageService");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(shareDeleter, "shareDeleter");
             this.db = db;
             this.imageService = imageService;
             this.shareStatus = shareStatus;
+            this.shareDeleter = shareDeleter;
         }
 
         [HttpGet("{id}")]
@@ -123,6 +126,8 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             await imageService.DeleteAllAsync(entity);
+            await shareDeleter.DeleteEntrySharesAsync(id);
+
             db.Entries.Remove(entity);
             await db.SaveChangesAsync();
 

@@ -22,16 +22,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext db;
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
+        private readonly ShareDeleter shareDeleter;
 
-        public StoryController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus)
+        public StoryController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter)
             : base(db, shareStatus, runStoryObserver: RunStoryModifier)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(shareDeleter, "shareDeleter");
             this.db = db;
             this.userNames = userNames;
             this.shareStatus = shareStatus;
+            this.shareDeleter = shareDeleter;
         }
 
         private static IQueryable<Story> RunStoryModifier(IQueryable<Story> query)
@@ -205,6 +208,8 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             foreach (var chapter in entity.Chapters)
                 db.Remove(chapter);
+
+            await shareDeleter.DeleteStorySharesAsync(id);
 
             db.Stories.Remove(entity);
             await db.SaveChangesAsync();
