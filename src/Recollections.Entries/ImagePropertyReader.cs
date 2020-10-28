@@ -46,7 +46,9 @@ namespace Neptuo.Recollections.Entries
         }
 
         public DateTime? FindTakenWhen()
-            => Find<DateTime>(ExifTags.DateTimeDigitized);
+            => Find<DateTime>(ExifTags.DateTimeDigitized)
+            ?? Find<DateTime>(ExifTags.DateTimeOriginal)
+            ?? Find<DateTime>(ExifTags.DateTime);
 
         public double? FindLatitude()
             => FindCoordinate(ExifTags.GPSLatitude);
