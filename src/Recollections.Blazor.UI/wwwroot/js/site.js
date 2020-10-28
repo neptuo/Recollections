@@ -524,7 +524,6 @@ window.MapInterop = {
             }
 
             model.layer.addMarker(marker);
-
             points.push(point);
         }
 

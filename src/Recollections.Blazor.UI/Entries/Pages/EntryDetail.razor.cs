@@ -72,7 +72,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadStoryAsync();
         }
 
-        private async Task LoadStoryAsync() 
+        private async Task LoadStoryAsync()
             => Story = await Api.GetEntryStoryAsync(EntryId);
 
         private async Task LoadAsync()
@@ -270,15 +270,28 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void OnLocationSelected(int index)
         {
-            index -= Images.Count;
-            if (index < Model.Locations.Count)
-            {
-                Log.Debug($"Selected location '{index}': {Model.Locations[index]}.");
+            Log.Debug($"Marker selected '{index}'.");
 
-                SelectedLocationIndex = index;
-                SelectedLocation = Model.Locations[index];
-                LocationEdit.Show();
-                StateHasChanged();
+            if (index < Images.Count)
+            {
+                var image = Images[index];
+
+                Log.Debug($"Selected image '{image.Id}'.");
+
+                Navigator.OpenImageDetail(EntryId, image.Id);
+            }
+            else
+            {
+                index -= Images.Count;
+                if (index < Model.Locations.Count)
+                {
+                    Log.Debug($"Selected location '{index}': {Model.Locations[index]}.");
+
+                    SelectedLocationIndex = index;
+                    SelectedLocation = Model.Locations[index];
+                    LocationEdit.Show();
+                    StateHasChanged();
+                }
             }
         }
 
