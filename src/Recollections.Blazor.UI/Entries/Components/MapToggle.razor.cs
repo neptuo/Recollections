@@ -14,6 +14,9 @@ namespace Neptuo.Recollections.Entries.Components
         public string Text { get; set; }
 
         [Parameter]
+        public bool IsEnabled { get; set; } = true;
+
+        [Parameter]
         public bool IsPlaceHolder { get; set; }
 
         [Parameter]
