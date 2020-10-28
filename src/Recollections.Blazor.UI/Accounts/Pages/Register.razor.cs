@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected Api Api { get; set; }
 
         [Inject]
-        protected NavigationManager Uri { get; set; }
+        protected Navigator Navigator { get; set; }
 
         [CascadingParameter]
         protected UserState UserState { get; set; }
@@ -24,6 +24,15 @@ namespace Neptuo.Recollections.Accounts.Pages
 
         public string UserName { get; set; }
         public string Password { get; set; }
+
+        protected async override Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+
+            await UserState.EnsureInitializedAsync();
+            if (UserState.IsAuthenticated)
+                Navigator.OpenTimeline();
+        }
 
         public async Task RegisterAsync()
         {

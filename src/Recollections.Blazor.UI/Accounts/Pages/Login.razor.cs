@@ -33,10 +33,19 @@ namespace Neptuo.Recollections.Accounts.Pages
 
         public List<string> ErrorMessages { get; } = new List<string>();
 
+        protected async override Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+
+            await UserState.EnsureInitializedAsync();
+            if (UserState.IsAuthenticated)
+                Navigator.OpenTimeline();
+        }
+
         protected async Task LoginAsync()
         {
             Log.Debug($"UserName: '{UserName}'");
-            Log.Debug($"Password: '{Password}'");
+            Log.Debug($"Password: '{Password.Length}'");
 
             ErrorMessages.Clear();
             if (!await UserState.LoginAsync(UserName, Password, IsPersistent))
