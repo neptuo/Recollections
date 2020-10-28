@@ -34,6 +34,7 @@ namespace Neptuo.Recollections.Entries.Components
             Entries.AddRange(response.Entries);
             HasMore = response.HasMore;
             offset = Entries.Count;
+            StateHasChanged();
         }
 
         protected async Task LoadMoreAsync()
