@@ -1,12 +1,16 @@
 ﻿@if (IsInstallable)
 {
-    <button @ref="Button" class="btn btn-outline-secondary" @onclick="InstallAsync" title="Install as application to your device" data-toggle="tooltip" data-placement="bottom">
-        <Icon Identifier="cloud-download-alt" />
-    </button>
+    <li class="nav-item mr-2">
+        <button @ref="Button" class="btn btn-outline-secondary" @onclick="InstallAsync" title="Install as application to your device" data-toggle="tooltip" data-placement="bottom">
+            <Icon Identifier="cloud-download-alt" />
+        </button>
+    </li>
 }
-else if(IsUpdateable)
+else if (IsUpdateable)
 {
-    <button @ref="Button" class="btn btn-outline-secondary" @onclick="UpdateAsync" title="Application update is ready. Click to complete the update." data-toggle="tooltip" data-placement="bottom">
-        <Icon Identifier="cloud-download-alt" />
-    </button>
+    <li class="nav-item mr-2">
+        <button @ref="Button" class="btn btn-outline-secondary" @onclick="UpdateAsync" title="Application update is ready. Click to complete the update." data-toggle="tooltip" data-placement="bottom">
+            <Icon Identifier="cloud-download-alt" />
+        </button>
+    </li>
 }

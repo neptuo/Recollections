@@ -45,13 +45,20 @@ a {
 @import "_file-upload.scss";
 
 .main-navbar {
-    height: 70px;
     z-index: 2;
+
+    .navbar-toggler {
+        border: none;
+        outline: none;
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
 }
 
-.main-navbar .navbar-toggler {
-    border: none;
-    outline: none;
+.user-navbar {
+    flex-direction: row;
 }
 
 .actions {
@@ -64,7 +71,7 @@ a {
     }
 }
 
-@media (max-width:575px){
+@media (max-width:575px) {
     .actions {
         button, form {
             width: 100%;
@@ -87,5 +94,5 @@ a {
 @import "_entry-picker.scss";
 @import "_image-detail.scss";
 @import "_stories.scss";
-@import "_story-picker.scss"; 
+@import "_story-picker.scss";
 @import "_version.scss";

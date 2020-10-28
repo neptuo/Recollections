@@ -175,12 +175,15 @@ h4 .inline-editor-viewmode .oi {
     display: none; }
 
 .main-navbar {
-  height: 70px;
   z-index: 2; }
+  .main-navbar .navbar-toggler {
+    border: none;
+    outline: none; }
+    .main-navbar .navbar-toggler:focus {
+      box-shadow: none; }
 
-.main-navbar .navbar-toggler {
-  border: none;
-  outline: none; }
+.user-navbar {
+  flex-direction: row; }
 
 .actions .right-actions {
   text-align: right; }
@@ -373,14 +376,15 @@ h4 .inline-editor-viewmode .oi {
 
 .mappage {
   position: absolute;
-  top: 70px;
+  top: 56px;
   left: 0;
   bottom: 0;
   right: 0; }
   .mappage .map-container {
     height: 100%; }
     .mappage .map-container .map {
-      height: 100%; }
+      height: 100%;
+      border-radius: 0 !important; }
   @media (max-width: 991px) {
     .mappage {
       top: 55px; } }

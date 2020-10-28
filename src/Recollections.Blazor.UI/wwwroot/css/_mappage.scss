@@ -1,6 +1,6 @@
 ﻿.mappage {
     position: absolute;
-    top: 70px;
+    top: 56px;
     left: 0;
     bottom: 0;
     right: 0;
@@ -10,6 +10,7 @@
 
         .map {
             height: 100%;
+            border-radius: 0 !important;
         }
     }
 

@@ -25,10 +25,8 @@
                     <NavLink class="nav-link" href="@Navigator.UrlAbout()">About</NavLink>
                 </li>
             </ul>
-            <span class="mr-2">
+            <ul class="navbar-nav user-navbar">
                 <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
-            </span>
-            <ul class="navbar-nav">
                 <UserInfo />
             </ul>
         </div>
