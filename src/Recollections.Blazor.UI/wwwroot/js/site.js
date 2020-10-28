@@ -75,6 +75,9 @@
 window.ElementReference = {
     Focus: function (element) {
         element.focus();
+    },
+    Blur: function (element) {
+        element.blur();
     }
 };
 

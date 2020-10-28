@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,10 +28,15 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected ILog<Timeline> Log { get; set; }
 
+        [Inject]
+        protected ElementReferenceInterop ElementInterop { get; set; }
+
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
         private int offset;
+
+        protected ElementReference MoreButton { get; set; }
 
         protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
         protected bool HasMore { get; private set; }
@@ -67,7 +73,10 @@ namespace Neptuo.Recollections.Entries.Pages
         public async Task LoadMoreAsync()
         {
             if (HasMore && !IsLoading)
+            {
+                _ = ElementInterop.BlurAsync(MoreButton);
                 await LoadAsync();
+            }
         }
     }
 }
