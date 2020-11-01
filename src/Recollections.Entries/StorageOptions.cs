@@ -10,6 +10,7 @@ namespace Neptuo.Recollections.Entries
     public class StorageOptions
     {
         public int MaxLength { get; set; }
+        public int? PremiumMaxLength { get; set; }
 
         public List<string> SupportedExtensions { get; } = new List<string>();
 

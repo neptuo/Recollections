@@ -33,6 +33,10 @@ namespace Neptuo.Recollections.Accounts
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
 
             services
+                .AddTransient<IUserNameProvider, DbUserNameProvider>()
+                .AddTransient<IUserPremiumProvider, DbUserPremiumProvider>();
+
+            services
                 .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)
                 .AddIdentityCore<ApplicationUser>(options => configuration.GetSection("Identity").GetSection("Password").Bind(options.Password))
                 .AddEntityFrameworkStores<DataContext>();

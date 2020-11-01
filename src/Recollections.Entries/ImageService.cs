@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Neptuo;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,28 +15,30 @@ namespace Neptuo.Recollections.Entries
     public class ImageService
     {
         private readonly DataContext dataContext;
-        private readonly StorageOptions configuration;
+        private readonly IImageValidator validator;
         private readonly IFileStorage fileStorage;
         private readonly ImageResizeService resizeService;
 
-        public ImageService(DataContext dataContext, IFileStorage fileStorage, IOptions<StorageOptions> configuration, ImageResizeService resizeService)
+        public ImageService(DataContext dataContext, IFileStorage fileStorage, IImageValidator validator, ImageResizeService resizeService)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(fileStorage, "fileStorage");
-            Ensure.NotNull(configuration, "configuration");
+            Ensure.NotNull(validator, "validator");
             Ensure.NotNull(resizeService, "resizeService");
             this.dataContext = dataContext;
             this.fileStorage = fileStorage;
-            this.configuration = configuration.Value;
+            this.validator = validator;
             this.resizeService = resizeService;
         }
 
         public async Task<Image> CreateAsync(Entry entry, IFileInput file)
         {
+            Ensure.NotNull(entry, "entry");
+            Ensure.NotNull(file, "file");
+
+            await validator.ValidateAsync(entry.UserId, file);
+
             string imageId = Guid.NewGuid().ToString();
-
-            Validate(file);
-
             Image entity = new Image()
             {
                 Id = imageId,
@@ -58,20 +61,6 @@ namespace Neptuo.Recollections.Entries
             await ComputeOtherSizesAsync(entry, entity);
 
             return entity;
-        }
-
-        private void Validate(IFileInput file)
-        {
-            if (file.Length > configuration.MaxLength)
-                throw new ImageMaxLengthExceededException();
-
-            string extension = Path.GetExtension(file.FileName);
-            if (extension == null)
-                throw new ImageNotSupportedExtensionException();
-
-            extension = extension.ToLowerInvariant();
-            if (!configuration.IsSupportedExtension(extension))
-                throw new ImageNotSupportedExtensionException();
         }
 
         private void SetProperties(Image entity, Stream imageContent, bool isWhenIncluded = true)
