@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,6 +94,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.Entry.Id != entryId)
                 return BadRequest();
 
+            var headers = Request.GetTypedHeaders();
+            if (headers.IfModifiedSince != null)
+                return StatusCode(304);
+
             Stream content = await fileProvider.FindAsync(entry, entity, type);
             if (content == null)
                 return NotFound();
@@ -108,7 +113,9 @@ namespace Neptuo.Recollections.Entries.Controllers
                 Response.Headers.Add("Content-Disposition", header.ToString());
             }
 
-            return File(content, GetFileContentType(imageName));
+            Response.Headers.Add("ETag", imageId);
+
+            return File(content, GetFileContentType(imageName), entity.Created, null);
         });
 
         private static string GetFileContentType(string filePath)
