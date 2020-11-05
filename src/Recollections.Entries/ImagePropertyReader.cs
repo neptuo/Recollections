@@ -90,8 +90,13 @@ namespace Neptuo.Recollections.Entries
             if (reader == null)
                 return null;
 
-            if (reader.GetTagValue(type, out T value))
-                return value;
+            try
+            {
+                if (reader.GetTagValue(type, out T value))
+                    return value;
+            }
+            catch (FormatException)
+            { }
 
             return default;
         }
