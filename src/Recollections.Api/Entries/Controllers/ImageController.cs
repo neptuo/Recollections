@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 using Neptuo;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -19,6 +21,9 @@ namespace Neptuo.Recollections.Entries.Controllers
     [Route("api/entries/{entryId}/images")]
     public class ImageController : ControllerBase
     {
+        private const int CacheSeconds = 365 * 24 * 60 * 60;
+        private static readonly StringValues CacheHeaderValue = new StringValues(new[] { "private", $"max-age={CacheSeconds}" });
+
         private readonly ImageService service;
         private readonly DataContext dataContext;
         private readonly IFileStorage fileProvider;
@@ -94,8 +99,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity.Entry.Id != entryId)
                 return BadRequest();
 
-            var headers = Request.GetTypedHeaders();
-            if (headers.IfModifiedSince != null)
+            if (Request.Headers.TryGetValue(HeaderNames.IfNoneMatch, out var ifNoneMatch) && ifNoneMatch.ToString() == imageId)
                 return StatusCode(304);
 
             Stream content = await fileProvider.FindAsync(entry, entity, type);
@@ -110,12 +114,16 @@ namespace Neptuo.Recollections.Entries.Controllers
                     FileName = imageName,
                     Inline = false
                 };
-                Response.Headers.Add("Content-Disposition", header.ToString());
+                Response.Headers.Add(HeaderNames.ContentDisposition, header.ToString());
+            }
+            else
+            {
+                Response.Headers.Add(HeaderNames.CacheControl, CacheHeaderValue);
             }
 
-            Response.Headers.Add("ETag", imageId);
+            Response.Headers.Add(HeaderNames.ETag, imageId);
 
-            return File(content, GetFileContentType(imageName), entity.Created, null);
+            return File(content, GetFileContentType(imageName));
         });
 
         private static string GetFileContentType(string filePath)
