@@ -26,6 +26,7 @@ namespace Neptuo.Recollections.Sharing.Components
         protected bool AreItemsLoading { get; set; }
         protected Modal Modal { get; set; }
         protected List<ShareModel> Items { get; set; }
+        protected bool HasPublic { get; set; }
 
         protected ShareModel NewShare { get; } = new ShareModel();
 
@@ -45,7 +46,9 @@ namespace Neptuo.Recollections.Sharing.Components
         {
             AreItemsLoading = true;
             Items = await api.GetListAsync();
+            HasPublic = Items.Any(s => s.UserName == "public");
             AreItemsLoading = false;
+
             StateHasChanged();
         }
 
@@ -55,10 +58,20 @@ namespace Neptuo.Recollections.Sharing.Components
             _ = LoadAsync();
         }
 
+        protected async Task OnPublicShareAsync() 
+        {
+            if (HasPublic)
+                return;
+
+            var share = new ShareModel(null, Permission.Read);
+            await api.CreateAsync(share);
+            await LoadAsync();
+        }
+
         protected async Task OnAddAsync()
         {
             if (String.IsNullOrEmpty(NewShare.UserName) || String.IsNullOrWhiteSpace(NewShare.UserName))
-                NewShare.UserName = null;
+                return;
 
             await api.CreateAsync(NewShare);
             await LoadAsync();

@@ -12,7 +12,19 @@
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <input @bind="@NewShare.UserName" type="text" class="form-control form-control-sm" placeholder="Username or empty for public..." />
+                    <button class="btn btn-primary btn-block btn-sm" @onclick="@OnPublicShareAsync" disabled="@HasPublic">
+                        Make visible for everyone
+                    </button>
+                </div>
+            </div>
+            <div class="row mt-1 mb-3">
+                <div class="col text-center">
+                    or share with specific user
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <input @bind="@NewShare.UserName" type="text" class="form-control form-control-sm" placeholder="Username..." />
                 </div>
                 <div class="col-3">
                     <select @bind="@NewShare.Permission" class="form-select form-select-sm">
