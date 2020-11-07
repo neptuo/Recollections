@@ -24,10 +24,13 @@
                 </a>
             </h2>
 
-            <span class="chapters">
-                <Icon Identifier="book" />
-                @story.Chapters chapters
-            </span>
+            @if (story.Chapters > 0) 
+            {
+                <span class="chapters">
+                    <Icon Identifier="book" />
+                    @story.Chapters chapters
+                </span>
+            }
 
             <span class="entries">
                 <Icon Prefix="fas" Identifier="comment-alt" />
