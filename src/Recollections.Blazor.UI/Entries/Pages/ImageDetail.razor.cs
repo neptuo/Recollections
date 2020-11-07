@@ -137,6 +137,14 @@ namespace Neptuo.Recollections.Entries.Pages
             Log.Debug($"JS interop completed.");
         }
 
+        protected Task OnClearLocationAsync() 
+        {
+            Markers[0].Latitude = null;
+            Markers[0].Longitude = null;
+            Markers[0].Altitude = null;
+            return SaveLocationAsync();
+        }
+
         protected string GetMapDescription(bool isVisible)
         {
             const string addLocationText = "Add Location on Map";

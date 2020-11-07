@@ -12,7 +12,7 @@
             </div>
             <div class="gps">
                 <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
-                    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" />
+                    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" OnClearLocation="@OnClearLocationAsync" />
                 </MapToggle>
             </div>
             <div class="text">

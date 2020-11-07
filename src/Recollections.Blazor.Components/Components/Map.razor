@@ -2,11 +2,20 @@
     <div class="map rounded"></div>
 
     <div class="map-controls">
-        @if (IsEditable && IsAdditive)
+        @if (IsEditable)
         {
-            <button class="btn btn-sm btn-light btn-add-location mr-1" title="Add Location">
-                <Icon Identifier="plus" />
-            </button>
+            if (IsAdditive) 
+            {
+                <button class="btn btn-sm btn-light btn-add-location mr-1" title="Add Location">
+                    <Icon Identifier="plus" />
+                </button>
+            } 
+            else if (IsClearable) 
+            {
+                <button class="btn btn-sm btn-danger mr-1" @onclick="@OnClearLocation" title="Clear location">
+                    <Icon Identifier="trash-alt" />
+                </button>
+            }
         }
 
         <button class="btn btn-sm btn-light btn-search" title="Search" @onclick="@(() => SearchModal.Show())">

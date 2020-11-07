@@ -27,6 +27,9 @@ namespace Neptuo.Recollections.Components
         public Action<int> MarkerSelected { get; set; }
 
         [Parameter]
+        public EventCallback OnClearLocation { get; set; }
+
+        [Parameter]
         public bool IsAdditive { get; set; }
 
         [Parameter]
@@ -44,6 +47,12 @@ namespace Neptuo.Recollections.Components
         protected List<MapSearchModel> SearchResults { get; } = new List<MapSearchModel>();
 
         internal bool IsEditable => FormState?.IsEditable ?? true;
+
+        protected bool IsClearable => Markers.Count == 1 
+            && OnClearLocation.HasDelegate
+            && Markers[0].IsEditable 
+            && Markers[0].Latitude != null 
+            && Markers[0].Longitude != null;
 
         public async override Task SetParametersAsync(ParameterView parameters)
         {
