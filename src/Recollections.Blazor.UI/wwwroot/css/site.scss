@@ -40,6 +40,49 @@ a {
     cursor: pointer;
 }
 
+input[type=text],
+input[type=password],
+select,
+textarea {
+    &:focus {
+        border-color: salmon;
+    }
+
+    &:focus, &:hover {
+        box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
+    }
+}
+
+.btn-salmon {
+    color: white;
+    border-color: salmon;
+    background-color: salmon;
+
+    &:focus, &:hover {
+        box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
+    }
+
+    &:hover {
+        color: white;
+        background-color: #e87563;
+    }
+}
+
+.btn-outline-salmon {
+    color: salmon;
+    border-color: salmon;
+    background-color: transparent;
+
+    &:focus, &:hover {
+        box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
+    }
+
+    &:hover {
+        color: white;
+        background-color: lightsalmon;
+    }
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";

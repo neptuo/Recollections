@@ -121,21 +121,6 @@ $dot-diameter: 18px;
     margin-left: calc(15% - 34px);
     margin-bottom: 48px;
     background: white;
-
-    .btn-outline-salmon {
-        color: salmon;
-        border-color: salmon;
-        background-color: transparent;
-
-        &:focus, &:hover {
-            box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
-        }
-
-        &:hover {
-            color: white;
-            background-color: lightsalmon;
-        }
-    }
 }
 
 @mixin narrow() {

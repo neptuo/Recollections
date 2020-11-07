@@ -31,6 +31,41 @@ blockquote {
 a {
   cursor: pointer; }
 
+input[type=text]:focus,
+input[type=password]:focus,
+select:focus,
+textarea:focus {
+  border-color: salmon; }
+
+input[type=text]:focus, input[type=text]:hover,
+input[type=password]:focus,
+input[type=password]:hover,
+select:focus,
+select:hover,
+textarea:focus,
+textarea:hover {
+  box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, 0.25); }
+
+.btn-salmon {
+  color: white;
+  border-color: salmon;
+  background-color: salmon; }
+  .btn-salmon:focus, .btn-salmon:hover {
+    box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, 0.25); }
+  .btn-salmon:hover {
+    color: white;
+    background-color: #e87563; }
+
+.btn-outline-salmon {
+  color: salmon;
+  border-color: salmon;
+  background-color: transparent; }
+  .btn-outline-salmon:focus, .btn-outline-salmon:hover {
+    box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, 0.25); }
+  .btn-outline-salmon:hover {
+    color: white;
+    background-color: lightsalmon; }
+
 .loading-bar {
   display: inline-block;
   position: relative;
@@ -315,15 +350,6 @@ h4 .inline-editor-viewmode .oi {
   margin-left: calc(15% - 34px);
   margin-bottom: 48px;
   background: white; }
-  .entry-more .btn-outline-salmon {
-    color: salmon;
-    border-color: salmon;
-    background-color: transparent; }
-    .entry-more .btn-outline-salmon:focus, .entry-more .btn-outline-salmon:hover {
-      box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, 0.25); }
-    .entry-more .btn-outline-salmon:hover {
-      color: white;
-      background-color: lightsalmon; }
 
 .entry-picker .timeline:before {
   left: 7px; }
@@ -478,19 +504,17 @@ h4 .inline-editor-viewmode .oi {
   .image-detail .placeholder {
     color: #aaaaaa; }
 
-.stories {
-  margin-bottom: 1rem; }
-  .stories .story {
-    padding: 1rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-    .stories .story .dates, .stories .story .entries, .stories .story .chapters, .stories .story .dates, .stories .story .owner {
-      padding-right: .75rem; }
-  .stories .story-new {
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
-  .stories .story:last-child {
-    padding-bottom: 0;
-    border-bottom-width: 0; }
+.stories .card {
+  border-color: salmon; }
+  .stories .card:hover, .stories .card:hover a {
+    color: white;
+    background-color: salmon; }
+
+.stories a {
+  color: black;
+  text-decoration: none; }
+  .stories a:hover {
+    text-decoration: none; }
 
 .entry-detail .chapter {
   margin-top: 1.5rem !important; }

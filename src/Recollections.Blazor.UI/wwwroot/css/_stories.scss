@@ -1,23 +1,20 @@
 ﻿.stories {
-    margin-bottom: 1rem;
+    .card {
+        border-color: $accent-color;
 
-    .story {
-        padding: 1rem;
-        border-bottom: 1px solid rgba(0,0,0,.1);
-
-        .dates, .entries, .chapters, .dates, .owner {
-            padding-right: .75rem;
+        &:hover, &:hover a {
+            color: white;
+            background-color: $accent-color;
         }
     }
 
-    .story-new {
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(0,0,0,.1);
-    }
-
-    .story:last-child {
-        padding-bottom: 0;
-        border-bottom-width: 0;
+    a {
+        color: black;
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: none;
+        }
     }
 }
 

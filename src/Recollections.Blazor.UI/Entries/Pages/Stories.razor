@@ -1,75 +1,83 @@
 ﻿@page "/stories"
 
 <div class="stories">
-    <div class="story-new">
-        <Validation ErrorMessages="ErrorMessages" />
+    <Validation ErrorMessages="ErrorMessages" />
 
-        <form @onsubmit="@CreateAsync">
-            <div class="row">
-                <div class="col-md col-sm-12">
-                    <input class="form-control" type="text" placeholder="Story title..." @bind="Title" />
-                </div>
-                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
-                    <button class="btn btn-primary btn-block" type="submit">Create new story</button>
+    <form @onsubmit="@CreateAsync">
+        <div class="row my-4">
+            <div class="col-md col-sm-12">
+                <input class="form-control" type="text" placeholder="Story title..." @bind="Title" />
+            </div>
+            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                <button class="btn btn-salmon btn-block" type="submit">
+                    <Icon Identifier="plus" />
+                    Create a new story
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
+            <div class="col-sm-12 col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a class="stretched-link" href="@Navigator.UrlStoryDetail(story.Id)">
+                                @story.Title
+                            </a>
+                        </h5>
+                        <div>
+                            @if (story.Chapters > 0) 
+                            {
+                                <div class="chapters">
+                                    <Icon Identifier="book" />
+                                    @story.Chapters chapters
+                                </div>
+                            }
+
+                            <div class="entries">
+                                <Icon Prefix="fas" Identifier="comment-alt" />
+                                @story.Entries entries
+                            </div>
+
+                            @if (story.MinDate != null || story.MaxDate != null)
+                            {
+                                <div class="dates">
+                                    <Icon Identifier="calendar" />
+                                    <span class="ml-1">
+                                        @if (story.MinDate != null)
+                                        {
+                                            @story.MinDate.Value.ToString(UiOptions.DateFormat)
+                                        }
+
+                                        @if (story.MinDate != story.MaxDate)
+                                        {
+                                            if (story.MinDate != null && story.MaxDate != null)
+                                            {
+                                                @: -
+                                            }
+
+                                            if (story.MaxDate != null)
+                                            {
+                                                @story.MaxDate.Value.ToString(UiOptions.DateFormat)
+                                            }
+                                        }
+                                    </span>
+                                </div>
+                            }
+
+                            @if (UserState.UserId != story.UserId)
+                            {
+                                <div class="owner">
+                                    <Icon Identifier="user" />
+                                    @story.UserName
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
-        </form>
+        </ListView>
     </div>
-
-    <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
-        <div class="story">
-            <h2>
-                <a href="@Navigator.UrlStoryDetail(story.Id)">
-                    @story.Title
-                </a>
-            </h2>
-
-            @if (story.Chapters > 0) 
-            {
-                <span class="chapters">
-                    <Icon Identifier="book" />
-                    @story.Chapters chapters
-                </span>
-            }
-
-            <span class="entries">
-                <Icon Prefix="fas" Identifier="comment-alt" />
-                @story.Entries entries
-            </span>
-
-            @if (story.MinDate != null || story.MaxDate != null)
-            {
-                <span class="dates">
-                    <Icon Identifier="calendar" />
-                    <span class="ml-1">
-                        @if (story.MinDate != null)
-                        {
-                            @story.MinDate.Value.ToString(UiOptions.DateFormat)
-                        }
-
-                        @if (story.MinDate != story.MaxDate)
-                        {
-                            if (story.MinDate != null && story.MaxDate != null)
-                            {
-                                @: -
-                            }
-
-                            if (story.MaxDate != null)
-                            {
-                                @story.MaxDate.Value.ToString(UiOptions.DateFormat)
-                            }
-                        }
-                    </span>
-                </span>
-            }
-
-            @if (UserState.UserId != story.UserId)
-            {
-                <span class="owner">
-                    <Icon Identifier="user" />
-                    @story.UserName
-                </span>
-            }
-        </div>
-    </ListView>
 </div>
