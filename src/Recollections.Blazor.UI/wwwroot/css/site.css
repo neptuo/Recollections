@@ -183,6 +183,9 @@ h4 .inline-editor-viewmode .oi {
 .inline-date .input-group {
   width: 200px; }
 
+.inline-datetime .input-group {
+  width: 350px; }
+
 .inline-markdown .inline-submit {
   margin-top: -60px; }
 

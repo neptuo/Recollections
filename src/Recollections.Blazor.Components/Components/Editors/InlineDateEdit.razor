@@ -1,12 +1,19 @@
 ﻿@inherits InlineEdit<DateTime>
 
-<div class="inline-editor inline-date @GetModeCssClass()">
+<div class="inline-editor @GetDateCssClass() @GetModeCssClass()">
     @if (IsEditMode)
     {
         <form @onsubmit="@OnSaveValueAsync">
             <div class="col-auto">
                 <div class="input-group">
-                    <input @ref="Input" type="text" class="form-control" @bind="Value" @bind:format="@Format" autofocus />
+                    <span class="input-group-text">
+                        <Icon Identifier="calendar-alt" />
+                    </span>
+                    <input @ref="DateInput" type="text" class="form-control" @bind="Value" @bind:format="@Format" autofocus />
+                    @if (IsTimeSelection)
+                    {
+                        <input type="text" class="form-control" @bind="TimeValue" />
+                    }
                     <button class="btn btn-outline-success btn-save" title="Save changes">
                         <Icon Identifier="check" />
                     </button>
@@ -29,7 +36,16 @@
             }
             else
             {
-                <span class="ml-1 inline-editor-content">@Value.ToString(Format ?? "yyyy-MM-dd")</span>
+                <span class="ml-1 inline-editor-content">
+                    @Value.ToString(Format ?? "yyyy-MM-dd")
+                    
+                    @if (IsTimeSelection)
+                    {
+                        <span class="ml-1">
+                            @Value.ToString(@TimeFormat)
+                        </span>
+                    }
+                </span>
             }
         </a>
     }
