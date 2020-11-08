@@ -40,20 +40,6 @@ a {
     cursor: pointer;
 }
 
-input[type=text],
-input[type=password],
-input[type=time],
-select,
-textarea {
-    &:focus {
-        border-color: salmon;
-    }
-
-    &:focus, &:hover {
-        box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
-    }
-}
-
 .btn-salmon {
     color: white;
     border-color: salmon;

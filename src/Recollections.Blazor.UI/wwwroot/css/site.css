@@ -31,21 +31,6 @@ blockquote {
 a {
   cursor: pointer; }
 
-input[type=text]:focus,
-input[type=password]:focus,
-select:focus,
-textarea:focus {
-  border-color: salmon; }
-
-input[type=text]:focus, input[type=text]:hover,
-input[type=password]:focus,
-input[type=password]:hover,
-select:focus,
-select:hover,
-textarea:focus,
-textarea:hover {
-  box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, 0.25); }
-
 .btn-salmon {
   color: white;
   border-color: salmon;
@@ -184,7 +169,7 @@ h4 .inline-editor-viewmode .oi {
   width: 200px; }
 
 .inline-datetime .input-group {
-  width: 350px; }
+  width: 330px; }
 
 .inline-markdown .inline-submit {
   margin-top: -60px; }
