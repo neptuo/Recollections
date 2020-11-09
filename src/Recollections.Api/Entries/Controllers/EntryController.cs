@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -21,18 +22,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ImageService imageService;
         private readonly ShareStatusService shareStatus;
         private readonly ShareDeleter shareDeleter;
+        private readonly IUserNameProvider userNames;
 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(imageService, "imageService");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(shareDeleter, "shareDeleter");
+            Ensure.NotNull(userNames, "userNames");
             this.db = db;
             this.imageService = imageService;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
+            this.userNames = userNames;
         }
 
         [HttpGet("{id}")]
@@ -61,6 +65,8 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
+
+            model.UserName = await userNames.GetUserNameAsync(entity.UserId);
 
             Response.Headers.Add(PermissionHeader.Name, permission.ToString());
 

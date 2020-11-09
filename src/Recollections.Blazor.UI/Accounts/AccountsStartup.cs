@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Blazored.LocalStorage;
+using Blazored.SessionStorage;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,8 +14,12 @@ namespace Neptuo.Recollections.Accounts
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<Interop>();
             services.AddTransient<Api>();
+
+            services
+                .AddTransient<TokenStorage>()
+                .AddBlazoredLocalStorage()
+                .AddBlazoredSessionStorage();
         }
     }
 }

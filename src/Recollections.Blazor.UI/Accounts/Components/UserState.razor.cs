@@ -22,7 +22,7 @@ namespace Neptuo.Recollections.Accounts.Components
         protected Navigator Navigator { get; set; }
 
         [Inject]
-        protected Interop Interop { get; set; }
+        protected TokenStorage TokenStorage { get; set; }
 
         [Parameter]
         public RenderFragment ChildContent { get; set; }
@@ -35,18 +35,18 @@ namespace Neptuo.Recollections.Accounts.Components
         public string UserName { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
 
-        private void SetAuthorization(string bearerToken, bool isPersistent)
+        private async Task SetAuthorizationAsync(string bearerToken, bool isPersistent, bool isStore = true)
         {
             BearerToken = bearerToken;
             Api.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
-            if (isPersistent)
-                Interop.SaveToken(bearerToken);
+            if (isStore)
+                await TokenStorage.SetAsync(bearerToken, isPersistent);
 
             UserChanged?.Invoke();
         }
 
-        private void ClearAuthorization()
+        private async Task ClearAuthorizationAsync()
         {
             if (BearerToken != null)
             {
@@ -54,7 +54,7 @@ namespace Neptuo.Recollections.Accounts.Components
                 UserId = null;
                 UserName = null;
                 Api.Authorization = null;
-                Interop.SaveToken(null);
+                await TokenStorage.ClearAsync();
 
                 UserChanged?.Invoke();
                 UserInfoChanged?.Invoke();
@@ -65,10 +65,10 @@ namespace Neptuo.Recollections.Accounts.Components
         {
             if (BearerToken == null)
             {
-                string bearerToken = await Interop.LoadTokenAsync();
+                string bearerToken = await TokenStorage.FindAsync();
                 if (!string.IsNullOrEmpty(bearerToken))
                 {
-                    SetAuthorization(bearerToken, false);
+                    await SetAuthorizationAsync(bearerToken, false, false);
                     await LoadUserInfoAsync();
                 }
             }
@@ -87,7 +87,7 @@ namespace Neptuo.Recollections.Accounts.Components
             }
             catch (UnauthorizedAccessException)
             {
-                ClearAuthorization();
+                await ClearAuthorizationAsync();
                 NavigateToLogin();
                 return false;
             }
@@ -102,7 +102,7 @@ namespace Neptuo.Recollections.Accounts.Components
             LoginResponse response = await Api.LoginAsync(new LoginRequest(username, password));
             if (response.BearerToken != null)
             {
-                SetAuthorization(response.BearerToken, isPersistent);
+                await SetAuthorizationAsync(response.BearerToken, isPersistent);
                 await LoadUserInfoAsync();
 
                 Navigator.OpenTimeline();
@@ -112,11 +112,10 @@ namespace Neptuo.Recollections.Accounts.Components
             return false;
         }
 
-        public Task LogoutAsync()
+        public async Task LogoutAsync()
         {
-            ClearAuthorization();
+            await ClearAuthorizationAsync();
             Navigator.OpenLogin();
-            return Task.FromResult(true);
         }
 
         public Task EnsureInitializedAsync()
