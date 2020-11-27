@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,13 +14,16 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [CascadingParameter]
+        protected UserState UserState { get; set; }
+
         [Inject]
         protected Api Api { get; set; }
 
         [Parameter]
         public string Query { get; set; }
 
-        protected List<object> Items { get; set; }
+        protected List<SearchEntryModel> Items { get; set; }
         protected bool IsLoading { get; set; }
 
         protected string EmptyMessage
@@ -27,9 +31,10 @@ namespace Neptuo.Recollections.Entries.Pages
                 ? "Start by filling the search phrase..."
                 : $"Nothing matches '{Query}'...";
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            base.OnInitialized();
+            await base.OnInitializedAsync();
+            await UserState.EnsureAuthenticatedAsync();
             Navigator.LocationChanged += OnLocationChanged;
         }
 
@@ -60,7 +65,8 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 IsLoading = true;
                 //await Task.Delay(1000);
-                await Api.SearchAsync(Query);
+                var response = await Api.SearchAsync(Query);
+                Items = response.Entries;
             }
             finally
             {

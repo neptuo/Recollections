@@ -17,6 +17,9 @@
 
     <div class="row">
         <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="@EmptyMessage" Context="entry">
+            <div class="col-12">
+                @entry.Title
+            </div>
         </ListView>
     </div>
 </div>
