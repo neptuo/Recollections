@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Neptuo;
 using Neptuo.Activators;
@@ -58,7 +59,7 @@ namespace Neptuo.Recollections.Entries
 
         public Task<AuthorizedModel<ImageModel>> GetImageAsync(string entryId, string imageId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ImageModel>>($"entries/{entryId}/images/{imageId}"));
-        
+
         public Task<byte[]> GetImageDataAsync(string url)
             => faultHandler.Wrap(http.GetByteArrayAsync((settings.BaseUrl + url).Replace("api/api", "api")));
 
@@ -102,6 +103,17 @@ namespace Neptuo.Recollections.Entries
 
         public Task<List<StoryEntryModel>> GetStoryChapterEntryListAsync(string storyId, string chapterId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/chapters/{chapterId}/entries"));
+
+        public Task<SearchResponse> SearchAsync(string query, int offset = 0)
+        {
+            string url = "search";
+            url = QueryHelpers.AddQueryString(url, "q", query);
+
+            if (offset > 0)
+                url = QueryHelpers.AddQueryString(url, "offset", offset.ToString());
+
+            return faultHandler.Wrap(http.GetFromJsonAsync<SearchResponse>(url));
+        }
 
         public Task<VersionModel> GetVersionAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<VersionModel>($"entries/version"));

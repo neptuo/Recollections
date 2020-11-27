@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -14,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Controllers
 {
-    [Authorize]
-    [Route("api/timeline/[action]")]
-    public class TimelineController : ControllerBase
+    [ApiController]
+    [Route("api/search")]
+    public class SearchController : ControllerBase
     {
         private const int PageSize = 10;
 
@@ -24,7 +22,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
 
-        public TimelineController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
+        public SearchController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
@@ -36,25 +34,30 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List(int offset)
+        public async Task<IActionResult> Get([FromQuery(Name = "q")] string query, int offset)
         {
             Ensure.PositiveOrZero(offset, "offset");
+
+            if (String.IsNullOrEmpty(query) || String.IsNullOrWhiteSpace(query))
+                return BadRequest();
 
             string userId = HttpContext.User.FindUserId();
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            List<TimelineEntryModel> result = await shareStatus
+            List<SearchEntryModel> result = await shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
                 .OrderByDescending(e => e.When)
+                .Where(e => e.Title.Contains(query, StringComparison.OrdinalIgnoreCase) || e.Text.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .Skip(offset)
                 .Take(PageSize)
-                .Select(e => new TimelineEntryModel()
+                .Select(e => new SearchEntryModel()
                 {
                     Id = e.Id,
                     UserId = e.UserId,
                     Title = e.Title,
                     When = e.When,
+                    Text = e.Text,
                     StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
                     ChapterTitle = e.Chapter.Title,
                     GpsCount = e.Locations.Count,
@@ -66,7 +69,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             for (int i = 0; i < result.Count; i++)
                 result[i].UserName = userNames[i];
 
-            return Ok(new TimelineListResponse(result, result.Count == PageSize));
+            return Ok(new SearchResponse(result, result.Count == PageSize));
         }
     }
 }

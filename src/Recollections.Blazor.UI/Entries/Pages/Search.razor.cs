@@ -13,6 +13,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected Api Api { get; set; }
+
         [Parameter]
         public string Query { get; set; }
 
@@ -56,7 +59,8 @@ namespace Neptuo.Recollections.Entries.Pages
             try
             {
                 IsLoading = true;
-                await Task.Delay(1000);
+                //await Task.Delay(1000);
+                await Api.SearchAsync(Query);
             }
             finally
             {
