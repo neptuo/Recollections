@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Commons.Components
 {
-    public partial class PwaInstall : ComponentBase, IDisposable
+    public partial class PwaInstall : ComponentBase, IAsyncDisposable
     {
         [Inject]
         internal PwaInstallInterop Interop { get; set; }
@@ -84,11 +84,11 @@ namespace Neptuo.Recollections.Commons.Components
             await Interop.UpdateAsync();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             Interop.Remove(this);
 
-            _ = Tooltip.DisposeAsync(Button);
+            await Tooltip.DisposeAsync(Button);
         }
     }
 }

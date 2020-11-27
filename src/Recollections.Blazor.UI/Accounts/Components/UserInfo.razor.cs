@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Components
 {
-    public partial class UserInfo : IDisposable
+    public partial class UserInfo : IAsyncDisposable
     {
         [Inject]
         protected ILog<UserInfo> Log { get; set; }
@@ -45,12 +45,12 @@ namespace Neptuo.Recollections.Accounts.Components
             }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             UserState.UserInfoChanged -= OnUserInfoChanged;
 
-            _ = TooltipInterop.DisposeAsync(MeButton);
-            _ = TooltipInterop.DisposeAsync(LogoutButton);
+            await TooltipInterop.DisposeAsync(MeButton);
+            await TooltipInterop.DisposeAsync(LogoutButton);
         }
 
         private void OnUserInfoChanged()
