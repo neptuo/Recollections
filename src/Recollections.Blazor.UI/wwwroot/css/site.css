@@ -531,5 +531,20 @@ h4 .inline-editor-viewmode .oi {
   padding-bottom: 0;
   border-bottom-width: 0; }
 
+.search .card {
+  border-color: salmon; }
+  .search .card .information {
+    margin-right: 12px;
+    color: #333; }
+  .search .card:hover, .search .card:hover a, .search .card:hover .information {
+    color: white;
+    background-color: salmon; }
+
+.search a {
+  color: black;
+  text-decoration: none; }
+  .search a:hover {
+    text-decoration: none; }
+
 .version {
   color: #aaaaaa; }
