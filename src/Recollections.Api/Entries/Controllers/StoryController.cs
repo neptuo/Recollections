@@ -118,7 +118,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpGet("{id}")]
-        [ProducesDefaultResponseType(typeof(StoryModel))]
+        [ProducesDefaultResponseType(typeof(AuthorizedModel<StoryModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -135,9 +135,12 @@ namespace Neptuo.Recollections.Entries.Controllers
             StoryModel model = new StoryModel();
             MapEntityToModel(entity, model);
 
-            Response.Headers.Add(PermissionHeader.Name, permission.ToString());
+            AuthorizedModel<StoryModel> result = new AuthorizedModel<StoryModel>(model);
+            result.OwnerId = entity.UserId;
+            result.OwnerName = await userNames.GetUserNameAsync(entity.UserId);
+            result.UserPermission = permission;
 
-            return Ok(model);
+            return Ok(result);
         });
 
         [HttpPost]

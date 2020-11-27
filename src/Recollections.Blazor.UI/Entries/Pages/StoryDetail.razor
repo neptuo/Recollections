@@ -8,6 +8,7 @@
                 <h2 class="title">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 </h2>
+                <UserInformation Owner="@Owner" />
                 <div class="text">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>

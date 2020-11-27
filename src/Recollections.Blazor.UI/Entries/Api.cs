@@ -35,32 +35,6 @@ namespace Neptuo.Recollections.Entries
             this.faultHandler = faultHandler;
         }
 
-        private static Permission GetPermissionFromResponse(HttpResponseMessage responseMessage)
-        {
-            Permission permission = Permission.Write;
-            if (responseMessage.Headers.TryGetValues(PermissionHeader.Name, out var permissionHeaderValues))
-            {
-                if (!Enum.TryParse(permissionHeaderValues.FirstOrDefault(), out permission))
-                    permission = Permission.Write;
-            }
-
-            return permission;
-        }
-
-        private async Task<(T, Permission)> GetModelWithPermissionAsync<T>(string url)
-        {
-            HttpResponseMessage responseMessage = await http.GetAsync(url);
-            if (responseMessage.StatusCode == HttpStatusCode.Unauthorized)
-                throw new UnauthorizedAccessException();
-
-            responseMessage.EnsureSuccessStatusCode();
-
-            var model = await responseMessage.Content.ReadFromJsonAsync<T>();
-            var permission = GetPermissionFromResponse(responseMessage);
-
-            return (model, permission);
-        }
-
         public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
@@ -76,14 +50,14 @@ namespace Neptuo.Recollections.Entries
         public Task DeleteEntryAsync(string entryId)
             => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}"));
 
-        public Task<(EntryModel, Permission)> GetEntryAsync(string entryId)
-            => faultHandler.Wrap(GetModelWithPermissionAsync<EntryModel>($"entries/{entryId}"));
+        public Task<AuthorizedModel<EntryModel>> GetEntryAsync(string entryId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<EntryModel>>($"entries/{entryId}"));
 
         public Task<List<ImageModel>> GetImagesAsync(string entryId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ImageModel>>($"entries/{entryId}/images"));
 
-        public Task<(ImageModel, Permission)> GetImageAsync(string entryId, string imageId)
-            => faultHandler.Wrap(GetModelWithPermissionAsync<ImageModel>($"entries/{entryId}/images/{imageId}"));
+        public Task<AuthorizedModel<ImageModel>> GetImageAsync(string entryId, string imageId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ImageModel>>($"entries/{entryId}/images/{imageId}"));
         
         public Task<byte[]> GetImageDataAsync(string url)
             => faultHandler.Wrap(http.GetByteArrayAsync((settings.BaseUrl + url).Replace("api/api", "api")));
@@ -105,8 +79,8 @@ namespace Neptuo.Recollections.Entries
         public Task<List<StoryChapterListModel>> GetStoryChapterListAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryChapterListModel>>($"stories/{storyId}/chapters"));
 
-        public Task<(StoryModel, Permission)> GetStoryAsync(string storyId)
-            => faultHandler.Wrap(GetModelWithPermissionAsync<StoryModel>($"stories/{storyId}"));
+        public Task<AuthorizedModel<StoryModel>> GetStoryAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<StoryModel>>($"stories/{storyId}"));
 
         public Task<StoryModel> CreateStoryAsync(StoryModel model)
             => faultHandler.Wrap(http.PostJsonAsync($"stories", model));

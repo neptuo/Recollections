@@ -9,8 +9,6 @@ namespace Neptuo.Recollections.Entries
 {
     public class EntryModel : ICloneable<EntryModel>, IEquatable<EntryModel>
     {
-        public string UserId { get; set; }
-
         public string Id { get; set; }
         public string Title { get; set; }
         public DateTime When { get; set; }
@@ -30,7 +28,6 @@ namespace Neptuo.Recollections.Entries
         public EntryModel(string id, string userId, string title, DateTime when, string text)
         {
             Id = id;
-            UserId = userId;
             Title = title;
             When = when;
             Text = text;
@@ -41,7 +38,6 @@ namespace Neptuo.Recollections.Entries
             var clone = new EntryModel()
             {
                 Id = Id,
-                UserId = UserId,
                 Title = Title,
                 When = When,
                 Text = Text
@@ -55,7 +51,6 @@ namespace Neptuo.Recollections.Entries
 
         public bool Equals(EntryModel other) => other != null &&
             Id == other.Id &&
-            UserId == other.UserId &&
             Title == other.Title &&
             When == other.When &&
             Text == other.Text &&
@@ -81,7 +76,6 @@ namespace Neptuo.Recollections.Entries
         {
             var hashCode = 242076647;
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Id);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(UserId);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Title);
             hashCode = hashCode * -1521134295 + When.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Text);

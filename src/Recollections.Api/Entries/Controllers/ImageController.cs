@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -28,18 +29,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext dataContext;
         private readonly IFileStorage fileProvider;
         private readonly ShareStatusService shareStatus;
+        private readonly IUserNameProvider userNames;
 
-        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus)
+        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(service, "service");
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(fileProvider, "fileProvider");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(userNames, "userNames");
             this.service = service;
             this.dataContext = dataContext;
             this.fileProvider = fileProvider;
             this.shareStatus = shareStatus;
+            this.userNames = userNames;
         }
 
         [HttpGet]
@@ -63,6 +67,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpGet("{imageId}")]
+        [ProducesDefaultResponseType(typeof(AuthorizedModel<ImageModel>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> Detail(string entryId, string imageId) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
             Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
@@ -73,9 +81,13 @@ namespace Neptuo.Recollections.Entries.Controllers
             service.MapEntityToModel(entity, model, entry.UserId);
 
             var permission = model.UserId == User.FindUserId() || await shareStatus.IsEntrySharedForWriteAsync(entryId, User.FindUserId()) ? Permission.Write : Permission.Read;
-            Response.Headers.Add(PermissionHeader.Name, permission.ToString());
 
-            return Ok(model);
+            AuthorizedModel<ImageModel> result = new AuthorizedModel<ImageModel>(model);
+            result.OwnerId = entry.UserId;
+            result.OwnerName = await userNames.GetUserNameAsync(entry.UserId);
+            result.UserPermission = permission;
+
+            return Ok(result);
         });
 
         [HttpGet("{imageId}/preview")]

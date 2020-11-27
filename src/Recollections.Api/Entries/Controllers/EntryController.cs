@@ -40,11 +40,11 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpGet("{id}")]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesDefaultResponseType(typeof(AuthorizedModel<EntryModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EntryModel>> Get(string id)
+        public async Task<ActionResult<AuthorizedModel<EntryModel>>> Get(string id)
         {
             Ensure.NotNullOrEmpty(id, "id");
 
@@ -66,11 +66,12 @@ namespace Neptuo.Recollections.Entries.Controllers
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
 
-            model.UserName = await userNames.GetUserNameAsync(entity.UserId);
+            AuthorizedModel<EntryModel> result = new AuthorizedModel<EntryModel>(model);
+            result.OwnerId = entity.UserId;
+            result.OwnerName = await userNames.GetUserNameAsync(entity.UserId);
+            result.UserPermission = permission;
 
-            Response.Headers.Add(PermissionHeader.Name, permission.ToString());
-
-            return Ok(model);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -143,7 +144,6 @@ namespace Neptuo.Recollections.Entries.Controllers
         private void MapEntityToModel(Entry entity, EntryModel model)
         {
             model.Id = entity.Id;
-            model.UserId = entity.UserId;
             model.Title = entity.Title;
             model.When = entity.When;
             model.Text = entity.Text;

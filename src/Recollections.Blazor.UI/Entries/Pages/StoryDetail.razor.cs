@@ -34,6 +34,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected EntryPicker EntryPicker { get; set; }
         protected StoryModel Model { get; set; }
+        protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
         protected async override Task OnInitializedAsync()
@@ -46,7 +47,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task LoadAsync()
         {
             Permission userPermission;
-            (Model, userPermission) = await Api.GetStoryAsync(StoryId);
+            (Model, Owner, userPermission) = await Api.GetStoryAsync(StoryId);
 
             Permissions.IsEditable = userPermission == Permission.Write;
             Permissions.IsOwner = UserState.UserId == Model.UserId;

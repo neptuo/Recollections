@@ -39,6 +39,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private EntryModel original;
         protected EntryModel Model { get; set; }
+        protected OwnerModel Owner { get; set; }
         protected List<ImageModel> Images { get; set; }
         protected EntryStoryModel Story { get; set; }
         protected bool HasStory => Story != null && Story.StoryId != null;
@@ -78,13 +79,13 @@ namespace Neptuo.Recollections.Entries.Pages
         private async Task LoadAsync()
         {
             Permission userPermission;
-            (Model, userPermission) = await Api.GetEntryAsync(EntryId);
+            (Model, Owner, userPermission) = await Api.GetEntryAsync(EntryId);
 
             UpdateOriginal();
 
             Log.Debug($"Entry user permission '{userPermission}'.");
             Permissions.IsEditable = userPermission == Permission.Write;
-            Permissions.IsOwner = UserState.UserId == Model.UserId;
+            Permissions.IsOwner = UserState.UserId == Owner.Id;
 
             Markers.Clear();
             foreach (var location in Model.Locations)

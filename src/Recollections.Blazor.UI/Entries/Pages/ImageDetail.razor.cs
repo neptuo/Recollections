@@ -40,6 +40,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private ImageModel original;
         protected ImageModel Model { get; set; }
+        protected OwnerModel Owner { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
@@ -54,7 +55,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private async Task LoadAsync()
         {
             Permission userPermission;
-            (Model, userPermission) = await Api.GetImageAsync(EntryId, ImageId);
+            (Model, Owner, userPermission) = await Api.GetImageAsync(EntryId, ImageId);
 
             UpdateOriginal();
 
