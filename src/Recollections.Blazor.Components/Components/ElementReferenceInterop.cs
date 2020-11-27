@@ -20,9 +20,6 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public ValueTask FocusAsync(ElementReference elementRef) 
-            => jsRuntime.InvokeVoidAsync("ElementReference.Focus", elementRef);
-
         public ValueTask BlurAsync(ElementReference elementRef) 
             => jsRuntime.InvokeVoidAsync("ElementReference.Blur", elementRef);
     }
