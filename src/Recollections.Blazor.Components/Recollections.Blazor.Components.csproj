@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0-rc.1.20451.17" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
     <PackageReference Include="Neptuo.Exceptions" Version="1.2.1" />
   </ItemGroup>
