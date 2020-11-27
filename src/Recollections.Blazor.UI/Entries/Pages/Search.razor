@@ -1,0 +1,22 @@
+﻿@page "/search"
+
+<div class="entries">
+    <form @onsubmit="@(() => { Navigator.OpenSearch(Query); StateHasChanged(); })">
+        <div class="row my-4">
+            <div class="col-md col-sm-12">
+                <input class="form-control" type="text" placeholder="Search phrase..." @bind="Query" />
+            </div>
+            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                <button class="btn btn-salmon btn-block" type="submit">
+                    <Icon Identifier="search" />
+                    Search
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="@EmptyMessage" Context="entry">
+        </ListView>
+    </div>
+</div>
