@@ -48,7 +48,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             List<SearchEntryModel> result = await shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
                 .OrderByDescending(e => e.When)
-                .Where(e => e.Title.Contains(query, StringComparison.OrdinalIgnoreCase) || e.Text.Contains(query, StringComparison.OrdinalIgnoreCase))
+                .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%"))
                 .Skip(offset)
                 .Take(PageSize)
                 .Select(e => new SearchEntryModel()
