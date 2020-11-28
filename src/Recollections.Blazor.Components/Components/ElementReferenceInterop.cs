@@ -22,5 +22,8 @@ namespace Neptuo.Recollections.Components
 
         public ValueTask BlurAsync(ElementReference elementRef) 
             => jsRuntime.InvokeVoidAsync("ElementReference.Blur", elementRef);
+
+        internal ValueTask ScrollIntoViewAsync(ElementReference elementRef)
+            => jsRuntime.InvokeVoidAsync("ElementReference.ScrollIntoView", elementRef);
     }
 }

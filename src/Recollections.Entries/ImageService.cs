@@ -18,17 +18,20 @@ namespace Neptuo.Recollections.Entries
         private readonly IImageValidator validator;
         private readonly IFileStorage fileStorage;
         private readonly ImageResizeService resizeService;
+        private readonly FreeLimitsChecker freeLimits;
 
-        public ImageService(DataContext dataContext, IFileStorage fileStorage, IImageValidator validator, ImageResizeService resizeService)
+        public ImageService(DataContext dataContext, IFileStorage fileStorage, IImageValidator validator, ImageResizeService resizeService, FreeLimitsChecker freeLimits)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(fileStorage, "fileStorage");
             Ensure.NotNull(validator, "validator");
             Ensure.NotNull(resizeService, "resizeService");
+            Ensure.NotNull(freeLimits, "freeLimits");
             this.dataContext = dataContext;
             this.fileStorage = fileStorage;
             this.validator = validator;
             this.resizeService = resizeService;
+            this.freeLimits = freeLimits;
         }
 
         public async Task<Image> CreateAsync(Entry entry, IFileInput file)
@@ -51,14 +54,18 @@ namespace Neptuo.Recollections.Entries
 
             await dataContext.Images.AddAsync(entity);
 
-            await CopyFileAsync(file, entry, entity);
+            bool isOriginalStored = await freeLimits.IsOriginalImageStoredAsync(entry.UserId);
 
-            using (Stream imageContnet = file.OpenReadStream())
-                SetProperties(entity, imageContnet);
+            if (isOriginalStored)
+                await CopyFileAsync(file, entry, entity);
+
+            using (Stream imageContent = file.OpenReadStream())
+                SetProperties(entity, imageContent);
 
             await dataContext.SaveChangesAsync();
 
-            await ComputeOtherSizesAsync(entry, entity);
+            using (Stream imageContent = file.OpenReadStream())
+                await ComputeOtherSizesAsync(entry, entity, imageContent, true);
 
             return entity;
         }
@@ -87,6 +94,11 @@ namespace Neptuo.Recollections.Entries
                 return;
 
             bool canSeek = originalContent.CanSeek && fileStorage.CanStreamSeek;
+            await ComputeOtherSizesAsync(entry, image, originalContent, canSeek);
+        }
+
+        private async Task ComputeOtherSizesAsync(Entry entry, Image image, Stream originalContent, bool canSeek)
+        {
             if (!canSeek)
             {
                 var memoryStream = new MemoryStream();
@@ -106,7 +118,7 @@ namespace Neptuo.Recollections.Entries
 
                 resizeService.Thumbnail(originalCopy, thumbnailContent, 200, 150);
                 thumbnailContent.Position = 0;
-                
+
                 await fileStorage.SaveAsync(entry, image, thumbnailContent, ImageType.Thumbnail);
             }
 
@@ -123,7 +135,7 @@ namespace Neptuo.Recollections.Entries
 
                 resizeService.Resize(originalCopy, previewContent, 1024);
                 previewContent.Position = 0;
-                
+
                 await fileStorage.SaveAsync(entry, image, previewContent, ImageType.Preview);
             }
         }

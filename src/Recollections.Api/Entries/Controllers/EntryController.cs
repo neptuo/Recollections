@@ -24,9 +24,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
         private readonly ShareDeleter shareDeleter;
         private readonly IUserNameProvider userNames;
-        private readonly FreeLimitChecker freeLimits;
+        private readonly FreeLimitsChecker freeLimits;
 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitChecker freeLimits)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");

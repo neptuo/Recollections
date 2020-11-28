@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class FreeLimitChecker
+    public class FreeLimitsChecker
     {
         private readonly DataContext db;
         private readonly IUserPremiumProvider premiumProvider;
         private readonly FreeLimitsOptions options;
 
-        public FreeLimitChecker(DataContext db, IUserPremiumProvider premiumProvider, IOptions<FreeLimitsOptions> options)
+        public FreeLimitsChecker(DataContext db, IUserPremiumProvider premiumProvider, IOptions<FreeLimitsOptions> options)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(premiumProvider, "premiumProvider");
@@ -36,10 +36,21 @@ namespace Neptuo.Recollections.Entries
             return value > count;
         }
 
+        private async Task<bool> BoolCheckAsync(string userId, bool? value)
+        {
+            if (value == null || await premiumProvider.HasPremiumAsync(userId))
+                return true;
+
+            return value.Value;
+        }
+
         public Task<bool> CanCreateEntryAsync(string userId) 
             => CountCheckAsync(userId, db.Entries.Where(e => e.UserId == userId), options.EntryCount);
 
         public Task<bool> CanCreateImageAsync(string userId, string entryId)
             => CountCheckAsync(userId, db.Images.Where(i => i.Entry.Id == entryId), options.ImageInEntryCount);
+
+        public Task<bool> IsOriginalImageStoredAsync(string userId)
+            => BoolCheckAsync(userId, options.IsOriginalImageStored);
     }
 }

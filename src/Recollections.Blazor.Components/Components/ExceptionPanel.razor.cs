@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +26,9 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected ILog<ExceptionPanel> Log { get; set; }
 
+        [Inject]
+        protected WindowInterop WindowInterop { get; set; }
+
         [Parameter]
         public RenderFragment NotFoundContent { get; set; }
 
@@ -32,6 +37,7 @@ namespace Neptuo.Recollections.Components
         protected string Message { get; private set; }
         protected bool IsNotFound { get; private set; }
 
+        protected ElementReference Container { get; private set; }
         protected Modal PremiumModal { get; private set; }
 
         protected override Task OnInitializedAsync()
@@ -80,6 +86,16 @@ namespace Neptuo.Recollections.Components
                     Title = "Server Update";
                     Message = "The server part of the application is currently being updated. Please come back later.";
                 }
+                else if (IsHttpResponseStatusCode(httpException, 404))
+                {
+                    Title = "Not found";
+                    Message = "Requested resource was not found on the server.";
+                }
+                else if (IsHttpResponseStatusCode(httpException, 402))
+                {
+                    PremiumModal.Show();
+                    IsVisible = false;
+                }
                 else
                 {
                     SetNetworkErrorMessage();
@@ -89,7 +105,7 @@ namespace Neptuo.Recollections.Components
             {
                 IsNotFound = true;
             }
-            else if(exception is FreeLimitsReachedExceptionException)
+            else if (exception is FreeLimitsReachedExceptionException)
             {
                 PremiumModal.Show();
                 IsVisible = false;
@@ -101,6 +117,9 @@ namespace Neptuo.Recollections.Components
             }
 
             StateHasChanged();
+
+            if (IsVisible)
+                WindowInterop.ScrollTo(0, 0);
         }
 
         private void SetNetworkErrorMessage()
@@ -110,7 +129,7 @@ namespace Neptuo.Recollections.Components
         }
 
         private static bool IsHttpResponseStatusCode(HttpRequestException exception, int statusCode)
-            => exception.Message.Contains($"Response status code does not indicate success: {statusCode}");
+            => exception.StatusCode == (HttpStatusCode)statusCode || exception.Message.Contains($"Response status code does not indicate success: {statusCode}");
 
         private static bool IsSkipped(Exception exception)
         {

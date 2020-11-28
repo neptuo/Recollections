@@ -30,9 +30,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly IFileStorage fileProvider;
         private readonly ShareStatusService shareStatus;
         private readonly IUserNameProvider userNames;
-        private readonly FreeLimitChecker freeLimits;
+        private readonly FreeLimitsChecker freeLimits;
 
-        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitChecker freeLimits)
+        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(service, "service");

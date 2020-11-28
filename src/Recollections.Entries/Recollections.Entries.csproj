@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Recollections.Accounts\Recollections.Accounts.csproj" />
     <ProjectReference Include="..\Recollections.Entries.Data\Recollections.Entries.Data.csproj" />
     <ProjectReference Include="..\Recollections.Entries.Models\Recollections.Entries.Models.csproj" />
   </ItemGroup>

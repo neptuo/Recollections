@@ -73,8 +73,8 @@
 };
 
 window.ElementReference = {
-    Focus: function (element) {
-        element.focus();
+    ScrollIntoView: function (element) {
+        element.scrollIntoView();
     },
     Blur: function (element) {
         element.blur();

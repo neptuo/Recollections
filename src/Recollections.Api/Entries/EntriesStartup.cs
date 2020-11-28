@@ -40,7 +40,7 @@ namespace Neptuo.Recollections.Entries
         private void ConfigureFreeLimits(IServiceCollection services)
         {
             services.Configure<FreeLimitsOptions>(configuration.GetSection("FreeLimits"));
-            services.AddTransient<FreeLimitChecker>();
+            services.AddTransient<FreeLimitsChecker>();
         }
 
         private static void ConfigureImages(IServiceCollection services)

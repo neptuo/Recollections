@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Accounts
+namespace Neptuo.Recollections.Entries
 {
     public class FreeLimitsOptions
     {
         public int? EntryCount { get; set; }
         public int? ImageInEntryCount { get; set; }
+        public bool? IsOriginalImageStored { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿@if (IsVisible)
 {
-    <div class="container exception-panel">
+    <div @ref="Container" class="container exception-panel">
         @if (IsNotFound)
         {
             @NotFoundContent
