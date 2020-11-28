@@ -38,6 +38,8 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             Ensure.PositiveOrZero(offset, "offset");
 
+            await Task.Delay(5 * 1000);
+
             if (String.IsNullOrEmpty(query) || String.IsNullOrWhiteSpace(query))
                 return BadRequest();
 
@@ -48,7 +50,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             List<SearchEntryModel> result = await shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
                 .OrderByDescending(e => e.When)
-                .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%"))
+                .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"))
                 .Skip(offset)
                 .Take(PageSize)
                 .Select(e => new SearchEntryModel()
