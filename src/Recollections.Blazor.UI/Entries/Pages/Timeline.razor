@@ -61,18 +61,5 @@
 </div>
 
 <div class="entry-more">
-    <button @ref="@MoreButton" class="btn btn-outline-salmon" @onclick="@LoadMoreAsync" disabled="@(IsLoading || !HasMore)">
-        @if (IsLoading)
-        {
-            @: Loading...
-        }
-        else if (!HasMore)
-        {
-            @: Here I started...
-        }
-        else
-        {
-            @: More...
-        }
-    </button>
+    <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="Here I started..." />
 </div>

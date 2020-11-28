@@ -1,0 +1,14 @@
+﻿<button @ref="@Button" class="btn btn-outline-salmon" @onclick="@LoadAsync" disabled="@(IsLoading || !HasMore)">
+    @if (IsLoading)
+    {
+        @LoadingText
+    }
+    else if (!HasMore)
+    {
+        @NoMoreText
+    }
+    else
+    {
+        @Text
+    }
+</button>
