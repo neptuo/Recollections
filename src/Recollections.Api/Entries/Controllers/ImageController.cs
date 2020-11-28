@@ -30,8 +30,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly IFileStorage fileProvider;
         private readonly ShareStatusService shareStatus;
         private readonly IUserNameProvider userNames;
+        private readonly FreeLimitChecker freeLimits;
 
-        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames)
+        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitChecker freeLimits)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(service, "service");
@@ -39,11 +40,13 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(fileProvider, "fileProvider");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(userNames, "userNames");
+            Ensure.NotNull(freeLimits, "freeLimits");
             this.service = service;
             this.dataContext = dataContext;
             this.fileProvider = fileProvider;
             this.shareStatus = shareStatus;
             this.userNames = userNames;
+            this.freeLimits = freeLimits;
         }
 
         [HttpGet]
@@ -150,6 +153,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPost]
         public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, Permission.Write, async entry =>
         {
+            string userId = HttpContext.User.FindUserId();
+            if (!await freeLimits.CanCreateImageAsync(userId, entryId))
+                return PremiumRequired();
+
             try
             {
                 Image entity = await service.CreateAsync(entry, new FormFileInput(file));

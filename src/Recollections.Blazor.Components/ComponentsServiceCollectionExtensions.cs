@@ -29,6 +29,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<TooltipInterop>();
             services.AddTransient<PopoverInterop>();
             services.AddTransient<ElementReferenceInterop>();
+            services.AddSingleton<FreeLimitsNotifier>();
+            services.AddTransient<IFreeLimitsNotifier, FreeLimitsNotifier>(provider => provider.GetRequiredService<FreeLimitsNotifier>());
 
             return services;
         }

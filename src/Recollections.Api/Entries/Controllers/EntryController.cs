@@ -86,7 +86,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             if (!await freeLimits.CanCreateEntryAsync(userId))
-                return StatusCode(StatusCodes.Status402PaymentRequired);
+                return PremiumRequired();
 
             Entry entity = new Entry();
             MapModelToEntity(model, entity);

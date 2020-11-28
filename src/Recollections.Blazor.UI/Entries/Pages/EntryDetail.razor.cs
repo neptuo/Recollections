@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
@@ -27,6 +28,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected Json Json { get; set; }
+
+        [Inject]
+        protected IFreeLimitsNotifier FreeLimitsNotifier { get; set; }
 
         [Inject]
         protected ILog<EntryDetail> Log { get; set; }
@@ -237,7 +241,12 @@ namespace Neptuo.Recollections.Entries.Pages
                 UploadErrors.Clear();
                 UploadErrors.AddRange(progresses.Where(p => p.Status == "error").Select(p => new UploadErrorModel(p)));
                 if (UploadErrors.Count > 0)
-                    UploadError.Show();
+                {
+                    if (UploadErrors.All(e => e.Progress.StatusCode == 402))
+                        FreeLimitsNotifier.Show();
+                    else
+                        UploadError.Show();
+                }
 
                 await LoadImagesAsync();
             }
@@ -396,6 +405,8 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 if (Progress.StatusCode == 400)
                     return "File is too large.";
+                else if (Progress.StatusCode == 402)
+                    return "Premium required.";
                 else
                     return "Unexpected server error.";
             }

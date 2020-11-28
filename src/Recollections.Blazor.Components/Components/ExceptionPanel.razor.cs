@@ -11,12 +11,15 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public partial class ExceptionPanel : ComponentBase, IExceptionHandler<Exception>
+    public partial class ExceptionPanel : ComponentBase, IExceptionHandler<Exception>, IDisposable
     {
         public static IReadOnlyCollection<Type> SkippedExceptions { get; } = new[] { typeof(UnauthorizedAccessException) };
 
         [Inject]
         protected ExceptionHandlerBuilder ExceptionHandlerBuilder { get; set; }
+
+        [Inject]
+        internal FreeLimitsNotifier FreeLimitsNotifier { get; set; }
 
         [Inject]
         protected ILog<ExceptionPanel> Log { get; set; }
@@ -34,8 +37,17 @@ namespace Neptuo.Recollections.Components
         protected override Task OnInitializedAsync()
         {
             ExceptionHandlerBuilder.Handler(this);
+            FreeLimitsNotifier.OnShow += OnFreeLimitsNotifierShow;
             return base.OnInitializedAsync();
         }
+
+        public void Dispose()
+        {
+            FreeLimitsNotifier.OnShow -= OnFreeLimitsNotifierShow;
+        }
+
+        private void OnFreeLimitsNotifierShow()
+            => PremiumModal.Show();
 
         void IExceptionHandler<Exception>.Handle(Exception exception)
         {

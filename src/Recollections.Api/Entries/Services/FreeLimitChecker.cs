@@ -27,13 +27,19 @@ namespace Neptuo.Recollections.Entries
             this.options = options.Value;
         }
 
-        public async Task<bool> CanCreateEntryAsync(string userId)
+        private async Task<bool> CountCheckAsync<T>(string userId, IQueryable<T> query, int? value)
         {
-            if (options.EntryCount == null || await premiumProvider.HasPremiumAsync(userId))
+            if (value == null || await premiumProvider.HasPremiumAsync(userId))
                 return true;
 
-            int count = await db.Entries.CountAsync(e => e.UserId == userId);
-            return options.EntryCount.Value > count;
+            int count = await query.CountAsync();
+            return value > count;
         }
+
+        public Task<bool> CanCreateEntryAsync(string userId) 
+            => CountCheckAsync(userId, db.Entries.Where(e => e.UserId == userId), options.EntryCount);
+
+        public Task<bool> CanCreateImageAsync(string userId, string entryId)
+            => CountCheckAsync(userId, db.Images.Where(i => i.Entry.Id == entryId), options.ImageInEntryCount);
     }
 }

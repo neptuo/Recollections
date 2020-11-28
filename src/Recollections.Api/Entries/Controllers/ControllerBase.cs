@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo;
 using Neptuo.Recollections.Sharing;
@@ -27,6 +28,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             this.runEntryObserver = runEntryObserver;
             this.runStoryObserver = runStoryObserver;
         }
+
+        protected IActionResult PremiumRequired()
+            => StatusCode(StatusCodes.Status402PaymentRequired);
 
         protected Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
             => RunEntryAsync(entryId, null, handler);

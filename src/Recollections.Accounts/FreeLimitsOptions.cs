@@ -10,5 +10,6 @@ namespace Neptuo.Recollections.Accounts
     public class FreeLimitsOptions
     {
         public int? EntryCount { get; set; }
+        public int? ImageInEntryCount { get; set; }
     }
 }
