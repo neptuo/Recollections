@@ -20,6 +20,9 @@ namespace Neptuo.Recollections.Components
         public string EmptyMessage { get; set; } = "No data...";
 
         [Parameter]
+        public RenderFragment EmptyContent { get; set; }
+
+        [Parameter]
         public RenderFragment<T> ChildContent { get; set; }
 
         protected override void OnParametersSet()

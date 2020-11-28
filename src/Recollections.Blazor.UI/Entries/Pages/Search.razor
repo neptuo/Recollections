@@ -1,10 +1,10 @@
 ﻿@page "/search"
 
 <div class="search">
-    <form @onsubmit="@(() => { Navigator.OpenSearch(Query); StateHasChanged(); })">
+    <form @onsubmit="@(() => { Navigator.OpenSearch(SearchText); StateHasChanged(); })">
         <div class="row my-4">
             <div class="col-md col-sm-12">
-                <input class="form-control" type="text" placeholder="Search phrase..." @bind="Query" />
+                <input class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
             </div>
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
                 <button class="btn btn-salmon btn-block" type="submit">
@@ -16,62 +16,75 @@
     </form>
 
     <div class="row">
-        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="@EmptyMessage" Context="entry">
-            <div class="col-12 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a class="stretched-link" href="@Navigator.UrlEntryDetail(entry.Id)">@entry.Title</a>
-                        </h5>
-                        <div>
-                            <span class="information">
-                                <Icon Identifier="calendar-alt" />
-                                @entry.When.ToString(UiOptions.DateFormat)
-                            </span>
-
-                            @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
-                            {
+        <ListView Items="@Items" IsLoading="@(Items.Count == 0 && IsLoading)" EmptyMessage="@EmptyMessage" Context="entry">
+            <EmptyContent>
+                <div class="col-12">
+                    <Alert Mode="@AlertMode.Warning" Message="@EmptyMessage" />
+                </div>
+            </EmptyContent>
+            <ChildContent>
+                <div class="col-12 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a class="stretched-link" href="@Navigator.UrlEntryDetail(entry.Id)">@entry.Title</a>
+                            </h5>
+                            <div>
                                 <span class="information">
-                                    <Icon Identifier="book" />
-
-                                    @entry.StoryTitle
-                                    @if (!String.IsNullOrEmpty(entry.ChapterTitle))
-                                    {
-                                        <span>
-                                            - @entry.ChapterTitle
-                                        </span>
-                                    }
+                                    <Icon Identifier="calendar-alt" />
+                                    @entry.When.ToString(UiOptions.DateFormat)
                                 </span>
-                            }
 
-                            @if (entry.GpsCount > 0)
-                            {
-                                <span class="information">
-                                    <Icon Prefix="fas" Identifier="location-arrow" />
-                                    @entry.GpsCount
-                                </span>
-                            }
+                                @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
+                                {
+                                    <span class="information">
+                                        <Icon Identifier="book" />
 
-                            @if (entry.ImageCount > 0)
-                            {
-                                <span class="information">
-                                    <Icon Identifier="image" />
-                                    @entry.ImageCount
-                                </span>
-                            }
+                                        @entry.StoryTitle
+                                        @if (!String.IsNullOrEmpty(entry.ChapterTitle))
+                                        {
+                                            <span>
+                                                - @entry.ChapterTitle
+                                            </span>
+                                        }
+                                    </span>
+                                }
 
-                            @if (UserState.UserId != entry.UserId)
-                            {
-                                <span class="information">
-                                    <Icon Identifier="user" />
-                                    @entry.UserName
-                                </span>
-                            }
+                                @if (entry.GpsCount > 0)
+                                {
+                                    <span class="information">
+                                        <Icon Prefix="fas" Identifier="location-arrow" />
+                                        @entry.GpsCount
+                                    </span>
+                                }
+
+                                @if (entry.ImageCount > 0)
+                                {
+                                    <span class="information">
+                                        <Icon Identifier="image" />
+                                        @entry.ImageCount
+                                    </span>
+                                }
+
+                                @if (UserState.UserId != entry.UserId)
+                                {
+                                    <span class="information">
+                                        <Icon Identifier="user" />
+                                        @entry.UserName
+                                    </span>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
+            </ChildContent>
         </ListView>
+
+        @if (HasQuery && Items.Count > 0)
+        {
+            <div class="col-12 mb-4">
+                <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="@LoadMoreAsync" NoMoreText="There is nothing more to show..." />
+            </div>
+        }
     </div>
 </div>

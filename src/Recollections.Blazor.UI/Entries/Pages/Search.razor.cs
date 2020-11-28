@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected UiOptions UiOptions { get; set; }
 
+        [Inject]
+        protected ILog<Search> Log { get; set; }
+
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
@@ -26,13 +30,21 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string Query { get; set; }
 
-        protected List<SearchEntryModel> Items { get; set; }
-        protected bool IsLoading { get; set; }
+        private int offset;
 
-        protected string EmptyMessage
-            => String.IsNullOrEmpty(Query)
-                ? "Start by filling the search phrase..."
-                : $"Nothing matches '{Query}'...";
+        /// <summary>
+        /// Don't use here. Only for binding purposes.
+        /// </summary>
+        protected string SearchText { get; set; }
+
+        protected List<SearchEntryModel> Items { get; } = new List<SearchEntryModel>(10);
+        protected bool HasMore { get; private set; }
+        protected bool IsLoading { get; set; }
+        protected bool HasQuery => !String.IsNullOrEmpty(Query);
+
+        protected string EmptyMessage => HasQuery
+            ? $"Nothing matches '{Query}'..."
+            : "Start by filling the search phrase...";
 
         protected override async Task OnInitializedAsync()
         {
@@ -52,29 +64,61 @@ namespace Neptuo.Recollections.Entries.Pages
             StateHasChanged();
         }
 
+        public override Task SetParametersAsync(ParameterView parameters)
+        {
+            Log.Debug("SetParametersAsync");
+            return base.SetParametersAsync(parameters);
+        }
+
         protected override async Task OnParametersSetAsync()
         {
+            Log.Debug("OnParametersSetAsync");
             await base.OnParametersSetAsync();
             await SearchAsync();
         }
 
-        protected async Task SearchAsync()
+        protected async Task SearchAsync(bool append = false)
         {
-            Query = Navigator.FindQueryParameter("q");
+            Log.Debug($"Search executed with '{append}'.");
+
+            string lastQuery = Query;
+            SearchText = Query = Navigator.FindQueryParameter("q");
+
+            if (!append)
+            {
+                if (Query == lastQuery)
+                {
+                    Log.Debug($"Not appending and query not changed (last '{lastQuery}', current '{Query}').");
+                    return;
+                }
+
+                Log.Debug($"Clearing '{Items.Count}' items.");
+                Items.Clear();
+                offset = 0;
+            }
+
             if (String.IsNullOrEmpty(Query))
                 return;
 
             try
             {
                 IsLoading = true;
-                //await Task.Delay(1000);
-                var response = await Api.SearchAsync(Query);
-                Items = response.Entries;
+
+                var response = await Api.SearchAsync(Query, offset);
+                Items.AddRange(response.Entries);
+                HasMore = response.HasMore;
+                offset = Items.Count;
+
+                Log.Debug($"Found '{response.Entries.Count}' items with '{response.HasMore}'.");
             }
             finally
             {
+                Log.Debug("Search finished.");
                 IsLoading = false;
             }
         }
+
+        protected Task LoadMoreAsync()
+            => SearchAsync(true);
     }
 }
