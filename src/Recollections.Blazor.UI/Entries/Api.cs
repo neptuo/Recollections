@@ -5,6 +5,7 @@ using Neptuo;
 using Neptuo.Activators;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
+using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -43,7 +44,17 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
         public Task<EntryModel> CreateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(http.PostJsonAsync("entries", model));
+            => faultHandler.Wrap(CreateEntryInteralAsync(model));
+
+        private async Task<EntryModel> CreateEntryInteralAsync(EntryModel model)
+        {
+            var response = await http.PostAsJsonAsync("entries", model);
+            if (response.StatusCode == HttpStatusCode.PaymentRequired)
+                throw new FreeLimitsReachedExceptionException();
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<EntryModel>();
+        }
 
         public Task UpdateEntryAsync(EntryModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{model.Id}", model));

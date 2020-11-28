@@ -11,3 +11,16 @@
         }
     </div>
 }
+
+<Modal @ref="PremiumModal">
+    <TitleContent>
+        <Icon Prefix="fas" Identifier="star" />
+        Premium
+    </TitleContent>
+    <ChildContent>
+        <Alert Message="You have reached limits for free users." Mode="@AlertMode.Warning" />
+        <p class="mx-2">
+            I you like Recollections, please consider donating some dollars to support our operating costs.
+        </p>
+    </ChildContent>
+</Modal>

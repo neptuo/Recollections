@@ -29,6 +29,8 @@ namespace Neptuo.Recollections.Components
         protected string Message { get; private set; }
         protected bool IsNotFound { get; private set; }
 
+        protected Modal PremiumModal { get; private set; }
+
         protected override Task OnInitializedAsync()
         {
             ExceptionHandlerBuilder.Handler(this);
@@ -74,6 +76,11 @@ namespace Neptuo.Recollections.Components
             else if (exception is UnauthorizedAccessException)
             {
                 IsNotFound = true;
+            }
+            else if(exception is FreeLimitsReachedExceptionException)
+            {
+                PremiumModal.Show();
+                IsVisible = false;
             }
             else
             {
