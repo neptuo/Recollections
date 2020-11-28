@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
@@ -23,8 +24,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
         private readonly ShareDeleter shareDeleter;
         private readonly IUserNameProvider userNames;
+        private readonly FreeLimitChecker freeLimits;
 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitChecker freeLimits)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
@@ -32,11 +34,13 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(shareDeleter, "shareDeleter");
             Ensure.NotNull(userNames, "userNames");
+            Ensure.NotNull(freeLimits, "freeLimits");
             this.db = db;
             this.imageService = imageService;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
             this.userNames = userNames;
+            this.freeLimits = freeLimits;
         }
 
         [HttpGet("{id}")]
@@ -80,6 +84,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
+
+            if (!await freeLimits.CanCreateEntryAsync(userId))
+                return StatusCode(StatusCodes.Status402PaymentRequired);
 
             Entry entity = new Entry();
             MapModelToEntity(model, entity);

@@ -28,12 +28,19 @@ namespace Neptuo.Recollections.Entries
             ConfigureImages(services);
             ConfigureDatabase(services);
             ConfigureStorage(services);
+            ConfigureFreeLimits(services);
 
             services
                 .AddHealthChecks()
                 .AddDbContextCheck<DataContext>("Entries.DataContext");
 
             EnsureDatabase(services);
+        }
+
+        private void ConfigureFreeLimits(IServiceCollection services)
+        {
+            services.Configure<FreeLimitsOptions>(configuration.GetSection("FreeLimits"));
+            services.AddTransient<FreeLimitChecker>();
         }
 
         private static void ConfigureImages(IServiceCollection services)
