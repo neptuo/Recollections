@@ -23,6 +23,8 @@ namespace Neptuo.Recollections.Entries
 {
     public class Api
     {
+        public const HttpStatusCode FreeLimitsReachedStatusCode = HttpStatusCode.PaymentRequired;
+
         private readonly HttpClient http;
         private readonly ApiSettings settings;
         private readonly TaskFaultHandler faultHandler;
@@ -37,6 +39,19 @@ namespace Neptuo.Recollections.Entries
             this.faultHandler = faultHandler;
         }
 
+        private Task<TModel> PostAsync<TModel>(string url, TModel model)
+            => PostAsync<TModel, TModel>(url, model);
+
+        private async Task<TResponse> PostAsync<TReqest, TResponse>(string url, TReqest model)
+        {
+            var response = await http.PostAsJsonAsync(url, model);
+            if (response.StatusCode == FreeLimitsReachedStatusCode)
+                throw new FreeLimitsReachedExceptionException();
+
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<TResponse>();
+        }
+
         public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
@@ -44,17 +59,7 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
         public Task<EntryModel> CreateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(CreateEntryInteralAsync(model));
-
-        private async Task<EntryModel> CreateEntryInteralAsync(EntryModel model)
-        {
-            var response = await http.PostAsJsonAsync("entries", model);
-            if (response.StatusCode == HttpStatusCode.PaymentRequired)
-                throw new FreeLimitsReachedExceptionException();
-
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<EntryModel>();
-        }
+            => faultHandler.Wrap(PostAsync("entries", model));
 
         public Task UpdateEntryAsync(EntryModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{model.Id}", model));
@@ -95,7 +100,7 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<StoryModel>>($"stories/{storyId}"));
 
         public Task<StoryModel> CreateStoryAsync(StoryModel model)
-            => faultHandler.Wrap(http.PostJsonAsync($"stories", model));
+            => faultHandler.Wrap(PostAsync($"stories", model));
 
         public Task UpdateStoryAsync(StoryModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"stories/{model.Id}", model));

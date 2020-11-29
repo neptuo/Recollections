@@ -12,5 +12,6 @@ namespace Neptuo.Recollections.Entries
         public int? EntryCount { get; set; }
         public int? ImageInEntryCount { get; set; }
         public bool? IsOriginalImageStored { get; set; }
+        public int? StoryCount { get; set; }
     }
 }

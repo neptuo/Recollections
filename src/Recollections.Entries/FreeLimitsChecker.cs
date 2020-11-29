@@ -52,5 +52,8 @@ namespace Neptuo.Recollections.Entries
 
         public Task<bool> IsOriginalImageStoredAsync(string userId)
             => BoolCheckAsync(userId, options.IsOriginalImageStored);
+
+        public Task<bool> CanCreateStoryAsync(string userId)
+            => CountCheckAsync(userId, db.Stories.Where(e => e.UserId == userId), options.StoryCount);
     }
 }

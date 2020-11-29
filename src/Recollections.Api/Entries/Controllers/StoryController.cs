@@ -22,18 +22,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
         private readonly ShareDeleter shareDeleter;
+        private readonly FreeLimitsChecker freeLimits;
 
-        public StoryController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter)
+        public StoryController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter, FreeLimitsChecker freeLimits)
             : base(db, shareStatus, runStoryObserver: RunStoryModifier)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(shareDeleter, "shareDeleter");
+            Ensure.NotNull(freeLimits, "freeLimits");
             this.db = db;
             this.userNames = userNames;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
+            this.freeLimits = freeLimits;
         }
 
         private static IQueryable<Story> RunStoryModifier(IQueryable<Story> query)
@@ -148,6 +151,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
+
+            if (!await freeLimits.CanCreateStoryAsync(userId))
+                return PremiumRequired();
 
             Story entity = new Story();
             MapModelToEntity(model, entity);
