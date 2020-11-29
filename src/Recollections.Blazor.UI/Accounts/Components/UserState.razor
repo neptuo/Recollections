@@ -1,3 +1,10 @@
 ﻿<CascadingValue Value="@this">
-    @ChildContent
+    @if (IsAuthenticationRequired)
+    {
+        <Neptuo.Recollections.Accounts.Pages.Login />
+    }
+    else
+    {
+        @ChildContent
+    }
 </CascadingValue>

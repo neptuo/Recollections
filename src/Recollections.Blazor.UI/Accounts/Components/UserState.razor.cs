@@ -27,6 +27,9 @@ namespace Neptuo.Recollections.Accounts.Components
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
+        [CascadingParameter]
+        public RouteData RouteData { get; set; }
+
         public event Action UserChanged;
         public event Action UserInfoChanged;
 
@@ -34,6 +37,8 @@ namespace Neptuo.Recollections.Accounts.Components
         public string UserId { get; private set; }
         public string UserName { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
+
+        protected bool IsAuthenticationRequired { get; set; }
 
         private async Task SetAuthorizationAsync(string bearerToken, bool isPersistent, bool isStore = true)
         {
@@ -105,17 +110,27 @@ namespace Neptuo.Recollections.Accounts.Components
                 await SetAuthorizationAsync(response.BearerToken, isPersistent);
                 await LoadUserInfoAsync();
 
-                Navigator.OpenTimeline();
+                SetAuthenticationRequired(false);
+
                 return true;
             }
 
             return false;
         }
 
+        private void SetAuthenticationRequired(bool isRequired)
+        {
+            IsAuthenticationRequired = isRequired;
+            StateHasChanged();
+
+            if (!isRequired && RouteData.PageType == typeof(Pages.Login))
+                Navigator.OpenTimeline();
+        }
+
         public async Task LogoutAsync()
         {
             await ClearAuthorizationAsync();
-            Navigator.OpenLogin();
+            SetAuthenticationRequired(true);
         }
 
         public Task EnsureInitializedAsync()
@@ -126,7 +141,7 @@ namespace Neptuo.Recollections.Accounts.Components
             await EnsureInitializedAsync();
 
             if (!IsAuthenticated)
-                NavigateToLogin();
+                SetAuthenticationRequired(true);
         }
     }
 }
