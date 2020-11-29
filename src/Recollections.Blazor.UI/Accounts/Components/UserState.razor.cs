@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Components
 {
-    public partial class UserState
+    public partial class UserState : IDisposable
     {
         private TaskCompletionSource<string> initializationSource = new TaskCompletionSource<string>();
 
@@ -68,6 +68,8 @@ namespace Neptuo.Recollections.Accounts.Components
 
         protected override async Task OnInitializedAsync()
         {
+            Navigator.LocationChanged += OnLocationChanged;
+
             if (BearerToken == null)
             {
                 string bearerToken = await TokenStorage.FindAsync();
@@ -79,6 +81,16 @@ namespace Neptuo.Recollections.Accounts.Components
             }
 
             initializationSource.SetResult(null);
+        }
+
+        public void Dispose()
+        {
+            Navigator.LocationChanged -= OnLocationChanged;
+        }
+
+        private void OnLocationChanged(string url)
+        {
+            SetAuthenticationRequired(false);
         }
 
         private async Task<bool> LoadUserInfoAsync()
@@ -123,7 +135,7 @@ namespace Neptuo.Recollections.Accounts.Components
             IsAuthenticationRequired = isRequired;
             StateHasChanged();
 
-            if (!isRequired && RouteData.PageType == typeof(Pages.Login))
+            if (IsAuthenticated && RouteData?.PageType == typeof(Pages.Login))
                 Navigator.OpenTimeline();
         }
 
