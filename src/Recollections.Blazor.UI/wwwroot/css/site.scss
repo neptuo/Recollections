@@ -96,16 +96,23 @@ a {
         text-align: right;
     }
 
-    button {
+    button.btn {
         margin-bottom: 4px;
     }
 }
 
 @media (max-width:575px) {
     .actions {
-        button, form {
+        button.btn, form {
             width: 100%;
             display: block;
+        }
+
+        /* Copy non-sm button styles */
+        button.btn {
+            font-size: 1rem;
+            padding: .375rem .75rem;
+            border-radius: .25rem;
         }
     }
 }

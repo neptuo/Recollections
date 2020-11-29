@@ -211,13 +211,19 @@ h4 .inline-editor-viewmode .oi {
 .actions .right-actions {
   text-align: right; }
 
-.actions button {
+.actions button.btn {
   margin-bottom: 4px; }
 
 @media (max-width: 575px) {
-  .actions button, .actions form {
-    width: 100%;
-    display: block; } }
+  .actions {
+    /* Copy non-sm button styles */ }
+    .actions button.btn, .actions form {
+      width: 100%;
+      display: block; }
+    .actions button.btn {
+      font-size: 1rem;
+      padding: .375rem .75rem;
+      border-radius: .25rem; } }
 
 @media (max-width: 480px) {
   footer {
