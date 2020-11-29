@@ -38,8 +38,6 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             Ensure.PositiveOrZero(offset, "offset");
 
-            await Task.Delay(5 * 1000);
-
             if (String.IsNullOrEmpty(query) || String.IsNullOrWhiteSpace(query))
                 return BadRequest();
 
