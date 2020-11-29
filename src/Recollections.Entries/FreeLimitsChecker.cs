@@ -27,13 +27,21 @@ namespace Neptuo.Recollections.Entries
             this.options = options.Value;
         }
 
-        private async Task<bool> CountCheckAsync<T>(string userId, IQueryable<T> query, int? value)
+        private async Task<bool> CountCheckAsync<T>(string userId, IQueryable<T> query, int? maxCount)
         {
-            if (value == null || await premiumProvider.HasPremiumAsync(userId))
+            if (maxCount == null || await premiumProvider.HasPremiumAsync(userId))
                 return true;
 
             int count = await query.CountAsync();
-            return value > count;
+            return maxCount > count;
+        }
+
+        private async Task<bool> CountCheckAsync(string userId, int currentCount, int? maxCount)
+        {
+            if (maxCount == null || await premiumProvider.HasPremiumAsync(userId))
+                return true;
+
+            return maxCount >= currentCount;
         }
 
         private async Task<bool> BoolCheckAsync(string userId, bool? value)
@@ -49,6 +57,9 @@ namespace Neptuo.Recollections.Entries
 
         public Task<bool> CanCreateImageAsync(string userId, string entryId)
             => CountCheckAsync(userId, db.Images.Where(i => i.Entry.Id == entryId), options.ImageInEntryCount);
+
+        public Task<bool> CanSetGpsAsync(string userId, int gpsCount)
+            => CountCheckAsync(userId, gpsCount, options.GpsInEntryCount);
 
         public Task<bool> IsOriginalImageStoredAsync(string userId)
             => BoolCheckAsync(userId, options.IsOriginalImageStored);

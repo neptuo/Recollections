@@ -45,10 +45,27 @@ namespace Neptuo.Recollections.Entries
         private async Task<TResponse> PostAsync<TReqest, TResponse>(string url, TReqest model)
         {
             var response = await http.PostAsJsonAsync(url, model);
+            return await ReadAsync<TResponse>(response);
+        }
+
+        private Task<TModel> PutAsync<TModel>(string url, TModel model)
+            => PutAsync<TModel, TModel>(url, model);
+
+        private async Task<TResponse> PutAsync<TReqest, TResponse>(string url, TReqest model)
+        {
+            var response = await http.PutAsJsonAsync(url, model);
+            return await ReadAsync<TResponse>(response);
+        }
+
+        private static async Task<TResponse> ReadAsync<TResponse>(HttpResponseMessage response)
+        {
             if (response.StatusCode == FreeLimitsReachedStatusCode)
                 throw new FreeLimitsReachedExceptionException();
 
             response.EnsureSuccessStatusCode();
+            if (response.StatusCode == HttpStatusCode.NoContent)
+                return default;
+
             return await response.Content.ReadFromJsonAsync<TResponse>();
         }
 
@@ -62,7 +79,7 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(PostAsync("entries", model));
 
         public Task UpdateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{model.Id}", model));
+            => faultHandler.Wrap(PutAsync($"entries/{model.Id}", model));
 
         public Task DeleteEntryAsync(string entryId)
             => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}"));

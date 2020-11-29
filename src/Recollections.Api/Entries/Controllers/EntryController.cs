@@ -88,6 +88,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await freeLimits.CanCreateEntryAsync(userId))
                 return PremiumRequired();
 
+            if (!await freeLimits.CanSetGpsAsync(userId, model.Locations.Count))
+                return PremiumRequired();
+
             Entry entity = new Entry();
             MapModelToEntity(model, entity);
             entity.UserId = userId;
@@ -101,7 +104,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<EntryModel>> Update(string id, EntryModel model)
+        public async Task<IActionResult> Update(string id, EntryModel model)
         {
             if (id != model.Id)
                 return BadRequest();
@@ -116,6 +119,9 @@ namespace Neptuo.Recollections.Entries.Controllers
                 if (!await shareStatus.IsEntrySharedForWriteAsync(id, userId))
                     return Unauthorized();
             }
+
+            if (!await freeLimits.CanSetGpsAsync(userId, model.Locations.Count))
+                return PremiumRequired();
 
             MapModelToEntity(model, entity);
 
