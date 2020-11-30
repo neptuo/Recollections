@@ -59,6 +59,10 @@ namespace Neptuo.Recollections.Accounts.Components
             StateHasChanged();
         }
 
-        protected Task LogoutAsync() => UserState.LogoutAsync();
+        protected Task LoginAsync() 
+            => UserState.EnsureAuthenticatedAsync();
+
+        protected Task LogoutAsync() 
+            => UserState.LogoutAsync();
     }
 }

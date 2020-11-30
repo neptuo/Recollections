@@ -14,7 +14,7 @@
 else
 {
     <li class="nav-item">
-        <NavLink class="nav-link" href="@Navigator.UrlLogin()">Login</NavLink>
+        <a class="nav-link" @onclick="LoginAsync">Login</a>
     </li>
     <li class="nav-item">
         <NavLink class="nav-link" href="@Navigator.UrlRegister()">Register</NavLink>

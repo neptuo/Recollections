@@ -1,12 +1,12 @@
-﻿<UserState>
-    <Router AppAssembly="typeof(Program).Assembly">
-        <Found Context="routeData">
+﻿<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <UserState RouteData="@routeData">
             <RouteView RouteData="routeData" />
-        </Found>
-        <NotFound>
-            <div class="container mt-4">
-                <NotFound />
-            </div>
-        </NotFound>
-    </Router>
-</UserState>
+        </UserState>
+    </Found>
+    <NotFound>
+        <div class="container mt-4">
+            <NotFound />
+        </div>
+    </NotFound>
+</Router>

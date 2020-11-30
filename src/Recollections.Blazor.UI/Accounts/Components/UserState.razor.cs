@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,10 +25,13 @@ namespace Neptuo.Recollections.Accounts.Components
         [Inject]
         protected TokenStorage TokenStorage { get; set; }
 
+        [Inject]
+        protected ILog<UserState> Log { get; set; }
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        [CascadingParameter]
+        [Parameter]
         public RouteData RouteData { get; set; }
 
         public event Action UserChanged;
@@ -90,7 +94,7 @@ namespace Neptuo.Recollections.Accounts.Components
 
         private void OnLocationChanged(string url)
         {
-            SetAuthenticationRequired(false);
+            SetAuthenticationRequiredOnly(false);
         }
 
         private async Task<bool> LoadUserInfoAsync()
@@ -132,17 +136,25 @@ namespace Neptuo.Recollections.Accounts.Components
 
         private void SetAuthenticationRequired(bool isRequired)
         {
-            IsAuthenticationRequired = isRequired;
-            StateHasChanged();
+            SetAuthenticationRequiredOnly(isRequired);
 
+            Log.Debug($"IsAuthenticated: '{IsAuthenticated}', PageType: '{RouteData?.PageType?.Name}'.");
             if (IsAuthenticated && RouteData?.PageType == typeof(Pages.Login))
                 Navigator.OpenTimeline();
+            else
+                StateHasChanged();
+        }
+
+        private void SetAuthenticationRequiredOnly(bool isRequired)
+        {
+            Log.Debug($"SetAuthenticationRequired to '{isRequired}'.");
+            IsAuthenticationRequired = isRequired;
         }
 
         public async Task LogoutAsync()
         {
             await ClearAuthorizationAsync();
-            SetAuthenticationRequired(true);
+            NavigateToLogin();
         }
 
         public Task EnsureInitializedAsync()
