@@ -1,7 +1,11 @@
 ﻿@if (IsVisible)
 {
     <div @ref="Container" class="container exception-panel">
-        @if (IsNotFound)
+        @if (IsUnauthorized)
+        {
+            @UnauthorizedContent
+        }
+        else if (IsNotFound)
         {
             @NotFoundContent
         }

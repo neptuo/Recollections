@@ -30,11 +30,15 @@ namespace Neptuo.Recollections.Components
         protected WindowInterop WindowInterop { get; set; }
 
         [Parameter]
+        public RenderFragment UnauthorizedContent { get; set; }
+
+        [Parameter]
         public RenderFragment NotFoundContent { get; set; }
 
         protected bool IsVisible { get; private set; }
         protected string Title { get; private set; }
         protected string Message { get; private set; }
+        protected bool IsUnauthorized { get; private set; }
         protected bool IsNotFound { get; private set; }
 
         protected ElementReference Container { get; private set; }
@@ -58,6 +62,7 @@ namespace Neptuo.Recollections.Components
         void IExceptionHandler<Exception>.Handle(Exception exception)
         {
             IsNotFound = false;
+            IsUnauthorized = false;
             IsVisible = true;
             if (IsSkipped(exception))
             {
@@ -83,7 +88,7 @@ namespace Neptuo.Recollections.Components
             {
                 if (IsHttpResponseStatusCode(httpException, 401))
                 {
-                    IsNotFound = true;
+                    IsUnauthorized = true;
                 }
                 if (IsHttpResponseStatusCode(httpException, 503))
                 {
@@ -107,7 +112,7 @@ namespace Neptuo.Recollections.Components
             }
             else if (exception is UnauthorizedAccessException)
             {
-                IsNotFound = true;
+                IsUnauthorized = true;
             }
             else if (exception is FreeLimitsReachedExceptionException)
             {

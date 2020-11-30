@@ -1,0 +1,10 @@
+﻿<h1>
+    <Icon Prefix="fas" Identifier="users-slash" />
+    Unauthorized
+</h1>
+<p>
+    You are not authorized to see the content at current URL. <br />
+</p>
+<p>
+    You can try to <a class="text-primary" @onclick="@UserState.EnsureAuthenticatedAsync">login here</a> and see if it helps.
+</p>
