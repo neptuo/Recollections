@@ -81,6 +81,10 @@ namespace Neptuo.Recollections.Components
             }
             else if (exception is HttpRequestException httpException)
             {
+                if (IsHttpResponseStatusCode(httpException, 401))
+                {
+                    IsNotFound = true;
+                }
                 if (IsHttpResponseStatusCode(httpException, 503))
                 {
                     Title = "Server Update";

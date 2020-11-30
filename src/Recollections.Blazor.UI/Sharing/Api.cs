@@ -1,4 +1,5 @@
 ﻿using Neptuo.Activators;
+using Neptuo.Recollections.Commons.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo;
 using Neptuo.Activators;
+using Neptuo.Recollections.Commons.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,6 @@ namespace Neptuo.Recollections.Accounts
     public class Api
     {
         private readonly HttpClient http;
-        private readonly Json json;
         private readonly TaskFaultHandler faultHandler;
 
         public AuthenticationHeaderValue Authorization
@@ -26,21 +26,19 @@ namespace Neptuo.Recollections.Accounts
             set => http.DefaultRequestHeaders.Authorization = value;
         }
 
-        public Api(IFactory<HttpClient> httpFactory, Json json, TaskFaultHandler faultHandler)
+        public Api(IFactory<HttpClient> httpFactory, TaskFaultHandler faultHandler)
         {
             Ensure.NotNull(httpFactory, "httpFactory");
-            Ensure.NotNull(json, "json");
             Ensure.NotNull(faultHandler, "faultHandler");
             this.http = httpFactory.Create();
-            this.json = json;
             this.faultHandler = faultHandler;
         }
 
         public Task<LoginResponse> LoginAsync(LoginRequest request)
-            => faultHandler.Wrap(http.PostJsonAsync<LoginRequest, LoginResponse>("accounts/login", request));
+            => faultHandler.Wrap(http.PostAsJsonAsync<LoginRequest, LoginResponse>("accounts/login", request));
 
         public Task<RegisterResponse> RegisterAsync(RegisterRequest request) 
-            => faultHandler.Wrap(http.PostJsonAsync<RegisterRequest, RegisterResponse>("accounts/register", request));
+            => faultHandler.Wrap(http.PostAsJsonAsync<RegisterRequest, RegisterResponse>("accounts/register", request));
 
         public Task<UserInfoResponse> GetProfileAsync(string userId)
             => faultHandler.Wrap(http.GetFromJsonAsync<UserInfoResponse>($"profiles/{userId}"));
@@ -64,7 +62,7 @@ namespace Neptuo.Recollections.Accounts
         }
 
         public Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
-            => faultHandler.Wrap(http.PostJsonAsync<ChangePasswordRequest, ChangePasswordResponse>("accounts/changepassword", request));
+            => faultHandler.Wrap(http.PostAsJsonAsync<ChangePasswordRequest, ChangePasswordResponse>("accounts/changepassword", request));
 
         public Task<UserDetailResponse> GetDetailAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<UserDetailResponse>("accounts/detail"));

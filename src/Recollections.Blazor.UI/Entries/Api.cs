@@ -5,6 +5,7 @@ using Neptuo;
 using Neptuo.Activators;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
+using Neptuo.Recollections.Commons.Exceptions;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
@@ -23,8 +24,6 @@ namespace Neptuo.Recollections.Entries
 {
     public class Api
     {
-        public const HttpStatusCode FreeLimitsReachedStatusCode = HttpStatusCode.PaymentRequired;
-
         private readonly HttpClient http;
         private readonly ApiSettings settings;
         private readonly TaskFaultHandler faultHandler;
@@ -39,36 +38,6 @@ namespace Neptuo.Recollections.Entries
             this.faultHandler = faultHandler;
         }
 
-        private Task<TModel> PostAsync<TModel>(string url, TModel model)
-            => PostAsync<TModel, TModel>(url, model);
-
-        private async Task<TResponse> PostAsync<TReqest, TResponse>(string url, TReqest model)
-        {
-            var response = await http.PostAsJsonAsync(url, model);
-            return await ReadAsync<TResponse>(response);
-        }
-
-        private Task<TModel> PutAsync<TModel>(string url, TModel model)
-            => PutAsync<TModel, TModel>(url, model);
-
-        private async Task<TResponse> PutAsync<TReqest, TResponse>(string url, TReqest model)
-        {
-            var response = await http.PutAsJsonAsync(url, model);
-            return await ReadAsync<TResponse>(response);
-        }
-
-        private static async Task<TResponse> ReadAsync<TResponse>(HttpResponseMessage response)
-        {
-            if (response.StatusCode == FreeLimitsReachedStatusCode)
-                throw new FreeLimitsReachedExceptionException();
-
-            response.EnsureSuccessStatusCode();
-            if (response.StatusCode == HttpStatusCode.NoContent)
-                return default;
-
-            return await response.Content.ReadFromJsonAsync<TResponse>();
-        }
-
         public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
@@ -76,10 +45,10 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
         public Task<EntryModel> CreateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(PostAsync("entries", model));
+            => faultHandler.Wrap(http.PostAsJsonAsync<EntryModel, EntryModel>("entries", model));
 
         public Task UpdateEntryAsync(EntryModel model)
-            => faultHandler.Wrap(PutAsync($"entries/{model.Id}", model));
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{model.Id}", model));
 
         public Task DeleteEntryAsync(string entryId)
             => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}"));
@@ -117,7 +86,7 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<StoryModel>>($"stories/{storyId}"));
 
         public Task<StoryModel> CreateStoryAsync(StoryModel model)
-            => faultHandler.Wrap(PostAsync($"stories", model));
+            => faultHandler.Wrap(http.PostAsJsonAsync<StoryModel, StoryModel>("stories", model));
 
         public Task UpdateStoryAsync(StoryModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"stories/{model.Id}", model));

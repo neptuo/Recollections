@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections
+namespace Neptuo.Recollections.Commons.Exceptions
 {
     public class TaskFaultHandler : IExceptionHandler
     {

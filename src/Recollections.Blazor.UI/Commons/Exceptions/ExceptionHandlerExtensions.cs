@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Neptuo;
+﻿using Neptuo;
 using Neptuo.Exceptions.Handlers;
+using Neptuo.Recollections.Commons.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ExceptionHandlerExtensions
     {
