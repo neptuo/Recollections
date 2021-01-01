@@ -38,7 +38,7 @@ namespace Neptuo.Recollections.Accounts
 
             services
                 .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)
-                .AddIdentityCore<ApplicationUser>(options => configuration.GetSection("Identity").GetSection("Password").Bind(options.Password))
+                .AddIdentityCore<User>(options => configuration.GetSection("Identity").GetSection("Password").Bind(options.Password))
                 .AddEntityFrameworkStores<DataContext>();
 
             services
@@ -84,7 +84,7 @@ namespace Neptuo.Recollections.Accounts
                 using (var scope = services.BuildServiceProvider().CreateScope())
                 {
                     var provider = scope.ServiceProvider;
-                    var userManager = provider.GetService<UserManager<ApplicationUser>>();
+                    var userManager = provider.GetService<UserManager<User>>();
                     var db = provider.GetService<DataContext>();
 
                     //db.Database.EnsureCreated();

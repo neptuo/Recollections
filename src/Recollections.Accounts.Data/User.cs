@@ -8,16 +8,18 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts
 {
-    public class ApplicationUser : IdentityUser
+    public class User : IdentityUser
     {
         public DateTime Created { get; set; }
 
-        public ApplicationUser()
+        public ICollection<UserPropertyValue> Properties { get; set; }
+
+        public User()
         {
             Created = DateTime.Now;
         }
 
-        public ApplicationUser(string userName)
+        public User(string userName)
             : base(userName)
         {
             Created = DateTime.Now;

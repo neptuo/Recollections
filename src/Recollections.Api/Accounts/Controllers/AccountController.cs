@@ -18,11 +18,11 @@ namespace Neptuo.Recollections.Accounts.Controllers
     [Route("api/accounts/[action]")]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<User> userManager;
         private readonly JwtOptions configuration;
         private readonly JwtSecurityTokenHandler tokenHandler;
 
-        public AccountController(UserManager<ApplicationUser> userManager, IOptions<JwtOptions> configuration, JwtSecurityTokenHandler tokenHandler)
+        public AccountController(UserManager<User> userManager, IOptions<JwtOptions> configuration, JwtSecurityTokenHandler tokenHandler)
         {
             Ensure.NotNull(userManager, "userManager");
             Ensure.NotNull(configuration, "configuration");
@@ -35,7 +35,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            ApplicationUser user = await userManager.FindByNameAsync(request.UserName);
+            User user = await userManager.FindByNameAsync(request.UserName);
             if (user != null)
             {
                 if (await userManager.CheckPasswordAsync(user, request.Password))
@@ -67,7 +67,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
-            var user = new ApplicationUser(model.UserName);
+            var user = new User(model.UserName);
             var result = await userManager.CreateAsync(user, model.Password);
 
             var response = new RegisterResponse();
@@ -92,7 +92,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [HttpGet]
         public async Task<IActionResult> Detail()
         {
-            ApplicationUser user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            User user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
             if (user == null)
                 return NotFound();
 
@@ -107,7 +107,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
-            ApplicationUser user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
+            User user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
             if (user == null)
                 return NotFound();
 

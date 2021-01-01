@@ -15,9 +15,9 @@ namespace Neptuo.Recollections.Accounts.Controllers
     [Route("api/profiles")]
     public class ProfileController : ControllerBase
     {
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly UserManager<User> userManager;
 
-        public ProfileController(UserManager<ApplicationUser> userManager)
+        public ProfileController(UserManager<User> userManager)
         {
             Ensure.NotNull(userManager, "userManager");
             this.userManager = userManager;
@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            User user = await userManager.FindByIdAsync(id);
 
             return Ok(new UserInfoResponse()
             {
