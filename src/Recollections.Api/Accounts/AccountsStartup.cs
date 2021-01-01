@@ -31,6 +31,7 @@ namespace Neptuo.Recollections.Accounts
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+            services.Configure<UserPropertyOptions>(configuration.GetSection("Properties"));
 
             services
                 .AddTransient<IUserNameProvider, DbUserNameProvider>()
