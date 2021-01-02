@@ -1,17 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Neptuo.Recollections.Migrations;
 
 namespace Neptuo.Recollections.Accounts.Migrations
 {
-    public partial class UserProperties : Migration
+    public partial class UserProperties : MigrationWithSchema<DataContext>
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                 name: "UserProperties",
+                schema: Schema.Name,
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
-                    Key = table.Column<string>(nullable: false),
+                    UserId = table.Column<string>(maxLength: 36, nullable: false),
+                    Key = table.Column<string>(maxLength: 36, nullable: false),
                     Value = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -20,6 +22,7 @@ namespace Neptuo.Recollections.Accounts.Migrations
                     table.ForeignKey(
                         name: "FK_UserProperties_AspNetUsers_UserId",
                         column: x => x.UserId,
+                        principalSchema: Schema.Name,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -29,7 +32,8 @@ namespace Neptuo.Recollections.Accounts.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "UserProperties");
+                name: "UserProperties",
+                schema: Schema.Name);
         }
     }
 }
