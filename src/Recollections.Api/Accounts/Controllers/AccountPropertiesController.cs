@@ -37,20 +37,23 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 .ToListAsync();
 
             List<UserPropertyModel> result = new List<UserPropertyModel>();
-            foreach (string key in options.Keys)
+            if (options.Keys != null)
             {
-                result.Add(new UserPropertyModel()
+                foreach (string key in options.Keys)
                 {
-                    Key = key,
-                    Value = values.FirstOrDefault(p => p.Key == key)?.Value
-                });
+                    result.Add(new UserPropertyModel()
+                    {
+                        Key = key,
+                        Value = values.FirstOrDefault(p => p.Key == key)?.Value
+                    });
+                }
             }
 
             return Ok(result);
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync(UserPropertyValue model)
+        public async Task<IActionResult> PutAsync(UserPropertyModel model)
         {
             Ensure.NotNull(model, "model");
 
@@ -58,7 +61,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            if (!options.Keys.Contains(model.Value))
+            if (options.Keys == null || !options.Keys.Contains(model.Key))
                 return BadRequest();
 
             UserPropertyValue entity = await db.UserProperties.FirstOrDefaultAsync(p => p.Key == model.Key && p.UserId == userId);
