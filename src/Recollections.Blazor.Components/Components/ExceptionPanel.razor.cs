@@ -151,5 +151,11 @@ namespace Neptuo.Recollections.Components
 
             return false;
         }
+
+        public void Hide()
+        {
+            IsVisible = false;
+            StateHasChanged();
+        }
     }
 }

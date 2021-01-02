@@ -3,8 +3,11 @@
     Unauthorized
 </h1>
 <p>
-    You are not authorized to see the content at current URL. <br />
+    You are not authorized to see the content at the current URL. <br />
 </p>
-<p>
-    You can try to <a class="text-primary" @onclick="@UserState.EnsureAuthenticatedAsync">login here</a> and see if it helps.
-</p>
+@if (!UserState.IsAuthenticated)
+{
+    <p>
+        You can try to <a class="text-primary" @onclick="@UserState.EnsureAuthenticatedAsync">login here</a> and see if it helps.
+    </p>
+}

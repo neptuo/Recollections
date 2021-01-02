@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ namespace Neptuo.Recollections.Commons.Layouts
         [Inject]
         internal Navigator Navigator { get; set; }
 
+        protected ExceptionPanel ExceptionPanel { get; set; }
         protected bool IsMainMenuVisible { get; set; } = false;
 
         protected override void OnInitialized()
@@ -38,7 +40,10 @@ namespace Neptuo.Recollections.Commons.Layouts
         }
 
         private void OnLocationChanged(string url)
-            => UpdateMainMenuVisible(false);
+        {
+            UpdateMainMenuVisible(false);
+            ExceptionPanel.Hide();
+        }
 
         protected void ToggleMainMenu()
             => UpdateMainMenuVisible(!IsMainMenuVisible);
