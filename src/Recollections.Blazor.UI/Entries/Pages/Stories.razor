@@ -1,5 +1,7 @@
 ﻿@page "/stories"
 
+<PageTitle Value="Stories" />
+
 <div class="stories">
     <Validation ErrorMessages="ErrorMessages" />
 
@@ -28,7 +30,7 @@
                             </a>
                         </h5>
                         <div>
-                            @if (story.Chapters > 0) 
+                            @if (story.Chapters > 0)
                             {
                                 <div class="chapters">
                                     <Icon Identifier="book" />

@@ -1,5 +1,7 @@
 ﻿@page "/search"
 
+<PageTitle Value="Search" />
+
 <div class="search">
     <form @onsubmit="@(() => { Navigator.OpenSearch(SearchText); StateHasChanged(); })">
         <div class="row my-4">

@@ -2,6 +2,8 @@
 
 @if (Model != null)
 {
+    <PageTitle Value="@Model.Title" />
+
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div class="entry-detail">

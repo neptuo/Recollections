@@ -85,6 +85,9 @@ window.Recollections = {
     NavigateTo: function (href) {
         window.location.href = href;
         return true;
+    },
+    SetTitle: function (title) {
+        document.title = title;
     }
 };
 
