@@ -5,6 +5,10 @@ a:not([href]):not([tabindex]) {
     text-decoration: none;
 }
 
+html, body {
+    overscroll-behavior-y: none;
+}
+
 body {
     position: relative;
     min-width: 400px;
