@@ -14,6 +14,7 @@ namespace Neptuo.Recollections.Entries
 
         public string Id { get; set; }
         public string Title { get; set; }
+        public int TextWordCount { get; set; }
         public DateTime When { get; set; }
 
         public string StoryTitle { get; set; }

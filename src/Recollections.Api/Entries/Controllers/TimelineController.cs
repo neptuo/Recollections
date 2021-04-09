@@ -44,29 +44,39 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            List<TimelineEntryModel> result = await shareStatus
+            var result = await shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
                 .OrderByDescending(e => e.When)
                 .Skip(offset)
                 .Take(PageSize)
-                .Select(e => new TimelineEntryModel()
+                .Select(e => new
                 {
-                    Id = e.Id,
-                    UserId = e.UserId,
-                    Title = e.Title,
-                    When = e.When,
-                    StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
-                    ChapterTitle = e.Chapter.Title,
-                    GpsCount = e.Locations.Count,
-                    ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id)
+                    Model = new TimelineEntryModel()
+                    {
+                        Id = e.Id,
+                        UserId = e.UserId,
+                        Title = e.Title,
+                        When = e.When,
+                        StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
+                        ChapterTitle = e.Chapter.Title,
+                        GpsCount = e.Locations.Count,
+                        ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id)
+                    },
+                    Text = e.Text
                 })
                 .ToListAsync();
 
-            var userNames = await this.userNames.GetUserNamesAsync(result.Select(e => e.UserId).ToArray());
-            for (int i = 0; i < result.Count; i++)
-                result[i].UserName = userNames[i];
+            foreach (var e in result)
+            {
+                if (!String.IsNullOrEmpty(e.Text))
+                    e.Model.TextWordCount = e.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+            }
 
-            return Ok(new TimelineListResponse(result, result.Count == PageSize));
+            var userNames = await this.userNames.GetUserNamesAsync(result.Select(e => e.Model.UserId).ToArray());
+            for (int i = 0; i < result.Count; i++)
+                result[i].Model.UserName = userNames[i];
+
+            return Ok(new TimelineListResponse(result.Select(e => e.Model).ToList(), result.Count == PageSize));
         }
     }
 }
