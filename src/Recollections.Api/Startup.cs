@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
@@ -15,6 +17,7 @@ namespace Neptuo.Recollections
 {
     public class Startup
     {
+        private readonly IConfiguration configuration;
         private readonly IWebHostEnvironment environment;
         private readonly AccountsStartup accountsStartup;
         private readonly EntriesStartup entriesStartup;
@@ -22,7 +25,9 @@ namespace Neptuo.Recollections
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
+            Ensure.NotNull(configuration, "configuration");
             Ensure.NotNull(environment, "environment");
+            this.configuration = configuration;
             this.environment = environment;
 
             accountsStartup = new AccountsStartup(configuration.GetSection("Accounts"), ResolvePath);
@@ -44,6 +49,8 @@ namespace Neptuo.Recollections
                 .AddRouting(options => options.LowercaseUrls = true)
                 .AddControllers()
                 .AddNewtonsoftJson();
+
+            services.Configure<CorsOptions>(configuration.GetSection("Cors"));
 
             accountsStartup.ConfigureServices(services);
             entriesStartup.ConfigureServices(services);
@@ -72,13 +79,11 @@ namespace Neptuo.Recollections
 
         private static void UseCors(IApplicationBuilder app)
         {
+            var options = app.ApplicationServices.GetRequiredService<IOptions<CorsOptions>>().Value;
+
             app.UseCors(p =>
             {
-#if DEBUG
-                p.WithOrigins("http://localhost:33881");
-#else
-                p.WithOrigins("http://localhost:33881", "https://app.recollections.neptuo.com");
-#endif
+                p.WithOrigins(options.Origins);
                 p.AllowAnyMethod();
                 p.AllowCredentials();
                 p.AllowAnyHeader();
