@@ -44,6 +44,18 @@ a {
     cursor: pointer;
 }
 
+.lnk-salmon-arrow {
+    color: inherit;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.4rem;
+    line-height: 1rem;
+
+    &:hover {
+        color: salmon;
+    }
+}
+
 .btn-salmon {
     color: white;
     border-color: salmon;

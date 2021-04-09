@@ -22,6 +22,9 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public EventCallback OnClick { get; set; }
 
+        [Parameter]
+        public RenderFragment AfterContent { get; set; }
+
         protected override bool IsEditable => IsClickable ?? base.IsEditable;
 
         protected async override Task OnEditAsync()
