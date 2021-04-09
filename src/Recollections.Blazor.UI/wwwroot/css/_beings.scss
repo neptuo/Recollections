@@ -1,0 +1,14 @@
+﻿.beings {
+    @import "_salmon-card.scss";
+
+    .card {
+        position: relative;
+    }
+
+    .being-icon {
+        position: absolute;
+        right: 12px;
+        font-size: 2rem;
+        top: 6px;
+    }
+}

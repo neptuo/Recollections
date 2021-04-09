@@ -7,6 +7,7 @@ using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using Neptuo.Recollections.Commons.Exceptions;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Beings;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -115,6 +116,42 @@ namespace Neptuo.Recollections.Entries
                 url = QueryHelpers.AddQueryString(url, "offset", offset.ToString());
 
             return faultHandler.Wrap(http.GetFromJsonAsync<SearchResponse>(url));
+        }
+
+        public Task<List<BeingListModel>> GetBeingListAsync()
+        {
+            var models = new List<BeingListModel>()
+            {
+                new BeingListModel()
+                {
+                    Id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51",
+                    Name = "Ivy",
+                    Icon = "crow"
+                },
+                new BeingListModel()
+                {
+                    Id = "22c011fd-2051-4ad5-9f73-c20ab01ec763",
+                    Name = "Sorin",
+                    Icon = "dove"
+                },
+                new BeingListModel()
+                {
+                    Id = "77ff59de-4d54-49fd-953e-eaad50bd6727",
+                    Name = "Mycroft",
+                    Icon = "dog"
+                }
+            };
+
+            foreach (var model in models)
+            {
+                if (model.UserId == null)
+                {
+                    model.UserId = "858dd45a-c58e-4cc2-8b1e-06be21747629";
+                    model.UserName = "tester";
+                }
+            }
+
+            return Task.FromResult(models);
         }
 
         public Task<VersionModel> GetVersionAsync()

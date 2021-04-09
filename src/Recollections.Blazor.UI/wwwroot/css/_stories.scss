@@ -1,21 +1,5 @@
 ﻿.stories {
-    .card {
-        border-color: $accent-color;
-
-        &:hover, &:hover a {
-            color: white;
-            background-color: $accent-color;
-        }
-    }
-
-    a {
-        color: black;
-        text-decoration: none;
-        
-        &:hover {
-            text-decoration: none;
-        }
-    }
+    @import "_salmon-card.scss";
 }
 
 .entry-detail {

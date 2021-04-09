@@ -1,0 +1,55 @@
+﻿@page "/beings"
+
+<PageTitle Value="Beings" />
+
+<div class="beings">
+    <Validation ErrorMessages="ErrorMessages" />
+
+    <form @onsubmit="@CreateAsync">
+        <div class="row my-4">
+            <div class="col-md col-sm-12">
+                <input class="form-control" type="text" placeholder="Name..." @bind="Name" />
+            </div>
+            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                <button class="btn btn-salmon btn-block" type="submit">
+                    <Icon Identifier="plus" />
+                    Create a new being
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any being..." Context="being">
+            <div class="col-sm-12 col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="being-icon">
+                            <Icon Identifier="@being.Icon" />
+                        </div>
+
+                        <h5 class="card-title">
+                            <a class="stretched-link" href="@Navigator.UrlBeingDetail(being.Id)">
+                                @being.Name
+                            </a>
+                        </h5>
+                        <div>
+                            <div class="entries">
+                                <Icon Prefix="fas" Identifier="comment-alt" />
+                                @being.Entries entries
+                            </div>
+
+                            @if (UserState.UserId != being.UserId)
+                            {
+                                <div class="owner">
+                                    <Icon Identifier="user" />
+                                    @being.UserName
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ListView>
+    </div>
+</div>

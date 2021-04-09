@@ -141,5 +141,17 @@ namespace Neptuo.Recollections
 
         public void OpenImageDetail(string entryId, string imageId)
             => uri.NavigateTo(UrlImageDetail(entryId, imageId));
+
+        public string UrlBeings()
+            => "/beings";
+
+        public void OpenBeings()
+            => uri.NavigateTo(UrlBeings());
+
+        public string UrlBeingDetail(string storyId)
+            => $"/being/{storyId}";
+
+        public void OpenBeingDetail(string storyId)
+            => uri.NavigateTo(UrlStoryDetail(storyId));
     }
 }

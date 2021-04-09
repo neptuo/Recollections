@@ -549,6 +549,27 @@ h4 .inline-editor-viewmode .oi {
   padding-bottom: 0;
   border-bottom-width: 0; }
 
+.beings .card {
+  border-color: salmon; }
+  .beings .card:hover, .beings .card:hover a {
+    color: white;
+    background-color: salmon; }
+
+.beings a {
+  color: black;
+  text-decoration: none; }
+  .beings a:hover {
+    text-decoration: none; }
+
+.beings .card {
+  position: relative; }
+
+.beings .being-icon {
+  position: absolute;
+  right: 12px;
+  font-size: 2rem;
+  top: 6px; }
+
 .search .card {
   border-color: salmon; }
   .search .card .information {
