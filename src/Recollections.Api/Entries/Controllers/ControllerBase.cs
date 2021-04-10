@@ -91,5 +91,13 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             return await handler(entity);
         }
+
+        protected Task<IActionResult> RunBeingAsync(string beingId, Func<object, Task<IActionResult>> handler)
+            => RunBeingAsync(beingId, null, handler);
+
+        protected async Task<IActionResult> RunBeingAsync(string beingId, Permission? sharePermission, Func<object, Task<IActionResult>> handler)
+        {
+            return await handler(null);
+        }
     }
 }

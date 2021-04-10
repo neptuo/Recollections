@@ -79,6 +79,16 @@ namespace Neptuo.Recollections.Sharing.Controllers
             return GetItemsAsync(db.StoryShares.Where(s => s.StoryId == storyId));
         });
 
+        [HttpGet("beings/{beingId}/sharing")]
+        [ProducesDefaultResponseType(typeof(ShareModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> GetBeingAsync(string beingId) => RunBeingAsync(beingId, being =>
+        {
+            return Task.FromResult<IActionResult>(Ok(new List<ShareModel>()));
+        });
+
         private async Task<IActionResult> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)
             where T : ShareBase
         {
@@ -129,10 +139,19 @@ namespace Neptuo.Recollections.Sharing.Controllers
         public Task<IActionResult> CreateStoryAsync(string storyId, ShareModel model) => RunStoryAsync(storyId, story =>
         {
             return CreateAsync(
-                model, 
-                userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId), 
+                model,
+                userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId),
                 () => new StoryShare(storyId)
             );
+        });
+
+        [HttpPost("beings/{beingId}/sharing")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> CreateBeingAsync(string beingId, ShareModel model) => RunBeingAsync(beingId, being =>
+        {
+            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status201Created));
         });
 
         private async Task<IActionResult> DeleteAsync<T>(string userName, Func<string, IQueryable<T>> findQuery)
@@ -166,9 +185,15 @@ namespace Neptuo.Recollections.Sharing.Controllers
         public Task<IActionResult> DeleteStoryAsync(string storyId, string userName) => RunStoryAsync(storyId, async story =>
         {
             return await DeleteAsync(
-                userName, 
+                userName,
                 userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId)
             );
+        });
+
+        [HttpDelete("beings/{beingId}/sharing/{userName}")]
+        public Task<IActionResult> DeleteBeingAsync(string beingId, string userName) => RunBeingAsync(beingId, async being =>
+        {
+            return Ok();
         });
     }
 }

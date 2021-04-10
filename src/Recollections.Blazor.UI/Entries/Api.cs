@@ -107,6 +107,18 @@ namespace Neptuo.Recollections.Entries
         public Task<List<StoryEntryModel>> GetStoryChapterEntryListAsync(string storyId, string chapterId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/chapters/{chapterId}/entries"));
 
+        public Task<List<BeingListModel>> GetBeingListAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<BeingListModel>>("beings"));
+
+        public Task<AuthorizedModel<BeingModel>> GetBeingAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<BeingModel>>($"beings/{beingId}"));
+
+        public Task UpdateBeingAsync(BeingModel model)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"beings/{model.Id}", model));
+
+        public Task DeleteBeingAsync(string beingId)
+            => faultHandler.Wrap(http.DeleteAsync($"beings/{beingId}"));
+
         public Task<SearchResponse> SearchAsync(string query, int offset = 0)
         {
             string url = "search";
@@ -116,72 +128,6 @@ namespace Neptuo.Recollections.Entries
                 url = QueryHelpers.AddQueryString(url, "offset", offset.ToString());
 
             return faultHandler.Wrap(http.GetFromJsonAsync<SearchResponse>(url));
-        }
-
-        public Task<List<BeingListModel>> GetBeingListAsync()
-        {
-            var models = new List<BeingListModel>()
-            {
-                new BeingListModel()
-                {
-                    Id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51",
-                    Name = "Ivy",
-                    Icon = "crow"
-                },
-                new BeingListModel()
-                {
-                    Id = "22c011fd-2051-4ad5-9f73-c20ab01ec763",
-                    Name = "Sorin",
-                    Icon = "dove"
-                },
-                new BeingListModel()
-                {
-                    Id = "77ff59de-4d54-49fd-953e-eaad50bd6727",
-                    Name = "Mycroft",
-                    Icon = "dog"
-                }
-            };
-
-            foreach (var model in models)
-            {
-                if (model.UserId == null)
-                {
-                    model.UserId = "db643987-f0ed-46ae-ad0e-5d44740393f0";
-                    model.UserName = "tester";
-                }
-            }
-
-            return Task.FromResult(models);
-        }
-
-        public Task<AuthorizedModel<BeingModel>> GetBeingAsync(string beingId)
-        {
-            return Task.FromResult(
-                new AuthorizedModel<BeingModel>()
-                {
-                    Model = new BeingModel()
-                    {
-                        Id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51",
-                        Name = "Ivy",
-                        //Icon = "crow",
-                        Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam faucibus, turpis sed auctor molestie, arcu velit fermentum ante, in accumsan magna ante ac justo. Aliquam gravida justo vel tortor feugiat rutrum. Mauris iaculis augue sed cursus vestibulum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos",
-                        UserId = "db643987-f0ed-46ae-ad0e-5d44740393f0"
-                    },
-                    OwnerId = "db643987-f0ed-46ae-ad0e-5d44740393f0",
-                    OwnerName = "tester",
-                    UserPermission = Permission.Write
-                }
-            );
-        }
-
-        public Task UpdateBeingAsync(BeingModel model)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task DeleteBeingAsync(string beingId)
-        {
-            return Task.CompletedTask;
         }
 
         public Task<VersionModel> GetVersionAsync()

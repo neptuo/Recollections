@@ -43,7 +43,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             => query.Include(s => s.Chapters);
 
         [HttpGet]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesDefaultResponseType(typeof(List<StoryListModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
