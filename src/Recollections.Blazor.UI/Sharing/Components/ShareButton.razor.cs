@@ -23,6 +23,9 @@ namespace Neptuo.Recollections.Sharing.Components
         [Parameter]
         public string StoryId { get; set; }
 
+        [Parameter]
+        public string BeingId { get; set; }
+
         protected bool AreItemsLoading { get; set; }
         protected Modal Modal { get; set; }
         protected List<ShareModel> Items { get; set; }
@@ -38,6 +41,8 @@ namespace Neptuo.Recollections.Sharing.Components
                 api = new EntryApi(Api, EntryId);
             else if (!String.IsNullOrEmpty(StoryId))
                 api = new StoryApi(Api, StoryId);
+            else if (!String.IsNullOrEmpty(BeingId))
+                api = new BeingApi(Api, BeingId);
             else
                 throw Ensure.Exception.InvalidOperation("One of 'entryId' and 'storyId' must be provided.");
         }
@@ -137,6 +142,29 @@ namespace Neptuo.Recollections.Sharing.Components
 
             public Task<List<ShareModel>> GetListAsync()
                 => api.GetStoryListAsync(storyId);
+        }
+
+        class BeingApi : IApi
+        {
+            private readonly Api api;
+            private readonly string beingId;
+
+            public BeingApi(Api api, string beingId)
+            {
+                Ensure.NotNull(api, "api");
+                Ensure.NotNull(beingId, "beingId");
+                this.api = api;
+                this.beingId = beingId;
+            }
+
+            public Task CreateAsync(ShareModel model)
+                => api.CreateBeingAsync(beingId, model);
+
+            public Task DeleteAsync(ShareModel model)
+                => api.DeleteBeingAsync(beingId, model);
+
+            public Task<List<ShareModel>> GetListAsync()
+                => api.GetBeingListAsync(beingId);
         }
     }
 }

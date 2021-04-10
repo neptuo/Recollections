@@ -24,7 +24,7 @@
 
                 <ActionPanel>
                     <PermissionView Request="@PermissionRequest.Owner">
-                        @*<ShareButton BeingId="@Model.Id" />*@
+                        <ShareButton BeingId="@Model.Id" />
                         <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Being">
                             <Icon Identifier="trash-alt" />
                             Delete Being
