@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +28,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Required]
         public string Password { get; set; }
 
-        public bool IsPersistent { get; set; }
+        public bool IsPersistent { get; set; } = true;
 
         public List<string> ErrorMessages { get; } = new List<string>();
 
