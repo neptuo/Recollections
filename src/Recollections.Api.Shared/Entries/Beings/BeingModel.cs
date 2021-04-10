@@ -9,6 +9,8 @@ namespace Neptuo.Recollections.Entries.Beings
 {
     public class BeingModel
     {
+        public string UserId { get; set; }
+
         public string Id { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }

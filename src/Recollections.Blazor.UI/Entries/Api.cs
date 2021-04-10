@@ -146,12 +146,42 @@ namespace Neptuo.Recollections.Entries
             {
                 if (model.UserId == null)
                 {
-                    model.UserId = "858dd45a-c58e-4cc2-8b1e-06be21747629";
+                    model.UserId = "db643987-f0ed-46ae-ad0e-5d44740393f0";
                     model.UserName = "tester";
                 }
             }
 
             return Task.FromResult(models);
+        }
+
+        public Task<AuthorizedModel<BeingModel>> GetBeingAsync(string beingId)
+        {
+            return Task.FromResult(
+                new AuthorizedModel<BeingModel>()
+                {
+                    Model = new BeingModel()
+                    {
+                        Id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51",
+                        Name = "Ivy",
+                        //Icon = "crow",
+                        Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam faucibus, turpis sed auctor molestie, arcu velit fermentum ante, in accumsan magna ante ac justo. Aliquam gravida justo vel tortor feugiat rutrum. Mauris iaculis augue sed cursus vestibulum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos",
+                        UserId = "db643987-f0ed-46ae-ad0e-5d44740393f0"
+                    },
+                    OwnerId = "db643987-f0ed-46ae-ad0e-5d44740393f0",
+                    OwnerName = "tester",
+                    UserPermission = Permission.Write
+                }
+            );
+        }
+
+        public Task UpdateBeingAsync(BeingModel model)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteBeingAsync(string beingId)
+        {
+            return Task.CompletedTask;
         }
 
         public Task<VersionModel> GetVersionAsync()

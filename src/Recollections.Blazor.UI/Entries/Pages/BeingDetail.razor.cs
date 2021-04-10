@@ -41,11 +41,35 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
-            //Permission userPermission;
-            //(Model, Owner, userPermission) = await Api.GetBeingAsync(BeingId);
+            Permission userPermission;
+            (Model, Owner, userPermission) = await Api.GetBeingAsync(BeingId);
 
-            //Permissions.IsEditable = userPermission == Permission.Write;
-            //Permissions.IsOwner = UserState.UserId == Model.UserId;
+            Permissions.IsEditable = userPermission == Permission.Write;
+            Permissions.IsOwner = UserState.UserId == Model.UserId;
+        }
+
+        protected Task SaveAsync()
+            => Api.UpdateBeingAsync(Model);
+
+        protected Task SaveNameAsync(string title)
+        {
+            Model.Name = title;
+            return SaveAsync();
+        }
+
+        protected Task SaveTextAsync(string text)
+        {
+            Model.Text = text;
+            return SaveAsync();
+        }
+
+        protected async Task DeleteAsync()
+        {
+            if (await Navigator.AskAsync($"Do you really want to delete being '{Model.Name}'?"))
+            {
+                await Api.DeleteBeingAsync(Model.Id);
+                Navigator.OpenBeings();
+            }
         }
     }
 }

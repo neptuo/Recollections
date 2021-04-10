@@ -3,4 +3,35 @@
 @if (Model != null)
 {
     <PageTitle Value="@Model.Name" />
-?
+
+    <CascadingValue Value="@Model">
+        <PermissionContainer State="@Permissions">
+            <div class="entry-detail">
+                <h2 class="title">
+                    <InlineTextEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" />
+                </h2>
+                <h2 class="icon">
+                    <InlineLink Value="@Model.Icon" PlaceHolder="user">
+                        <ValueContent Context="identifier">
+                            <Icon Identifier="@identifier" />
+                        </ValueContent>
+                    </InlineLink>
+                </h2>
+                <UserInformation Owner="@Owner" />
+                <div class="text">
+                    <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
+                </div>
+
+                <ActionPanel>
+                    <PermissionView Request="@PermissionRequest.Owner">
+                        @*<ShareButton BeingId="@Model.Id" />*@
+                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Being">
+                            <Icon Identifier="trash-alt" />
+                            Delete Being
+                        </button>
+                    </PermissionView>
+                </ActionPanel>
+            </div>
+        </PermissionContainer>
+    </CascadingValue>
+}
