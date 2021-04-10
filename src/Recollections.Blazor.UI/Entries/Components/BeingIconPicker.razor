@@ -1,0 +1,10 @@
+﻿<Modal @ref="Modal" Title="Select an Icon" CssClass="icon-picker">
+    <ChildContent>
+        @foreach (var icon in Icons)
+        {
+            <button class="btn @(Value == icon ? "selected" : String.Empty) @(icon == null ? "empty" : String.Empty)" @onclick="@(() => { Selected.InvokeAsync(icon); Hide(); })">
+                <Icon Identifier="@(icon ?? "user")" />
+            </button>
+        }
+    </ChildContent>
+</Modal>

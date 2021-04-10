@@ -574,6 +574,16 @@ h4 .inline-editor-viewmode .oi {
   font-size: 2rem;
   top: 6px; }
 
+.icon-picker .modal-body .btn {
+  width: 20%;
+  font-size: 2.9rem; }
+  .icon-picker .modal-body .btn:hover {
+    color: lightsalmon; }
+  .icon-picker .modal-body .btn.selected {
+    color: salmon; }
+  .icon-picker .modal-body .btn.empty {
+    opacity: 0.5; }
+
 .search .card {
   border-color: salmon; }
   .search .card .information {

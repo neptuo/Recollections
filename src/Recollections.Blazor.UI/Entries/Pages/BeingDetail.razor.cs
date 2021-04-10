@@ -32,6 +32,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
+        protected BeingIconPicker IconPicker { get; set; }
+
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -54,6 +56,12 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Task SaveNameAsync(string title)
         {
             Model.Name = title;
+            return SaveAsync();
+        }
+
+        protected Task SaveIconAsync(string icon)
+        {
+            Model.Icon = icon;
             return SaveAsync();
         }
 

@@ -11,7 +11,7 @@
                     <InlineTextEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" />
                 </h2>
                 <h2 class="icon">
-                    <InlineLink Value="@Model.Icon" PlaceHolder="user">
+                    <InlineLink Value="@Model.Icon" PlaceHolder="user" OnClick="@(() => IconPicker.Show())">
                         <ValueContent Context="identifier">
                             <Icon Identifier="@identifier" />
                         </ValueContent>
@@ -34,4 +34,6 @@
             </div>
         </PermissionContainer>
     </CascadingValue>
+
+    <BeingIconPicker @ref="IconPicker" Value="@Model.Icon" Selected="@(async value => await SaveIconAsync(value))" />
 }
