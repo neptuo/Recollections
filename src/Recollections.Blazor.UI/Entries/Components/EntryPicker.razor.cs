@@ -25,15 +25,19 @@ namespace Neptuo.Recollections.Entries.Components
         private int offset;
         private bool isFirstShow = true;
 
+        protected bool IsLoading { get; set; }
         protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
         protected bool HasMore { get; private set; }
 
         private async Task LoadAsync()
         {
+            IsLoading = true;
             TimelineListResponse response = await Api.GetTimelineListAsync(offset);
             Entries.AddRange(response.Entries);
             HasMore = response.HasMore;
             offset = Entries.Count;
+            IsLoading = false;
+
             StateHasChanged();
         }
 

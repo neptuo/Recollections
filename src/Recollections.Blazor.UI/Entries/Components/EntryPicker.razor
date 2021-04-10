@@ -1,8 +1,7 @@
 ﻿<Modal @ref="Modal" Title="Select Entry" CssClass="entry-picker">
     <ChildContent>
         <div class="timeline">
-            @foreach (var entry in Entries)
-            {
+            <ListView Items="@Entries" IsLoading="@IsLoading" EmptyMessage="You don't have any entry..." Context="entry">
                 <div class="entry">
                     <div class="title">
                         <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
@@ -47,7 +46,7 @@
                         </p>
                     </div>
                 </div>
-            }
+            </ListView>
         </div>
     </ChildContent>
     <Buttons>

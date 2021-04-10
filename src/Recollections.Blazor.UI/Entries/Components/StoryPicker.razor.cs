@@ -25,13 +25,17 @@ namespace Neptuo.Recollections.Entries.Components
 
         private bool isFirstShow = true;
 
+        protected bool IsLoading { get; set; }
         protected List<StoryListModel> Stories { get; } = new List<StoryListModel>();
         protected Dictionary<string, List<StoryChapterListModel>> Chapters = new Dictionary<string, List<StoryChapterListModel>>();
 
         private async Task LoadAsync()
         {
+            IsLoading = true;
             Stories.Clear();
             Stories.AddRange(await Api.GetStoryListAsync());
+            IsLoading = false;
+
             StateHasChanged();
         }
 
