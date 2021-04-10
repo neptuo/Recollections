@@ -92,12 +92,29 @@ namespace Neptuo.Recollections.Entries.Controllers
             return await handler(entity);
         }
 
-        protected Task<IActionResult> RunBeingAsync(string beingId, Func<object, Task<IActionResult>> handler)
+        protected Task<IActionResult> RunBeingAsync(string beingId, Func<Being, Task<IActionResult>> handler)
             => RunBeingAsync(beingId, null, handler);
 
-        protected async Task<IActionResult> RunBeingAsync(string beingId, Permission? sharePermission, Func<object, Task<IActionResult>> handler)
+        protected async Task<IActionResult> RunBeingAsync(string beingId, Permission? sharePermission, Func<Being, Task<IActionResult>> handler)
         {
-            return await handler(null);
+            Ensure.NotNullOrEmpty(beingId, "beingId");
+
+            Being entity = await db.Beings.FindAsync(beingId);
+            if (entity == null)
+                return NotFound();
+
+            string userId = HttpContext.User.FindUserId();
+            if (entity.UserId != userId)
+            {
+                if (sharePermission == null)
+                    return Unauthorized();
+                else if (sharePermission == Permission.Read && !await shareStatus.IsBeingSharedForReadAsync(beingId, userId))
+                    return Unauthorized();
+                else if (sharePermission == Permission.Write && !await shareStatus.IsBeingSharedForWriteAsync(beingId, userId))
+                    return Unauthorized();
+            }
+
+            return await handler(entity);
         }
     }
 }

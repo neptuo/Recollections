@@ -173,9 +173,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> Update(string id, StoryModel model) => RunStoryAsync(id, Permission.Write, async story =>
+        public Task<IActionResult> Update(string id, StoryModel model) => RunStoryAsync(id, Permission.Write, async entity =>
         {
-            var removedChapters = MapModelToEntity(model, story);
+            var removedChapters = MapModelToEntity(model, entity);
             foreach (var chapter in removedChapters)
             {
                 foreach (var entry in await db.Entries.Where(e => e.Chapter.Id == chapter.Id).ToListAsync())
@@ -185,7 +185,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 }
             }
 
-            db.Stories.Update(story);
+            db.Stories.Update(entity);
             await db.SaveChangesAsync();
 
             return NoContent();

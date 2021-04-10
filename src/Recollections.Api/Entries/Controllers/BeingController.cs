@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries.Beings;
@@ -21,18 +22,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
         private readonly ShareDeleter shareDeleter;
+        private readonly FreeLimitsChecker freeLimits;
 
-        public BeingController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter)
+        public BeingController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter, FreeLimitsChecker freeLimits)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(shareDeleter, "shareDeleter");
+            Ensure.NotNull(freeLimits, "freeLimits");
             this.db = db;
             this.userNames = userNames;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
+            this.freeLimits = freeLimits;
         }
 
         [HttpGet]
@@ -42,38 +46,30 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<BeingListModel>>> GetList()
         {
-            var models = new List<BeingListModel>()
-            {
-                new BeingListModel()
-                {
-                    Id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51",
-                    Name = "Ivy",
-                    Icon = "crow"
-                },
-                new BeingListModel()
-                {
-                    Id = "22c011fd-2051-4ad5-9f73-c20ab01ec763",
-                    Name = "Sorin",
-                    Icon = "dove"
-                },
-                new BeingListModel()
-                {
-                    Id = "77ff59de-4d54-49fd-953e-eaad50bd6727",
-                    Name = "Mycroft",
-                    Icon = "dog"
-                }
-            };
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
 
-            foreach (var model in models)
+            List<Being> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId)
+                .OrderByDescending(b => b.Name)
+                .ToListAsync();
+
+            List<BeingListModel> models = new List<BeingListModel>();
+            foreach (Being entity in entities)
             {
-                if (model.UserId == null)
-                {
-                    model.UserId = "db643987-f0ed-46ae-ad0e-5d44740393f0";
-                    model.UserName = "tester";
-                }
+                var model = new BeingListModel();
+                models.Add(model);
+
+                MapEntityToModel(entity, model);
+
+                // TODO: Entries.
             }
 
-            return models;
+            var userNames = await this.userNames.GetUserNamesAsync(models.Select(e => e.UserId).ToArray());
+            for (int i = 0; i < models.Count; i++)
+                models[i].UserName = userNames[i];
+
+            return Ok(models);
         }
 
         [HttpGet("{id}")]
@@ -83,18 +79,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> Get(string id) => RunBeingAsync(id, Permission.Read, async entity =>
         {
-            BeingModel model = new BeingModel()
+            Permission permission = Permission.Write;
+            string userId = HttpContext.User.FindUserId();
+            if (entity.UserId != userId)
             {
-                Id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51",
-                Name = "Ivy",
-                Icon = "crow",
-                UserId = "db643987-f0ed-46ae-ad0e-5d44740393f0"
-            };
+                if (!await shareStatus.IsBeingSharedForWriteAsync(id, userId))
+                    permission = Permission.Read;
+            }
+
+            BeingModel model = new BeingModel();
+            MapEntityToModel(entity, model);
 
             AuthorizedModel<BeingModel> result = new AuthorizedModel<BeingModel>(model);
-            result.OwnerId = "db643987-f0ed-46ae-ad0e-5d44740393f0";
-            result.OwnerName = "tester";
-            result.UserPermission = Permission.Write;
+            result.OwnerId = entity.UserId;
+            result.OwnerName = await userNames.GetUserNameAsync(entity.UserId);
+            result.UserPermission = permission;
 
             return Ok(result);
         });
@@ -102,7 +101,23 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(BeingModel model)
         {
-            return CreatedAtAction(nameof(Get), new { id = "ae08c8cf-0dc8-4123-8c53-55e0c0982f51" }, model);
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            if (!await freeLimits.CanCreateBeingAsync(userId))
+                return PremiumRequired();
+
+            Being entity = new Being();
+            MapModelToEntity(model, entity);
+            entity.UserId = userId;
+            entity.Created = DateTime.Now;
+
+            await db.Beings.AddAsync(entity);
+            await db.SaveChangesAsync();
+
+            MapEntityToModel(entity, model);
+            return CreatedAtAction(nameof(Get), new { id = entity.Id }, model);
         }
 
         [HttpPut("{id}")]
@@ -112,13 +127,53 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> Update(string id, BeingModel model) => RunBeingAsync(id, Permission.Write, async entity =>
         {
+            MapModelToEntity(model, entity);
+
+            db.Beings.Update(entity);
+            await db.SaveChangesAsync();
+
             return NoContent();
         });
 
         [HttpDelete("{id}")]
         public Task<IActionResult> Delete(string id) => RunBeingAsync(id, async entity =>
         {
+            string userId = User.FindUserId();
+
+            // TODO: Entries
+
+            await shareDeleter.DeleteBeingSharesAsync(id);
+
+            db.Beings.Remove(entity);
+            await db.SaveChangesAsync();
+
             return Ok();
         });
+
+        private void MapEntityToModel(Being entity, BeingListModel model)
+        {
+            model.Id = entity.Id;
+            model.UserId = entity.UserId;
+            model.Name = entity.Name;
+            model.Icon = entity.Icon;
+        }
+
+        private void MapEntityToModel(Being entity, BeingModel model)
+        {
+            model.Id = entity.Id;
+            model.UserId = entity.UserId;
+            model.Name = entity.Name;
+            model.Icon = entity.Icon;
+            model.Text = entity.Text;
+        }
+
+        private void MapModelToEntity(BeingModel model, Being entity)
+        {
+            entity.Id = model.Id;
+            entity.UserId = model.UserId;
+            entity.Name = model.Name;
+            entity.Icon = model.Icon;
+            entity.Text = model.Text;
+        }
     }
 }

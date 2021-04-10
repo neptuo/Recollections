@@ -42,6 +42,20 @@ namespace Neptuo.Recollections.Entries
         }
     }
 
+    public class BeingShare : ShareBase
+    {
+        public string BeingId { get; set; }
+
+        public BeingShare()
+        { }
+
+        public BeingShare(string beingId)
+        {
+            Ensure.NotNull(beingId, "beingId");
+            BeingId = beingId;
+        }
+    }
+
     public class ProfileShare : ShareBase
     {
         public string ProfileUserId { get; set; }

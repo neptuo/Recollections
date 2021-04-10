@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Entries
         public DbSet<Story> Stories { get; set; }
         public DbSet<StoryShare> StoryShares { get; set; }
 
+        public DbSet<Being> Beings { get; set; }
+        public DbSet<BeingShare> BeingShares { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
             : base(options)
         {
@@ -45,6 +48,9 @@ namespace Neptuo.Recollections.Entries
 
             modelBuilder.Entity<StoryShare>()
                 .HasKey(s => new { s.UserId, s.StoryId });
+
+            modelBuilder.Entity<BeingShare>()
+                .HasKey(s => new { s.UserId, s.BeingId });
 
             if (!String.IsNullOrEmpty(schema.Name))
             {
