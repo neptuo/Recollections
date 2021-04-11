@@ -9,10 +9,11 @@
     .images {
         margin: 24px 0;
         display: grid;
-        grid-gap: 15px;
+        grid-gap: 24px;
 
         @media (min-width:520px) {
             grid-template-columns: 1fr 1fr;
+            grid-gap: 16px;
         }
 
         @media (min-width:768px) {
@@ -37,10 +38,36 @@
             }
 
             img {
-                width: 200px;
-                height: 160px;
+                /* Container margin + entry-detail padding */
+                width: calc((100vw - 1.5rem - 48px));
+                height: calc((100vw - 1.5rem - 48px) / 4 * 3);
 
-                transition: all 0.5s;
+                @media (min-width:520px) {
+                    width: 226px;
+                    height: 169.5px;
+                }
+
+                @media (min-width:768px) {
+                    width: 205.33px;
+                    height: 154px;
+                }
+
+                @media (min-width:992px) {
+                    width: 210px;
+                    height: 157.5px;
+                }
+
+                @media (min-width:1200px) {
+                    width: 200px;
+                    height: 160px;
+                }
+
+                @media (min-width:1400px) {
+                    width: 236px;
+                    height: 177px;
+                }
+
+                transition: transform 0.5s;
             }
 
             img:hover {
