@@ -1,13 +1,15 @@
 ﻿@if (UserState.IsAuthenticated)
 {
     <li class="nav-item mr-2">
-        <a @ref="MeButton" class="btn btn-outline-info" href="/me" title="About me" data-toggle="tooltip" data-placement="bottom">
+        <a @ref="MeButton" class="btn btn-outline-info border-0" href="/me" title="About me" data-toggle="tooltip" data-placement="bottom">
             <Icon Identifier="user" />
+            About me
         </a>
     </li>
     <li class="nav-item">
-        <button @ref="LogoutButton" type="button" class="btn btn-outline-danger" @onclick="@LogoutAsync" title="Log out" data-toggle="tooltip" data-placement="bottom">
+        <button type="button" class="btn btn-outline-danger border-0" @onclick="@LogoutAsync">
             <Icon Prefix="fas" Identifier="sign-out-alt" />
+            Log out
         </button>
     </li>
 }

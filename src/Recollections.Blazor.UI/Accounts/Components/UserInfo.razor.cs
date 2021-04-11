@@ -39,10 +39,7 @@ namespace Neptuo.Recollections.Accounts.Components
             await base.OnAfterRenderAsync(firstRender);
 
             if (UserState.IsAuthenticated)
-            {
                 await TooltipInterop.InitializeAsync(MeButton);
-                await TooltipInterop.InitializeAsync(LogoutButton);
-            }
         }
 
         public async ValueTask DisposeAsync()
@@ -50,7 +47,6 @@ namespace Neptuo.Recollections.Accounts.Components
             UserState.UserInfoChanged -= OnUserInfoChanged;
 
             await TooltipInterop.DisposeAsync(MeButton);
-            await TooltipInterop.DisposeAsync(LogoutButton);
         }
 
         private void OnUserInfoChanged()
