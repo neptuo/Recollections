@@ -20,5 +20,7 @@ namespace Neptuo.Recollections.Entries
         public string Text { get; set; }
 
         public DateTime Created { get; set; }
+
+        public IList<Entry> Entries { get; set; } = new List<Entry>();
     }
 }

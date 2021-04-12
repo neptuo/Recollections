@@ -122,6 +122,12 @@ namespace Neptuo.Recollections.Entries
         public Task DeleteBeingAsync(string beingId)
             => faultHandler.Wrap(http.DeleteAsync($"beings/{beingId}"));
 
+        public Task<List<EntryBeingModel>> GetEntryBeingsAsync(string entryId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryBeingModel>>($"entries/{entryId}/beings"));
+
+        public Task UpdateEntryBeingsAsync(string entryId, List<string> beingIds)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/beings", beingIds));
+
         public Task<SearchResponse> SearchAsync(string query, int offset = 0)
         {
             string url = "search";

@@ -44,6 +44,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected OwnerModel Owner { get; set; }
         protected List<ImageModel> Images { get; set; }
         protected EntryStoryModel Story { get; set; }
+        protected List<EntryBeingModel> Beings { get; } = new List<EntryBeingModel>();
+        protected string BeingsTitle => Beings.Count > 0 ? String.Join(", ", Beings.Select(b => b.Name)) : null;
         protected bool HasStory => Story != null && Story.StoryId != null;
         protected string StoryTitle
         {
@@ -75,10 +77,17 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadAsync();
             await LoadImagesAsync();
             await LoadStoryAsync();
+            await LoadBeingsAsync();
         }
 
         private async Task LoadStoryAsync()
             => Story = await Api.GetEntryStoryAsync(EntryId);
+
+        private async Task LoadBeingsAsync()
+        {
+            Beings.Clear();
+            Beings.AddRange(await Api.GetEntryBeingsAsync(EntryId));
+        }
 
         private async Task LoadAsync()
         {
@@ -325,16 +334,23 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected StoryPicker StoryPicker { get; set; }
 
-        protected void SelectStory()
-        {
-            StoryPicker.Show();
-        }
+        protected void SelectStory() => StoryPicker.Show();
 
         protected async void StorySelected(EntryStoryModel model)
         {
             await Api.UpdateEntryStoryAsync(EntryId, model);
             await LoadStoryAsync();
             StateHasChanged();
+        }
+
+        protected BeingPicker BeingPicker { get; set; }
+
+        protected void SelectBeing() => BeingPicker.Show(Beings.Select(b => b.Id));
+
+        protected async Task BeingSelectedAsync(List<string> beingIds)
+        {
+            await Api.UpdateEntryBeingsAsync(EntryId, beingIds);
+            await LoadBeingsAsync();
         }
     }
 

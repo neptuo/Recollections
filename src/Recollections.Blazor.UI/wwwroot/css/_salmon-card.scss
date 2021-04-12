@@ -1,6 +1,11 @@
 ﻿.card {
     border-color: $accent-color;
 
+    &.selected {
+        color: white;
+        background-color: lightsalmon;
+    }
+
     &:hover, &:hover a {
         color: white;
         background-color: $accent-color;

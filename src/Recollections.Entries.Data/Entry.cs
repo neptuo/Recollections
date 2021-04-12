@@ -24,6 +24,7 @@ namespace Neptuo.Recollections.Entries
         public StoryChapter Chapter { get; set; }
 
         public IList<OrderedLocation> Locations { get; set; } = new List<OrderedLocation>();
+        public IList<Being> Beings { get; set; } = new List<Being>();
 
         public DateTime When { get; set; }
         public DateTime Created { get; set; }

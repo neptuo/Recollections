@@ -24,6 +24,9 @@
                     </InlineLink>
                 </div>
                 <UserInformation Owner="@Owner" />
+                <div class="being">
+                    <InlineLink Value="@BeingsTitle" PlaceHolder="No beings..." Icon="user-friends" OnClick="@SelectBeing" />
+                </div>
                 <div class="gps">
                     <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
                         <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
@@ -140,4 +143,5 @@
     </Modal>
 
     <StoryPicker @ref="StoryPicker" Selected="StorySelected" />
+    <BeingPicker @ref="BeingPicker" Selected="BeingSelectedAsync" />
 }

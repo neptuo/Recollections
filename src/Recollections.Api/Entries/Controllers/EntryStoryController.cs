@@ -38,7 +38,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpGet]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesDefaultResponseType(typeof(EntryStoryModel))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
         [ProducesResponseType(Status404NotFound)]

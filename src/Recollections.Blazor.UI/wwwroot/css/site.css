@@ -545,6 +545,9 @@ h4 .inline-editor-viewmode .oi {
 
 .stories .card {
   border-color: salmon; }
+  .stories .card.selected {
+    color: white;
+    background-color: lightsalmon; }
   .stories .card:hover, .stories .card:hover a {
     color: white;
     background-color: salmon; }
@@ -584,6 +587,9 @@ h4 .inline-editor-viewmode .oi {
 
 .beings .card {
   border-color: salmon; }
+  .beings .card.selected {
+    color: white;
+    background-color: lightsalmon; }
   .beings .card:hover, .beings .card:hover a {
     color: white;
     background-color: salmon; }

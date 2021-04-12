@@ -1,0 +1,22 @@
+﻿<Modal @ref="Modal" Title="Select beings" CssClass="beings" FormSubmit="@OnSubmit">
+    <ChildContent>
+        <ListView Items="@Beings" IsLoading="@IsLoading" Context="being">
+            <div class="card mb-3 @(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)">
+                <div class="card-body">
+                    <div class="being-icon">
+                        <Icon Identifier="@being.Icon" />
+                    </div>
+
+                    <h5 class="card-title">
+                        <a class="stretched-link" @onclick="@(() => OnItemClick(being.Id))">
+                            @being.Name
+                        </a>
+                    </h5>
+                </div>
+            </div>
+        </ListView>
+    </ChildContent>
+    <Buttons>
+        <button class="btn btn-primary btn-sm">Save</button>
+    </Buttons>
+</Modal>
