@@ -148,10 +148,10 @@ namespace Neptuo.Recollections
         public void OpenBeings()
             => uri.NavigateTo(UrlBeings());
 
-        public string UrlBeingDetail(string storyId)
-            => $"/being/{storyId}";
+        public string UrlBeingDetail(string beingId)
+            => $"/being/{beingId}";
 
-        public void OpenBeingDetail(string storyId)
-            => uri.NavigateTo(UrlStoryDetail(storyId));
+        public void OpenBeingDetail(string beingId)
+            => uri.NavigateTo(UrlBeingDetail(beingId));
     }
 }

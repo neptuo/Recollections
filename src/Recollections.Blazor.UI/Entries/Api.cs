@@ -113,6 +113,9 @@ namespace Neptuo.Recollections.Entries
         public Task<AuthorizedModel<BeingModel>> GetBeingAsync(string beingId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<BeingModel>>($"beings/{beingId}"));
 
+        public Task<BeingModel> CreateBeingAsync(BeingModel model)
+            => faultHandler.Wrap(http.PostAsJsonAsync<BeingModel, BeingModel>($"beings", model));
+
         public Task UpdateBeingAsync(BeingModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"beings/{model.Id}", model));
 

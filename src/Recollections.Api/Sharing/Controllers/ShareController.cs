@@ -86,7 +86,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> GetBeingAsync(string beingId) => RunBeingAsync(beingId, being =>
         {
-            return Task.FromResult<IActionResult>(Ok(new List<ShareModel>()));
+            return GetItemsAsync(db.BeingShares.Where(s => s.BeingId == beingId));
         });
 
         private async Task<IActionResult> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)
@@ -151,7 +151,11 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> CreateBeingAsync(string beingId, ShareModel model) => RunBeingAsync(beingId, being =>
         {
-            return Task.FromResult<IActionResult>(StatusCode(StatusCodes.Status201Created));
+            return CreateAsync(
+                model,
+                userId => db.BeingShares.Where(s => s.BeingId == beingId && s.UserId == userId),
+                () => new BeingShare(beingId)
+            );
         });
 
         private async Task<IActionResult> DeleteAsync<T>(string userName, Func<string, IQueryable<T>> findQuery)
@@ -193,7 +197,10 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [HttpDelete("beings/{beingId}/sharing/{userName}")]
         public Task<IActionResult> DeleteBeingAsync(string beingId, string userName) => RunBeingAsync(beingId, async being =>
         {
-            return Ok();
+            return await DeleteAsync(
+                userName,
+                userId => db.BeingShares.Where(s => s.BeingId == beingId && s.UserId == userId)
+            );
         });
     }
 }
