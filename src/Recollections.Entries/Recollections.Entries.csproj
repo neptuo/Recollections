@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-      <RootNamespace>Neptuo.Recollections.Entries</RootNamespace>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Neptuo.Recollections.Entries</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ExifLib.Standard" Version="1.7.0" />
     <PackageReference Include="Neptuo" Version="6.0.1" />
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
