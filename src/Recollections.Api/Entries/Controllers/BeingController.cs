@@ -51,7 +51,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             List<Being> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId)
-                .OrderByDescending(b => b.Name)
+                .OrderBy(b => b.Name)
                 .ToListAsync();
 
             List<BeingListModel> models = new List<BeingListModel>();
@@ -62,7 +62,11 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 MapEntityToModel(entity, model);
 
-                // TODO: Entries.
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
+                    .Where(e => e.Beings.Contains(entity))
+                    .CountAsync();
+
+                model.Entries = entries;
             }
 
             var userNames = await this.userNames.GetUserNamesAsync(models.Select(e => e.UserId).ToArray());
@@ -139,8 +143,6 @@ namespace Neptuo.Recollections.Entries.Controllers
         public Task<IActionResult> Delete(string id) => RunBeingAsync(id, async entity =>
         {
             string userId = User.FindUserId();
-
-            // TODO: Entries
 
             await shareDeleter.DeleteBeingSharesAsync(id);
 
