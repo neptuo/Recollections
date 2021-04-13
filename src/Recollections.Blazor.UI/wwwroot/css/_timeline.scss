@@ -95,6 +95,7 @@ $dot-diameter: 18px;
         .information {
             margin-right: 12px;
             color: #333;
+            white-space: nowrap;
         }
 
         .placeholder {
@@ -170,4 +171,13 @@ $dot-diameter: 18px;
 
 @media (max-width: 768px) {
     @include narrow;
+
+    .timeline {
+        padding-right: 6px;
+        padding-left: 6px;
+
+        &:before {
+            left: 13px;
+        }
+    }
 }

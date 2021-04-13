@@ -114,6 +114,52 @@ a {
             box-shadow: none;
         }
     }
+
+    &.block-icons {
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+
+        .fa, .fas {
+            display: block;
+            text-align: center;
+        }
+
+        .nav-link {
+            text-align: center;
+            padding-right: 1.1rem;
+            padding-left: 1.1rem;
+
+            @media (min-width:1200px) {
+                padding-right: 1.5rem;
+                padding-left: 1.5rem;
+            }
+        }
+
+        @media (min-width:992px) {
+            & ~ .mappage {
+                top: 64px !important;
+            }
+        }
+
+        @media (max-width:991px) {
+            .navbar-nav {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+
+                button, a {
+                    width: 100%;
+                    display: block;
+                    padding-top: 2.5rem;
+                    padding-bottom: 2.5rem;
+                }
+            }
+
+            .nav-link {
+                padding-top: 2.5rem;
+                padding-bottom: 2.5rem;
+            }
+        }
+    }
 }
 
 .user-navbar {
@@ -136,7 +182,6 @@ a {
             width: 100%;
             display: block;
         }
-
         /* Copy non-sm button styles */
         button.btn {
             font-size: 1rem;

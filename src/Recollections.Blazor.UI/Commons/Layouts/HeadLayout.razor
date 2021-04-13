@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-inverse navbar navbar-expand-lg navbar-dark bg-dark main-navbar sticky-top">
+<nav class="navbar navbar-inverse navbar navbar-expand-lg navbar-dark bg-dark main-navbar sticky-top block-icons">
     <div class="container">
         <a class="navbar-brand" href="@Navigator.UrlTimeline()">
             <img src="/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -13,22 +13,40 @@
         <div class="navbar-collapse @(IsMainMenuVisible ? "" : "collapse")">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlTimeline()" Match="@NavLinkMatch.All">Timeline</NavLink>
+                    <NavLink class="nav-link" href="@Navigator.UrlTimeline()" Match="@NavLinkMatch.All">
+                        <Icon Identifier="stream" />
+                        Timeline
+                    </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlMap()">Map</NavLink>
+                    <NavLink class="nav-link" href="@Navigator.UrlMap()">
+                        <Icon Identifier="map-marked-alt" />
+                        Map
+                    </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlSearch()">Search</NavLink>
+                    <NavLink class="nav-link" href="@Navigator.UrlSearch()">
+                        <Icon Identifier="search" />
+                        Search
+                    </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlStories()">Stories</NavLink>
+                    <NavLink class="nav-link" href="@Navigator.UrlStories()">
+                        <Icon Identifier="book" />
+                        Stories
+                    </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlBeings()">Beings</NavLink>
+                    <NavLink class="nav-link" href="@Navigator.UrlBeings()">
+                        <Icon Identifier="user-friends" />
+                        Beings
+                    </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlAbout()">About</NavLink>
+                    <NavLink class="nav-link" href="@Navigator.UrlAbout()">
+                        <Icon Identifier="info-circle" />
+                        About
+                    </NavLink>
                 </li>
             </ul>
             <ul class="navbar-nav user-navbar">

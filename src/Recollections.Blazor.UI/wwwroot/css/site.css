@@ -223,6 +223,35 @@ h4 .inline-editor-viewmode .oi {
     outline: none; }
     .main-navbar .navbar-toggler:focus {
       box-shadow: none; }
+  .main-navbar.block-icons {
+    padding-top: .25rem;
+    padding-bottom: .25rem; }
+    .main-navbar.block-icons .fa, .main-navbar.block-icons .fas {
+      display: block;
+      text-align: center; }
+    .main-navbar.block-icons .nav-link {
+      text-align: center;
+      padding-right: 1.1rem;
+      padding-left: 1.1rem; }
+      @media (min-width: 1200px) {
+        .main-navbar.block-icons .nav-link {
+          padding-right: 1.5rem;
+          padding-left: 1.5rem; } }
+    @media (min-width: 992px) {
+      .main-navbar.block-icons ~ .mappage {
+        top: 64px !important; } }
+    @media (max-width: 991px) {
+      .main-navbar.block-icons .navbar-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; }
+        .main-navbar.block-icons .navbar-nav button, .main-navbar.block-icons .navbar-nav a {
+          width: 100%;
+          display: block;
+          padding-top: 2.5rem;
+          padding-bottom: 2.5rem; }
+      .main-navbar.block-icons .nav-link {
+        padding-top: 2.5rem;
+        padding-bottom: 2.5rem; } }
 
 .user-navbar {
   flex-direction: row; }
@@ -346,7 +375,8 @@ h4 .inline-editor-viewmode .oi {
             content: "»"; }
     .entry .body .information {
       margin-right: 12px;
-      color: #333; }
+      color: #333;
+      white-space: nowrap; }
     .entry .body .placeholder {
       color: #aaaaaa; }
   .entry:after {
@@ -411,7 +441,12 @@ h4 .inline-editor-viewmode .oi {
     width: 100%;
     float: none; }
   .entry-more {
-    margin-left: 0; } }
+    margin-left: 0; }
+  .timeline {
+    padding-right: 6px;
+    padding-left: 6px; }
+    .timeline:before {
+      left: 13px; } }
 
 .mappage {
   position: absolute;
@@ -426,7 +461,7 @@ h4 .inline-editor-viewmode .oi {
       border-radius: 0 !important; }
   @media (max-width: 991px) {
     .mappage {
-      top: 55px; } }
+      top: 48px; } }
 
 .entry-detail {
   padding: 24px;
