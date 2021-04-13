@@ -15,6 +15,23 @@ namespace Neptuo.Recollections.Entries.Components
         {
             null,
             "user",
+            "user-secret",
+            "user-tie",
+            "user-nurse",
+            "user-ninja",
+            "user-md",
+            "user-graduate",
+            "user-astronaut",
+            "female",
+            "male",
+            "child",
+            "baby",
+            "walking",
+            "swimmer",
+            "snowboarding",
+            "hiking",
+            "biking",
+            "bed",
             "cat",
             "crow",
             "dog",
@@ -30,7 +47,9 @@ namespace Neptuo.Recollections.Entries.Components
             "kiwi-bird",
             "otter",
             "paw",
-            "spider"
+            "spider",
+            "snowman",
+            "robot"
         };
 
         protected Modal Modal { get; set; }
