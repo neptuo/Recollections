@@ -20,11 +20,11 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
 
-        public StoryEntriesController(DataContext dataContext, ShareStatusService shareStatus)
+        public StoryEntriesController(DataContext db, ShareStatusService shareStatus)
         {
-            Ensure.NotNull(dataContext, "db");
+            Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
-            this.db = dataContext;
+            this.db = db;
             this.shareStatus = shareStatus;
         }
 

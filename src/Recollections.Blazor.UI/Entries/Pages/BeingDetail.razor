@@ -21,6 +21,9 @@
                 <div class="text">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
+                <div class="entries">
+                    <BeingEntries BeingId="@Model.Id" />
+                </div>
 
                 <ActionPanel>
                     <PermissionView Request="@PermissionRequest.Owner">
