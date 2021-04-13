@@ -20,6 +20,8 @@ namespace Neptuo.Recollections.Entries
         public string StoryTitle { get; set; }
         public string ChapterTitle { get; set; }
         
+        public List<TimelineEntryBeingModel> Beings { get; set; }
+
         public int ImageCount { get; set; }
         public int GpsCount { get; set; }
     }

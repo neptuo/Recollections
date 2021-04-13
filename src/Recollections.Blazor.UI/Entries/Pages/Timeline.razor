@@ -33,6 +33,14 @@
                         </span>
                     }
 
+                    @if (entry.TextWordCount > 0)
+                    {
+                        <span class="information">
+                            <Icon Identifier="quote-right" />
+                            @entry.TextWordCount words
+                        </span>
+                    }
+
                     @if (entry.GpsCount > 0)
                     {
                         <span class="information">
@@ -57,12 +65,15 @@
                         </span>
                     }
 
-                    @if (entry.TextWordCount > 0)
+                    @if (entry.Beings != null)
                     {
-                        <span class="information">
-                            <Icon Identifier="quote-right" />
-                            @entry.TextWordCount words
-                        </span>
+                        foreach (var being in entry.Beings)
+                        {
+                            <span class="information">
+                                <BeingIcon Identifier="@being.Icon" />
+                                @being.Name
+                            </span>
+                        }
                     }
                 </p>
             </div>

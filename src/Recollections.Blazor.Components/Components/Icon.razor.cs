@@ -17,7 +17,12 @@ namespace Neptuo.Recollections.Components
         public string Prefix { get; set; }
 
         [Parameter]
+        public string CssClass { get; set; }
+
+        [Parameter]
         public Action OnClick { get; set; }
+
+        protected string FullCssClass { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -25,6 +30,8 @@ namespace Neptuo.Recollections.Components
 
             if (String.IsNullOrEmpty(Prefix))
                 Prefix = "fa";
+
+            FullCssClass = String.Join(" ", Prefix, "fa-" + Identifier, CssClass);
         }
     }
 }

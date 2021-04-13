@@ -60,16 +60,40 @@ namespace Neptuo.Recollections.Entries.Controllers
                         StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
                         ChapterTitle = e.Chapter.Title,
                         GpsCount = e.Locations.Count,
-                        ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id)
+                        ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id),
+                        //Beings = e.Beings
+                        //    .Select(b => new TimelineEntryBeingModel()
+                        //    {
+                        //        Name = b.Name,
+                        //        Icon = b.Icon
+                        //    }).ToList()
                     },
+                    BeingCount = e.Beings.Count(),
                     Text = e.Text
                 })
+                .AsNoTracking()
+                .AsSplitQuery()
                 .ToListAsync();
 
-            foreach (var e in result)
+            foreach (var entry in result)
             {
-                if (!String.IsNullOrEmpty(e.Text))
-                    e.Model.TextWordCount = e.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+                if (entry.BeingCount > 0) 
+                {
+                    entry.Model.Beings = await shareStatus
+                        .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                        .Where(e => e.Id == entry.Model.Id)
+                        .SelectMany(e => e.Beings)
+                        .OrderBy(b => b.Name)
+                        .Select(b => new TimelineEntryBeingModel()
+                        {
+                            Name = b.Name,
+                            Icon = b.Icon
+                        })
+                        .ToListAsync();
+                }
+
+                if (!String.IsNullOrEmpty(entry.Text))
+                    entry.Model.TextWordCount = entry.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
             }
 
             var userNames = await this.userNames.GetUserNamesAsync(result.Select(e => e.Model.UserId).ToArray());

@@ -347,8 +347,8 @@ h4 .inline-editor-viewmode .oi {
     .entry .body .information {
       margin-right: 12px;
       color: #333; }
-    .entry .body .oi {
-      font-size: 12px; }
+    .entry .body .placeholder {
+      color: #aaaaaa; }
   .entry:after {
     content: '';
     display: block;

@@ -80,7 +80,7 @@ $dot-diameter: 18px;
             a {
                 color: black;
                 text-decoration: none;
-                
+
                 &:hover {
                     text-decoration: none;
 
@@ -97,8 +97,8 @@ $dot-diameter: 18px;
             color: #333;
         }
 
-        .oi {
-            font-size: 12px;
+        .placeholder {
+            color: $placeholder-color;
         }
     }
 
