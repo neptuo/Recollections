@@ -1,4 +1,4 @@
-﻿<Modal @ref="Modal" Title="Select Entry" CssClass="entry-picker">
+﻿<Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker">
     <ChildContent>
         <div class="timeline">
             <ListView Items="@Entries" IsLoading="@IsLoading" EmptyMessage="You don't have any entry..." Context="entry">
@@ -50,6 +50,17 @@
                                     <Icon Identifier="image" />
                                     @entry.ImageCount
                                 </span>
+                            }
+
+                            @if (entry.Beings != null)
+                            {
+                                foreach (var being in entry.Beings)
+                                {
+                                    <span class="information">
+                                        <BeingIcon Identifier="@being.Icon" />
+                                        @being.Name
+                                    </span>
+                                }
                             }
                         </p>
                     </div>
