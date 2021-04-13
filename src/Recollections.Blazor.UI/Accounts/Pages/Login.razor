@@ -5,26 +5,24 @@
 <div class="component-login text-center">
     <form @onsubmit="@LoginAsync">
 
-        <img src="/img/icon-512x512.png" class="mb-3 mt-4" />
+        <img src="/img/icon-512x512.png" class="my-4" />
 
         <Validation ErrorMessages="ErrorMessages" />
 
-        <label for="UserName" class="sr-only">Username:</label>
-        <input type="text" id="UserName" class="form-control" placeholder="Username:" @bind="UserName" />
-        <label for="Password" class="sr-only">Password:</label>
-        <input type="password" id="Password" class="form-control" placeholder="Password:" @bind="Password" />
+        <input type="text" class="form-control" placeholder="Username..." @bind="UserName" />
+        <input type="password" class="form-control" placeholder="Password..." @bind="Password" />
 
-        <div class="checkbox mb-3">
+        <div class="checkbox mb-4">
             <label>
                 <input type="checkbox" value="remember-me" @bind="IsPersistent" /> Remember me
             </label>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 mx-4">
             <button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
         </div>
         <div class="mb-3">
-            <a href="@Navigator.UrlRegister()">Register</a>
+            <a href="@Navigator.UrlRegister()">Register a new account</a>
         </div>
     </form>
 </div>
