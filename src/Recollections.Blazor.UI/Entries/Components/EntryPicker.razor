@@ -28,6 +28,14 @@
                                 </span>
                             }
 
+                            @if (entry.TextWordCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="quote-right" />
+                                    @entry.TextWordCount words
+                                </span>
+                            }
+
                             @if (entry.GpsCount > 0)
                             {
                                 <span class="information">
