@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Neptuo.Recollections.Accounts;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Neptuo.Recollections.Entries
             this.pathResolver = pathResolver;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services, IHostEnvironment environment)
         {
             ConfigureImages(services);
             ConfigureDatabase(services);
@@ -34,7 +35,8 @@ namespace Neptuo.Recollections.Entries
                 .AddHealthChecks()
                 .AddDbContextCheck<DataContext>("Entries.DataContext");
 
-            EnsureDatabase(services);
+            if (environment.IsDevelopment())
+                EnsureDatabase(services);
         }
 
         private void ConfigureFreeLimits(IServiceCollection services)

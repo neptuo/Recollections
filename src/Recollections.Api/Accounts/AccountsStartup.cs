@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace Neptuo.Recollections.Accounts
             this.pathResolver = pathResolver;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services, IHostEnvironment environment)
         {
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
             services.Configure<UserPropertyOptions>(configuration.GetSection("Properties"));
@@ -75,7 +76,8 @@ namespace Neptuo.Recollections.Accounts
                         .Build();
                 });
 
-            EnsureDatabase(services);
+            if (environment.IsDevelopment())
+                EnsureDatabase(services);
         }
 
         private static void EnsureDatabase(IServiceCollection services)

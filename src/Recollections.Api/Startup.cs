@@ -52,8 +52,8 @@ namespace Neptuo.Recollections
 
             services.Configure<CorsOptions>(configuration.GetSection("Cors"));
 
-            accountsStartup.ConfigureServices(services);
-            entriesStartup.ConfigureServices(services);
+            accountsStartup.ConfigureServices(services, environment);
+            entriesStartup.ConfigureServices(services, environment);
             sharingStartup.ConfigureServices(services);
         }
 
