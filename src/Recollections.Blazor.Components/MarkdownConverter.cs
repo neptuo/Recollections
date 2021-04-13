@@ -16,6 +16,7 @@ namespace Neptuo.Recollections
         {
             settings = CommonMarkSettings.Default.Clone();
             settings.RenderSoftLineBreaksAsLineBreaks = true;
+            settings.AdditionalFeatures |= CommonMarkAdditionalFeatures.StrikethroughTilde;
         }
 
         public string Convert(string markdown) => CommonMarkConverter.Convert(markdown, settings);
