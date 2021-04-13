@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Neptuo.Recollections</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Recollections.Accounts.Data\Recollections.Accounts.Data.csproj" />
+    <ProjectReference Include="..\Recollections.Data.Ef\Recollections.Data.Ef.csproj" />
+    <ProjectReference Include="..\Recollections.Entries.Data\Recollections.Entries.Data.csproj" />
+  </ItemGroup>
+
+</Project>
