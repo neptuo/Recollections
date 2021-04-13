@@ -16,9 +16,15 @@
 else
 {
     <li class="nav-item">
-        <a class="nav-link" @onclick="LoginAsync">Login</a>
+        <a class="nav-link" @onclick="LoginAsync">
+            <Icon Identifier="sign-in-alt" />
+            Login
+        </a>
     </li>
     <li class="nav-item">
-        <NavLink class="nav-link" href="@Navigator.UrlRegister()">Register</NavLink>
+        <NavLink class="nav-link" href="@Navigator.UrlRegister()">
+            <Icon Identifier="user-plus" />
+            Register
+        </NavLink>
     </li>
 }
