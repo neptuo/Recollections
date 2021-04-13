@@ -10,6 +10,14 @@ namespace Neptuo.Recollections
 {
     public class MarkdownConverter
     {
-        public string Convert(string markdown) => CommonMarkConverter.Convert(markdown);
+        private static readonly CommonMarkSettings settings;
+
+        static MarkdownConverter()
+        {
+            settings = CommonMarkSettings.Default.Clone();
+            settings.RenderSoftLineBreaksAsLineBreaks = true;
+        }
+
+        public string Convert(string markdown) => CommonMarkConverter.Convert(markdown, settings);
     }
 }
