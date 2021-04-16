@@ -15,9 +15,12 @@ namespace Neptuo.Recollections
                 return;
             }
 
+            string accountsConnectionString = args[0];
+            string entriesConnectionString = args[1];
+
             Console.WriteLine("Creating contexts.");
-            using var accounts = new AccountsDataContext(DbContextOptions<AccountsDataContext>(""), Schema<AccountsDataContext>("Accounts"));
-            using var entries = new EntriesDataContext(DbContextOptions<EntriesDataContext>(""), Schema<EntriesDataContext>("Entries"));
+            using var accounts = new AccountsDataContext(DbContextOptions<AccountsDataContext>(accountsConnectionString), Schema<AccountsDataContext>("Accounts"));
+            using var entries = new EntriesDataContext(DbContextOptions<EntriesDataContext>(entriesConnectionString), Schema<EntriesDataContext>("Entries"));
 
             Console.WriteLine("Migrating accounts db.");
             accounts.Database.Migrate();
