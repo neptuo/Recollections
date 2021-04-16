@@ -11,7 +11,7 @@ namespace Neptuo.Recollections
         {
             if (args.Length != 2)
             {
-                Console.WriteLine("Pass two arguments as two connection strings to two databases to migrate.");
+                Console.WriteLine("Pass two arguments as two connection strings to two databases to migrate (first Accounts, second Entries).");
                 return;
             }
 
