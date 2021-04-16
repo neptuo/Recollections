@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Neptuo.Recollections.Migrations;
 using System;
 using AccountsDataContext = Neptuo.Recollections.Accounts.DataContext;
 using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
@@ -9,18 +10,17 @@ namespace Neptuo.Recollections
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2)
+            if (args.Length != 1)
             {
-                Console.WriteLine("Pass two arguments as two connection strings to two databases to migrate (first Accounts, second Entries).");
+                Console.WriteLine("Pass one argument with connection string to database to migrate.");
                 return;
             }
 
-            string accountsConnectionString = args[0];
-            string entriesConnectionString = args[1];
+            string connectionString = args[0];
 
             Console.WriteLine("Creating contexts.");
-            using var accounts = new AccountsDataContext(DbContextOptions<AccountsDataContext>(accountsConnectionString), Schema<AccountsDataContext>("Accounts"));
-            using var entries = new EntriesDataContext(DbContextOptions<EntriesDataContext>(entriesConnectionString), Schema<EntriesDataContext>("Entries"));
+            using var accounts = new AccountsDataContext(DbContextOptions<AccountsDataContext>(connectionString, "Accounts"), Schema<AccountsDataContext>("Accounts"));
+            using var entries = new EntriesDataContext(DbContextOptions<EntriesDataContext>(connectionString, "Entries"), Schema<EntriesDataContext>("Entries"));
 
             Console.WriteLine("Migrating accounts db.");
             accounts.Database.Migrate();
@@ -31,16 +31,26 @@ namespace Neptuo.Recollections
             Console.WriteLine("Done.");
         }
 
-        private static DbContextOptions<T> DbContextOptions<T>(string connectionString)
+        private static DbContextOptions<T> DbContextOptions<T>(string connectionString, string schema)
             where T : DbContext
         {
-            return new DbContextOptionsBuilder<T>().UseSqlServer(connectionString).Options;
+            var builder = new DbContextOptionsBuilder<T>()
+                .UseSqlServer(connectionString, sql =>
+                {
+                    if (!String.IsNullOrEmpty(schema))
+                        sql.MigrationsHistoryTable("__EFMigrationsHistory", schema);
+                });
+
+
+            return builder.Options;
         }
 
         private static SchemaOptions<T> Schema<T>(string name)
             where T : DbContext
         {
-            return new SchemaOptions<T>() { Name = name };
+            var schema = new SchemaOptions<T>() { Name = name };
+            MigrationWithSchema.SetSchema(schema);
+            return schema;
         }
 }
 }
