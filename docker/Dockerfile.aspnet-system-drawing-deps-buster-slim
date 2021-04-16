@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim
 RUN apt-get update \
     && apt-get install -y --allow-unauthenticated \
         libc6-dev \
