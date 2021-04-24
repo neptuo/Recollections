@@ -142,6 +142,9 @@ namespace Neptuo.Recollections.Entries
             return faultHandler.Wrap(http.GetFromJsonAsync<SearchResponse>(url));
         }
 
+        public Task<List<CalendarEntryModel>> GetMonthEntryListAsync(int year, int month)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<CalendarEntryModel>>($"calendar/{year}/{month}"));
+
         public Task<VersionModel> GetVersionAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<VersionModel>($"entries/version"));
     }
