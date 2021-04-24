@@ -5,14 +5,27 @@
 @if (IsMonthView)
 {
     <h3 class="d-flex align-items-center mt-4">
-        <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="@PrevPeriod">Prev</button>
+        <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="@PrevPeriodAsync">Prev</button>
         <div>
             <span>@Year</span>
             -
             <span>@Month</span>
         </div>
-        <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="@NextPeriod">Next</button>
+        <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="@NextPeriodAsync">Next</button>
     </h3>
 
-    <MonthView Year="@Year.Value" Month="@Month.Value" />
+    <MonthView Year="@Year.Value" Month="@Month.Value" Context="day">
+        <div>
+            <span class="badge bg-light text-dark">
+                @day
+            </span>
+        </div>
+
+        @foreach (var model in Models.Where(e => e.When.Day == day))
+        {
+            <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon">
+                @model.Title
+            </a>
+        }
+    </MonthView>
 }

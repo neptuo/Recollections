@@ -16,6 +16,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public int Month { get; set; }
 
+        [Parameter]
+        public RenderFragment<int> ChildContent { get; set; }
+
         protected int FirstDay { get; set; }
         protected int MaxDay { get; set; }
 

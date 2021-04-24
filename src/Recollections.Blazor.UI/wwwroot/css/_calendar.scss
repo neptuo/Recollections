@@ -5,15 +5,35 @@
         padding: 8px;
         border: 0px solid #dee2e6;
         border-left-width: 1px;
-        border-top-width: 1px;
+        border-bottom-width: 1px;
 
         &:last-child {
             border-right-width: 1px;
+        }
+
+        .badge {
+            margin-bottom: .125rem;
+        }
+
+        .bg-salmon {
+            display: block;
+            text-align: left;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        a.bg-salmon {
+            text-decoration: none;
+
+            &:hover {
+                color: white;
+            }
         }
     }
 
     .calendar-header {
         font-weight: bold;
+        border-top-width: 1px;
     }
 
     .calendar-cell {
@@ -22,7 +42,6 @@
 
     .calendar-row:last-child {
         .calendar-cell {
-            border-bottom-width: 1px;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,15 @@ namespace Neptuo.Recollections.Entries.Pages
 {
     public partial class Calendar
     {
+        [Inject]
+        protected Api Api { get; set; }
+
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
+        [CascadingParameter]
+        protected UserState UserState { get; set; }
+
         [Parameter]
         public int? Year { get; set; }
 
@@ -18,22 +28,36 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected bool IsMonthView => Month != null;
 
+        protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
+
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
+            await UserState.EnsureAuthenticatedAsync();
 
             if (Year == null)
             {
                 Year = DateTime.Now.Year;
                 Month = DateTime.Now.Month;
             }
+
+            await LoadDataAsync();
         }
 
-        protected void PrevPeriod()
+        private async Task LoadDataAsync()
         {
             if (IsMonthView)
             {
-                if (Month > 0)
+                Models.Clear();
+                Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
+            }
+        }
+
+        protected async Task PrevPeriodAsync()
+        {
+            if (IsMonthView)
+            {
+                if (Month > 1)
                 {
                     Month--;
                 }
@@ -43,9 +67,11 @@ namespace Neptuo.Recollections.Entries.Pages
                     Month = 12;
                 }
             }
+
+            await LoadDataAsync();
         }
 
-        protected void NextPeriod()
+        protected async Task NextPeriodAsync()
         {
             if (IsMonthView)
             {
@@ -59,6 +85,8 @@ namespace Neptuo.Recollections.Entries.Pages
                     Month = 1;
                 }
             }
+
+            await LoadDataAsync();
         }
     }
 }

@@ -70,6 +70,10 @@ a {
     color: white;
     background-color: lightsalmon; }
 
+.bg-salmon {
+  color: white;
+  background-color: salmon; }
+
 .loading-bar {
   display: inline-block;
   position: relative;
@@ -675,19 +679,32 @@ h4 .inline-editor-viewmode .oi {
   padding: 8px;
   border: 0px solid #dee2e6;
   border-left-width: 1px;
-  border-top-width: 1px; }
+  border-bottom-width: 1px; }
   .calendar .calendar-header:last-child,
   .calendar .calendar-cell:last-child {
     border-right-width: 1px; }
+  .calendar .calendar-header .badge,
+  .calendar .calendar-cell .badge {
+    margin-bottom: .125rem; }
+  .calendar .calendar-header .bg-salmon,
+  .calendar .calendar-cell .bg-salmon {
+    display: block;
+    text-align: left;
+    text-overflow: ellipsis;
+    overflow: hidden; }
+  .calendar .calendar-header a.bg-salmon,
+  .calendar .calendar-cell a.bg-salmon {
+    text-decoration: none; }
+    .calendar .calendar-header a.bg-salmon:hover,
+    .calendar .calendar-cell a.bg-salmon:hover {
+      color: white; }
 
 .calendar .calendar-header {
-  font-weight: bold; }
+  font-weight: bold;
+  border-top-width: 1px; }
 
 .calendar .calendar-cell {
   aspect-ratio: 1; }
-
-.calendar .calendar-row:last-child .calendar-cell {
-  border-bottom-width: 1px; }
 
 .version {
   color: #aaaaaa; }
