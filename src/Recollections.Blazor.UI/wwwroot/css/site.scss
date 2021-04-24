@@ -119,7 +119,7 @@ a {
         padding-top: .25rem;
         padding-bottom: .25rem;
 
-        .fa, .fas {
+        .fa, .fas, .far {
             display: block;
             text-align: center;
         }
@@ -209,4 +209,5 @@ a {
 @import "_beings.scss";
 @import "_icon-picker.scss";
 @import "_search.scss";
+@import "_calendar.scss";
 @import "_version.scss";

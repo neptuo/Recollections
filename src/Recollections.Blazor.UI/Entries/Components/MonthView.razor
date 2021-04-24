@@ -1,0 +1,57 @@
+﻿<div class="my-4 d-flex flex-column calendar">
+    <div class="d-flex flex-row calendar-row">
+        <div class="calendar-header">
+            M<span class="d-none d-lg-inline">onday</span>
+        </div>
+        <div class="calendar-header">
+            T<span class="d-none d-lg-inline">uesday</span>
+        </div>
+        <div class="calendar-header">
+            W<span class="d-none d-lg-inline">ednesday</span>
+        </div>
+        <div class="calendar-header">
+            T<span class="d-none d-lg-inline">hursday</span>
+        </div>
+        <div class="calendar-header">
+            F<span class="d-none d-lg-inline">riday</span>
+        </div>
+        <div class="calendar-header">
+            S<span class="d-none d-lg-inline">aturday</span>
+        </div>
+        <div class="calendar-header">
+            S<span class="d-none d-lg-inline">unday</span>
+        </div>
+    </div>
+
+    @{
+        var day = 1;
+        var hasCell = false;
+    }
+    @for (int i = 0; i < 6; i++)
+    {
+        hasCell = false;
+
+        <div class="d-flex flex-row calendar-row">
+            @for (int j = 0; j < 7; j++)
+            {
+                if ((i == 0 && j < (int)FirstDay) || (hasCell && day > MaxDay))
+                {
+                    <div class="calendar-cell"></div>
+                }
+                else if (day > MaxDay)
+                {
+                    break;
+                }
+                else
+                {
+                    <div class="calendar-cell">
+                        @day
+                    </div>
+
+                    hasCell = true;
+                    day++;
+                }
+            }
+        </div>
+    }
+</div>

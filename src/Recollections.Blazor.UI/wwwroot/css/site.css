@@ -226,7 +226,7 @@ h4 .inline-editor-viewmode .oi {
   .main-navbar.block-icons {
     padding-top: .25rem;
     padding-bottom: .25rem; }
-    .main-navbar.block-icons .fa, .main-navbar.block-icons .fas {
+    .main-navbar.block-icons .fa, .main-navbar.block-icons .fas, .main-navbar.block-icons .far {
       display: block;
       text-align: center; }
     .main-navbar.block-icons .nav-link {
@@ -668,6 +668,26 @@ h4 .inline-editor-viewmode .oi {
   text-decoration: none; }
   .search a:hover {
     text-decoration: none; }
+
+.calendar .calendar-header,
+.calendar .calendar-cell {
+  width: calc(100% / 7);
+  padding: 8px;
+  border: 0px solid #dee2e6;
+  border-left-width: 1px;
+  border-top-width: 1px; }
+  .calendar .calendar-header:last-child,
+  .calendar .calendar-cell:last-child {
+    border-right-width: 1px; }
+
+.calendar .calendar-header {
+  font-weight: bold; }
+
+.calendar .calendar-cell {
+  aspect-ratio: 1; }
+
+.calendar .calendar-row:last-child .calendar-cell {
+  border-bottom-width: 1px; }
 
 .version {
   color: #aaaaaa; }

@@ -1,0 +1,18 @@
+﻿@page "/calendar"
+@page "/calendar/{Year}"
+@page "/calendar/{Year}/{Month}"
+
+@if (IsMonthView)
+{
+    <h3 class="d-flex align-items-center mt-4">
+        <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="@PrevPeriod">Prev</button>
+        <div>
+            <span>@Year</span>
+            -
+            <span>@Month</span>
+        </div>
+        <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="@NextPeriod">Next</button>
+    </h3>
+
+    <MonthView Year="@Year.Value" Month="@Month.Value" />
+}

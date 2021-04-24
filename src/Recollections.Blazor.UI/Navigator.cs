@@ -106,6 +106,12 @@ namespace Neptuo.Recollections
         public void OpenMap()
             => uri.NavigateTo(UrlMap());
 
+        public string UrlCalendar()
+            => "/calendar";
+
+        public void OpenCalendar()
+            => uri.NavigateTo(UrlCalendar());
+
         public string UrlSearch(string query = null)
         {
             string url = "/search";

@@ -1,0 +1,28 @@
+﻿.calendar {
+    .calendar-header,
+    .calendar-cell {
+        width: calc(100% / 7);
+        padding: 8px;
+        border: 0px solid #dee2e6;
+        border-left-width: 1px;
+        border-top-width: 1px;
+
+        &:last-child {
+            border-right-width: 1px;
+        }
+    }
+
+    .calendar-header {
+        font-weight: bold;
+    }
+
+    .calendar-cell {
+        aspect-ratio: 1;
+    }
+
+    .calendar-row:last-child {
+        .calendar-cell {
+            border-bottom-width: 1px;
+        }
+    }
+}
