@@ -1,4 +1,4 @@
-﻿<Modal @ref="Modal" Title="@Title">
+﻿<Modal @ref="Modal" Title="@Title" CssClass="date-picker">
     @if (CurrentPart == DatePickerPart.Year)
     {
         <h5 class="d-flex align-items-center mb-2">
@@ -11,8 +11,8 @@
             {
                 var year = i;
 
-                <div class="col-3 d-flex align-items-center aspect-1">
-                    <button class="btn btn-link btn-block" @onclick="@(() => OnYearSelected(year))">
+                <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
+                    <button class="btn btn-outline-salmon btn-block" @onclick="@(() => OnYearSelected(year))">
                         @i
                     </button>
                 </div>
@@ -35,8 +35,8 @@
                 var month = i + 1;
                 var monthName = MonthNames[i];
 
-                <div class="col-3 d-flex align-items-center aspect-1">
-                    <button class="btn btn-link btn-block" @onclick="@(() => OnMonthSelected(month))">
+                <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
+                    <button class="btn btn-outline-salmon btn-block" @onclick="@(() => OnMonthSelected(month))">
                         @monthName
                     </button>
                 </div>
@@ -55,7 +55,7 @@
         </h5>
 
         <MonthView Year="@CurrentYear" Month="@CurrentMonth" Context="day">
-            <button class="btn btn-link btn-block" @onclick="@(() => OnDaySelected(day))">
+            <button class="btn btn-outline-salmon btn-block" @onclick="@(() => OnDaySelected(day))">
                 @day
             </button>
         </MonthView>

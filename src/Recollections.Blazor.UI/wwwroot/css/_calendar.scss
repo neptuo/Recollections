@@ -46,6 +46,12 @@
     }
 }
 
-.modal-body .calendar .d-lg-inline {
-    display: none !important;
+.date-picker {
+    .btn {
+        border: none !important;
+    }
+
+    .d-lg-inline {
+        display: none !important;
+    }
 }
