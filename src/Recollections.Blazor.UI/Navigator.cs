@@ -106,18 +106,28 @@ namespace Neptuo.Recollections
         public void OpenMap()
             => uri.NavigateTo(UrlMap());
 
-        public string UrlCalendar()
-            => "/calendar";
+        public string UrlCalendar(int? year = null, int? month = null)
+        {
+            string url = "/calendar";
+            if (year != null)
+            {
+                url += $"/{year}";
+                if (month != null)
+                    url += $"/{month}";
+            }
 
-        public void OpenCalendar()
-            => uri.NavigateTo(UrlCalendar());
+            return url;
+        }
+
+        public void OpenCalendar(int? year = null, int? month = null)
+            => uri.NavigateTo(UrlCalendar(year, month));
 
         public string UrlSearch(string query = null)
         {
             string url = "/search";
             if (!String.IsNullOrEmpty(query))
                 url = QueryHelpers.AddQueryString(url, "q", query);
-            
+
             return url;
         }
 

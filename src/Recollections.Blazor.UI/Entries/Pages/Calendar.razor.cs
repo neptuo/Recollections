@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,9 @@ namespace Neptuo.Recollections.Entries.Pages
 {
     public partial class Calendar
     {
+        [Inject]
+        protected ILog<Calendar> Log { get; set; }
+
         [Inject]
         protected Api Api { get; set; }
 
@@ -30,10 +34,20 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
 
-        protected override async Task OnParametersSetAsync()
+        protected override async Task OnInitializedAsync()
         {
-            await base.OnParametersSetAsync();
+            await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
+        }
+
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            int? prevYear = Year;
+            int? prevMonth = Month;
+
+            await base.SetParametersAsync(parameters);
+
+            Log.Info($"Parameters: Year='{Year}', Month='{Month}', prev('{prevYear}', '{prevMonth}').");
 
             if (Year == null)
             {
@@ -41,7 +55,8 @@ namespace Neptuo.Recollections.Entries.Pages
                 Month = DateTime.Now.Month;
             }
 
-            await LoadDataAsync();
+            if (Year != prevYear || Month != prevMonth)
+                await LoadDataAsync();
         }
 
         private async Task LoadDataAsync()
@@ -51,42 +66,50 @@ namespace Neptuo.Recollections.Entries.Pages
                 Models.Clear();
                 Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
             }
+
+            StateHasChanged();
         }
 
-        protected async Task PrevPeriodAsync()
+        protected string GetPrevPeriodUrl()
         {
+            int? year = Year;
+            int? month = Month;
+
             if (IsMonthView)
             {
-                if (Month > 1)
+                if (month > 1)
                 {
-                    Month--;
+                    month--;
                 }
                 else
                 {
-                    Year--;
-                    Month = 12;
+                    year--;
+                    month = 12;
                 }
             }
 
-            await LoadDataAsync();
+            return Navigator.UrlCalendar(year, month);
         }
 
-        protected async Task NextPeriodAsync()
+        protected string GetNextPeriodUrl()
         {
+            int? year = Year;
+            int? month = Month;
+
             if (IsMonthView)
             {
-                if (Month < 12)
+                if (month < 12)
                 {
-                    Month++;
+                    month++;
                 }
                 else
                 {
-                    Year++;
-                    Month = 1;
+                    year++;
+                    month = 1;
                 }
             }
 
-            await LoadDataAsync();
+            return Navigator.UrlCalendar(year, month);
         }
     }
 }

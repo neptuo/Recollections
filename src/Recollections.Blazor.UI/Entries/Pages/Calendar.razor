@@ -1,17 +1,17 @@
 ﻿@page "/calendar"
-@page "/calendar/{Year}"
-@page "/calendar/{Year}/{Month}"
+@page "/calendar/{Year:int}"
+@page "/calendar/{Year:int}/{Month:int}"
 
 @if (IsMonthView)
 {
     <h3 class="d-flex align-items-center mt-4">
-        <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="@PrevPeriodAsync">Prev</button>
+        <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
         <div>
             <span>@Year</span>
             -
             <span>@Month</span>
         </div>
-        <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="@NextPeriodAsync">Next</button>
+        <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
     </h3>
 
     <MonthView Year="@Year.Value" Month="@Month.Value" Context="day">
