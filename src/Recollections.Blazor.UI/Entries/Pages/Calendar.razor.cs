@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -31,6 +32,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public int? Month { get; set; }
 
+        protected DatePicker DatePicker { get; set; }
+
+        protected Date SelectedDate { get; set; }
         protected bool IsMonthView => Month != null;
         protected string MonthTitle => $"{DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]} {Year}";
 
@@ -57,6 +61,12 @@ namespace Neptuo.Recollections.Entries.Pages
                 Month = DateTime.Now.Month;
             }
 
+            SelectedDate = new Date()
+            {
+                Year = Year,
+                Month = Month
+            };
+
             if (Year != prevYear || Month != prevMonth)
                 await LoadDataAsync();
         }
@@ -78,17 +88,7 @@ namespace Neptuo.Recollections.Entries.Pages
             int? month = Month;
 
             if (IsMonthView)
-            {
-                if (month > 1)
-                {
-                    month--;
-                }
-                else
-                {
-                    year--;
-                    month = 12;
-                }
-            }
+                (year, month) = DatePicker.PrevMonth(year.Value, month.Value);
 
             return Navigator.UrlCalendar(year, month);
         }
@@ -99,19 +99,15 @@ namespace Neptuo.Recollections.Entries.Pages
             int? month = Month;
 
             if (IsMonthView)
-            {
-                if (month < 12)
-                {
-                    month++;
-                }
-                else
-                {
-                    year++;
-                    month = 1;
-                }
-            }
+                (year, month) = DatePicker.NextMonth(year.Value, month.Value);
 
             return Navigator.UrlCalendar(year, month);
+        }
+
+        protected void OnDatePicked(Date date)
+        {
+            if (date.Year != null && date.Month != null)
+                Navigator.OpenCalendar(date.Year, date.Month);
         }
     }
 }

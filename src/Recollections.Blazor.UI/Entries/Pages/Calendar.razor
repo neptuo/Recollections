@@ -10,6 +10,8 @@
         <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
         <span>
             @MonthTitle
+
+            <Icon Identifier="calendar-plus" OnClick="@(() => DatePicker.Show())" />
         </span>
         <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
     </h3>
@@ -29,3 +31,5 @@
         }
     </MonthView>
 }
+
+<DatePicker @ref="DatePicker" Part="@DatePickerPart.Month" Value="@SelectedDate" ValueChanged="@OnDatePicked" />

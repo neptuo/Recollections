@@ -104,6 +104,10 @@ a {
     background-color: salmon;
 }
 
+.aspect-1 {
+    aspect-ratio: 1;
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";

@@ -74,6 +74,9 @@ a {
   color: white;
   background-color: salmon; }
 
+.aspect-1 {
+  aspect-ratio: 1; }
+
 .loading-bar {
   display: inline-block;
   position: relative;
@@ -705,6 +708,9 @@ h4 .inline-editor-viewmode .oi {
 
 .calendar .calendar-cell {
   aspect-ratio: 1; }
+
+.modal-body .calendar .d-lg-inline {
+  display: none !important; }
 
 .version {
   color: #aaaaaa; }
