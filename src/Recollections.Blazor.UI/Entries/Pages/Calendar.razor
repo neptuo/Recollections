@@ -4,13 +4,13 @@
 
 @if (IsMonthView)
 {
+    <PageTitle Value="@MonthTitle" />
+
     <h3 class="d-flex align-items-center mt-4">
         <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
-        <div>
-            <span>@Year</span>
-            -
-            <span>@Month</span>
-        </div>
+        <span>
+            @MonthTitle
+        </span>
         <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
     </h3>
 

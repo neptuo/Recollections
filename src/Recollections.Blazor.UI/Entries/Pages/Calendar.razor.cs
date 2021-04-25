@@ -3,6 +3,7 @@ using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,7 @@ namespace Neptuo.Recollections.Entries.Pages
         public int? Month { get; set; }
 
         protected bool IsMonthView => Month != null;
+        protected string MonthTitle => $"{DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]} {Year}";
 
         protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
 
