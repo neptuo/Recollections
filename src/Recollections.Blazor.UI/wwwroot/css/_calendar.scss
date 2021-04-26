@@ -52,6 +52,11 @@
     .badge {
         margin-bottom: .250rem;
     }
+
+    strong {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .date-picker {
