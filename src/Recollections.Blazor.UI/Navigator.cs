@@ -141,19 +141,19 @@ namespace Neptuo.Recollections
             => uri.NavigateTo(UrlStories());
 
         public string UrlStoryDetail(string storyId)
-            => $"/story/{storyId}";
+            => $"/stories/{storyId}";
 
         public void OpenStoryDetail(string storyId)
             => uri.NavigateTo(UrlStoryDetail(storyId));
 
         public string UrlEntryDetail(string entryId)
-            => $"/entry/{entryId}";
+            => $"/entries/{entryId}";
 
         public void OpenEntryDetail(string entryId)
             => uri.NavigateTo(UrlEntryDetail(entryId));
 
         public string UrlImageDetail(string entryId, string imageId)
-            => $"/entry/{entryId}/image/{imageId}";
+            => $"/entries/{entryId}/images/{imageId}";
 
         public void OpenImageDetail(string entryId, string imageId)
             => uri.NavigateTo(UrlImageDetail(entryId, imageId));
@@ -165,7 +165,7 @@ namespace Neptuo.Recollections
             => uri.NavigateTo(UrlBeings());
 
         public string UrlBeingDetail(string beingId)
-            => $"/being/{beingId}";
+            => $"/beings/{beingId}";
 
         public void OpenBeingDetail(string beingId)
             => uri.NavigateTo(UrlBeingDetail(beingId));
