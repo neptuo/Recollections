@@ -31,7 +31,13 @@ namespace Neptuo.Recollections.Components
             if (String.IsNullOrEmpty(Prefix))
                 Prefix = "fa";
 
-            FullCssClass = String.Join(" ", Prefix, "fa-" + Identifier, CssClass);
+            FullCssClass = String.Join(
+                " ", 
+                Prefix, 
+                "fa-" + Identifier, 
+                OnClick != null ? "cursor-pointer" : null,
+                CssClass
+            );
         }
     }
 }

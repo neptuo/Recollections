@@ -6,12 +6,12 @@
 {
     <PageTitle Value="@MonthTitle" />
 
-    <h3 class="d-flex align-items-center mt-4">
+    <h3 class="d-flex align-items-center my-4">
         <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
         <span>
             @MonthTitle
 
-            <Icon Identifier="calendar-plus" OnClick="@(() => DatePicker.Show())" />
+            <Icon Prefix="far" Identifier="calendar-alt" OnClick="@(() => DatePicker.Show())" />
         </span>
         <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
     </h3>

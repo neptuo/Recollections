@@ -51,7 +51,19 @@
         border: none !important;
     }
 
-    .d-lg-inline {
-        display: none !important;
+
+    .calendar-header {
+        text-align: center;
+        border-width: 0 !important;
+
+        .d-lg-inline {
+            display: none !important;
+        }
+    }
+
+    .calendar-cell {
+        display: flex;
+        align-items: stretch;
+        border-width: 0 !important;
     }
 }

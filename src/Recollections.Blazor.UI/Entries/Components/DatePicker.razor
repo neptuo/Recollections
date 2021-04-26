@@ -23,7 +23,7 @@
     {
         <h5 class="d-flex align-items-center mb-2">
             <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear--)">Prev</button>
-            <span @onclick="(() => CurrentPart = DatePickerPart.Year)">
+            <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Year)">
                 @CurrentYear
             </span>
             <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear++)">Next</button>
@@ -47,7 +47,7 @@
     {
         <h5 class="d-flex align-items-center mb-2">
             <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = PrevMonth(CurrentYear, CurrentMonth); })">Prev</button>
-            <span @onclick="(() => CurrentPart = DatePickerPart.Month)">
+            <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Month)">
                 @MonthNames[CurrentMonth - 1]
                 @CurrentYear
             </span>

@@ -108,6 +108,10 @@ a {
     aspect-ratio: 1;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";
