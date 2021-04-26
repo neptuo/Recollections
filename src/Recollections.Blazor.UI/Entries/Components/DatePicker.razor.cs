@@ -120,6 +120,28 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
+        protected void OnTodaySelected()
+        {
+            var today = DateTime.Today;
+            switch (Part)
+            {
+                case DatePickerPart.Year:
+                    OnYearSelected(today.Year);
+                    break;
+                case DatePickerPart.Month:
+                    CurrentYear = today.Year;
+                    OnMonthSelected(today.Month);
+                    break;
+                case DatePickerPart.Day:
+                    CurrentYear = today.Year;
+                    CurrentMonth = today.Month;
+                    OnDaySelected(today.Day);
+                    break;
+                default:
+                    throw Ensure.Exception.NotSupported(Part);
+            }
+        }
+
         public void Show() => Modal.Show();
         public void Hide() => Modal.Hide();
 
