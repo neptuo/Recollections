@@ -4,60 +4,47 @@
     <div class="container">
         <a class="navbar-brand" href="@Navigator.UrlTimeline()">
             <img src="/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
-            <span class="d-inline d-lg-none d-xl-inline">
+            <span class="@(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")">
                 Recollections
             </span>
         </a>
+
+        <div class="@(IsMainMenuVisible ? "d-none" : "d-block d-lg-none")">
+            <ul class="navbar-nav small-navbar-nav flex-row">
+                @foreach (var menuItem in MenuItems)
+                {
+                    if (menuItem.IsSmall)
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="@menuItem.Url" Match="@menuItem.Match">
+                                <Icon Identifier="@menuItem.Icon" />
+                            </NavLink>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+
         <button class="navbar-toggler" type="button" @onclick="ToggleMainMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="navbar-collapse @(IsMainMenuVisible ? "" : "collapse")">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlTimeline()" Match="@NavLinkMatch.All">
-                        <Icon Identifier="stream" />
-                        Timeline
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlMap()">
-                        <Icon Identifier="map-marked-alt" />
-                        Map
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlCalendar()">
-                        <Icon Identifier="calendar-alt" Prefix="far" />
-                        Calendar
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlSearch()">
-                        <Icon Identifier="search" />
-                        Search
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlStories()">
-                        <Icon Identifier="book" />
-                        Stories
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlBeings()">
-                        <Icon Identifier="user-friends" />
-                        Beings
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="@Navigator.UrlAbout()">
-                        <Icon Identifier="info-circle" />
-                        About
-                    </NavLink>
-                </li>
+            <ul class="navbar-nav large-navbar-nav mr-auto">
+                @foreach (var menuItem in MenuItems)
+                {
+                    if (menuItem.IsLarge)
+                    {
+                        <li class="nav-item">
+                            <NavLink class="nav-link" href="@menuItem.Url" Match="@menuItem.Match">
+                                <Icon Identifier="@menuItem.Icon" />
+                                @menuItem.Text
+                            </NavLink>
+                        </li>
+                    }
+                }
             </ul>
-            <ul class="navbar-nav user-navbar">
+            <ul class="navbar-nav large-navbar-nav user-navbar">
                 <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
                 <UserInfo />
             </ul>

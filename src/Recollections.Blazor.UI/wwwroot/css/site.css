@@ -261,17 +261,23 @@ h4 .inline-editor-viewmode .oi {
       .main-navbar.block-icons ~ .mappage {
         top: 64px !important; } }
     @media (max-width: 991px) {
-      .main-navbar.block-icons .navbar-nav {
+      .main-navbar.block-icons .large-navbar-nav {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr; }
-        .main-navbar.block-icons .navbar-nav button, .main-navbar.block-icons .navbar-nav a {
+        .main-navbar.block-icons .large-navbar-nav button, .main-navbar.block-icons .large-navbar-nav a {
           width: 100%;
           display: block;
           padding-top: 2.5rem;
           padding-bottom: 2.5rem; }
-      .main-navbar.block-icons .nav-link {
-        padding-top: 2.5rem;
-        padding-bottom: 2.5rem; } }
+        .main-navbar.block-icons .large-navbar-nav .nav-link {
+          padding-top: 2.5rem;
+          padding-bottom: 2.5rem; } }
+    @media (max-width: 450px) {
+      .main-navbar.block-icons .navbar-brand {
+        margin-right: 0; }
+      .main-navbar.block-icons .small-navbar-nav .nav-link {
+        padding-right: .95rem;
+        padding-left: .95rem; } }
 
 .user-navbar {
   flex-direction: row; }
