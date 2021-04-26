@@ -57,6 +57,25 @@ a {
     cursor: pointer;
 }
 
+@mixin dark-arrow() {
+    color: black !important;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: none;
+
+        &::after {
+            position: absolute;
+            color: salmon;
+            content: "»";
+        }
+    }
+}
+
+.lnk-dark-arrow {
+    @include dark-arrow;
+}
+
 .lnk-salmon-arrow {
     color: inherit;
     font-weight: bold;

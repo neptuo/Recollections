@@ -78,17 +78,7 @@ $dot-diameter: 18px;
             font-size: 180%;
 
             a {
-                color: black;
-                text-decoration: none;
-
-                &:hover {
-                    text-decoration: none;
-
-                    &::after {
-                        color: salmon;
-                        content: "»";
-                    }
-                }
+                @include dark-arrow;
             }
         }
 

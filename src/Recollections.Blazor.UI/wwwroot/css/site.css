@@ -41,6 +41,16 @@ blockquote {
 a {
   cursor: pointer; }
 
+.lnk-dark-arrow {
+  color: black !important;
+  text-decoration: none; }
+  .lnk-dark-arrow:hover {
+    text-decoration: none; }
+    .lnk-dark-arrow:hover::after {
+      position: absolute;
+      color: salmon;
+      content: "»"; }
+
 .lnk-salmon-arrow {
   color: inherit;
   font-weight: bold;
@@ -376,11 +386,12 @@ h4 .inline-editor-viewmode .oi {
       margin-top: -6px;
       font-size: 180%; }
       .entry .body h2 a {
-        color: black;
+        color: black !important;
         text-decoration: none; }
         .entry .body h2 a:hover {
           text-decoration: none; }
           .entry .body h2 a:hover::after {
+            position: absolute;
             color: salmon;
             content: "»"; }
     .entry .body .information {

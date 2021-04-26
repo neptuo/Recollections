@@ -8,9 +8,24 @@
 <h3 class="d-flex align-items-center my-4">
     <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
     <span>
-        @Title
+        <Icon Prefix="far" Identifier="calendar-alt" CssClass="mr-2" OnClick="@(() => DatePicker.Show())" />
 
-        <Icon Prefix="far" Identifier="calendar-alt" OnClick="@(() => DatePicker.Show())" />
+        @if (IsMonthView)
+        {
+            <span class="cursor-pointer" @onclick="@(() => DatePicker.Show())">
+                @System.Globalization.DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]
+            </span>
+            <a class="lnk-dark-arrow" href="@Navigator.UrlCalendar(Year.Value)">
+                @Year
+            </a>
+        }
+        else
+        {
+            <span class="cursor-pointer" @onclick="@(() => DatePicker.Show())">
+                @Year
+            </span>
+        }
+
     </span>
     <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
 </h3>
@@ -37,12 +52,15 @@ else
     <div class="row yearlendar">
         @for (int i = 0; i < 12; i++)
         {
+            var month = i + 1;
             <div class="col-2 mb-4">
                 <strong class="mb-1 d-block text-center">
-                    @System.Globalization.DateTimeFormatInfo.CurrentInfo.MonthNames[i]
+                    <a class="lnk-dark-arrow" href="@Navigator.UrlCalendar(Year.Value, month)">
+                        @System.Globalization.DateTimeFormatInfo.CurrentInfo.MonthNames[i]
+                    </a>
                 </strong>
 
-                @foreach (var model in Models.Where(e => e.When.Month == i + 1))
+                @foreach (var model in Models.Where(e => e.When.Month == month))
                 {
                     <div>
                         <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon">
