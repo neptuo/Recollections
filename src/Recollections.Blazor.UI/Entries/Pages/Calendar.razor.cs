@@ -36,6 +36,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected Date SelectedDate { get; set; }
         protected bool IsMonthView => Month != null;
+        protected bool IsYearView => Year != null;
 
         protected string Title => IsMonthView
             ? $"{DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]} {Year}"
