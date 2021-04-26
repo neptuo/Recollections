@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -18,14 +20,48 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext dataContext;
         private readonly ShareStatusService shareStatus;
+        private readonly IUserPremiumProvider premiumProvider;
 
-        public CalendarController(DataContext dataContext, ShareStatusService shareStatus)
+        public CalendarController(DataContext dataContext, ShareStatusService shareStatus, IUserPremiumProvider premiumProvider)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(premiumProvider, "premiumProvider");
             this.dataContext = dataContext;
             this.shareStatus = shareStatus;
+            this.premiumProvider = premiumProvider;
+        }
+
+        [HttpGet("{year}")]
+        [ProducesDefaultResponseType(typeof(List<CalendarEntryModel>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetYearList(int year)
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            if (!await premiumProvider.HasPremiumAsync(userId))
+                return PremiumRequired();
+
+            var result = await shareStatus
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                .Where(e => e.When.Year == year)
+                .OrderByDescending(e => e.When)
+                .Select(e => new CalendarEntryModel()
+                {
+                    Id = e.Id,
+                    Title = e.Title,
+                    When = e.When
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            return Ok(result);
         }
 
         [HttpGet("{year}/{month}")]

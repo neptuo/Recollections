@@ -36,7 +36,10 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected Date SelectedDate { get; set; }
         protected bool IsMonthView => Month != null;
-        protected string MonthTitle => $"{DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]} {Year}";
+
+        protected string Title => IsMonthView
+            ? $"{DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]} {Year}"
+            : Year.ToString();
 
         protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
 
@@ -73,11 +76,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadDataAsync()
         {
+            Models.Clear();
             if (IsMonthView)
-            {
-                Models.Clear();
                 Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
-            }
+            else
+                Models.AddRange(await Api.GetYearEntryListAsync(Year.Value));
 
             StateHasChanged();
         }
@@ -89,6 +92,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
             if (IsMonthView)
                 (year, month) = DatePicker.PrevMonth(year.Value, month.Value);
+            else
+                year--;
 
             return Navigator.UrlCalendar(year, month);
         }
@@ -100,14 +105,24 @@ namespace Neptuo.Recollections.Entries.Pages
 
             if (IsMonthView)
                 (year, month) = DatePicker.NextMonth(year.Value, month.Value);
+            else
+                year++;
 
             return Navigator.UrlCalendar(year, month);
         }
 
         protected void OnDatePicked(Date date)
         {
-            if (date.Year != null && date.Month != null)
-                Navigator.OpenCalendar(date.Year, date.Month);
+            if (IsMonthView)
+            {
+                if (date.Year != null && date.Month != null)
+                    Navigator.OpenCalendar(date.Year, date.Month);
+            }
+            else
+            {
+                if (date.Year != null)
+                    Navigator.OpenCalendar(date.Year);
+            }
         }
     }
 }

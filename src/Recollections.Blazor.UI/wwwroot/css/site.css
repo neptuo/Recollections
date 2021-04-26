@@ -679,6 +679,20 @@ h4 .inline-editor-viewmode .oi {
   .search a:hover {
     text-decoration: none; }
 
+.calendar .badge, .yearlendar .badge {
+  margin-bottom: .125rem; }
+
+.calendar .bg-salmon, .yearlendar .bg-salmon {
+  display: block;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden; }
+
+.calendar a.bg-salmon, .yearlendar a.bg-salmon {
+  text-decoration: none; }
+  .calendar a.bg-salmon:hover, .yearlendar a.bg-salmon:hover {
+    color: white; }
+
 .calendar .calendar-header,
 .calendar .calendar-cell {
   width: calc(100% / 7);
@@ -689,21 +703,6 @@ h4 .inline-editor-viewmode .oi {
   .calendar .calendar-header:last-child,
   .calendar .calendar-cell:last-child {
     border-right-width: 1px; }
-  .calendar .calendar-header .badge,
-  .calendar .calendar-cell .badge {
-    margin-bottom: .125rem; }
-  .calendar .calendar-header .bg-salmon,
-  .calendar .calendar-cell .bg-salmon {
-    display: block;
-    text-align: left;
-    text-overflow: ellipsis;
-    overflow: hidden; }
-  .calendar .calendar-header a.bg-salmon,
-  .calendar .calendar-cell a.bg-salmon {
-    text-decoration: none; }
-    .calendar .calendar-header a.bg-salmon:hover,
-    .calendar .calendar-cell a.bg-salmon:hover {
-      color: white; }
 
 .calendar .calendar-header {
   font-weight: bold;
@@ -711,6 +710,9 @@ h4 .inline-editor-viewmode .oi {
 
 .calendar .calendar-cell {
   aspect-ratio: 1; }
+
+.yearlendar .badge {
+  margin-bottom: .250rem; }
 
 .date-picker .btn {
   border: none !important; }

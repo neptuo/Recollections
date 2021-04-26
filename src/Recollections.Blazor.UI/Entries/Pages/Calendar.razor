@@ -2,20 +2,21 @@
 @page "/calendar/{Year:int}"
 @page "/calendar/{Year:int}/{Month:int}"
 
+
+<PageTitle Value="@Title" />
+
+<h3 class="d-flex align-items-center my-4">
+    <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
+    <span>
+        @Title
+
+        <Icon Prefix="far" Identifier="calendar-alt" OnClick="@(() => DatePicker.Show())" />
+    </span>
+    <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
+</h3>
+
 @if (IsMonthView)
 {
-    <PageTitle Value="@MonthTitle" />
-
-    <h3 class="d-flex align-items-center my-4">
-        <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
-        <span>
-            @MonthTitle
-
-            <Icon Prefix="far" Identifier="calendar-alt" OnClick="@(() => DatePicker.Show())" />
-        </span>
-        <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
-    </h3>
-
     <MonthView Year="@Year.Value" Month="@Month.Value" Context="day">
         <div>
             <span class="badge bg-light text-dark">
@@ -31,5 +32,27 @@
         }
     </MonthView>
 }
+else
+{
+    <div class="row yearlendar">
+        @for (int i = 0; i < 12; i++)
+        {
+            <div class="col-2 mb-4">
+                <strong class="mb-1 d-block text-center">
+                    @System.Globalization.DateTimeFormatInfo.CurrentInfo.MonthNames[i]
+                </strong>
 
-<DatePicker @ref="DatePicker" Part="@DatePickerPart.Month" Value="@SelectedDate" ValueChanged="@OnDatePicked" />
+                @foreach (var model in Models.Where(e => e.When.Month == i + 1))
+                {
+                    <div>
+                        <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon">
+                            @model.Title
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+<DatePicker @ref="DatePicker" Part="@(IsMonthView ? DatePickerPart.Month : DatePickerPart.Year)" Value="@SelectedDate" ValueChanged="@OnDatePicked" />
