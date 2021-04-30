@@ -236,9 +236,19 @@ a {
     }
 }
 
-@media (max-width:480px) {
+@media (max-width:490px) {
     footer {
         font-size: 13px;
+
+        .navbar-text {
+            padding: 0;
+        }
+    }
+}
+
+@media (max-width: 410px) {
+    .versions {
+        display: none;
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @layout HeadLayout
+@inject Navigator Navigator
 
 <div class="container body-content">
     @Body
@@ -8,12 +9,22 @@
     <div class="container">
         <span class="navbar-text">
             <small>
-                &copy; 2021 &#8226; Recollections &#8226; <a href="https://www.neptuo.com" target="_blank">Neptuo</a>
+                &copy; 2021
+                &#8226; <a href="@Navigator.UrlAbout()" target="_blank">Recollections</a>
+                &#8226; <a href="https://www.neptuo.com" target="_blank">Neptuo</a>
             </small>
         </span>
         <span class="navbar-text text-right">
             <small>
-                <VersionInfo />
+                <span class="versions">
+                    <VersionInfo />
+
+                    &#8226;
+                </span>
+
+                <a href="@Navigator.UrlGithubRepositoryIssuesNew()" target="_blank">
+                    Report a bug
+                </a>
             </small>
         </span>
     </div>

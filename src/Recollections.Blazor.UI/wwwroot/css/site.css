@@ -299,9 +299,15 @@ h4 .inline-editor-viewmode .oi {
       padding: .375rem .75rem;
       border-radius: .25rem; } }
 
-@media (max-width: 480px) {
+@media (max-width: 490px) {
   footer {
-    font-size: 13px; } }
+    font-size: 13px; }
+    footer .navbar-text {
+      padding: 0; } }
+
+@media (max-width: 410px) {
+  .versions {
+    display: none; } }
 
 .exception-panel {
   margin-top: 24px; }
