@@ -24,4 +24,8 @@
     <Watch Include="**\*.razor" />
   </ItemGroup>
   
+  <ItemGroup>
+    <None Include="wwwroot\Gallery.js" />
+  </ItemGroup>
+  
 </Project>

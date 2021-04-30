@@ -163,6 +163,17 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
+        protected async Task<string> OnGetImageDataAsync(int index)
+        {
+            if (index > Images.Count)
+                return null;
+
+            var image = Images[index];
+
+            byte[] content = await Api.GetImageDataAsync(image.Preview);
+            return "data:image/png;base64," + Convert.ToBase64String(content);
+        }
+
         protected async Task SaveTitleAsync(string value)
         {
             if (String.IsNullOrEmpty(value))

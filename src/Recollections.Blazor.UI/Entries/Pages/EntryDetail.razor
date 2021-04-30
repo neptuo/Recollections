@@ -38,6 +38,8 @@
                 <div class="images">
                     @if (Images != null)
                     {
+                        <Gallery Count="@Images.Count" DataGetter="OnGetImageDataAsync" />
+
                         @foreach (var image in Images)
                         {
                             <EntryImage Image="@image" />
