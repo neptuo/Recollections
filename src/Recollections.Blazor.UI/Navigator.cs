@@ -77,7 +77,7 @@ namespace Neptuo.Recollections
             => "https://github.com/neptuo/Recollections/issues/new";
 
         public string UrlAbout()
-            => "/about";
+            => "https://about.recollections.app";
 
         public void OpenAbout()
             => uri.NavigateTo(UrlAbout());

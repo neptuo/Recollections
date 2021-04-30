@@ -16,7 +16,7 @@
                     if (menuItem.IsSmall)
                     {
                         <li class="nav-item">
-                            <NavLink class="nav-link" href="@menuItem.Url" Match="@menuItem.Match">
+                            <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
                                 <Icon Identifier="@menuItem.Icon" />
                             </NavLink>
                         </li>
@@ -36,7 +36,7 @@
                     if (menuItem.IsLarge)
                     {
                         <li class="nav-item">
-                            <NavLink class="nav-link" href="@menuItem.Url" Match="@menuItem.Match">
+                            <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
                                 <Icon Identifier="@menuItem.Icon" />
                                 @menuItem.Text
                             </NavLink>

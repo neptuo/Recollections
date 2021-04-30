@@ -30,7 +30,7 @@ namespace Neptuo.Recollections.Commons.Layouts
             MenuItems.Add(new MenuItem("Search", "search", Navigator.UrlSearch()));
             MenuItems.Add(new MenuItem("Stories", "book", Navigator.UrlStories()));
             MenuItems.Add(new MenuItem("Beings", "user-friends", Navigator.UrlBeings()));
-            MenuItems.Add(new MenuItem("About", "info-circle", Navigator.UrlAbout(), isSmall: false));
+            MenuItems.Add(new MenuItem("About", "info-circle", Navigator.UrlAbout(), isSmall: false, isNewWindow: true));
 
             Navigator.LocationChanged += OnLocationChanged;
         }
@@ -69,7 +69,9 @@ namespace Neptuo.Recollections.Commons.Layouts
         public bool IsSmall { get; set; }
         public bool IsLarge { get; set; }
 
-        public MenuItem(string text, string icon, string url, NavLinkMatch match = NavLinkMatch.Prefix, bool isSmall = true, bool isLarge = true)
+        public bool IsNewWindow { get; set; }
+
+        public MenuItem(string text, string icon, string url, NavLinkMatch match = NavLinkMatch.Prefix, bool isSmall = true, bool isLarge = true, bool isNewWindow = false)
         {
             Text = text;
             Icon = icon;
@@ -77,6 +79,7 @@ namespace Neptuo.Recollections.Commons.Layouts
             Match = match;
             IsSmall = isSmall;
             IsLarge = isLarge;
+            IsNewWindow = isNewWindow;
         }
     }
 }
