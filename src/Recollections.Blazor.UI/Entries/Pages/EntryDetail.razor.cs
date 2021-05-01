@@ -67,6 +67,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
         protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
+        protected Gallery Gallery { get; set; }
+        protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
 
         protected async override Task OnInitializedAsync()
         {
@@ -160,6 +162,17 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 Log.Debug($"LoadImages.Final, markers: {Markers.Count}.");
                 Log.Debug(Json.Serialize(Markers));
+            }
+
+            GalleryItems.Clear();
+            foreach (var image in Images)
+            {
+                GalleryItems.Add(new GalleryModel()
+                {
+                    Title = image.Name,
+                    Width = image.Preview.Width,
+                    Height = image.Preview.Height
+                });
             }
         }
 

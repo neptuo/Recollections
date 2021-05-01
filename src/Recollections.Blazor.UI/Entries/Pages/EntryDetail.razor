@@ -38,10 +38,9 @@
                 <div class="images">
                     @if (Images != null)
                     {
-                        <Gallery Count="@Images.Count" DataGetter="OnGetImageDataAsync" />
+                        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" />
 
                         @foreach (var image in Images)
-                        {
                             <EntryImage Image="@image" />
                         }
                     }
@@ -70,6 +69,10 @@
                                     BearerToken="@UserState.BearerToken"
                                     Progress="@(async e => await OnUploadProgressAsync(e))" />
                     </PermissionView>
+                    <button type="button" class="btn btn-sm btn-primary" @onclick="(() => Gallery.Open(0))">
+                        <Icon Identifier="images" />
+                        Gallery
+                    </button>
                     <PermissionView Request="@PermissionRequest.Owner">
                         <ShareButton EntryId="@EntryId" />
 

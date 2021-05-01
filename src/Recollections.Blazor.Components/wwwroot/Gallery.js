@@ -7,9 +7,9 @@ const options = {
 };
 const lightbox = new PhotoSwipeLightbox(options);
 
-export function initialize(interop, count) {
+export function initialize(interop, images) {
     lightbox.on("numItems", (e) => {
-        e.numItems = count
+        e.numItems = images.length
     });
 
     lightbox.on("itemData", (e) => {
@@ -19,14 +19,14 @@ export function initialize(interop, count) {
                     resolve(data);
                 });
             }),
-            //w: 200,
-            //h: 160,
-            alt: "Image...",
+            w: images[e.index].width,
+            h: images[e.index].height,
+            alt: images[e.index].title,
         }
     });
     lightbox.init();
 }
 
-export function open() {
-    lightbox.loadAndOpen(0);
+export function open(index) {
+    lightbox.loadAndOpen(index);
 }

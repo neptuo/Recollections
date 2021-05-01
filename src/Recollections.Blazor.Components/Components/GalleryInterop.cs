@@ -21,18 +21,18 @@ namespace Neptuo.Recollections.Components
             this.js = js;
         }
 
-        public async Task InitializedAsync(Gallery component, int imageCount)
+        public async Task InitializedAsync(Gallery component, List<GalleryModel> models)
         {
             Ensure.NotNull(component, "component");
             this.component = component;
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Gallery.js");
 
-            await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this), imageCount);
+            await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this), models);
         }
 
-        public async Task OpenAsync()
-            => await module.InvokeVoidAsync("open");
+        public async Task OpenAsync(int index)
+            => await module.InvokeVoidAsync("open", index);
 
         [JSInvokable]
         public Task<string> GetImageDataAsync(int index)

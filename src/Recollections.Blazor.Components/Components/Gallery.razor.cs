@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Components
         protected GalleryInterop Interop { get; set; }
 
         [Parameter]
-        public int Count { get; set; }
+        public List<GalleryModel> Models { get; set; }
 
         [Parameter]
         public Func<int, Task<string>> DataGetter { get; set; }
@@ -24,11 +24,13 @@ namespace Neptuo.Recollections.Components
         {
             await base.OnInitializedAsync();
 
-            if (Count > 0)
-            {
-                await Interop.InitializedAsync(this, Count);
-                await Interop.OpenAsync();
-            }
+            if (Models != null && Models.Count > 0)
+                await Interop.InitializedAsync(this, Models);
+        }
+
+        public void Open(int index)
+        {
+            _ = Interop.OpenAsync(index);
         }
     }
 }
