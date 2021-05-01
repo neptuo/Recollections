@@ -90,11 +90,11 @@ namespace Neptuo.Recollections.Entries.Components
             switch (ImageType)
             {
                 case ImageType.Original:
-                    return Image.Original;
+                    return Image.Original.Url;
                 case ImageType.Preview:
-                    return Image.Preview;
+                    return Image.Preview.Url;
                 case ImageType.Thumbnail:
-                    return Image.Thumbnail;
+                    return Image.Thumbnail.Url;
                 default:
                     throw Ensure.Exception.NotSupported(ImageType);
             }

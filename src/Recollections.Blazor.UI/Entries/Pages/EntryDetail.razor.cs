@@ -170,7 +170,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             var image = Images[index];
 
-            byte[] content = await Api.GetImageDataAsync(image.Preview);
+            byte[] content = await Api.GetImageDataAsync(image.Preview.Url);
             return "data:image/png;base64," + Convert.ToBase64String(content);
         }
 

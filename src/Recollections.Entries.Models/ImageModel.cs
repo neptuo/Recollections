@@ -12,9 +12,9 @@ namespace Neptuo.Recollections.Entries
         public string Id { get; set; }
         public string UserId { get; set; }
 
-        public string Thumbnail { get; set; }
-        public string Preview { get; set; }
-        public string Original{ get; set; }
+        public ImageSourceModel Thumbnail { get; set; }
+        public ImageSourceModel Preview { get; set; }
+        public ImageSourceModel Original { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
@@ -26,23 +26,24 @@ namespace Neptuo.Recollections.Entries
         {
             Id = Id,
             UserId = UserId,
-            Thumbnail = Thumbnail,
-            Preview = Preview,
-            Original = Original,
+            Thumbnail = Thumbnail.Clone(),
+            Preview = Preview.Clone(),
+            Original = Original.Clone(),
             Name = Name,
             Description = Description,
             When = When,
             Location = Location.Clone()
         };
 
-        public override bool Equals(object obj) => Equals(obj as ImageModel);
+        public override bool Equals(object obj) 
+            => Equals(obj as ImageModel);
 
         public bool Equals(ImageModel other) => other != null &&
             Id == other.Id &&
             UserId == other.UserId && 
-            Thumbnail == other.Thumbnail &&
-            Preview == other.Preview &&
-            Original == other.Original &&
+            Thumbnail.Equals(other.Thumbnail) &&
+            Preview.Equals(other.Preview) &&
+            Original.Equals(other.Original) &&
             Name == other.Name &&
             Description == other.Description &&
             When == other.When &&
@@ -50,17 +51,17 @@ namespace Neptuo.Recollections.Entries
 
         public override int GetHashCode()
         {
-            var hashCode = 3;
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Id);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(UserId);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Thumbnail);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Preview);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Original);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Name);
-            hashCode = hashCode * 7 + EqualityComparer<string>.Default.GetHashCode(Description);
-            hashCode = hashCode * 7 + When.GetHashCode();
-            hashCode = hashCode * 7 + Location.GetHashCode();
-            return hashCode;
+            HashCode hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(UserId);
+            hash.Add(Thumbnail);
+            hash.Add(Preview);
+            hash.Add(Original);
+            hash.Add(Name);
+            hash.Add(Description);
+            hash.Add(When);
+            hash.Add(Location);
+            return hash.ToHashCode();
         }
     }
 }

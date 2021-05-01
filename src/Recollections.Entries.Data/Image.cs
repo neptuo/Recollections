@@ -20,6 +20,9 @@ namespace Neptuo.Recollections.Entries
         public DateTime Created { get; set; }
         public DateTime When { get; set; }
 
+        public int OriginalWidth { get; set; }
+        public int OriginalHeight { get; set; }
+
         public ImageLocation Location { get; set; } = new ImageLocation();
 
         public string FileName { get; set; }

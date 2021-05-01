@@ -45,23 +45,36 @@ namespace Neptuo.Recollections.Entries
             }
         }
 
-        public void Resize(Stream inputContent, Stream outputContent, int width)
+        public (int width, int height) GetResizedBounds(int originalWidth, int originalHeight, int desiredWidth)
+        {
+            if (desiredWidth < originalWidth)
+            {
+                var ratio = desiredWidth / (double)originalWidth;
+                int desiredHeight = (int)(ratio * originalHeight);
+
+                return (desiredWidth, desiredHeight);
+            }
+
+            return (originalWidth, originalHeight);
+        }
+
+        public (int width, int height) GetSize(Stream inputContent)
+        {
+            using var input = DrImage.FromStream(inputContent);
+            return (input.Width, input.Height);
+        }
+
+        public void Resize(Stream inputContent, Stream outputContent, int desiredWidth)
         {
             using (var input = DrImage.FromStream(inputContent))
             {
                 EnsureExifImageRotation(input, inputContent);
 
-                if (width < input.Width)
-                {
-                    var ratio = width / (double)input.Width;
-                    int height = (int)(ratio * input.Height);
-
+                var (width, height) = GetResizedBounds(input.Width, input.Height, desiredWidth);
+                if (width != input.Width)
                     Resize(input, outputContent, null, width, height);
-                }
                 else
-                {
                     SaveImage(outputContent, input);
-                }
             }
         }
 

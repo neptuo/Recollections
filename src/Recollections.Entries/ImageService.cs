@@ -14,6 +14,10 @@ namespace Neptuo.Recollections.Entries
 {
     public class ImageService
     {
+        private const int PreviewWidth = 1024;
+        private const int ThumbnailWidth = 200;
+        private const int ThumbnailHeight = 150;
+
         private readonly DataContext dataContext;
         private readonly IImageValidator validator;
         private readonly IFileStorage fileStorage;
@@ -41,6 +45,10 @@ namespace Neptuo.Recollections.Entries
 
             await validator.ValidateAsync(entry.UserId, file);
 
+            (int width, int height) size = default;
+            using (Stream imageContent = file.OpenReadStream())
+                size = resizeService.GetSize(imageContent);
+
             string imageId = Guid.NewGuid().ToString();
             Image entity = new Image()
             {
@@ -49,7 +57,9 @@ namespace Neptuo.Recollections.Entries
                 FileName = imageId + Path.GetExtension(file.FileName),
                 Created = DateTime.Now,
                 When = entry.When,
-                Entry = entry
+                Entry = entry,
+                OriginalWidth = size.width,
+                OriginalHeight = size.height
             };
 
             await dataContext.Images.AddAsync(entity);
@@ -116,7 +126,7 @@ namespace Neptuo.Recollections.Entries
                 await originalContent.CopyToAsync(originalCopy);
                 originalCopy.Position = 0;
 
-                resizeService.Thumbnail(originalCopy, thumbnailContent, 200, 150);
+                resizeService.Thumbnail(originalCopy, thumbnailContent, ThumbnailWidth, ThumbnailHeight);
                 thumbnailContent.Position = 0;
 
                 await fileStorage.SaveAsync(entry, image, thumbnailContent, ImageType.Thumbnail);
@@ -133,7 +143,7 @@ namespace Neptuo.Recollections.Entries
                 await originalContent.CopyToAsync(originalCopy);
                 originalCopy.Position = 0;
 
-                resizeService.Resize(originalCopy, previewContent, 1024);
+                resizeService.Resize(originalCopy, previewContent, PreviewWidth);
                 previewContent.Position = 0;
 
                 await fileStorage.SaveAsync(entry, image, previewContent, ImageType.Preview);
@@ -186,9 +196,11 @@ namespace Neptuo.Recollections.Entries
             model.Location.Altitude = entity.Location.Altitude;
 
             string basePath = $"api/entries/{entity.Entry.Id}/images/{entity.Id}";
-            model.Preview = $"{basePath}/preview";
-            model.Thumbnail = $"{basePath}/thumbnail";
-            model.Original = $"{basePath}/original";
+
+            var previewSize = resizeService.GetResizedBounds(entity.OriginalWidth, entity.OriginalHeight, PreviewWidth);
+            model.Preview = new ImageSourceModel($"{basePath}/preview", previewSize.width, previewSize.height);
+            model.Thumbnail = new ImageSourceModel($"{basePath}/thumbnail", ThumbnailWidth, ThumbnailHeight);
+            model.Original = new ImageSourceModel($"{basePath}/original", entity.OriginalWidth, entity.OriginalHeight);
         }
 
         public void MapModelToEntity(ImageModel model, Image entity)
