@@ -13,9 +13,9 @@ namespace Neptuo.Recollections.Entries
         public string Preview { get; }
         public string Thumbnail { get; }
 
-        public ImagePath(SystemIoFileStorage storage, ImageResizeService service, Entry entry, Image image)
+        public ImagePath(SystemIoFileStorage storage, ImageFormatDefinition formatDefinition, Entry entry, Image image)
         {
-            Ensure.NotNull(service, "service");
+            Ensure.NotNull(formatDefinition, "formatDefinition");
             Ensure.NotNull(entry, "entry");
             Ensure.NotNull(image, "image");
 
@@ -23,8 +23,8 @@ namespace Neptuo.Recollections.Entries
             string baseName = Path.GetFileNameWithoutExtension(image.FileName);
 
             Original = Path.Combine(storagePath, image.FileName);
-            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", service.ImageExtension));
-            Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", service.ImageExtension));
+            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", formatDefinition.FileExtension));
+            Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", formatDefinition.FileExtension));
         }
 
         public string Get(ImageType type)

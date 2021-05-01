@@ -12,22 +12,22 @@ namespace Neptuo.Recollections.Entries
     {
         private readonly SystemIoStorageOptions configuration;
         private readonly PathResolver pathResolver;
-        private readonly ImageResizeService resizeService;
+        private readonly ImageFormatDefinition formatDefinition;
 
         public bool CanStreamSeek => true;
 
-        public SystemIoFileStorage(PathResolver pathResolver, IOptions<SystemIoStorageOptions> configuration, ImageResizeService resizeService)
+        public SystemIoFileStorage(PathResolver pathResolver, IOptions<SystemIoStorageOptions> configuration, ImageFormatDefinition formatDefinition)
         {
             Ensure.NotNull(pathResolver, "pathResolver");
             Ensure.NotNull(configuration, "configuration");
-            Ensure.NotNull(resizeService, "resizeService");
+            Ensure.NotNull(formatDefinition, "formatDefinition");
             this.pathResolver = pathResolver;
             this.configuration = configuration.Value;
-            this.resizeService = resizeService;
+            this.formatDefinition = formatDefinition;
         }
 
         public ImagePath GetPath(Entry entry, Image entity)
-            => new ImagePath(this, resizeService, entry, entity);
+            => new ImagePath(this, formatDefinition, entry, entity);
 
         public string GetStoragePath(Entry entry)
         {
