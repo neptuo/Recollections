@@ -51,7 +51,7 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageService>()
                 .AddTransient<ImageResizeService>()
                 .AddTransient<IImageValidator, PermiumImageSizeValidator>()
-                .AddSingleton(new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg"));
+                .AddSingleton(ImageFormatDefinition.Jpeg);
         }
 
         private void ConfigureDatabase(IServiceCollection services)

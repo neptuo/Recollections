@@ -24,7 +24,7 @@ namespace Neptuo.Recollections
 
             Console.WriteLine("Migrating accounts db.");
             accounts.Database.Migrate();
-            
+
             Console.WriteLine("Migrating entries db.");
             entries.Database.Migrate();
 
@@ -52,5 +52,5 @@ namespace Neptuo.Recollections
             MigrationWithSchema.SetSchema(schema);
             return schema;
         }
-}
+    }
 }

@@ -9,6 +9,8 @@ namespace Neptuo.Recollections.Entries
 {
     public class ImageFormatDefinition
     {
+        public static readonly ImageFormatDefinition Jpeg = new ImageFormatDefinition(ImageFormat.Jpeg, ".jpg");
+
         public ImageFormat Format { get; }
         public ImageCodecInfo Codec { get; }
         public string FileExtension { get; }

@@ -41,7 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Data.Ef", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Accounts", "src\Recollections.Accounts\Recollections.Accounts.csproj", "{3A4766FA-8B5C-4841-A474-C3B67752D4FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.DbMigrationApplier", "src\Recollections.DbMigrationApplier\Recollections.DbMigrationApplier.csproj", "{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.DbMigrationApplier", "src\Recollections.DbMigrationApplier\Recollections.DbMigrationApplier.csproj", "{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.ImageSizeCalculator", "src\Recollections.ImageSizeCalculator\Recollections.ImageSizeCalculator.csproj", "{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,6 +111,10 @@ Global
 		{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{4FB6B5CA-2E5A-424A-83F3-2BF6D75539CA} = {003E432D-6946-4A88-BC1F-2175B154D3D1}
 		{3A4766FA-8B5C-4841-A474-C3B67752D4FE} = {38B9D47D-3F13-4777-A204-47F9C3A40E2B}
 		{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997} = {930F0831-13F2-43E9-B548-226D1610F227}
+		{D3B3C78D-7A08-4C2D-B535-FD9A301EB869} = {930F0831-13F2-43E9-B548-226D1610F227}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {087891FB-93D9-4D03-AFE6-11BD7F9A44F7}
