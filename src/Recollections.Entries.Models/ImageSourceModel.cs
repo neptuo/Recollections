@@ -20,8 +20,8 @@ namespace Neptuo.Recollections.Entries
         public ImageSourceModel(string url, int width, int height)
         {
             Ensure.NotNull(url, "url");
-            Ensure.Positive(width, "width");
-            Ensure.Positive(height, "height");
+            Ensure.PositiveOrZero(width, "width");
+            Ensure.PositiveOrZero(height, "height");
             Url = url;
             Width = width;
             Height = height;
