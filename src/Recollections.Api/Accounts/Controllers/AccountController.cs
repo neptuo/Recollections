@@ -15,57 +15,80 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Controllers
 {
+    [ApiController]
     [Route("api/accounts/[action]")]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<User> userManager;
-        private readonly JwtOptions configuration;
+        private readonly JwtOptions jwtOptions;
+        private readonly TokenLoginOptions tokenOptions;
         private readonly JwtSecurityTokenHandler tokenHandler;
 
-        public AccountController(UserManager<User> userManager, IOptions<JwtOptions> configuration, JwtSecurityTokenHandler tokenHandler)
+        public AccountController(UserManager<User> userManager, IOptions<JwtOptions> jwtOptions, IOptions<TokenLoginOptions> tokenOptions, JwtSecurityTokenHandler tokenHandler)
         {
             Ensure.NotNull(userManager, "userManager");
-            Ensure.NotNull(configuration, "configuration");
+            Ensure.NotNull(jwtOptions, "jwtOptions");
+            Ensure.NotNull(tokenOptions, "tokenOptions");
             Ensure.NotNull(tokenHandler, "tokenHandler");
             this.userManager = userManager;
-            this.configuration = configuration.Value;
+            this.jwtOptions = jwtOptions.Value;
+            this.tokenOptions = tokenOptions.Value;
             this.tokenHandler = tokenHandler;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             User user = await userManager.FindByNameAsync(request.UserName);
             if (user != null)
             {
                 if (await userManager.CheckPasswordAsync(user, request.Password))
-                {
-                    var claims = new[]
-                    {
-                        new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id)
-                    };
-
-                    var credentials = new SigningCredentials(configuration.GetSecurityKey(), SecurityAlgorithms.HmacSha256);
-                    var expiry = DateTime.Now.Add(configuration.GetExpiry());
-
-                    var token = new JwtSecurityToken(
-                        configuration.Issuer,
-                        configuration.Issuer,
-                        claims,
-                        expires: expiry,
-                        signingCredentials: credentials
-                    );
-
-                    return Ok(new LoginResponse(tokenHandler.WriteToken(token)));
-                }
+                    return CreateJwtToken(user);
             }
 
             return Ok(new LoginResponse());
         }
 
+        private IActionResult CreateJwtToken(User user, bool isReadOnly = false)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+
+            claims.IsReadOnly(isReadOnly);
+
+            var credentials = new SigningCredentials(jwtOptions.GetSecurityKey(), SecurityAlgorithms.HmacSha256);
+            var expiry = DateTime.Now.Add(jwtOptions.GetExpiry());
+
+            var token = new JwtSecurityToken(
+                jwtOptions.Issuer,
+                jwtOptions.Issuer,
+                claims,
+                expires: expiry,
+                signingCredentials: credentials
+            );
+
+            return Ok(new LoginResponse(tokenHandler.WriteToken(token)));
+        }
+
+        [HttpPost("login/token")]
+        public async Task<IActionResult> LoginWithToken(string token)
+        {
+            Ensure.NotNullOrEmpty(token, "token");
+            if (tokenOptions.Tokens.TryGetValue(token, out var userName))
+            {
+                var user = await userManager.FindByNameAsync(userName);
+                if (user != null)
+                    return CreateJwtToken(user, true);
+            }
+
+            return NotFound();
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest model)
+        public async Task<IActionResult> Register(RegisterRequest model)
         {
             var user = new User(model.UserName);
             var result = await userManager.CreateAsync(user, model.Password);
@@ -105,7 +128,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
             User user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
             if (user == null)

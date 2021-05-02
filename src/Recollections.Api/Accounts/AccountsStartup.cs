@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,7 @@ namespace Neptuo.Recollections.Accounts
         public void ConfigureServices(IServiceCollection services, IHostEnvironment environment)
         {
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+            services.Configure<TokenLoginOptions>(o => configuration.GetSection("TokenLogin").Bind(o.Tokens));
             services.Configure<UserPropertyOptions>(configuration.GetSection("Properties"));
 
             services
@@ -105,6 +107,16 @@ namespace Neptuo.Recollections.Accounts
         {
             app.UseAuthentication();
             app.UseAuthorization();
+            app.Use(async (context, next) =>
+            {
+                if (context.User.IsReadOnly() && !HttpMethods.IsGet(context.Request.Method))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+
+                await next();
+            });
         }
     }
 }
