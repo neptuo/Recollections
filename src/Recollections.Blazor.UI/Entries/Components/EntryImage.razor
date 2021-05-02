@@ -1,7 +1,7 @@
 ﻿<div class="image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
     @if (ImageType == Models.ImageType.Thumbnail)
     {
-        <a href="@GetLinkUrl()" @onclick="@(() => OnClick.InvokeAsync())" @onclick:preventDefault>
+        <a href="@GetLinkUrl()">
             <img src="@Url" class="rounded" />
         </a>
     }

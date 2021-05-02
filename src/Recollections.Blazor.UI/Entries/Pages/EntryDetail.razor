@@ -41,6 +41,7 @@
                         <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" />
 
                         @foreach (var image in Images)
+                        {
                             <EntryImage Image="@image" />
                         }
                     }
