@@ -54,24 +54,37 @@ namespace Neptuo.Recollections
             Console.WriteLine($"Found '{images.Count}' images.");
             foreach (var image in images)
             {
-                var fileContent = await fileStorage.FindAsync(image.Entry, image, ImageType.Original);
-                if (fileContent != null)
-                {
-                    using (fileContent)
-                    {
-                        var size = resizeService.GetSize(fileContent);
-                        image.OriginalWidth = size.width;
-                        image.OriginalHeight = size.height;
-
-                        entries.Images.Update(image);
-                    }
-                }
+                if (!await TryUpdateOriginalSizeAsync(entries, fileStorage, resizeService, image, ImageType.Original))
+                    await TryUpdateOriginalSizeAsync(entries, fileStorage, resizeService, image, ImageType.Preview);
             }
 
             Console.WriteLine("Saving changes.");
             await entries.SaveChangesAsync();
 
             Console.WriteLine("Done.");
+        }
+
+        private static async Task<bool> TryUpdateOriginalSizeAsync(EntriesDataContext entries, IFileStorage fileStorage, ImageResizeService resizeService, Image image, ImageType imageType)
+        {
+            var fileContent = await fileStorage.FindAsync(image.Entry, image, imageType);
+            if (fileContent != null)
+            {
+                using (fileContent)
+                {
+                    var size = resizeService.GetSize(fileContent);
+                    image.OriginalWidth = size.width;
+                    image.OriginalHeight = size.height;
+
+                    entries.Images.Update(image);
+                }
+
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Missing '{imageType}' file for '{image.Id}'.");
+                return false;
+            }
         }
 
         private static DbContextOptions<T> DbContextOptions<T>(string connectionString, string schema)
