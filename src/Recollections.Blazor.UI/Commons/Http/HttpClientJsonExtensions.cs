@@ -14,12 +14,14 @@ namespace Neptuo.Recollections
         public async static Task<TResponse> PostAsJsonAsync<TRequest, TResponse>(this HttpClient http, string url, TRequest request)
         {
             var response = await http.PostAsJsonAsync(url, request);
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<TResponse>();
         }
 
         public async static Task<TResponse> PutAsJsonAsync<TRequest, TResponse>(this HttpClient http, string url, TRequest request)
         {
             var response = await http.PutAsJsonAsync(url, request);
+            response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<TResponse>();
         }
     }
