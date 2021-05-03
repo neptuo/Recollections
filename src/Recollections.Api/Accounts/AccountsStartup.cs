@@ -111,7 +111,7 @@ namespace Neptuo.Recollections.Accounts
             {
                 if (context.User.IsReadOnly() && !HttpMethods.IsGet(context.Request.Method))
                 {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.StatusCode = 422;
                     return;
                 }
 
