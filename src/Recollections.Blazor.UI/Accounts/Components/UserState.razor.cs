@@ -42,6 +42,7 @@ namespace Neptuo.Recollections.Accounts.Components
         public string UserName { get; private set; }
         public bool IsAuthenticated => BearerToken != null;
 
+        protected bool IsTokenProcessing { get; set; }
         protected bool IsAuthenticationRequired { get; set; }
 
         private async Task SetAuthorizationAsync(string bearerToken, bool isPersistent, bool isStore = true)
@@ -74,6 +75,30 @@ namespace Neptuo.Recollections.Accounts.Components
         {
             Navigator.LocationChanged += OnLocationChanged;
 
+            string token = Navigator.FindQueryParameter("token");
+            if (!String.IsNullOrEmpty(token))
+            {
+                IsTokenProcessing = true;
+
+                try
+                {
+                    var response = await Api.LoginWithTokenAsync(new LoginWithTokenRequest() { Token = token });
+                    await SetAuthorizationAsync(response.BearerToken, false, false);
+                    await LoadUserInfoAsync();
+
+                    Navigator.OpenTimeline();
+                }
+                catch (AggregateException e) when (e.InnerException is HttpRequestException http && http.StatusCode == HttpStatusCode.NotFound)
+                {
+                    Console.WriteLine(e.GetType().FullName);
+                    Navigator.OpenLogin();
+                }
+                finally
+                {
+                    IsTokenProcessing = false;
+                }
+            }
+
             if (BearerToken == null)
             {
                 string bearerToken = await TokenStorage.FindAsync();
@@ -85,6 +110,8 @@ namespace Neptuo.Recollections.Accounts.Components
             }
 
             initializationSource.SetResult(null);
+
+            await base.OnInitializedAsync();
         }
 
         public void Dispose()

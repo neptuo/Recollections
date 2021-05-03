@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Neptuo.Recollections.Accounts.Controllers
 {
     [ApiController]
-    [Route("api/accounts/[action]")]
+    [Route("api/accounts")]
     public class AccountController : ControllerBase
     {
         private readonly UserManager<User> userManager;
@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
             this.tokenHandler = tokenHandler;
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             User user = await userManager.FindByNameAsync(request.UserName);
@@ -74,10 +74,10 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [HttpPost("login/token")]
-        public async Task<IActionResult> LoginWithToken(string token)
+        public async Task<IActionResult> LoginWithToken(LoginWithTokenRequest request)
         {
-            Ensure.NotNullOrEmpty(token, "token");
-            if (tokenOptions.Tokens.TryGetValue(token, out var userName))
+            Ensure.NotNull(request, "request");
+            if (tokenOptions.Tokens.TryGetValue(request.Token, out var userName))
             {
                 var user = await userManager.FindByNameAsync(userName);
                 if (user != null)
@@ -87,7 +87,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
             return NotFound();
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest model)
         {
             var user = new User(model.UserName);
@@ -101,7 +101,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("info")]
         public IActionResult Info()
         {
             return Ok(new UserInfoResponse()
@@ -112,7 +112,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("detail")]
         public async Task<IActionResult> Detail()
         {
             User user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
@@ -127,7 +127,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
             User user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);

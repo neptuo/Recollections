@@ -37,6 +37,9 @@ namespace Neptuo.Recollections.Accounts
         public Task<LoginResponse> LoginAsync(LoginRequest request)
             => faultHandler.Wrap(http.PostAsJsonAsync<LoginRequest, LoginResponse>("accounts/login", request));
 
+        public Task<LoginResponse> LoginWithTokenAsync(LoginWithTokenRequest request)
+            => faultHandler.Wrap(http.PostAsJsonAsync<LoginWithTokenRequest, LoginResponse>("accounts/login/token", request));
+
         public Task<RegisterResponse> RegisterAsync(RegisterRequest request) 
             => faultHandler.Wrap(http.PostAsJsonAsync<RegisterRequest, RegisterResponse>("accounts/register", request));
 

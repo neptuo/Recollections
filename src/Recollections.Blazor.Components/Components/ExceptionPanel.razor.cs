@@ -35,6 +35,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public RenderFragment NotFoundContent { get; set; }
 
+        [Parameter]
+        public EventCallback OnReadOnlyClick { get; set; }
+
         protected bool IsVisible { get; private set; }
         protected string Title { get; private set; }
         protected string Message { get; private set; }
@@ -43,6 +46,8 @@ namespace Neptuo.Recollections.Components
 
         protected ElementReference Container { get; private set; }
         protected Modal PremiumModal { get; private set; }
+
+        protected Modal ReadOnlyModal { get; set; }
 
         protected override Task OnInitializedAsync()
         {
@@ -105,6 +110,11 @@ namespace Neptuo.Recollections.Components
                     PremiumModal.Show();
                     IsVisible = false;
                 }
+                else if(IsHttpResponseStatusCode(httpException, 422))
+                {
+                    ReadOnlyModal.Show();
+                    IsVisible = false;
+                }
                 else
                 {
                     SetNetworkErrorMessage();
@@ -156,6 +166,12 @@ namespace Neptuo.Recollections.Components
         {
             IsVisible = false;
             StateHasChanged();
+        }
+
+        protected Task OnStartRegistrationClickAsync()
+        {
+            ReadOnlyModal.Hide();
+            return OnReadOnlyClick.InvokeAsync();
         }
     }
 }

@@ -16,6 +16,9 @@ namespace Neptuo.Recollections.Commons.Layouts
         [Inject]
         internal Navigator Navigator { get; set; }
 
+        [CascadingParameter]
+        protected UserState UserState { get; set; }
+
         protected List<MenuItem> MenuItems { get; } = new List<MenuItem>();
         protected ExceptionPanel ExceptionPanel { get; set; }
         protected bool IsMainMenuVisible { get; set; } = false;
@@ -57,6 +60,12 @@ namespace Neptuo.Recollections.Commons.Layouts
 
         protected void ToggleMainMenu()
             => UpdateMainMenuVisible(!IsMainMenuVisible);
+
+        protected async Task OnReadOnlyClickAsync()
+        {
+            await UserState.LogoutAsync();
+            Navigator.OpenRegister();
+        }
     }
 
     public class MenuItem

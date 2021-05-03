@@ -3,6 +3,15 @@
     {
         <Neptuo.Recollections.Accounts.Pages.Login />
     }
+    else if (IsTokenProcessing)
+    {
+        <div class="container mt-4">
+            <h5 class="text-center">
+                <Icon Identifier="user" />
+                Processing your invitation token...
+            </h5>
+        </div>
+    }
     else
     {
         @ChildContent
