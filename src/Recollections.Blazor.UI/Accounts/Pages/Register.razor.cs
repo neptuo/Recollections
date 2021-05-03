@@ -39,7 +39,8 @@ namespace Neptuo.Recollections.Accounts.Pages
             RegisterResponse response = await Api.RegisterAsync(new RegisterRequest(UserName, Password));
             if (response.IsSuccess)
             {
-                await UserState.LoginAsync(UserName, Password);
+                if (await UserState.LoginAsync(UserName, Password))
+                    Navigator.OpenTimeline();
                 
                 UserName = null;
                 Password = null;
