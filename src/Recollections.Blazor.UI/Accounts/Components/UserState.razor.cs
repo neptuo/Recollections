@@ -2,11 +2,13 @@
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,6 +42,8 @@ namespace Neptuo.Recollections.Accounts.Components
         public string BearerToken { get; private set; }
         public string UserId { get; private set; }
         public string UserName { get; private set; }
+        public bool IsReadOnly { get; private set; } = true;
+        public bool IsEditable => !IsReadOnly;
         public bool IsAuthenticated => BearerToken != null;
 
         protected bool IsTokenProcessing { get; set; }
@@ -83,8 +87,8 @@ namespace Neptuo.Recollections.Accounts.Components
                 try
                 {
                     var response = await Api.LoginWithTokenAsync(new LoginWithTokenRequest() { Token = token });
-                    await SetAuthorizationAsync(response.BearerToken, false, false);
-                    await LoadUserInfoAsync();
+                    if (LoadUserInfo(response.BearerToken))
+                        await SetAuthorizationAsync(response.BearerToken, false);
 
                     Navigator.OpenTimeline();
                 }
@@ -102,11 +106,8 @@ namespace Neptuo.Recollections.Accounts.Components
             if (BearerToken == null)
             {
                 string bearerToken = await TokenStorage.FindAsync();
-                if (!string.IsNullOrEmpty(bearerToken))
-                {
+                if (LoadUserInfo(bearerToken))
                     await SetAuthorizationAsync(bearerToken, false, false);
-                    await LoadUserInfoAsync();
-                }
             }
 
             initializationSource.SetResult(null);
@@ -124,23 +125,25 @@ namespace Neptuo.Recollections.Accounts.Components
             SetAuthenticationRequiredOnly(false);
         }
 
-        private async Task<bool> LoadUserInfoAsync()
+        private bool LoadUserInfo(string bearerToken)
         {
-            try
+            if (!string.IsNullOrEmpty(bearerToken))
             {
-                UserInfoResponse response = await Api.GetInfoAsync();
-                UserId = response.UserId;
-                UserName = response.UserName;
-                UserInfoChanged?.Invoke();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                await ClearAuthorizationAsync();
-                NavigateToLogin();
-                return false;
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(bearerToken);
+                if (jwtToken.ValidTo > DateTime.Now)
+                {
+                    var claims = jwtToken.Claims;
+
+                    UserId = claims.FindUserId();
+                    UserName = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                    IsReadOnly = claims.IsReadOnly();
+                    UserInfoChanged?.Invoke();
+                    return true;
+                }
             }
 
-            return true;
+            return false;
         }
 
         private void NavigateToLogin() => Navigator.OpenLogin();
@@ -150,8 +153,8 @@ namespace Neptuo.Recollections.Accounts.Components
             LoginResponse response = await Api.LoginAsync(new LoginRequest(username, password));
             if (response.BearerToken != null)
             {
-                await SetAuthorizationAsync(response.BearerToken, isPersistent);
-                await LoadUserInfoAsync();
+                if (LoadUserInfo(response.BearerToken))
+                    await SetAuthorizationAsync(response.BearerToken, isPersistent);
 
                 SetAuthenticationRequired(false);
 

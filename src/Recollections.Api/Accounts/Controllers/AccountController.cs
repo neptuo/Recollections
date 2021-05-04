@@ -36,19 +36,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
             this.tokenHandler = tokenHandler;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
-        {
-            User user = await userManager.FindByNameAsync(request.UserName);
-            if (user != null)
-            {
-                if (await userManager.CheckPasswordAsync(user, request.Password))
-                    return CreateJwtToken(user);
-            }
-
-            return Ok(new LoginResponse());
-        }
-
         private IActionResult CreateJwtToken(User user, bool isReadOnly = false)
         {
             var claims = new List<Claim>()
@@ -71,6 +58,19 @@ namespace Neptuo.Recollections.Accounts.Controllers
             );
 
             return Ok(new LoginResponse(tokenHandler.WriteToken(token)));
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest request)
+        {
+            User user = await userManager.FindByNameAsync(request.UserName);
+            if (user != null)
+            {
+                if (await userManager.CheckPasswordAsync(user, request.Password))
+                    return CreateJwtToken(user);
+            }
+
+            return Ok(new LoginResponse());
         }
 
         [HttpPost("login/token")]

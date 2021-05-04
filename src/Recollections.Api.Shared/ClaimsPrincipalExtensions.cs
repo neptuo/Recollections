@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neptuo;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,8 +13,21 @@ namespace Neptuo.Recollections
     {
         private const string ReadOnly = "readonly";
 
+        public static string FindUserId(this IEnumerable<Claim> user)
+        {
+            Ensure.NotNull(user, "user");
+
+            string userId = user.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (String.IsNullOrEmpty(userId))
+                return null;
+
+            return userId;
+        }
+
         public static string FindUserId(this ClaimsPrincipal user)
         {
+            Ensure.NotNull(user, "user");
+
             string userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (String.IsNullOrEmpty(userId))
                 return null;
@@ -21,10 +35,24 @@ namespace Neptuo.Recollections
             return userId;
         }
 
+        public static bool IsReadOnly(this IEnumerable<Claim> user)
+        {
+            Ensure.NotNull(user, "user");
+
+            string isReadonly = user.FirstOrDefault(c => c.Type == ReadOnly)?.Value;
+            return IsReadOnly(isReadonly);
+        }
+
         public static bool IsReadOnly(this ClaimsPrincipal user)
         {
             Ensure.NotNull(user, "user");
+
             string isReadonly = user.FindFirst(ReadOnly)?.Value;
+            return IsReadOnly(isReadonly);
+        }
+
+        private static bool IsReadOnly(string isReadonly)
+        {
             if (String.IsNullOrEmpty(isReadonly))
                 return false;
 
