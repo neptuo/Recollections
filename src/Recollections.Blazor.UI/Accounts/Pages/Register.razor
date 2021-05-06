@@ -2,21 +2,35 @@
 
 <PageTitle Value="Register" />
 
-<div class="component-login text-center">
+<Card Title="Registration">
     <form @onsubmit="@RegisterAsync">
+        @if (ErrorMessages.Count > 0)
+        {
+            <div class="mb-3 text-danger">
+                @foreach (var errorMessage in ErrorMessages)
+                {
+                    <div class="d-flex align-items-center">
+                        <Icon Identifier="exclamation-triangle" />
+                        @errorMessage
+                    </div>
+                }
+            </div>
+        }
 
-        <img src="/img/icon-512x512.png" class="my-4" />
-
-        <Validation ErrorMessages="ErrorMessages" />
-
-        <input type="text" class="form-control" placeholder="Username..." @bind="UserName" />
-        <input type="password" class="form-control" placeholder="Password..." @bind="Password" />
-
-        <div class="mb-3 mt-4 mx-4">
-            <button type="submit" class="btn btn-lg btn-primary btn-block">Register</button>
+        <div class="input-control mb-3">
+            <Icon Identifier="user" />
+            <input type="text" class="form-control" placeholder="Username..." @bind="UserName" />
         </div>
+        <div class="input-control mb-3">
+            <Icon Identifier="lock" />
+            <input type="password" class="form-control" placeholder="Password..." @bind="Password" />
+        </div>
+
         <div class="mb-3">
-            <a href="@Navigator.UrlLogin()">I already have an account</a>
+            <button type="submit" class="btn btn-salmon btn-block">Register</button>
+        </div>
+        <div>
+            <a href="@Navigator.UrlLogin()" class="btn btn-block btn-secondary">I already have an account</a>
         </div>
     </form>
-</div>
+</Card>

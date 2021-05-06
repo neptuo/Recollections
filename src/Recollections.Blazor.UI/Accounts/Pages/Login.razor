@@ -2,27 +2,35 @@
 
 <PageTitle Value="Login" />
 
-<div class="component-login text-center">
+<Card Title="Login">
     <form @onsubmit="@LoginAsync">
+        @if (!IsValid)
+        {
+            <div class="mb-3 text-danger">
+                <Icon Identifier="exclamation-triangle" />
+                Invalid username or password.
+            </div>
+        }
 
-        <img src="/img/icon-512x512.png" class="my-4" />
-
-        <Validation ErrorMessages="ErrorMessages" />
-
-        <input type="text" class="form-control" placeholder="Username..." @bind="UserName" />
-        <input type="password" class="form-control" placeholder="Password..." @bind="Password" />
-
-        <div class="checkbox mb-4">
-            <label>
-                <input type="checkbox" value="remember-me" @bind="IsPersistent" /> Remember me
-            </label>
+        <div class="input-control mb-3">
+            <Icon Identifier="user" />
+            <input type="text" class="form-control" placeholder="Username..." @bind="UserName" />
+        </div>
+        <div class="input-control mb-3">
+            <Icon Identifier="lock" />
+            <input type="password" class="form-control" placeholder="Password..." @bind="Password" />
         </div>
 
-        <div class="mb-3 mx-4">
-            <button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="remember-me" @bind="IsPersistent" />
+            <label class="form-check-label" for="remember-me">Remember me for 14 days</label>
         </div>
+
         <div class="mb-3">
-            <a href="@Navigator.UrlRegister()">Register a new account</a>
+            <button type="submit" class="btn btn-salmon btn-block">Login</button>
+        </div>
+        <div>
+            <a href="@Navigator.UrlRegister()" class="btn btn-block btn-secondary">Register a new account</a>
         </div>
     </form>
-</div>
+</Card>

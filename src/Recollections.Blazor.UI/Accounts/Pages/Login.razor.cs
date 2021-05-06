@@ -23,14 +23,13 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected UserState UserState { get; set; }
 
         [Required]
-        public string UserName { get; set; }
+        protected string UserName { get; set; }
 
         [Required]
-        public string Password { get; set; }
+        protected string Password { get; set; }
 
-        public bool IsPersistent { get; set; } = true;
-
-        public List<string> ErrorMessages { get; } = new List<string>();
+        protected bool IsPersistent { get; set; } = true;
+        protected bool IsValid { get; set; } = true;
 
         protected async override Task OnInitializedAsync()
         {
@@ -44,11 +43,11 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected async Task LoginAsync()
         {
             Log.Debug($"UserName: '{UserName}'");
-            Log.Debug($"Password: '{Password.Length}'");
+            Log.Debug($"Password: '{Password?.Length ?? 0}'");
 
-            ErrorMessages.Clear();
-            if (!await UserState.LoginAsync(UserName, Password, IsPersistent))
-                ErrorMessages.Add("Invalid combination of username and password.");
+            IsValid = true;
+            if (String.IsNullOrEmpty(UserName) || String.IsNullOrEmpty(Password) || !await UserState.LoginAsync(UserName, Password, IsPersistent))
+                IsValid = false;
         }
     }
 }
