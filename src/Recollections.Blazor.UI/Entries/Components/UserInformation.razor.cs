@@ -12,6 +12,9 @@ namespace Neptuo.Recollections.Entries.Components
 {
     public partial class UserInformation
     {
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
         [CascadingParameter]
         public UserState UserState { get; set; }
 
