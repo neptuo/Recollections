@@ -6,17 +6,43 @@ const options = {
     pswpCSS: '/_content/Recollections.Blazor.Components/photoswipe/photoswipe.css'
 };
 const lightbox = new PhotoSwipeLightbox(options);
+let autoPlayTimer = null;
+let stopCallback = () => { };
+
+const playDurationSeconds = 4;
+const playIcon = '<i class="fas fa-play"></i>';
+const pauseIcon = '<i class="fas fa-pause"></i>';
+
+function play(el) {
+    autoPlayTimer = setInterval(() => { lightbox.pswp.next() }, playDurationSeconds * 1000);
+    el.innerHTML = pauseIcon;
+    lightbox.pswp.next();
+}
+
+function stop(el) {
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = null;
+    el.innerHTML = playIcon;
+
+    stopCallback();
+}
 
 export function initialize(interop, images) {
     lightbox.on('uiRegister', function () {
         lightbox.pswp.ui.registerElement({
-            name: 'test-button',
+            name: 'autoplay',
             order: 9,
             isButton: true,
-            html: 'Test',
+            html: playIcon,
             onClick: (event, el) => {
-                if (confirm('Do you want to toggle zoom?')) {
-                    lightbox.pswp.toggleZoom();
+                lightbox.pswp.on('close', () => {
+                    stop(el);
+                });
+
+                if (autoPlayTimer == null) {
+                    play(el);
+                } else {
+                    stop(el);
                 }
             }
         });
@@ -30,6 +56,32 @@ export function initialize(interop, images) {
             onInit: (el, pswp) => {
                 lightbox.pswp.on('change', () => {
                     el.innerHTML = lightbox.pswp.currSlide.data.alt || '';
+                });
+            }
+        });
+
+        lightbox.pswp.ui.registerElement({
+            name: 'autoplay-progress',
+            order: 9,
+            isButton: false,
+            appendTo: 'root',
+            html: '',
+            onInit: (el, pswp) => {
+                stopCallback = () => {
+                    el.style.display = "none";
+                }
+
+                lightbox.pswp.on('change', () => {
+                    if (autoPlayTimer != null) {
+                        el.style.display = "block";
+                        el.style.transition = "";
+                        el.style.width = "0%";
+                        el.offsetHeight;
+                        el.style.transition = "width " + playDurationSeconds + "s linear";
+                        el.style.width = "100%";
+                    } else {
+                        el.style.display = "none";
+                    }
                 });
             }
         });

@@ -565,6 +565,15 @@ h4 .inline-editor-viewmode .oi {
   text-align: center;
   font-size: 1.8rem; }
 
+.pswp__button--autoplay {
+  color: white; }
+
+.pswp__autoplay-progress {
+  height: 3px;
+  background: white;
+  position: absolute;
+  bottom: 0px; }
+
 .entry-picker .modal-body {
   padding: 0; }
 
