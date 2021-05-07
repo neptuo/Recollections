@@ -1,4 +1,4 @@
-﻿<Modal @ref="Modal" Title="Select beings" CssClass="beings" FormSubmit="@OnSubmit">
+﻿<Modal @ref="Modal" Title="Select beings" CssClass="beings" OnFormSubmit="@OnSubmit">
     <ChildContent>
         <ListView Items="@Beings" IsLoading="@IsLoading" Context="being">
             <div class="card mb-3 @(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)">

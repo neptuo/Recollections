@@ -87,7 +87,7 @@
         </PermissionContainer>
     </CascadingValue>
 
-    <Modal @ref="@LocationEdit" Title="Location" FormSubmit="@(async () => await SaveSelectedLocationAsync())">
+    <Modal @ref="@LocationEdit" Title="Location" OnFormSubmit="@(async () => await SaveSelectedLocationAsync())">
         <ChildContent>
             @if (SelectedLocation != null)
             {

@@ -36,18 +36,15 @@ namespace Neptuo.Recollections.Components
         public string CloseButtonText { get; set; } = "Close";
 
         [Parameter]
-        public Action FormSubmit { get; set; }
+        public EventCallback OnFormSubmit { get; set; }
 
         [Parameter]
-        public Action CloseButtonClick { get; set; }
+        public Action OnClose { get; set; }
 
         protected string DialogCssClass { get; set; }
 
         [Parameter]
         public ModalSize Size { get; set; } = ModalSize.Normal;
-
-        [Parameter]
-        public Action Closed { get; set; }
 
         protected ElementReference Container { get; set; }
 
@@ -71,14 +68,12 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        protected void OnFormSubmit(EventArgs e) => FormSubmit?.Invoke();
-
         protected void OnCloseButtonClick()
         {
             Log.Debug("Modal.OnCloseButtonClick");
 
-            if (CloseButtonClick != null)
-                CloseButtonClick();
+            if (OnClose != null)
+                OnClose();
             else
                 Hide();
         }
