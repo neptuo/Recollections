@@ -6,9 +6,9 @@
 <PageTitle Value="@Title" />
 
 <h3 class="d-flex align-items-center my-4">
-    <a class="mr-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
+    <a class="me-auto btn btn btn-secondary btn-sm" href="@GetPrevPeriodUrl()">Prev</a>
     <span>
-        <Icon Prefix="far" Identifier="calendar-alt" CssClass="mr-2" OnClick="@(() => DatePicker.Show())" />
+        <Icon Prefix="far" Identifier="calendar-alt" CssClass="me-2" OnClick="@(() => DatePicker.Show())" />
 
         @if (IsMonthView)
         {
@@ -27,7 +27,7 @@
         }
 
     </span>
-    <a class="ml-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
+    <a class="ms-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
 </h3>
 
 @if (IsMonthView)

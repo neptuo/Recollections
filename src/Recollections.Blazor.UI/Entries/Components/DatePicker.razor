@@ -3,8 +3,8 @@
         @if (CurrentPart == DatePickerPart.Year)
         {
             <h5 class="d-flex align-items-center mb-2">
-                <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear -= 12)">Prev</button>
-                <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear += 12)">Next</button>
+                <button class="me-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear -= 12)">Prev</button>
+                <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear += 12)">Next</button>
             </h5>
 
             <div class="row">
@@ -13,7 +13,7 @@
                     var year = i;
 
                     <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
-                        <button class="btn btn-outline-salmon btn-block" @onclick="@(() => OnYearSelected(year))">
+                        <button class="btn btn-outline-salmon d-block w-100" @onclick="@(() => OnYearSelected(year))">
                             @i
                         </button>
                     </div>
@@ -23,11 +23,11 @@
         else if (CurrentPart == DatePickerPart.Month)
         {
             <h5 class="d-flex align-items-center mb-2">
-                <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear--)">Prev</button>
+                <button class="me-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear--)">Prev</button>
                 <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Year)">
                     @CurrentYear
                 </span>
-                <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear++)">Next</button>
+                <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear++)">Next</button>
             </h5>
 
             <div class="row">
@@ -37,7 +37,7 @@
                     var monthName = MonthNames[i];
 
                     <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
-                        <button class="btn btn-outline-salmon btn-block" @onclick="@(() => OnMonthSelected(month))">
+                        <button class="btn btn-outline-salmon d-block w-100" @onclick="@(() => OnMonthSelected(month))">
                             @monthName
                         </button>
                     </div>
@@ -47,16 +47,16 @@
         else
         {
             <h5 class="d-flex align-items-center mb-2">
-                <button class="mr-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = PrevMonth(CurrentYear, CurrentMonth); })">Prev</button>
+                <button class="me-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = PrevMonth(CurrentYear, CurrentMonth); })">Prev</button>
                 <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Month)">
                     @MonthNames[CurrentMonth - 1]
                     @CurrentYear
                 </span>
-                <button class="ml-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = NextMonth(CurrentYear, CurrentMonth); })">Next</button>
+                <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = NextMonth(CurrentYear, CurrentMonth); })">Next</button>
             </h5>
 
             <MonthView Year="@CurrentYear" Month="@CurrentMonth" Context="day">
-                <button class="btn btn-outline-salmon btn-block" @onclick="@(() => OnDaySelected(day))">
+                <button class="btn btn-outline-salmon d-block w-100" @onclick="@(() => OnDaySelected(day))">
                     @day
                 </button>
             </MonthView>

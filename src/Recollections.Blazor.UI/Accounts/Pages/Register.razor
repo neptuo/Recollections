@@ -26,11 +26,9 @@
             <input type="password" class="form-control" placeholder="Password..." @bind="Password" />
         </div>
 
-        <div class="mb-3">
-            <button type="submit" class="btn btn-salmon btn-block">Register</button>
-        </div>
-        <div>
-            <a href="@Navigator.UrlLogin()" class="btn btn-block btn-secondary">I already have an account</a>
+        <div class="d-grid gap-3">
+            <button type="submit" class="btn btn-salmon">Register</button>
+            <a href="@Navigator.UrlLogin()" class="btn btn-secondary">I already have an account</a>
         </div>
     </form>
 </Card>

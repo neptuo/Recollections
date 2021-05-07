@@ -32,16 +32,16 @@
             <Icon Identifier="calendar-alt" />
             @if (Value == DateTime.MinValue)
             {
-                <span class="ml-1 inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
+                <span class="ms-1 inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else
             {
-                <span class="ml-1 inline-editor-content">
+                <span class="ms-1 inline-editor-content">
                     @Value.ToString(Format ?? "yyyy-MM-dd")
                     
                     @if (IsTimeSelection)
                     {
-                        <span class="ml-1">
+                        <span class="ms-1">
                             @Value.ToString(@TimeFormat)
                         </span>
                     }

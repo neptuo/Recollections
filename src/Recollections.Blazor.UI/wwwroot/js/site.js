@@ -262,7 +262,7 @@ window.InlineMarkdownEdit = {
                 "horizontal-rule",
                 {
                     name: "cancel",
-                    className: "fa fa-times float-right",
+                    className: "fa fa-times float-end",
                     title: "Close Editor",
                     action: function (editor) {
                         interop.invokeMethodAsync("Markdown.OnCancel");
@@ -270,7 +270,7 @@ window.InlineMarkdownEdit = {
                 },
                 {
                     name: "save",
-                    className: "fa fa-check float-right",
+                    className: "fa fa-check float-end",
                     title: "Save",
                     action: function (editor) {
                         var value = editor.value();

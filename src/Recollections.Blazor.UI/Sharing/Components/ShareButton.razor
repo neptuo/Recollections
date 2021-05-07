@@ -9,55 +9,53 @@
         Share
     </TitleContent>
     <ChildContent>
-        <div class="container">
-            <div class="row">
-                <div class="col">
-                    <button class="btn btn-primary btn-block btn-sm" @onclick="@OnPublicShareAsync" disabled="@HasPublic">
-                        Make visible for everyone
-                    </button>
-                </div>
+        <div class="row">
+            <div class="col">
+                <button class="btn btn-primary d-block w-100" @onclick="@OnPublicShareAsync" disabled="@HasPublic">
+                    Make visible for everyone
+                </button>
             </div>
-            <div class="row mt-1 mb-3">
-                <div class="col text-center">
-                    or share with specific user
-                </div>
+        </div>
+        <div class="row mt-1 mb-3">
+            <div class="col text-center text-muted">
+                or share with specific user
             </div>
-            <div class="row">
+        </div>
+        <div class="row">
+            <div class="col">
+                <input @bind="@NewShare.UserName" type="text" class="form-control form-control-sm" placeholder="Username..." />
+            </div>
+            <div class="col-3">
+                <select @bind="@NewShare.Permission" class="form-select form-select-sm">
+                    <option>Read</option>
+                    <option>Write</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-sm btn-primary" @onclick="OnAddAsync">
+                    <Icon Identifier="plus" />
+                </button>
+            </div>
+        </div>
+        <hr />
+        <ListView Items="@Items" IsLoading="@AreItemsLoading" Context="model" T="@ShareModel">
+            <div class="row" @key="@model.UserName">
                 <div class="col">
-                    <input @bind="@NewShare.UserName" type="text" class="form-control form-control-sm" placeholder="Username..." />
+                    <strong>
+                        @(model.UserName ?? "public")
+                    </strong>
                 </div>
                 <div class="col-3">
-                    <select @bind="@NewShare.Permission" class="form-select form-select-sm">
-                        <option>Read</option>
-                        <option>Write</option>
-                    </select>
+                    <span class="ms-2">
+                        @model.Permission
+                    </span>
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-sm btn-primary" @onclick="OnAddAsync">
-                        <Icon Identifier="plus" />
+                    <button class="btn btn-sm btn-danger" @onclick="@(async () => await OnDeleteAsync(model))">
+                        <Icon Identifier="times" />
                     </button>
                 </div>
             </div>
-            <hr />
-            <ListView Items="@Items" IsLoading="@AreItemsLoading" Context="model" T="@ShareModel">
-                <div class="row" @key="@model.UserName">
-                    <div class="col">
-                        <strong>
-                            @(model.UserName ?? "public")
-                        </strong>
-                    </div>
-                    <div class="col-3">
-                        <span class="ml-2">
-                            @model.Permission
-                        </span>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-sm btn-danger" @onclick="@(async () => await OnDeleteAsync(model))">
-                            <Icon Identifier="times" />
-                        </button>
-                    </div>
-                </div>
-            </ListView>
-        </div>
+        </ListView>
     </ChildContent>
 </Modal>

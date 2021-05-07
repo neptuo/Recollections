@@ -32,11 +32,11 @@
             <Icon Identifier="location-arrow" />
             @if (Value == null || !Value.HasValue())
             {
-                <span class="ml-1 inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
+                <span class="ms-1 inline-editor-content placeholder">@(PlaceHolder ?? "No value...")</span>
             }
             else
             {
-                <span class="ml-1 inline-editor-content">@Value?.ToString()</span>
+                <span class="ms-1 inline-editor-content">@Value?.ToString()</span>
             }
         </a>
     }
