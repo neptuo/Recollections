@@ -39,10 +39,10 @@ namespace Neptuo.Recollections.Accounts.Components
 
                     await Task.Delay(2 * 1000);
 
+                    Hide();
+
                     IsChanged = false;
                     StateHasChanged();
-
-                    Hide();
                 }
                 else
                 {
