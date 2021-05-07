@@ -33,16 +33,29 @@ namespace Neptuo.Recollections.Accounts.Pages
         {
             await base.OnInitializedAsync();
             await UserState.EnsureInitializedAsync();
-            await LoadAsync();
+        }
+
+        public async override Task SetParametersAsync(ParameterView parameters)
+        {
+            var oldUserId = UserId;
+            await base.SetParametersAsync(parameters);
+
+            if (oldUserId != UserId)
+                await LoadAsync();
         }
 
         protected async Task LoadAsync()
         {
+            Model = null;
+            Owner = null;
+
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetProfileAsync(UserId);
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.Write;
             Permissions.IsOwner = UserState.UserId == UserId;
+
+            StateHasChanged();
         }
     }
 }
