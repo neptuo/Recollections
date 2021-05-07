@@ -1,4 +1,4 @@
-﻿<div class="alert @ModeCssClass" role="alert">
+﻿<div class="alert @ModeCssClass @CssClass" role="alert">
     @if (OnDismiss.HasDelegate)
     {
         <button type="button" class="btn-close" @onclick="@OnDismiss"></button>
@@ -27,4 +27,6 @@
             </div>
         }
     }
+
+    @ChildContent
 </div>

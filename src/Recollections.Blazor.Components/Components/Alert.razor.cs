@@ -20,6 +20,9 @@ namespace Neptuo.Recollections.Components
         public IEnumerable<string> Messages { get; set; }
 
         [Parameter]
+        public RenderFragment ChildContent { get; set; }
+
+        [Parameter]
         public EventCallback OnDismiss { get; set; }
 
         private AlertMode mode;
@@ -36,8 +39,10 @@ namespace Neptuo.Recollections.Components
                     UpdateModeCssClass();
                 }
             }
-
         }
+
+        [Parameter]
+        public string CssClass { get; set; }
 
         protected string ModeCssClass { get; set; }
 

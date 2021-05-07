@@ -22,7 +22,10 @@ namespace Neptuo.Recollections.Accounts.Components
         protected Navigator Navigator { get; set; }
 
         [CascadingParameter]
-        protected UserState UserState { get; set; }
+        public UserState UserState { get; set; }
+
+        [Parameter]
+        public EventCallback OnChangePassword { get; set; }
 
         protected ElementReference MeButton { get; set; }
 
