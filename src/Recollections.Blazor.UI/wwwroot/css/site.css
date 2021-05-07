@@ -557,6 +557,14 @@ h4 .inline-editor-viewmode .oi {
   .entry-detail .placeholder {
     color: #aaaaaa; }
 
+.pswp__title {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  color: white;
+  text-align: center;
+  font-size: 1.8rem; }
+
 .entry-picker .modal-body {
   padding: 0; }
 
