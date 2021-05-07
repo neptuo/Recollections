@@ -95,7 +95,7 @@ namespace Neptuo.Recollections
             => uri.NavigateTo(UrlRegister());
 
         public string UrlProfile(string userId)
-            => $"/user/{userId}";
+            => $"/users/{userId}";
 
         public void OpenProfile(string userId)
             => uri.NavigateTo(UrlProfile(userId));
