@@ -54,6 +54,32 @@
             }
         }
     },
+    Dropdown: {
+        Init: function (container) {
+            var dropDown = bootstrap.Dropdown.getInstance(container);
+            if (dropDown == null) {
+                dropDown = new bootstrap.Dropdown(container);
+            }
+        },
+        Show: function (container) {
+            var dropDown = bootstrap.Dropdown.getInstance(container);
+            if (dropDown != null) {
+                dropDown.show();
+            }
+        },
+        Hide: function (container) {
+            var dropDown = bootstrap.Dropdown.getInstance(container);
+            if (dropDown != null) {
+                dropDown.hide();
+            }
+        },
+        Dispose: function (container) {
+            var dropDown = bootstrap.Dropdown.getInstance(container);
+            if (dropDown != null) {
+                dropDown.dispose();
+            }
+        }
+    },
     Popover: {
         Show: function (container) {
             var popover = bootstrap.Popover.getInstance(container);

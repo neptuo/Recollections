@@ -29,8 +29,8 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="navbar-collapse @(IsMainMenuVisible ? "" : "collapse")">
-            <ul class="navbar-nav large-navbar-nav me-auto">
+        <div class="navbar-collapse justify-content-between @(IsMainMenuVisible ? "" : "collapse")">
+            <ul class="navbar-nav large-navbar-nav">
                 @foreach (var menuItem in MenuItems)
                 {
                     if (menuItem.IsLarge)

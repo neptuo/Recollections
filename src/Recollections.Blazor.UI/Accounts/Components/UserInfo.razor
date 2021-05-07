@@ -1,17 +1,55 @@
 ﻿@if (UserState.IsAuthenticated)
 {
-    <li class="nav-item me-2">
-        <a @ref="MeButton" class="btn btn-outline-info border-0" href="/me" title="About me" data-toggle="tooltip" data-placement="bottom">
-            <Icon Identifier="user" />
-            About me
+    <li class="nav-item dropdown d-none d-lg-block">
+        <a @ref="MeButton" class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            <Icon Identifier="user-circle" />
+            Me
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <a class="dropdown-item" href="@Navigator.UrlProfile(UserState.UserId)">
+                    <Icon Identifier="address-card" />
+                    Profile
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item">
+                    <Icon Identifier="key" />
+                    Change password
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a class="dropdown-item text-danger" @onclick="@LogoutAsync">
+                    <Icon Prefix="fas" Identifier="sign-out-alt" />
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </li>
+    <li class="d-block d-lg-none">
+        <a class="nav-link" href="@Navigator.UrlProfile(UserState.UserId)">
+            <Icon Identifier="address-card" />
+            Profile
         </a>
     </li>
-    <li class="nav-item">
-        <button type="button" class="btn btn-outline-danger border-0" @onclick="@LogoutAsync">
+    <li class="d-block d-lg-none">
+        <a class="nav-link">
+            <Icon Identifier="key" />
+            Change password
+        </a>
+    </li>
+    <li class="d-block d-lg-none">
+        <a class="nav-link text-danger" @onclick="@LogoutAsync">
             <Icon Prefix="fas" Identifier="sign-out-alt" />
+            Logout
+        </a>
+    </li>
+    @*<li class="nav-item">
+        <button type="button" class="btn btn-outline-danger border-0" @onclick="@LogoutAsync">
             Log out
         </button>
-    </li>
+    </li>*@
 }
 else
 {

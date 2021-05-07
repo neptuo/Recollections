@@ -16,7 +16,7 @@ namespace Neptuo.Recollections.Accounts.Components
         protected ILog<UserInfo> Log { get; set; }
 
         [Inject]
-        protected TooltipInterop TooltipInterop { get; set; }
+        protected DropdownInterop DropdownInterop { get; set; }
 
         [Inject]
         protected Navigator Navigator { get; set; }
@@ -25,7 +25,6 @@ namespace Neptuo.Recollections.Accounts.Components
         protected UserState UserState { get; set; }
 
         protected ElementReference MeButton { get; set; }
-        protected ElementReference LogoutButton { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
@@ -39,14 +38,14 @@ namespace Neptuo.Recollections.Accounts.Components
             await base.OnAfterRenderAsync(firstRender);
 
             if (UserState.IsAuthenticated)
-                await TooltipInterop.InitializeAsync(MeButton);
+                await DropdownInterop.InitializeAsync(MeButton);
         }
 
         public async ValueTask DisposeAsync()
         {
             UserState.UserInfoChanged -= OnUserInfoChanged;
 
-            await TooltipInterop.DisposeAsync(MeButton);
+            await DropdownInterop.DisposeAsync(MeButton);
         }
 
         private void OnUserInfoChanged()

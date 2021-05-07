@@ -27,6 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<Downloader>();
             services.AddTransient<MapInterop>();
             services.AddTransient<TooltipInterop>();
+            services.AddTransient<DropdownInterop>();
             services.AddTransient<PopoverInterop>();
             services.AddTransient<ElementReferenceInterop>();
             services.AddTransient<WindowInterop>();
