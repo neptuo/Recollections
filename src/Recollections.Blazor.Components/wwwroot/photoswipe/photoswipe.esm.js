@@ -589,7 +589,7 @@ class Slide {
 
     if (this.data.html) {
       this.addSlideHTML(this.data.html);
-    } else if (this.data.src || this.data.provider) {
+    } else if (this.data.src) {
       // Use image-based placeholder only for the first slide
       const useImagePlaceholder = this.data.msrc && this.isFirstSlide;
 
@@ -647,14 +647,7 @@ class Slide {
     // as it causes flash of image after it's loaded in Safari
     // this.image.decoding = 'async';
 
-    if (this.data.provider) {
-      this.data.provider.then((src) => {
-        this.image.src = src;
-      });
-    } else {
-      this.image.src = this.data.src;
-    }
-
+    this.image.src = this.data.src;
     if (this.data.srcset) {
       this.image.srcset = this.data.srcset;
     }
@@ -701,19 +694,11 @@ class Slide {
       this._appendImage();
       //}
 
-      const continuation = () => {
-        decodeImage(this.image).then(() => {
-          this._onImageLoaded();
-        }).catch(() => {
-          this._onImageLoaded(true);
-        });
-      }
-
-      if (this.data.provider) {
-        this.data.provider.then(() => continuation());
-      } else {
-        continuation();
-      }
+      decodeImage(this.image).then(() => {
+        this._onImageLoaded();
+      }).catch(() => {
+        this._onImageLoaded(true);
+      });
     }
   }
 
@@ -835,7 +820,7 @@ class Slide {
    * @private
    */
   _updateImagesSize() {
-    if ((!this.data.src && !this.data.provider) || !this.width) {
+    if (!this.data.src || !this.width) {
       return;
     }
 
@@ -1088,7 +1073,7 @@ class Slide {
   }
 
   _calculateSize() {
-    if ((this.data.src || this.data.provider) && !this.loadError) {
+    if (this.data.src && !this.loadError) {
       const { pswp } = this;
 
       equalizePoints(
