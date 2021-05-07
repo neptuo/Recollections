@@ -58,6 +58,15 @@ namespace Neptuo.Recollections.Entries
 
     public class ProfileShare : ShareBase
     {
-        public string ProfileUserId { get; set; }
+        public string ProfileId { get; set; }
+
+        public ProfileShare()
+        { }
+
+        public ProfileShare(string profileId)
+        {
+            Ensure.NotNull(profileId, "profileId");
+            ProfileId = profileId;
+        }
     }
 }

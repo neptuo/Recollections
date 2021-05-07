@@ -11,6 +11,9 @@ namespace Neptuo.Recollections.Components
     public partial class ActionPanel : ComponentBase
     {
         [Parameter]
+        public string CssClass { get; set; }
+
+        [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         [Parameter]

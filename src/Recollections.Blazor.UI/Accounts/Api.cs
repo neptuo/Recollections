@@ -2,6 +2,7 @@
 using Neptuo;
 using Neptuo.Activators;
 using Neptuo.Recollections.Commons.Exceptions;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,8 +44,8 @@ namespace Neptuo.Recollections.Accounts
         public Task<RegisterResponse> RegisterAsync(RegisterRequest request) 
             => faultHandler.Wrap(http.PostAsJsonAsync<RegisterRequest, RegisterResponse>("accounts/register", request));
 
-        public Task<UserInfoResponse> GetProfileAsync(string userId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<UserInfoResponse>($"profiles/{userId}"));
+        public Task<AuthorizedModel<ProfileModel>> GetProfileAsync(string userId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ProfileModel>>($"profiles/{userId}"));
 
         public async Task<UserInfoResponse> GetInfoAsync()
         {

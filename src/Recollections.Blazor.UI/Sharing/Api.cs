@@ -50,5 +50,14 @@ namespace Neptuo.Recollections.Sharing
 
         public Task DeleteBeingAsync(string beingId, ShareModel model)
             => faultHandler.Wrap(http.DeleteAsync($"beings/{beingId}/sharing/{model.UserName}"));
+
+        public Task<List<ShareModel>> GetProfileListAsync(string profileId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"profiles/{profileId}/sharing"));
+
+        public Task CreateProfileAsync(string profileId, ShareModel model)
+            => faultHandler.Wrap(http.PostAsJsonAsync($"profiles/{profileId}/sharing", model));
+
+        public Task DeleteProfileAsync(string profileId, ShareModel model)
+            => faultHandler.Wrap(http.DeleteAsync($"profiles/{profileId}/sharing/{model.UserName}"));
     }
 }

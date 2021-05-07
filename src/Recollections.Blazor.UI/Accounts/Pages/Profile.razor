@@ -1,13 +1,29 @@
 ﻿@page "/user/{UserId}"
 @layout Commons.Layouts.MainLayout
 
-<PageTitle Value="@UserName" />
+<PageTitle Value="@(Owner?.Name ?? UserId)" />
 
-<div class="row body-offset">
-    <div class="col-6">
-        <h2 class="mb-3">
-            <Icon Identifier="user" />
-            @UserName
-        </h2>
-    </div>
-</div>
+@if (Model != null)
+{
+    <CascadingValue Value="@Model">
+        <PermissionContainer State="@Permissions">
+            <div class="entry-detail">
+                <h2 class="title">
+                    <Icon Identifier="user" />
+                    @Owner.Name
+                </h2>
+
+                <div class="datetime">
+                    <Icon Identifier="calendar-day" />
+                    @Model.RegistrationDate.ToString(UiOptions.DateFormat)
+                </div>
+
+                <ActionPanel CssClass="mt-3">
+                    <PermissionView Request="@PermissionRequest.Owner">
+                        <ShareButton ProfileId="@Owner.Id" />
+                    </PermissionView>
+                </ActionPanel>
+            </div>
+        </PermissionContainer>
+    </CascadingValue>
+}

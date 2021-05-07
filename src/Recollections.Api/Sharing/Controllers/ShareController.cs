@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
@@ -89,6 +90,46 @@ namespace Neptuo.Recollections.Sharing.Controllers
             return GetItemsAsync(db.BeingShares.Where(s => s.BeingId == beingId));
         });
 
+        [HttpGet("profiles/{profileId}/sharing")]
+        [ProducesDefaultResponseType(typeof(ShareModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> GetProfileAsync([FromServices] ShareStatusService shareStatus, [FromServices] UserManager<User> userManager, string profileId) => RunProfileAsync(shareStatus, userManager, profileId, profile =>
+        {
+            return GetItemsAsync(db.ProfileShares.Where(s => s.ProfileId == profileId));
+        });
+
+        // DUPLICATED CODE FROM ProfileController.cs
+
+        protected Task<IActionResult> RunProfileAsync(ShareStatusService shareStatus, UserManager<User> userManager, string profileId, Func<User, Task<IActionResult>> handler)
+            => RunProfileAsync(shareStatus, userManager, profileId, null, handler);
+
+        protected async Task<IActionResult> RunProfileAsync(ShareStatusService shareStatus, UserManager<User> userManager, string profileId, Permission? sharePermission, Func<User, Task<IActionResult>> handler)
+        {
+            Ensure.NotNullOrEmpty(profileId, "profileId");
+
+            User entity = await userManager.FindByIdAsync(profileId);
+            if (entity == null)
+                return NotFound();
+
+            string userId = HttpContext.User.FindUserId();
+            if (entity.Id != userId)
+            {
+                if (sharePermission == null)
+                    return Unauthorized();
+                else if (sharePermission == Permission.Read && !await shareStatus.IsProfileSharedForReadAsync(profileId, userId))
+                    return Unauthorized();
+                else if (sharePermission == Permission.Write)
+                    return Unauthorized();
+            }
+
+            return await handler(entity);
+        }
+
+        // DUPLICATED CODE FROM ProfileController.cs
+
+
         private async Task<IActionResult> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)
             where T : ShareBase
         {
@@ -158,6 +199,19 @@ namespace Neptuo.Recollections.Sharing.Controllers
             );
         });
 
+        [HttpPost("profiles/{profileId}/sharing")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Task<IActionResult> CreateProfileAsync([FromServices] ShareStatusService shareStatus, [FromServices] UserManager<User> userManager, string profileId, ShareModel model) => RunProfileAsync(shareStatus, userManager, profileId, profile =>
+        {
+            return CreateAsync(
+                model,
+                userId => db.ProfileShares.Where(s => s.ProfileId == profileId && s.UserId == userId),
+                () => new ProfileShare(profileId)
+            );
+        });
+
         private async Task<IActionResult> DeleteAsync<T>(string userName, Func<string, IQueryable<T>> findQuery)
             where T : ShareBase
         {
@@ -200,6 +254,15 @@ namespace Neptuo.Recollections.Sharing.Controllers
             return await DeleteAsync(
                 userName,
                 userId => db.BeingShares.Where(s => s.BeingId == beingId && s.UserId == userId)
+            );
+        });
+
+        [HttpDelete("profiles/{profileId}/sharing/{userName}")]
+        public Task<IActionResult> DeleteProfileAsync([FromServices] ShareStatusService shareStatus, [FromServices] UserManager<User> userManager, string profileId, string userName) => RunProfileAsync(shareStatus, userManager, profileId, async profile =>
+        {
+            return await DeleteAsync(
+                userName,
+                userId => db.ProfileShares.Where(s => s.ProfileId == profileId && s.UserId == userId)
             );
         });
     }

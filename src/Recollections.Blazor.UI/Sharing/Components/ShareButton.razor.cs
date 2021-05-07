@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Neptuo;
 using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
@@ -26,6 +25,9 @@ namespace Neptuo.Recollections.Sharing.Components
         [Parameter]
         public string BeingId { get; set; }
 
+        [Parameter]
+        public string ProfileId { get; set; }
+
         protected bool AreItemsLoading { get; set; }
         protected Modal Modal { get; set; }
         protected List<ShareModel> Items { get; set; }
@@ -43,6 +45,8 @@ namespace Neptuo.Recollections.Sharing.Components
                 api = new StoryApi(Api, StoryId);
             else if (!String.IsNullOrEmpty(BeingId))
                 api = new BeingApi(Api, BeingId);
+            else if (!String.IsNullOrEmpty(ProfileId))
+                api = new ProfileApi(Api, ProfileId);
             else
                 throw Ensure.Exception.InvalidOperation("One of 'entryId' and 'storyId' must be provided.");
         }
@@ -165,6 +169,29 @@ namespace Neptuo.Recollections.Sharing.Components
 
             public Task<List<ShareModel>> GetListAsync()
                 => api.GetBeingListAsync(beingId);
+        }
+
+        class ProfileApi : IApi
+        {
+            private readonly Api api;
+            private readonly string profileId;
+
+            public ProfileApi(Api api, string profileId)
+            {
+                Ensure.NotNull(api, "api");
+                Ensure.NotNull(profileId, "profileId");
+                this.api = api;
+                this.profileId = profileId;
+            }
+
+            public Task CreateAsync(ShareModel model)
+                => api.CreateProfileAsync(profileId, model);
+
+            public Task DeleteAsync(ShareModel model)
+                => api.DeleteProfileAsync(profileId, model);
+
+            public Task<List<ShareModel>> GetListAsync()
+                => api.GetProfileListAsync(profileId);
         }
     }
 }
