@@ -122,8 +122,10 @@ function bindEvents(model, $container) {
     }
 
     function markerClick(e) {
-        var id = Number.parseInt(e.target.getId());
-        model.interop.invokeMethodAsync("MapInterop.MarkerSelected", id);
+        if (!("getPOI" in e.target)) {
+            var id = Number.parseInt(e.target.getId());
+            model.interop.invokeMethodAsync("MapInterop.MarkerSelected", id);
+        }
     }
 
     function moveMarkerOnCoords(id, coords) {
