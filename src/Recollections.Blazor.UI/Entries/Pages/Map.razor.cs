@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using System;
@@ -18,9 +19,13 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected PropertyCollection Properties { get; set; }
+
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
+        protected bool IsPointOfInterest { get; set; }
         protected List<MapEntryModel> Entries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
@@ -34,6 +39,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
+            IsPointOfInterest = await Properties.GetAsync("Map.PointOfInterest", false);
             Entries = await Api.GetMapListAsync();
 
             Markers.Clear();

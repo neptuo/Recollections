@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Components
         public bool IsResizable { get; set; }
 
         [Parameter]
-        public bool IsPointOfInterest { get; set; } = true;
+        public bool IsPointOfInterest { get; set; }
 
         [CascadingParameter]
         public FormState FormState { get; set; }

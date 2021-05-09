@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo;
@@ -26,6 +27,9 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [HttpGet]
+        [ProducesDefaultResponseType(typeof(List<UserPropertyModel>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetListAsync()
         {
             string userId = HttpContext.User.FindUserId();

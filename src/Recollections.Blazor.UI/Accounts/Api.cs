@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Neptuo;
-using Neptuo.Activators;
+﻿using Neptuo.Activators;
 using Neptuo.Recollections.Commons.Exceptions;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -11,7 +9,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts
@@ -47,23 +44,11 @@ namespace Neptuo.Recollections.Accounts
         public Task<AuthorizedModel<ProfileModel>> GetProfileAsync(string userId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ProfileModel>>($"profiles/{userId}"));
 
-        public async Task<UserInfoResponse> GetInfoAsync()
-        {
-            try
-            {
-                HttpResponseMessage response = await http.GetAsync("accounts/info");
-                if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    throw new UnauthorizedAccessException();
+        public Task<List<UserPropertyModel>> GetPropertiesAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<UserPropertyModel>>("accounts/properties"));
 
-                UserInfoResponse responseModel = await response.Content.ReadFromJsonAsync<UserInfoResponse>();
-                return responseModel;
-            }
-            catch (Exception e)
-            {
-                faultHandler.Handle(e);
-                throw;
-            }
-        }
+        public Task SetPropertyAsync(UserPropertyModel model)
+            => faultHandler.Wrap(http.PutAsJsonAsync("accounts/properties", model));
 
         public Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
             => faultHandler.Wrap(http.PostAsJsonAsync<ChangePasswordRequest, ChangePasswordResponse>("accounts/changepassword", request));
