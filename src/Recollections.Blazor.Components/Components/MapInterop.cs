@@ -10,25 +10,29 @@ namespace Neptuo.Recollections.Components
 {
     public class MapInterop
     {
-        private readonly IJSRuntime jsRuntime;
+        private readonly IJSRuntime js;
+        private IJSObjectReference module;
         private Map editor;
 
-        public MapInterop(IJSRuntime jsRuntime)
+        public MapInterop(IJSRuntime js)
         {
-            Ensure.NotNull(jsRuntime, "jsRuntime");
-            this.jsRuntime = jsRuntime;
+            Ensure.NotNull(js, "js");
+            this.js = js;
         }
 
-        public ValueTask InitializeAsync(Map editor)
+        public async Task InitializeAsync(Map editor)
         {
             this.editor = editor;
-            return jsRuntime.InvokeVoidAsync(
-                "MapInterop.Initialize", 
-                editor.Container, 
-                DotNetObjectReference.Create(this), 
-                editor.Markers, 
-                editor.IsZoomed, 
-                editor.IsResizable, 
+
+            module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
+
+            await module.InvokeVoidAsync(
+                "initialize",
+                editor.Container,
+                DotNetObjectReference.Create(this),
+                editor.Markers,
+                editor.IsZoomed,
+                editor.IsResizable,
                 editor.IsEditable
             );
         }
@@ -45,7 +49,7 @@ namespace Neptuo.Recollections.Components
         public Task<IEnumerable<MapSearchModel>> SearchAsync(string searchQuery)
         {
             searchCompletion = new TaskCompletionSource<IEnumerable<MapSearchModel>>();
-            _ = jsRuntime.InvokeVoidAsync("MapInterop.Search", editor.Container, searchQuery);
+            _ = module.InvokeVoidAsync("search", editor.Container, searchQuery);
 
             return searchCompletion.Task;
         }
@@ -57,7 +61,7 @@ namespace Neptuo.Recollections.Components
             searchCompletion = null;
         }
 
-        public ValueTask CenterAtAsync(double latitude, double longitude)
-            => jsRuntime.InvokeVoidAsync("MapInterop.CenterAt", editor.Container, latitude, longitude);
+        public async Task CenterAtAsync(double latitude, double longitude)
+            => await module.InvokeVoidAsync("centerAt", editor.Container, latitude, longitude);
     }
 }
