@@ -41,7 +41,7 @@
       ]
     },
     {
-      "library": "popper.js@1.16.1",
+      "library": "popper.js@2.9.2",
       "destination": "wwwroot/lib/popper",
       "files": [
         "umd/*"

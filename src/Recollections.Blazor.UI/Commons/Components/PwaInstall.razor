@@ -1,7 +1,7 @@
 ﻿@if (IsInstallable)
 {
     <li class="nav-item me-2">
-        <a @ref="Button" class="nav-link" @onclick="InstallAsync" title="Install as application to your device" data-toggle="tooltip" data-placement="bottom">
+        <a @ref="Button" class="nav-link" @onclick="InstallAsync" title="Install as application to your device" data-bs-toggle="tooltip" data-bs-placement="bottom">
             <Icon Identifier="cloud-download-alt" />
             Install
         </a>
@@ -10,7 +10,7 @@
 else if (IsUpdateable)
 {
     <li class="nav-item me-2">
-        <a @ref="Button" class="nav-link" @onclick="UpdateAsync" title="Application update is ready. Click to complete the update." data-toggle="tooltip" data-placement="bottom">
+        <a @ref="Button" class="nav-link" @onclick="UpdateAsync" title="Application update is ready. Click to complete the update." data-bs-toggle="tooltip" data-bs-placement="bottom">
             <Icon Identifier="cloud-download-alt" />
             Update
         </a>
