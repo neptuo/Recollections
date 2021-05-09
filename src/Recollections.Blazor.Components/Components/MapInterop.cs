@@ -26,7 +26,10 @@ namespace Neptuo.Recollections.Components
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
 
-            await module.InvokeVoidAsync("ensureApi");
+            await module.InvokeVoidAsync(
+                "ensureApi",
+                editor.IsPointOfInterest
+            );
 
             await module.InvokeVoidAsync(
                 "initialize",
@@ -35,7 +38,8 @@ namespace Neptuo.Recollections.Components
                 editor.Markers,
                 editor.IsZoomed,
                 editor.IsResizable,
-                editor.IsEditable
+                editor.IsEditable,
+                editor.IsPointOfInterest
             );
         }
 

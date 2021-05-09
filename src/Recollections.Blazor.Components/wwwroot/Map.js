@@ -1,35 +1,54 @@
 ﻿let isLoaded = false;
 
-export function ensureApi() {
+export function ensureApi(isPoi) {
     if (isLoaded) {
         return;
     }
 
     return new Promise(function (resolve, reject) {
+        let options = {};
+
+        if (isPoi) {
+            options.poi = true;
+        }
+
         window.Loader.lang = "en";
         window.Loader.async = true;
-        window.Loader.load(null, null, function () {
+        window.Loader.load(null, options, function () {
             isLoaded = true;
             resolve();
         });
     });
 }
 
-export function initialize(container, interop, markers, isZoomed, isResizable, isEditable) {
+export function initialize(container, interop, markers, isZoomed, isResizable, isEditable, isPoi) {
     let model = null;
 
     const $container = $(container);
     if ($container.data('map') == null) {
-        var map = new SMap($container.find('.map')[0]);
+        const map = new SMap($container.find('.map')[0]);
         map.addDefaultLayer(SMap.DEF_BASE).enable();
         map.addDefaultControls();
 
-        var layer = new SMap.Layer.Marker();
+        const layer = new SMap.Layer.Marker();
         map.addLayer(layer).enable();
 
         if (isResizable) {
-            var sync = new SMap.Control.Sync();
+            const sync = new SMap.Control.Sync();
             map.addControl(sync);
+        }
+
+        if (isPoi) {
+            const poiLayer = new SMap.Layer.Marker(undefined, {
+                poiTooltip: true
+            });
+            map.addLayer(poiLayer).enable();
+
+            var dataProvider = map.createDefaultDataProvider();
+            dataProvider.setOwner(map);
+            dataProvider.addLayer(poiLayer);
+            dataProvider.setMapSet(SMap.MAPSET_BASE);
+            dataProvider.enable();
         }
 
         model = {
