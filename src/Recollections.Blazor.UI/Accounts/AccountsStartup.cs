@@ -18,6 +18,7 @@ namespace Neptuo.Recollections.Accounts
 
             services
                 .AddTransient<TokenStorage>()
+                .AddSingleton<PropertyCollection>()
                 .AddBlazoredLocalStorage()
                 .AddBlazoredSessionStorage();
         }
