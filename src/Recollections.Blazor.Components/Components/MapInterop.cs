@@ -26,6 +26,8 @@ namespace Neptuo.Recollections.Components
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
 
+            await module.InvokeVoidAsync("ensureApi");
+
             await module.InvokeVoidAsync(
                 "initialize",
                 editor.Container,

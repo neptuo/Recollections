@@ -1,4 +1,21 @@
-﻿export function initialize(container, interop, markers, isZoomed, isResizable, isEditable) {
+﻿let isLoaded = false;
+
+export function ensureApi() {
+    if (isLoaded) {
+        return;
+    }
+
+    return new Promise(function (resolve, reject) {
+        window.Loader.lang = "en";
+        window.Loader.async = true;
+        window.Loader.load(null, null, function () {
+            isLoaded = true;
+            resolve();
+        });
+    });
+}
+
+export function initialize(container, interop, markers, isZoomed, isResizable, isEditable) {
     let model = null;
 
     const $container = $(container);
