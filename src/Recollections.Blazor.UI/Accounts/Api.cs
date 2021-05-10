@@ -52,8 +52,5 @@ namespace Neptuo.Recollections.Accounts
 
         public Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
             => faultHandler.Wrap(http.PostAsJsonAsync<ChangePasswordRequest, ChangePasswordResponse>("accounts/changepassword", request));
-
-        public Task<UserDetailResponse> GetDetailAsync()
-            => faultHandler.Wrap(http.GetFromJsonAsync<UserDetailResponse>("accounts/detail"));
     }
 }

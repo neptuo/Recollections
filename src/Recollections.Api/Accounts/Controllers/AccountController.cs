@@ -101,32 +101,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [Authorize]
-        [HttpGet("info")]
-        public IActionResult Info()
-        {
-            return Ok(new UserInfoResponse()
-            {
-                UserId = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier),
-                UserName = HttpContext.User.Identity.Name
-            });
-        }
-
-        [Authorize]
-        [HttpGet("detail")]
-        public async Task<IActionResult> Detail()
-        {
-            User user = await userManager.FindByNameAsync(HttpContext.User.Identity.Name);
-            if (user == null)
-                return NotFound();
-
-            return Ok(new UserDetailResponse()
-            {
-                UserName = user.UserName,
-                Created = user.Created
-            });
-        }
-
-        [Authorize]
         [HttpPost("changepassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
