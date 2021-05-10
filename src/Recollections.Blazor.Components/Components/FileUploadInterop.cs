@@ -12,23 +12,26 @@ namespace Neptuo.Recollections.Components
 {
     public class FileUploadInterop
     {
-        private readonly IJSRuntime jsRuntime;
+        private readonly IJSRuntime js;
+        private IJSObjectReference module;
         private readonly ILog<FileUploadInterop> log;
 
         public FileUpload Editor { get; set; }
 
-        public FileUploadInterop(IJSRuntime jsRuntime, ILog<FileUploadInterop> log)
+        public FileUploadInterop(IJSRuntime js, ILog<FileUploadInterop> log)
         {
-            Ensure.NotNull(jsRuntime, "jsRuntime");
+            Ensure.NotNull(js, "js");
             Ensure.NotNull(log, "log");
-            this.jsRuntime = jsRuntime;
+            this.js = js;
             this.log = log;
         }
 
         public async Task InitializeAsync(FileUpload editor, string bearerToken)
         {
             Editor = editor;
-            await jsRuntime.InvokeVoidAsync("FileUpload.Initialize", DotNetObjectReference.Create(this), editor.FormElement, bearerToken);
+
+            module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
+            await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this), editor.FormElement, bearerToken, true);
         }
 
         [JSInvokable("FileUpload.OnCompleted")]
