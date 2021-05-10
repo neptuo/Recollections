@@ -46,7 +46,7 @@
             </ul>
             <ul class="navbar-nav large-navbar-nav user-navbar">
                 <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
-                <UserInfo OnChangePassword="@(() => ChangePasswordModal.Show())" />
+                <UserInfo OnChangePassword="@(() => { IsMainMenuVisible = false; ChangePasswordModal.Show(); })" />
             </ul>
         </div>
     </div>
