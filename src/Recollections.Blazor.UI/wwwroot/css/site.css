@@ -294,7 +294,7 @@ h4 .inline-editor-viewmode .oi {
       padding: .375rem .75rem;
       border-radius: .25rem; } }
 
-@media (max-width: 490px) {
+@media (max-width: 510px) {
   footer {
     font-size: 13px; }
     footer .navbar-text {
