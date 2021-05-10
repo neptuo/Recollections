@@ -2,6 +2,7 @@
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,9 +26,11 @@ namespace Neptuo.Recollections.Entries.Pages
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
-        protected bool IsPointOfInterest { get; set; }
         protected List<MapEntryModel> Entries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
+
+        protected bool IsLoading { get; set; } = true;
+        protected bool IsPointOfInterest { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
@@ -39,8 +42,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadAsync()
         {
-            IsPointOfInterest = await Properties.GetAsync("Map.PointOfInterest", false);
             Entries = await Api.GetMapListAsync();
+            IsPointOfInterest = await Properties.IsPointOfInterestAsync();
 
             Markers.Clear();
             foreach (var entry in Entries)
@@ -53,6 +56,8 @@ namespace Neptuo.Recollections.Entries.Pages
                     Title = entry.Title
                 });
             }
+
+            IsLoading = false;
         }
 
         protected void OnMarkerSelected(int index)
@@ -60,5 +65,6 @@ namespace Neptuo.Recollections.Entries.Pages
             var entry = Entries[index];
             Navigator.OpenEntryDetail(entry.Id);
         }
+
     }
 }

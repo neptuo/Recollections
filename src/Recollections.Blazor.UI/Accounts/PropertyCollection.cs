@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neptuo;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,7 +51,26 @@ namespace Neptuo.Recollections.Accounts
                 return defaultValue;
             }
 
-            throw Ensure.Exception.InvalidOperation($"Property '{key}' is not supported.");
+            throw NotSupportedKey(key);
         }
+
+        public async Task SetAsync<T>(string key, T value)
+        {
+            Ensure.NotNull(key, "key");
+
+            if (!storage.TryGetValue(key, out var model))
+                throw NotSupportedKey(key);
+
+            string rawValue = null;
+            if (value != null && !Converts.Try(value, out rawValue))
+                throw Ensure.Exception.InvalidOperation($"Property type '{typeof(T).Name}' is not supported.");
+
+            model.Value = rawValue;
+
+            await api.SetPropertyAsync(model);
+        }
+
+        private static InvalidOperationException NotSupportedKey(string key) 
+            => Ensure.Exception.InvalidOperation($"Property '{key}' is not supported.");
     }
 }

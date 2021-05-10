@@ -3,6 +3,13 @@
 
 <PageTitle Value="Map" />
 
-<div class="mappage">
-    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkerSelected="OnMarkerSelected" IsResizable="true" IsPointOfInterest="@IsPointOfInterest" />
-</div>
+@if (!IsLoading)
+{
+    <div class="mappage">
+        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkerSelected="OnMarkerSelected" IsResizable="true" IsPointOfInterest="IsPointOfInterest">
+            <ButtonsContent>
+                <PoiToggleButton />
+            </ButtonsContent>
+        </Neptuo.Recollections.Components.Map>
+    </div>
+}

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Neptuo.Converters;
 using Neptuo.Events;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Commons;
@@ -56,10 +57,21 @@ namespace Neptuo.Recollections
                 .AddSingleton<Json>()
                 .AddTransient<Navigator>();
 
+            ConfigureConverts();
+
             common.ConfigureServices(services);
             accounts.ConfigureServices(services);
             entries.ConfigureServices(services);
             sharing.ConfigureServices(services);
+        }
+
+        private static void ConfigureConverts()
+        {
+            Converts.Repository
+                .AddToString<bool>()
+                .AddStringTo<bool>(Boolean.TryParse)
+                .AddToString<int>()
+                .AddStringTo<int>(Int32.TryParse);
         }
 
         private static void ConfigureComponents(RootComponentMappingCollection rootComponents)

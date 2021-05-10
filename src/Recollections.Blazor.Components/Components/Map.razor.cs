@@ -38,6 +38,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsPointOfInterest { get; set; }
 
+        [Parameter]
+        public RenderFragment ButtonsContent { get; set; }
+
         [CascadingParameter]
         public FormState FormState { get; set; }
 
