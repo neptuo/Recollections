@@ -1,5 +1,5 @@
 ﻿
-export function initialize(interop, form, bearerToken, isDragAndDrop) {
+export function initialize(interop, form, bearerToken, dragAndDropTarget) {
     form = $(form);
 
     if (form.data('fileUpload') != null)
@@ -104,26 +104,26 @@ export function initialize(interop, form, bearerToken, isDragAndDrop) {
         }
     });
 
-    if (isDragAndDrop) {
-        document.body.addEventListener('drag', function (e) {
+    if (dragAndDropTarget) {
+        dragAndDropTarget.addEventListener('drag', function (e) {
             e.preventDefault();
         });
-        document.body.addEventListener('dragstart', function (e) {
+        dragAndDropTarget.addEventListener('dragstart', function (e) {
             e.preventDefault();
         });
-        document.body.addEventListener('dragend', function (e) {
+        dragAndDropTarget.addEventListener('dragend', function (e) {
             e.preventDefault();
         });
-        document.body.addEventListener('dragover', function (e) {
+        dragAndDropTarget.addEventListener('dragover', function (e) {
             e.preventDefault();
         });
-        document.body.addEventListener('dragenter', function (e) {
+        dragAndDropTarget.addEventListener('dragenter', function (e) {
             e.preventDefault();
         });
-        document.body.addEventListener('dragleave', function (e) {
+        dragAndDropTarget.addEventListener('dragleave', function (e) {
             e.preventDefault();
         });
-        document.body.addEventListener('drop', function (e) {
+        dragAndDropTarget.addEventListener('drop', function (e) {
             addFilesToQueue(e.dataTransfer.files);
 
             if (uploadIndex == -1) {
@@ -133,7 +133,11 @@ export function initialize(interop, form, bearerToken, isDragAndDrop) {
             e.preventDefault();
         });
     }
-};
+}
+
+export function destroy() {
+
+}
 
 function uploadFile(file, url, bearerToken, onCompleted, onError, onProgress) {
     var formData = new FormData();

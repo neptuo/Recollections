@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public partial class FileUpload : ComponentBase
+    public partial class FileUpload : ComponentBase, IAsyncDisposable
     {
         public const string DefaultText = "Upload Images";
 
@@ -32,6 +32,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public Action<IReadOnlyCollection<FileUploadProgress>> Progress { get; set; }
 
+        [Parameter]
+        public ElementReference DragAndDropContainer { get; set; }
+
         public ElementReference FormElement { get; protected set; }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
@@ -46,6 +49,11 @@ namespace Neptuo.Recollections.Components
         {
             Log.Debug("FileUploadModel.OnCompleted");
             Progress?.Invoke(progresses);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Interop.DestroyAsync();
         }
     }
 }

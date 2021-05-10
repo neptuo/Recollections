@@ -43,6 +43,8 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string EntryId { get; set; }
 
+        protected ElementReference Container { get; set; }
+
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected OwnerModel Owner { get; set; }

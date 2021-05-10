@@ -31,7 +31,12 @@ namespace Neptuo.Recollections.Components
             Editor = editor;
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
-            await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this), editor.FormElement, bearerToken, true);
+            await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this), editor.FormElement, bearerToken, editor.DragAndDropContainer);
+        }
+
+        public async Task DestroyAsync()
+        {
+            await module.InvokeVoidAsync("destroy");
         }
 
         [JSInvokable("FileUpload.OnCompleted")]

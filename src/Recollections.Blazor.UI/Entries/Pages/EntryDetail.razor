@@ -6,7 +6,7 @@
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
-            <div class="entry-detail">
+            <div @ref="Container" class="entry-detail">
                 <h2 class="title">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 </h2>
@@ -68,7 +68,8 @@
                     <PermissionView Request="@PermissionRequest.Write">
                         <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
                                     BearerToken="@UserState.BearerToken"
-                                    Progress="@(async e => await OnUploadProgressAsync(e))" />
+                                    Progress="@(async e => await OnUploadProgressAsync(e))"
+                                    DragAndDropContainer="Container" />
                     </PermissionView>
                     <button type="button" class="btn btn-sm btn-primary" @onclick="(() => Gallery.Open(0))">
                         <Icon Identifier="images" />
