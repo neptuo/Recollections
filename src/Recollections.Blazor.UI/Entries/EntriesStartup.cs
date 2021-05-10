@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;

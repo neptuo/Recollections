@@ -26,9 +26,11 @@ namespace Neptuo.Recollections.Components
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
 
+            bool isPointOfInterest = editor.PointOfInterest?.IsEnabled ?? false;
+
             await module.InvokeVoidAsync(
                 "ensureApi",
-                editor.IsPointOfInterest
+                isPointOfInterest
             );
 
             await module.InvokeVoidAsync(
@@ -39,7 +41,7 @@ namespace Neptuo.Recollections.Components
                 editor.IsZoomed,
                 editor.IsResizable,
                 editor.IsEditable,
-                editor.IsPointOfInterest
+                isPointOfInterest
             );
         }
 

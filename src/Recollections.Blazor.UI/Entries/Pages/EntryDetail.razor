@@ -29,7 +29,7 @@
                 </div>
                 <div class="gps">
                     <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
-                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="@OnLocationSelected" />
+                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" PointOfInterest="PoiToggleButton" />
                     </MapToggle>
                 </div>
                 <div class="text">

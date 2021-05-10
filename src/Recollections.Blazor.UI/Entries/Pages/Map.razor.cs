@@ -30,10 +30,12 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         protected bool IsLoading { get; set; } = true;
-        protected bool IsPointOfInterest { get; set; }
+        protected PoiToggleButton PoiToggleButton { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
+            PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
+
             await base.OnInitializedAsync();
             await UserState.EnsureAuthenticatedAsync();
 
@@ -43,7 +45,6 @@ namespace Neptuo.Recollections.Entries.Pages
         private async Task LoadAsync()
         {
             Entries = await Api.GetMapListAsync();
-            IsPointOfInterest = await Properties.IsPointOfInterestAsync();
 
             Markers.Clear();
             foreach (var entry in Entries)

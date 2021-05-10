@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Components;
@@ -32,6 +33,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected ILog<EntryDetail> Log { get; set; }
+
+        [Inject]
+        protected PropertyCollection Properties { get; set; }
 
         [CascadingParameter]
         protected UserState UserState { get; set; }
@@ -69,10 +73,13 @@ namespace Neptuo.Recollections.Entries.Pages
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
+        protected PoiToggleButton PoiToggleButton { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
             Log.Debug("OnInitializedAsync");
+
+            PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
 
             await base.OnInitializedAsync();
             await UserState.EnsureInitializedAsync();

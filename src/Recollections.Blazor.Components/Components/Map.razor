@@ -4,13 +4,13 @@
     <div class="map-controls">
         @if (IsEditable)
         {
-            if (IsAdditive) 
+            if (IsAdditive)
             {
                 <button class="btn btn-sm btn-light btn-add-location me-1" title="Add Location">
                     <Icon Identifier="plus" />
                 </button>
-            } 
-            else if (IsClearable) 
+            }
+            else if (IsClearable)
             {
                 <button class="btn btn-sm btn-danger me-1" @onclick="@OnClearLocation" title="Clear location">
                     <Icon Identifier="trash-alt" />
@@ -18,7 +18,12 @@
             }
         }
 
-        @ButtonsContent
+        @if (PointOfInterest != null)
+        {
+            <button class="btn btn-sm btn-light me-1" title="@PointOfInterest.Title" @onclick="PointOfInterest.OnClickAsync">
+                <Icon Identifier="@PointOfInterest.IconIdentifier" />
+            </button>
+        }
 
         <button class="btn btn-sm btn-light btn-search" title="Search" @onclick="@(() => SearchModal.Show())">
             <Icon Identifier="search" />

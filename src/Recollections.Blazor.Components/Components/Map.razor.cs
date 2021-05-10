@@ -36,10 +36,7 @@ namespace Neptuo.Recollections.Components
         public bool IsResizable { get; set; }
 
         [Parameter]
-        public bool IsPointOfInterest { get; set; }
-
-        [Parameter]
-        public RenderFragment ButtonsContent { get; set; }
+        public IMapToggleButton PointOfInterest { get; set; }
 
         [CascadingParameter]
         public FormState FormState { get; set; }
@@ -60,12 +57,16 @@ namespace Neptuo.Recollections.Components
             && Markers[0].Latitude != null 
             && Markers[0].Longitude != null;
 
-        public async override Task SetParametersAsync(ParameterView parameters)
-        {
-            Log.Debug("SetParametersAsync");
-            await base.SetParametersAsync(parameters);
+        protected bool IsInitialized { get; set; }
 
-            Log.Debug($"Markers: '{Markers.Count}', has '{parameters.TryGetValue<IList<MapMarkerModel>>(nameof(Markers), out _)}'");
+        protected async override Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+
+            if (PointOfInterest != null)
+                await PointOfInterest.InitializeAsync();
+
+            IsInitialized = true;
         }
 
         private MapSearchModel selected;
@@ -73,6 +74,9 @@ namespace Neptuo.Recollections.Components
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("OnAfterRenderAsync");
+
+            if (!IsInitialized)
+                return;
 
             await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this);
