@@ -30,12 +30,13 @@
         </button>
 
         <div class="navbar-collapse justify-content-between @(IsMainMenuVisible ? "" : "collapse")">
-            <ul class="navbar-nav large-navbar-nav">
-                @foreach (var menuItem in MenuItems)
+            <ul class="navbar-nav large-navbar-nav w-100">
+                @for (int i = 0; i < MenuItems.Count; i++)
                 {
+                    var menuItem = MenuItems[i];
                     if (menuItem.IsLarge)
                     {
-                        <li class="nav-item">
+                        <li class="nav-item @(i == MenuItems.Count - 1 ? "me-lg-auto" : "")">
                             <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
                                 <Icon Identifier="@menuItem.Icon" />
                                 @menuItem.Text
@@ -43,8 +44,6 @@
                         </li>
                     }
                 }
-            </ul>
-            <ul class="navbar-nav large-navbar-nav user-navbar">
                 <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
                 <UserInfo OnChangePassword="@(() => { IsMainMenuVisible = false; ChangePasswordModal.Show(); })" />
             </ul>
