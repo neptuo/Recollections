@@ -6,6 +6,7 @@ const options = {
     pswpCSS: '/_content/Recollections.Blazor.Components/photoswipe/photoswipe.css'
 };
 const lightbox = new PhotoSwipeLightbox(options);
+let isInitiazed = false;
 let autoPlayTimer = null;
 let stopCallback = () => { };
 
@@ -36,66 +37,72 @@ function stop(el) {
 }
 
 export function initialize(interop, images) {
-    lightbox.on('uiRegister', function () {
-        lightbox.pswp.ui.registerElement({
-            name: 'autoplay',
-            order: 9,
-            isButton: true,
-            html: playIcon,
-            onClick: (event, el) => {
-                lightbox.pswp.on('close', () => {
-                    stop(el);
-                });
 
-                if (autoPlayTimer == null) {
-                    play(el);
-                } else {
-                    stop(el);
-                }
-            }
-        });
+    if (!isInitiazed) {
+        lightbox.on('uiRegister', function () {
+            lightbox.pswp.ui.registerElement({
+                name: 'autoplay',
+                order: 9,
+                isButton: true,
+                html: playIcon,
+                onClick: (event, el) => {
+                    lightbox.pswp.on('close', () => {
+                        stop(el);
+                    });
 
-        lightbox.pswp.ui.registerElement({
-            name: 'title',
-            order: 9,
-            isButton: false,
-            appendTo: 'root',
-            html: 'Caption text',
-            onInit: (el, pswp) => {
-                lightbox.pswp.on('change', () => {
-                    el.innerHTML = lightbox.pswp.currSlide.data.alt || '';
-                });
-            }
-        });
-
-        lightbox.pswp.ui.registerElement({
-            name: 'autoplay-progress',
-            order: 9,
-            isButton: false,
-            appendTo: 'root',
-            html: '',
-            onInit: (el, pswp) => {
-                stopCallback = () => {
-                    el.style.display = "none";
-                }
-
-                lightbox.pswp.on('change', () => {
-                    if (autoPlayTimer != null) {
-                        el.style.display = "block";
-                        el.style.transition = "";
-                        el.style.width = "0%";
-                        el.offsetHeight;
-                        el.style.transition = "width " + playDurationSeconds + "s linear";
-                        el.style.width = "100%";
+                    if (autoPlayTimer == null) {
+                        play(el);
                     } else {
+                        stop(el);
+                    }
+                }
+            });
+
+            lightbox.pswp.ui.registerElement({
+                name: 'title',
+                order: 9,
+                isButton: false,
+                appendTo: 'root',
+                html: 'Caption text',
+                onInit: (el, pswp) => {
+                    lightbox.pswp.on('change', () => {
+                        el.innerHTML = lightbox.pswp.currSlide.data.alt || '';
+                    });
+                }
+            });
+
+            lightbox.pswp.ui.registerElement({
+                name: 'autoplay-progress',
+                order: 9,
+                isButton: false,
+                appendTo: 'root',
+                html: '',
+                onInit: (el, pswp) => {
+                    stopCallback = () => {
                         el.style.display = "none";
                     }
-                });
-            }
+
+                    lightbox.pswp.on('change', () => {
+                        if (autoPlayTimer != null) {
+                            el.style.display = "block";
+                            el.style.transition = "";
+                            el.style.width = "0%";
+                            el.offsetHeight;
+                            el.style.transition = "width " + playDurationSeconds + "s linear";
+                            el.style.width = "100%";
+                        } else {
+                            el.style.display = "none";
+                        }
+                    });
+                }
+            });
         });
-    });
+    }
 
     lightbox.on("numItems", (e) => {
+        // Just for auto function.
+        lightbox.pswp.numItems = images.length;
+
         e.numItems = images.length
     });
 
@@ -120,6 +127,7 @@ export function initialize(interop, images) {
         }
     });
     lightbox.init();
+    isInitiazed = true;
 }
 
 export function open(index) {
