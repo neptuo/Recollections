@@ -1,5 +1,18 @@
 ﻿@import "_colors.scss";
 
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: $placeholder-color;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #52585F;
+}
+
+
 a:not([href]):not([tabindex]) {
     color: inherit;
     text-decoration: none;
