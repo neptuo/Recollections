@@ -751,4 +751,3 @@ class PhotoSwipeLightbox extends PhotoSwipeBase {
 }
 
 export default PhotoSwipeLightbox;
-//# sourceMappingURL=photoswipe-lightbox.esm.js.map
