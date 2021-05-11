@@ -525,11 +525,20 @@ h4 .inline-editor-viewmode .oi {
       .entry-detail .images {
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr; } }
     .entry-detail .images .image {
+      position: relative;
       display: flex;
       align-items: center; }
       .entry-detail .images .image a {
         display: block;
         margin: 0 auto; }
+        .entry-detail .images .image a button {
+          position: absolute;
+          right: 6px;
+          top: 6px;
+          display: none; }
+        .entry-detail .images .image a:hover button {
+          display: inline-block;
+          z-index: 1; }
       .entry-detail .images .image img {
         /* Container margin + entry-detail padding */
         width: calc((100vw - 1.5rem - 48px));

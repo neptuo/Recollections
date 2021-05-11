@@ -2,6 +2,7 @@
     @if (ImageType == Models.ImageType.Thumbnail)
     {
         <a href="@GetLinkUrl()">
+            @ThumbnailContent
             <img src="@Url" class="rounded" />
         </a>
     }

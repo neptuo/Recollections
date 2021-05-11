@@ -29,12 +29,25 @@
         }
 
         .image {
+            position: relative;
             display: flex;
             align-items: center;
 
             a {
                 display: block;
                 margin: 0 auto;
+
+                button {
+                    position: absolute;
+                    right: 6px;
+                    top: 6px;
+                    display: none;
+                }
+
+                &:hover button {
+                    display: inline-block;
+                    z-index: 1;
+                }
             }
 
             img {
