@@ -97,6 +97,8 @@ export function initialize(interop, images) {
                 }
             });
         });
+
+        isInitiazed = true;
     }
 
     lightbox.on("numItems", (e) => {
@@ -115,8 +117,10 @@ export function initialize(interop, images) {
 
         if (images[e.index].src) {
             e.itemData.src = images[e.index].src;
+        } else if (images[e.index].provider) {
+            e.itemData.provider = images[e.index].provider;
         } else {
-            e.itemData.provider = new Promise((resolve) => {
+            e.itemData.provider = images[e.index].provider = new Promise((resolve) => {
                 interop.invokeMethodAsync("GetImageDataAsync", e.index).then(function (data) {
                     images[e.index].src = data;
 
@@ -127,7 +131,6 @@ export function initialize(interop, images) {
         }
     });
     lightbox.init();
-    isInitiazed = true;
 }
 
 export function open(index) {
