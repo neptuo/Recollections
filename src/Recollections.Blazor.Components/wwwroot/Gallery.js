@@ -13,8 +13,16 @@ const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
 const pauseIcon = '<i class="fas fa-pause"></i>';
 
+function next(el) {
+    if (lightbox.pswp.currIndex < lightbox.pswp.numItems - 1) {
+        lightbox.pswp.next();
+    } else {
+        stop(el);
+    }
+}
+
 function play(el) {
-    autoPlayTimer = setInterval(() => { lightbox.pswp.next() }, playDurationSeconds * 1000);
+    autoPlayTimer = setInterval(() => next(el), playDurationSeconds * 1000);
     el.innerHTML = pauseIcon;
     lightbox.pswp.next();
 }
