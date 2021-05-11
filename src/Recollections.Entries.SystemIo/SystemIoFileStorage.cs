@@ -43,7 +43,7 @@ namespace Neptuo.Recollections.Entries
             if (!File.Exists(filePath))
                 return Task.FromResult<Stream>(null);
 
-            return Task.FromResult<Stream>(new FileStream(filePath, FileMode.Open));
+            return Task.FromResult<Stream>(new FileStream(filePath, FileMode.Open, FileAccess.Read));
         }
 
         public async Task SaveAsync(Entry entry, Image image, Stream content, ImageType type)
