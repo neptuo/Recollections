@@ -101,14 +101,22 @@ export function initialize(interop, images) {
 
     lightbox.on("itemData", (e) => {
         e.itemData = {
-            provider: new Promise((resolve) => {
-                interop.invokeMethodAsync("GetImageDataAsync", e.index).then(function (data) {
-                    resolve(data);
-                });
-            }),
             w: images[e.index].width,
             h: images[e.index].height,
             alt: images[e.index].title,
+        }
+
+        if (images[e.index].src) {
+            e.itemData.src = images[e.index].src;
+        } else {
+            e.itemData.provider = new Promise((resolve) => {
+                interop.invokeMethodAsync("GetImageDataAsync", e.index).then(function (data) {
+                    images[e.index].src = data;
+
+                    console.log(`Loading image at index '${e.index}'`);
+                    resolve(data);
+                });
+            });
         }
     });
     lightbox.init();
