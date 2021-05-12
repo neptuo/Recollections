@@ -4,7 +4,7 @@
     <RootNamespace>Neptuo.Recollections</RootNamespace>
     <VersionPrefix>0.13.0</VersionPrefix>
 
-    <PublishDomain>app.recollections.neptuo.com</PublishDomain>
+    <PublishDomain>recollections.app</PublishDomain>
     <TargetFramework>net5.0</TargetFramework>
     <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
   </PropertyGroup>
