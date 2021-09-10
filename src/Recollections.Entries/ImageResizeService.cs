@@ -61,7 +61,28 @@ namespace Neptuo.Recollections.Entries
         public (int width, int height) GetSize(Stream inputContent)
         {
             using var input = DrImage.FromStream(inputContent);
-            return (input.Width, input.Height);
+
+            inputContent.Position = 0;
+            using var imageReader = new ImagePropertyReader(inputContent);
+
+            int width = input.Width;
+            int height = input.Height;
+
+            ImagePropertyReader.Orientation? orientation = imageReader.FindOrientation();
+            if (orientation != null)
+            {
+                switch (orientation.Value)
+                {
+                    case ImagePropertyReader.Orientation.D270:
+                    case ImagePropertyReader.Orientation.D90:
+                        int tmp = width;
+                        width = height;
+                        height = tmp;
+                        break;
+                }
+            }
+
+            return (width, height);
         }
 
         public void Resize(Stream inputContent, Stream outputContent, int desiredWidth)
@@ -78,7 +99,7 @@ namespace Neptuo.Recollections.Entries
             }
         }
 
-        private void SaveImage(Stream outputContent, DrImage target) 
+        private void SaveImage(Stream outputContent, DrImage target)
             => target.Save(outputContent, formatDefinition.Codec, formatDefinition.EncoderParameters);
 
         private void Resize(DrImage input, Stream outputContent, Rectangle? inputRect, int width, int height)

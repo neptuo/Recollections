@@ -48,7 +48,7 @@ namespace Neptuo.Recollections
             Console.WriteLine("Getting images.");
             var images = await entries.Images
                 .Include(i => i.Entry)
-                .Where(i => i.OriginalWidth == 0 || i.OriginalHeight == 0)
+                //.Where(i => i.OriginalWidth == 0 || i.OriginalHeight == 0)
                 .ToListAsync();
 
             Console.WriteLine($"Found '{images.Count}' images.");
@@ -72,10 +72,13 @@ namespace Neptuo.Recollections
                 using (fileContent)
                 {
                     var size = resizeService.GetSize(fileContent);
-                    image.OriginalWidth = size.width;
-                    image.OriginalHeight = size.height;
+                    if (size.width != image.OriginalWidth || size.height != image.OriginalHeight)
+                    {
+                        image.OriginalWidth = size.width;
+                        image.OriginalHeight = size.height;
 
-                    entries.Images.Update(image);
+                        entries.Images.Update(image);
+                    }
                 }
 
                 return true;
