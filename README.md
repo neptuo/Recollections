@@ -17,3 +17,13 @@ Example:
 ```
 dotnet ef migrations add NewMigration --startup-project src\Recollections.Api --project src\Recollections.Entries.Data --context Neptuo.Recollections.Entries.DataContext
 ```
+
+### Build docker images
+From repository root:
+```
+docker build . -f .\docker\Dockerfile.api-buster-slim -t neptuo/recollections-api:{version}-buster-slim
+docker build . -f .\docker\Dockerfile.api-stretch-slim-arm32v7 -t neptuo/recollections-api:{version}-stretch-slim-arm32v7
+
+docker push neptuo/recollections-api:{version}-buster-slim
+docker push neptuo/recollections-api:{version}-stretch-slim-arm32v7
+```
