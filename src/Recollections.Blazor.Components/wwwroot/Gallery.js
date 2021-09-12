@@ -9,6 +9,8 @@ const lightbox = new PhotoSwipeLightbox(options);
 let isInitiazed = false;
 let autoPlayTimer = null;
 let stopCallback = () => { };
+let interop = null;
+let images = [];
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -36,7 +38,9 @@ function stop(el) {
     stopCallback();
 }
 
-export function initialize(interop, images) {
+export function initialize(intr, imgs) {
+    interop = intr;
+    images = imgs;
 
     if (!isInitiazed) {
         lightbox.on('uiRegister', function () {
@@ -98,39 +102,42 @@ export function initialize(interop, images) {
             });
         });
 
+        lightbox.on("numItems", (e) => {
+            // Just for auto function.
+            lightbox.pswp.numItems = images.length;
+
+            e.numItems = images.length
+        });
+
+        lightbox.on("itemData", (e) => {
+            e.itemData = {
+                w: images[e.index].width,
+                h: images[e.index].height,
+                alt: images[e.index].title,
+            }
+
+            // Src is only used when swiping images in gallery.
+            // On every gallery open, all images are refetched (fortunately disk cache is used).
+            // It is caused by the reseting of images array on every gallery component render.
+            if (images[e.index].src) {
+                e.itemData.src = images[e.index].src;
+            } else if (images[e.index].provider) {
+                e.itemData.provider = images[e.index].provider;
+            } else {
+                e.itemData.provider = images[e.index].provider = new Promise((resolve) => {
+                    interop.invokeMethodAsync("GetImageDataAsync", e.index).then(function (data) {
+                        images[e.index].src = data;
+
+                        console.log(`Loading image at index '${e.index}'`);
+                        resolve(data);
+                    });
+                });
+            }
+        });
+
+        lightbox.init();
         isInitiazed = true;
     }
-
-    lightbox.on("numItems", (e) => {
-        // Just for auto function.
-        lightbox.pswp.numItems = images.length;
-
-        e.numItems = images.length
-    });
-
-    lightbox.on("itemData", (e) => {
-        e.itemData = {
-            w: images[e.index].width,
-            h: images[e.index].height,
-            alt: images[e.index].title,
-        }
-
-        if (images[e.index].src) {
-            e.itemData.src = images[e.index].src;
-        } else if (images[e.index].provider) {
-            e.itemData.provider = images[e.index].provider;
-        } else {
-            e.itemData.provider = images[e.index].provider = new Promise((resolve) => {
-                interop.invokeMethodAsync("GetImageDataAsync", e.index).then(function (data) {
-                    images[e.index].src = data;
-
-                    console.log(`Loading image at index '${e.index}'`);
-                    resolve(data);
-                });
-            });
-        }
-    });
-    lightbox.init();
 }
 
 export function open(index) {

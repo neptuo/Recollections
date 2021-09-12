@@ -192,6 +192,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
             var image = Images[index];
 
+            Log.Debug($"Get image for gallery at '{index}' (count '{Images.Count}'), URL is '{image.Preview.Url}'.");
+
             byte[] content = await Api.GetImageDataAsync(image.Preview.Url);
             return "data:image/png;base64," + Convert.ToBase64String(content);
         }

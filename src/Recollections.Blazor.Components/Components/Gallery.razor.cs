@@ -11,6 +11,8 @@ namespace Neptuo.Recollections.Components
 {
     public partial class Gallery
     {
+        private int? indexToOpen;
+
         [Inject]
         protected GalleryInterop Interop { get; set; }
 
@@ -20,17 +22,21 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public Func<int, Task<string>> DataGetter { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnInitializedAsync();
+            await base.OnAfterRenderAsync(firstRender);
+            await Interop.InitializedAsync(this, Models ?? new List<GalleryModel>(0));
 
-            if (Models != null && Models.Count > 0)
-                await Interop.InitializedAsync(this, Models);
+            if (indexToOpen != null)
+            {
+                await Interop.OpenAsync(indexToOpen.Value);
+                indexToOpen = null;
+            }
         }
 
         public void Open(int index)
         {
-            _ = Interop.OpenAsync(index);
+            indexToOpen = index;
         }
     }
 }
