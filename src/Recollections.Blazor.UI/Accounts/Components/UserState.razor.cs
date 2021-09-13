@@ -30,6 +30,9 @@ namespace Neptuo.Recollections.Accounts.Components
         [Inject]
         protected ILog<UserState> Log { get; set; }
 
+        [Inject]
+        protected PropertyCollection UserProperties { get; set; }
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
@@ -57,6 +60,7 @@ namespace Neptuo.Recollections.Accounts.Components
             if (isStore)
                 await TokenStorage.SetAsync(bearerToken, isPersistent);
 
+            UserProperties.ClearOnUserChanged();
             UserChanged?.Invoke();
         }
 

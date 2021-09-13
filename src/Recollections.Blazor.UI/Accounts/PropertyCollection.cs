@@ -31,7 +31,7 @@ namespace Neptuo.Recollections.Accounts
         private async Task LoadAsync()
         {
             var response = await api.GetPropertiesAsync();
-            
+
             storage.Clear();
             foreach (var model in response)
                 storage[model.Key] = model;
@@ -40,6 +40,9 @@ namespace Neptuo.Recollections.Accounts
         public async Task<T> GetAsync<T>(string key, T defaultValue = default)
         {
             Ensure.NotNullOrEmpty(key, "key");
+
+            if (!api.IsAuthorized)
+                return defaultValue;
 
             await EnsureAsync();
 
@@ -58,6 +61,9 @@ namespace Neptuo.Recollections.Accounts
         {
             Ensure.NotNull(key, "key");
 
+            if (!api.IsAuthorized)
+                return;
+
             if (!storage.TryGetValue(key, out var model))
                 throw NotSupportedKey(key);
 
@@ -70,7 +76,13 @@ namespace Neptuo.Recollections.Accounts
             await api.SetPropertyAsync(model);
         }
 
-        private static InvalidOperationException NotSupportedKey(string key) 
+        private static InvalidOperationException NotSupportedKey(string key)
             => Ensure.Exception.InvalidOperation($"Property '{key}' is not supported.");
+
+        internal void ClearOnUserChanged()
+        {
+            storage.Clear();
+            ensureTask = null;
+        }
     }
 }

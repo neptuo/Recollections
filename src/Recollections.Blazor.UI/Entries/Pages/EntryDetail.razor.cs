@@ -81,10 +81,12 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Log.Debug("OnInitializedAsync");
 
-            PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
-
             await base.OnInitializedAsync();
             await UserState.EnsureInitializedAsync();
+
+            if (UserState.IsAuthenticated)
+                PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
+            
             await LoadAsync();
             await LoadImagesAsync();
             await LoadStoryAsync();

@@ -24,6 +24,8 @@ namespace Neptuo.Recollections.Accounts
             set => http.DefaultRequestHeaders.Authorization = value;
         }
 
+        public bool IsAuthorized => Authorization != null;
+
         public Api(IFactory<HttpClient> httpFactory, TaskFaultHandler faultHandler)
         {
             Ensure.NotNull(httpFactory, "httpFactory");
