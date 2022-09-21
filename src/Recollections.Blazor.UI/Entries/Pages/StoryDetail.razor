@@ -54,13 +54,13 @@
 
                             <ActionPanel>
                                 <PermissionView Request="@PermissionRequest.Write">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
-                                        <Icon Prefix="fas" Identifier="comment-alt" />
-                                        Add Chapter Entry
+                                    <button type="button" class="btn btn-sm btn-outline-primary border-0" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
+                                        <Icon Prefix="fas" Identifier="plus" />
+                                        Add Entry
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
                                         <Icon Identifier="trash-alt" />
-                                        Delete Chapter
+                                        Delete
                                     </button>
                                 </PermissionView>
                             </ActionPanel>
