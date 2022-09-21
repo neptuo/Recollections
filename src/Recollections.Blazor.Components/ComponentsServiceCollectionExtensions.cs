@@ -34,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<FreeLimitsNotifier>();
             services.AddTransient<PageTitleInterop>();
             services.AddTransient<GalleryInterop>();
+            services.AddTransient<AutoloadNextInterop>();
             services.AddTransient<IFreeLimitsNotifier, FreeLimitsNotifier>(provider => provider.GetRequiredService<FreeLimitsNotifier>());
 
             return services;
