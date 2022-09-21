@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class PageTitle : ComponentBase, IDisposable
+    public class DocumentTitle : ComponentBase, IDisposable
     {
         private const string Suffix = "Recollections";
 
         [Inject]
-        protected PageTitleInterop Interop { get; set; }
+        protected DocumentTitleInterop Interop { get; set; }
 
         [Parameter]
         public string Value { get; set; }
@@ -25,7 +25,7 @@ namespace Neptuo.Recollections.Components
             if (String.IsNullOrEmpty(Value))
                 await Interop.SetAsync(Suffix);
             else
-                await Interop.SetAsync($"{Value} - Recollections");
+                await Interop.SetAsync($"{Value} - {Suffix}");
         }
 
         public void Dispose()

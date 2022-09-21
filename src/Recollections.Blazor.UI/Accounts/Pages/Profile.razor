@@ -1,7 +1,7 @@
 ﻿@page "/users/{UserId}"
 @layout Commons.Layouts.MainLayout
 
-<PageTitle Value="@(Owner?.Name ?? UserId)" />
+<DocumentTitle Value="@(Owner?.Name ?? UserId)" />
 
 @if (Model != null)
 {

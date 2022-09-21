@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class PageTitleInterop
+    public class DocumentTitleInterop
     {
         private readonly IJSRuntime jsRuntime;
 
-        public PageTitleInterop(IJSRuntime jsRuntime)
+        public DocumentTitleInterop(IJSRuntime jsRuntime)
         {
             Ensure.NotNull(jsRuntime, "jsRuntime");
             this.jsRuntime = jsRuntime;
