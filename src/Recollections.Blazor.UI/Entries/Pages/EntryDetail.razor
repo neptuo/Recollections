@@ -42,10 +42,10 @@
 
                         @foreach (var image in Images)
                         {
-                            <EntryImage Image="@image">
+                            <EntryImage Image="@image" OnClick="(() => Gallery.Open(Images.IndexOf(image)))">
                                 <ThumbnailContent>
-                                    <button class="btn btn-outline-primary border-0 p-0" @onclick="(() => Gallery.Open(Images.IndexOf(image)))" @onclick:stopPropagation @onclick:preventDefault>
-                                        <Icon Identifier="images" CssClass="p-1" />
+                                    <button class="btn btn-outline-primary border-0 p-0" @onclick="(() => Navigator.OpenImageDetail(EntryId, image.Id))">
+                                        <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
                                     </button>
                                 </ThumbnailContent>
                             </EntryImage>

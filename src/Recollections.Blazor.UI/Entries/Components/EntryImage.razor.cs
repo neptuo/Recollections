@@ -45,6 +45,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public RenderFragment ThumbnailContent { get; set; }
 
+        [Parameter]
+        public EventCallback OnClick { get; set; }
+
         protected string GetLinkUrl()
         {
             if (Entry != null)

@@ -1,8 +1,11 @@
 ﻿<div class="image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
-    @if (ImageType == Models.ImageType.Thumbnail)
+    @if (OnClick.HasDelegate)
     {
-        <a href="@GetLinkUrl()">
-            @ThumbnailContent
+        <a href="@GetLinkUrl()" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
+            @if (ImageType == Models.ImageType.Thumbnail) 
+            {
+                @ThumbnailContent
+            }
             <img src="@Url" class="rounded" />
         </a>
     }
