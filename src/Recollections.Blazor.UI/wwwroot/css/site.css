@@ -317,6 +317,11 @@ h4 .inline-editor-viewmode .oi {
 .main-navbar .menu-collapse.menu-show {
   height: 505px;
 }
+@media (min-width: 992px) {
+  .main-navbar .menu-collapse {
+    height: auto;
+  }
+}
 .main-navbar.block-icons {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;

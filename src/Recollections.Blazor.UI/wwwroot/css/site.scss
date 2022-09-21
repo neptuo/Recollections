@@ -168,6 +168,10 @@ a {
         &.menu-show {
             height: 505px;
         }
+
+        @media (min-width: 992px) {
+            height: auto;
+        }
     }
 
     &.block-icons {
