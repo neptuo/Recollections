@@ -82,6 +82,8 @@ namespace Neptuo.Recollections.Sharing.Components
             if (String.IsNullOrEmpty(NewShare.UserName) || String.IsNullOrWhiteSpace(NewShare.UserName))
                 return;
 
+            NewShare.UserName = NewShare.UserName.Trim();
+
             await api.CreateAsync(NewShare);
             await LoadAsync();
 
