@@ -134,10 +134,19 @@ namespace Neptuo.Recollections.Sharing.Controllers
             where T : ShareBase
         {
             string userId;
-            if (model.UserName != null && model.UserName != ShareStatusService.PublicUserName)
-                userId = (await userNames.GetUserIdsAsync(new[] { model.UserName })).First();
+            string userName = model.UserName;
+            if (userName != null)
+            {
+                userName = userName.Trim();
+                if (userName != ShareStatusService.PublicUserName)
+                    userId = (await userNames.GetUserIdsAsync(new[] { userName })).First();
+                else
+                    userId = ShareStatusService.PublicUserId;
+            }
             else
+            {
                 userId = ShareStatusService.PublicUserId;
+            }
 
             if (userId == ShareStatusService.PublicUserId && model.Permission != Permission.Read)
                 return BadRequest();
