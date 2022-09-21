@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    <VersionPrefix>0.13.2</VersionPrefix>
+    <VersionPrefix>0.13.3</VersionPrefix>
 
     <PublishDomain>recollections.app</PublishDomain>
     <TargetFramework>net5.0</TargetFramework>
