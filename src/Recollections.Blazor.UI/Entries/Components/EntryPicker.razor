@@ -1,7 +1,7 @@
 ﻿<Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker">
     <ChildContent>
         <div class="timeline">
-            <ListView Items="@Entries" IsLoading="@IsLoading" EmptyMessage="You don't have any entry..." Context="entry">
+            <ListView Items="@Entries" EmptyMessage="You don't have any entry..." Context="entry">
                 <div class="entry">
                     <div class="title">
                         <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
@@ -52,6 +52,14 @@
                                 </span>
                             }
 
+                            @if (UserState.UserId != entry.UserId)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="user" />
+                                    @entry.UserName
+                                </span>
+                            }
+
                             @if (entry.Beings != null)
                             {
                                 foreach (var being in entry.Beings)
@@ -71,7 +79,16 @@
     <Buttons>
         @if (HasMore)
         {
-            <button class="btn btn-outline-primary" @onclick="@LoadMoreAsync">More...</button>
+            <button class="btn btn-outline-primary" disabled="@IsLoading" @onclick="@LoadMoreAsync">
+                @if (IsLoading) 
+                {
+                    @: Loading...
+                } 
+                else 
+                {
+                    @: More...
+                }
+            </button>
         }
     </Buttons>
 </Modal>

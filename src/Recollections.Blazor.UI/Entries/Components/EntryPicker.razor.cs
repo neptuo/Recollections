@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ namespace Neptuo.Recollections.Entries.Components
 
         [Parameter]
         public Action<TimelineEntryModel> Selected { get; set; }
+
+        [CascadingParameter]
+        protected UserState UserState { get; set; }
 
         protected Modal Modal { get; set; }
 
