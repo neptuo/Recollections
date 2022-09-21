@@ -24,7 +24,7 @@ html, body {
 
 body {
     position: relative;
-    min-width: 400px;
+    min-width: 370px;
     min-height: 100vh;
     padding-bottom: 56px;
 }
@@ -157,6 +157,16 @@ a {
 
         &:focus {
             box-shadow: none;
+        }
+    }
+
+    .menu-collapse {
+        height: 0;
+        transition: height .5s ease-in-out;
+        overflow: hidden;
+
+        &.menu-show {
+            height: 505px;
         }
     }
 

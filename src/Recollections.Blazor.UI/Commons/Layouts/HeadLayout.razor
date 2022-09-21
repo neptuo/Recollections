@@ -4,11 +4,11 @@
     <div class="container">
         <a class="navbar-brand" href="@Navigator.UrlTimeline()">
             <img src="/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
-            <span class="@(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")">
-                Recollections
-            </span>
         </a>
 
+        <div class="navbar-brand @(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")">
+            Recollections
+        </div>
         <div class="@(IsMainMenuVisible ? "d-none" : "d-block d-lg-none")">
             <ul class="navbar-nav small-navbar-nav flex-row">
                 @foreach (var menuItem in MenuItems)
@@ -25,11 +25,11 @@
             </ul>
         </div>
 
-        <button class="navbar-toggler" type="button" @onclick="ToggleMainMenu">
+        <button class="navbar-toggler px-0" type="button" @onclick="ToggleMainMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="navbar-collapse justify-content-between @(IsMainMenuVisible ? "" : "collapse")">
+        <div class="navbar-collapse justify-content-between menu-collapse @(IsMainMenuVisible ? "menu-show" : "")">
             <ul class="navbar-nav large-navbar-nav w-100">
                 @for (int i = 0; i < MenuItems.Count; i++)
                 {
