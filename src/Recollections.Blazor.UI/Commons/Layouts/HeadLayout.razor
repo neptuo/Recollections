@@ -6,9 +6,9 @@
             <img src="/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
         </a>
 
-        <div class="navbar-brand @(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")">
+        <a class="navbar-brand @(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")" href="@Navigator.UrlTimeline()">
             Recollections
-        </div>
+        </a>
         <div class="@(IsMainMenuVisible ? "d-none" : "d-block d-lg-none")">
             <ul class="navbar-nav small-navbar-nav flex-row">
                 @foreach (var menuItem in MenuItems)
