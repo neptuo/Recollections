@@ -143,3 +143,9 @@ export function initialize(intr, imgs) {
 export function open(index) {
     lightbox.loadAndOpen(index);
 }
+
+export function dispose() {
+    if (lightbox.pswp) {
+        lightbox.pswp.close();
+    }
+}

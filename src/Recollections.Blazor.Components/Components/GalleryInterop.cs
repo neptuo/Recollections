@@ -34,6 +34,9 @@ namespace Neptuo.Recollections.Components
         public async Task OpenAsync(int index)
             => await module.InvokeVoidAsync("open", index);
 
+        public async Task DisposeAsync()
+            => await module.InvokeVoidAsync("dispose");
+
         [JSInvokable]
         public Task<string> GetImageDataAsync(int index)
         {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public partial class Gallery
+    public partial class Gallery : IAsyncDisposable
     {
         private int? indexToOpen;
 
@@ -34,9 +34,10 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        public void Open(int index)
-        {
-            indexToOpen = index;
-        }
+        public void Open(int index) 
+            => indexToOpen = index;
+
+        public async ValueTask DisposeAsync() 
+            => await Interop.DisposeAsync();
     }
 }
