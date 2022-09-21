@@ -64,6 +64,9 @@ namespace Neptuo.Recollections
             return null;
         }
 
+        public string GetCurrentUrl() 
+            => uri.ToAbsoluteUri(uri.Uri).ToString();
+
         public ValueTask<bool> AskAsync(string message)
             => jsRuntime.InvokeAsync<bool>("window.confirm", message);
 

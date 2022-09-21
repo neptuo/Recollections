@@ -16,6 +16,12 @@ namespace Neptuo.Recollections.Sharing.Components
         [Inject]
         protected Api Api { get; set; }
 
+        [Inject]
+        protected Navigator Navigator { get; set; }
+
+        [Inject]
+        protected WindowInterop Interop { get; set; }
+
         [Parameter]
         public string EntryId { get; set; }
 
@@ -34,6 +40,7 @@ namespace Neptuo.Recollections.Sharing.Components
         protected bool HasPublic { get; set; }
 
         protected ShareModel NewShare { get; } = new ShareModel();
+        protected bool IsCopiedToClipboard { get; set; } = false;
 
         protected override void OnParametersSet()
         {

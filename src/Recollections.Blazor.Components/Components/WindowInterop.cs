@@ -19,5 +19,7 @@ namespace Neptuo.Recollections.Components
         }
 
         public void ScrollTo(int x, int y) => jsRuntime.InvokeVoid("window.scrollTo", x, y);
+
+        public void CopyToClipboard(string text) => jsRuntime.InvokeVoid("navigator.clipboard.writeText", text);
     }
 }

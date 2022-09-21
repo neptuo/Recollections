@@ -57,5 +57,19 @@
                 </div>
             </div>
         </ListView>
+        <hr />
+        <div class="row mt-1 mb-3">
+            <div class="col text-center text-muted">
+                Copy current URL
+            </div>
+        </div>
+        <div class="input-group">
+            <input type="text" readonly value="@Navigator.GetCurrentUrl()" class="form-control" />
+            <div class="input-group-append">
+                <button class="btn btn-@(IsCopiedToClipboard ? "success" : "outline-secondary") m-0" type="button" @onclick="(() => { Interop.CopyToClipboard(Navigator.GetCurrentUrl()); IsCopiedToClipboard = true; })">
+                    <Icon Identifier="copy" />
+                </button>
+            </div>
+        </div>
     </ChildContent>
 </Modal>
