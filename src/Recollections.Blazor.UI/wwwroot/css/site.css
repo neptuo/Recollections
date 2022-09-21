@@ -309,17 +309,14 @@ h4 .inline-editor-viewmode .oi {
 .main-navbar .navbar-toggler:focus {
   box-shadow: none;
 }
-.main-navbar .menu-collapse {
-  height: 0;
-  transition: height 0.5s ease-in-out;
-  overflow: hidden;
-}
-.main-navbar .menu-collapse.menu-show {
-  height: 505px;
-}
-@media (min-width: 992px) {
+@media (max-width: 991px) {
   .main-navbar .menu-collapse {
-    height: auto;
+    height: 0;
+    transition: height 0.5s ease-in-out;
+    overflow: hidden;
+  }
+  .main-navbar .menu-collapse.menu-show {
+    height: 505px;
   }
 }
 .main-navbar.block-icons {

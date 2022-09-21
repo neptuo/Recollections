@@ -160,17 +160,15 @@ a {
         }
     }
 
-    .menu-collapse {
-        height: 0;
-        transition: height .5s ease-in-out;
-        overflow: hidden;
+    @media (max-width: 991px) {
+        .menu-collapse {
+            height: 0;
+            transition: height .5s ease-in-out;
+            overflow: hidden;
 
-        &.menu-show {
-            height: 505px;
-        }
-
-        @media (min-width: 992px) {
-            height: auto;
+            &.menu-show {
+                height: 505px;
+            }
         }
     }
 
