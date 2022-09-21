@@ -38,7 +38,7 @@
                 <div class="images">
                     @if (Images != null)
                     {
-                        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" />
+                        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="(i => Navigator.OpenImageDetail(EntryId, Images[i].Id))" />
 
                         @foreach (var image in Images)
                         {

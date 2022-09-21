@@ -22,6 +22,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public Func<int, Task<string>> DataGetter { get; set; }
 
+        [Parameter]
+        public EventCallback<int> OnOpenInfo { get; set; }
+
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);

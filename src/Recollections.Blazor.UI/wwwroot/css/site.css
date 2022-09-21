@@ -755,7 +755,7 @@ h4 .inline-editor-viewmode .oi {
   font-size: 1.8rem;
 }
 
-.pswp__button--autoplay {
+.pswp__button--autoplay, .pswp__button--info {
   color: white;
 }
 

@@ -63,6 +63,16 @@ export function initialize(intr, imgs) {
             });
 
             lightbox.pswp.ui.registerElement({
+                name: 'info',
+                order: 9,
+                isButton: true,
+                html: '<i class="fas fa-info-circle"></i>',
+                onClick: () => {
+                    interop.invokeMethodAsync("OpenInfoAsync", lightbox.pswp.currIndex);
+                }
+            });
+
+            lightbox.pswp.ui.registerElement({
                 name: 'title',
                 order: 9,
                 isButton: false,

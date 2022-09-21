@@ -45,5 +45,9 @@ namespace Neptuo.Recollections.Components
 
             return component.DataGetter(index);
         }
+
+        [JSInvokable]
+        public Task OpenInfoAsync(int index) 
+            => component.OnOpenInfo.InvokeAsync(index);
     }
 }
