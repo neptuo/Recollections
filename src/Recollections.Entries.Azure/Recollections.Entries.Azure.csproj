@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Neptuo.Recollections.Entries</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Storage.File" Version="11.2.2" />
+    <PackageReference Include="Microsoft.Azure.Storage.File" Version="11.2.3" />
   </ItemGroup>
 
   <ItemGroup>

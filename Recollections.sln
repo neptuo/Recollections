@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Api", "src\Recollections.Api\Recollections.Api.csproj", "{EF04B5E3-2C3E-4194-AE17-1E39C89F477E}"
 EndProject
@@ -43,7 +43,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Accounts", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.DbMigrationApplier", "src\Recollections.DbMigrationApplier\Recollections.DbMigrationApplier.csproj", "{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.ImageSizeCalculator", "src\Recollections.ImageSizeCalculator\Recollections.ImageSizeCalculator.csproj", "{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.ImageSizeCalculator", "src\Recollections.ImageSizeCalculator\Recollections.ImageSizeCalculator.csproj", "{D3B3C78D-7A08-4C2D-B535-FD9A301EB869}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Anything", ".Anything", "{544B38E1-7CFA-4E38-9279-B85282DC277C}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

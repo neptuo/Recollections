@@ -1,0 +1,9 @@
+<Project>
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Neptuo" Version="6.0.2" />
+	</ItemGroup>
+</Project>
