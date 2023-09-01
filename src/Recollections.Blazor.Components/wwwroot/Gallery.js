@@ -154,7 +154,15 @@ export function open(index) {
     lightbox.loadAndOpen(index);
 }
 
-export function dispose() {
+export function isOpen() {
+    if (lightbox.pswp) {
+        return lightbox.pswp.isOpen;
+    }
+
+    return false;
+}
+
+export function close() {
     if (lightbox.pswp) {
         lightbox.pswp.close();
     }

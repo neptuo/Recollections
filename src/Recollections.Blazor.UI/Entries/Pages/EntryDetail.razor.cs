@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
@@ -388,6 +389,15 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             await Api.UpdateEntryBeingsAsync(EntryId, beingIds);
             await LoadBeingsAsync();
+        }
+
+        protected async Task OnBeforeInternalNavigation(LocationChangingContext context)
+        {
+            if (await Gallery.IsOpenAsync())
+            {
+                _ = Gallery.CloseAsync();
+                context.PreventNavigation();
+            }
         }
     }
 

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,7 +41,13 @@ namespace Neptuo.Recollections.Components
         public void Open(int index) 
             => indexToOpen = index;
 
+        public Task CloseAsync()
+            => Interop.CloseAsync();
+
+        public Task<bool> IsOpenAsync()
+            => Interop.IsOpenAsync();
+
         public async ValueTask DisposeAsync() 
-            => await Interop.DisposeAsync();
+            => await Interop.CloseAsync();
     }
 }

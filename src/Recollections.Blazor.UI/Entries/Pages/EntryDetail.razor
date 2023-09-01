@@ -1,5 +1,7 @@
 ﻿@page "/entries/{EntryId}"
 
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
 @if (Model != null)
 {
     <DocumentTitle Value="@Model.Title" />
