@@ -46,7 +46,7 @@
                         {
                             <EntryImage Image="@image" OnClick="(() => Gallery.Open(Images.IndexOf(image)))">
                                 <ThumbnailContent>
-                                    <button class="btn btn-outline-primary border-0 p-0" @onclick="(() => Navigator.OpenImageDetail(EntryId, image.Id))">
+                                    <button class="btn btn-outline-primary border-0 p-0" @onclick="(() => Navigator.OpenImageDetail(EntryId, image.Id))" @onclick:stopPropagation="true">
                                         <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
                                     </button>
                                 </ThumbnailContent>
