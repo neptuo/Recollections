@@ -156,7 +156,7 @@ export function open(index) {
 
 export function isOpen() {
     if (lightbox.pswp) {
-        return lightbox.pswp.isOpen;
+        return lightbox.pswp.isOpen && !lightbox.pswp.isDestroying;
     }
 
     return false;
