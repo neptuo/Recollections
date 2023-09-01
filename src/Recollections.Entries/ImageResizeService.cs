@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DrImage = System.Drawing.Image;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
+using static System.Net.Mime.MediaTypeNames;
+using IsImage = SixLabors.ImageSharp.Image;
 
 namespace Neptuo.Recollections.Entries
 {
@@ -23,7 +26,7 @@ namespace Neptuo.Recollections.Entries
 
         public void Thumbnail(Stream inputContent, Stream outputContent, int width, int height)
         {
-            using (var input = DrImage.FromStream(inputContent))
+            using (var input = IsImage.Load(inputContent))
             {
                 EnsureExifImageRotation(input, inputContent);
 
@@ -60,7 +63,7 @@ namespace Neptuo.Recollections.Entries
 
         public (int width, int height) GetSize(Stream inputContent)
         {
-            using var input = DrImage.FromStream(inputContent);
+            using var input = IsImage.Load(inputContent);
 
             inputContent.Position = 0;
             using var imageReader = new ImagePropertyReader(inputContent);
@@ -87,7 +90,7 @@ namespace Neptuo.Recollections.Entries
 
         public void Resize(Stream inputContent, Stream outputContent, int desiredWidth)
         {
-            using (var input = DrImage.FromStream(inputContent))
+            using (var input = IsImage.Load(inputContent))
             {
                 EnsureExifImageRotation(input, inputContent);
 
@@ -99,24 +102,22 @@ namespace Neptuo.Recollections.Entries
             }
         }
 
-        private void SaveImage(Stream outputContent, DrImage target)
-            => target.Save(outputContent, formatDefinition.Codec, formatDefinition.EncoderParameters);
+        private void SaveImage(Stream outputContent, IsImage target)
+            => target.Save(outputContent, formatDefinition.Codec);
 
-        private void Resize(DrImage input, Stream outputContent, Rectangle? inputRect, int width, int height)
+        private void Resize(IsImage input, Stream outputContent, Rectangle? inputRect, int width, int height)
         {
-            using (var target = new Bitmap(width, height))
-            using (Graphics targetGraphics = Graphics.FromImage(target))
+            using var target = input.Clone(x =>
             {
-                targetGraphics.CompositingQuality = CompositingQuality.HighQuality;
-                targetGraphics.SmoothingMode = SmoothingMode.HighQuality;
-                targetGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                targetGraphics.DrawImage(input, new Rectangle(0, 0, width, height), inputRect ?? new Rectangle(0, 0, input.Width, input.Height), GraphicsUnit.Pixel);
+                if (inputRect != null)
+                    x.Crop(inputRect.Value);
 
-                SaveImage(outputContent, target);
-            }
+                x.Resize(width, height);
+            });
+            SaveImage(outputContent, target);
         }
 
-        private void EnsureExifImageRotation(DrImage image, Stream imageContent)
+        private void EnsureExifImageRotation(IsImage image, Stream imageContent)
         {
             imageContent.Position = 0;
             using (var imageReader = new ImagePropertyReader(imageContent))
@@ -127,13 +128,13 @@ namespace Neptuo.Recollections.Entries
                     switch (orientation.Value)
                     {
                         case ImagePropertyReader.Orientation.D270:
-                            image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                            image.Mutate(x => x.RotateFlip(RotateMode.Rotate90, FlipMode.None));
                             break;
                         case ImagePropertyReader.Orientation.D180:
-                            image.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                            image.Mutate(x => x.RotateFlip(RotateMode.Rotate180, FlipMode.None));
                             break;
                         case ImagePropertyReader.Orientation.D90:
-                            image.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                            image.Mutate(x => x.RotateFlip(RotateMode.Rotate270, FlipMode.None));
                             break;
                     }
                 }
