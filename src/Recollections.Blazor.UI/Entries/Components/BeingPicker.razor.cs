@@ -50,7 +50,7 @@ namespace Neptuo.Recollections.Entries.Components
             Log.Info($"Selected beings: '{String.Join(", ", SelectedIds)}'.");
         }
 
-        private async void OnSubmit()
+        private void OnSubmit()
         {
             Hide();
             _ = Selected.InvokeAsync(SelectedIds);

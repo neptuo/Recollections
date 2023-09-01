@@ -135,10 +135,12 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        protected async ValueTask SearchResultSelectedAsync(MapSearchModel selected)
+        protected ValueTask SearchResultSelectedAsync(MapSearchModel selected)
         {
             this.selected = selected;
             SearchModal.Hide();
+
+            return ValueTask.CompletedTask;
         }
     }
 }

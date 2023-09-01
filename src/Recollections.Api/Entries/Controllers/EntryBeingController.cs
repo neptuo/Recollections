@@ -38,7 +38,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
         [ProducesResponseType(Status404NotFound)]
-        public Task<IActionResult> Get(string entryId) => RunEntryAsync(entryId, Permission.Read, async entry =>
+        public Task<IActionResult> Get(string entryId) => RunEntryAsync(entryId, Permission.Read, entry =>
         {
             var models = entry.Beings
                 .OrderBy(b => b.Name)
@@ -48,7 +48,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                     Name = b.Name
                 });
 
-            return Ok(models);
+            return Task.FromResult<IActionResult>(Ok(models));
         });
 
         [HttpPut]

@@ -25,21 +25,8 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public EventCallback OnDismiss { get; set; }
 
-        private AlertMode mode;
-
         [Parameter]
-        public AlertMode Mode
-        {
-            get => mode;
-            set
-            {
-                if (mode != value)
-                {
-                    mode = value;
-                    UpdateModeCssClass();
-                }
-            }
-        }
+        public AlertMode Mode { get; set; }
 
         [Parameter]
         public string CssClass { get; set; }
@@ -52,9 +39,15 @@ namespace Neptuo.Recollections.Components
             UpdateModeCssClass();
         }
 
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+            UpdateModeCssClass();
+        }
+
         protected void UpdateModeCssClass()
         {
-            switch (mode)
+            switch (Mode)
             {
                 case AlertMode.Success:
                     ModeCssClass = "alert-success";
@@ -69,7 +62,7 @@ namespace Neptuo.Recollections.Components
                     ModeCssClass = "alert-danger";
                     break;
                 default:
-                    throw Ensure.Exception.NotSupported(mode.ToString());
+                    throw Ensure.Exception.NotSupported(Mode);
             }
 
             if (OnDismiss.HasDelegate)

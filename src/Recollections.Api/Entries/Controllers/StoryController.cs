@@ -104,7 +104,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetChapterList(string storyId) => RunStoryAsync(storyId, Permission.Read, async story =>
+        public Task<IActionResult> GetChapterList(string storyId) => RunStoryAsync(storyId, Permission.Read, story =>
         {
             List<StoryChapterListModel> models = new List<StoryChapterListModel>();
             foreach (StoryChapter entity in story.Chapters.OrderBy(c => c.Order))
@@ -116,7 +116,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 });
             }
 
-            return Ok(models);
+            return Task.FromResult<IActionResult>(Ok(models));
         });
 
         [HttpGet("{id}")]

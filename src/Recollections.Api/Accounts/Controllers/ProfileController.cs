@@ -32,7 +32,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetAsync(string id) => RunProfileAsync(id, Permission.Read, async (entity) =>
+        public Task<IActionResult> GetAsync(string id) => RunProfileAsync(id, Permission.Read, (entity) =>
         {
             ProfileModel model = new ProfileModel();
             MapEntityToModel(entity, model);
@@ -42,7 +42,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
             result.OwnerName = entity.UserName;
             result.UserPermission = entity.Id == HttpContext.User.FindUserId() ? Permission.Write : Permission.Read;
 
-            return Ok(result);
+            return Task.FromResult<IActionResult>(Ok(result));
         });
 
         private void MapEntityToModel(User entity, ProfileModel model)
