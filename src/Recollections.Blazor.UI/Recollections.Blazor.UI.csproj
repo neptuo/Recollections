@@ -29,7 +29,6 @@
     <Content Remove="**\*.svg" />
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
-    <Watch Include="**\*.razor" />
   </ItemGroup>
 
   <!-- PWA -->
