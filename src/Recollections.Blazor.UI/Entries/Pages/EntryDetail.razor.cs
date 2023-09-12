@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts;
@@ -188,17 +189,18 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        protected async Task<string> OnGetImageDataAsync(int index)
+        protected async Task<Stream> OnGetImageDataAsync(int index)
         {
             if (index > Images.Count)
                 return null;
 
             var image = Images[index];
-
             Log.Debug($"Get image for gallery at '{index}' (count '{Images.Count}'), URL is '{image.Preview.Url}'.");
 
-            byte[] content = await Api.GetImageDataAsync(image.Preview.Url);
-            return "data:image/png;base64," + Convert.ToBase64String(content);
+            var stream = await Api.GetImageDataAsync(image.Preview.Url);
+            Log.Debug($"Got image data for gallery at '{index}'");
+
+            return stream;
         }
 
         protected async Task SaveTitleAsync(string value)

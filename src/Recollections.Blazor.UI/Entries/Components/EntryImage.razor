@@ -6,12 +6,13 @@
             {
                 @ThumbnailContent
             }
-            <img src="@Url" class="rounded" />
+
+            @RenderImage()
         </a>
     }
     else
     {
-        <img src="@Url" class="rounded" />
+        @RenderImage()
     }
 
     @if (PlaceHolder != null)
@@ -19,3 +20,11 @@
         <span class="@PlaceHolderCssClass">@PlaceHolder</span>
     }
 </div>
+
+@code
+{
+    protected RenderFragment RenderImage() 
+    {
+        return @<img @ref="@Element" src="@PlaceholderUrl" class="rounded" />;
+    }
+}

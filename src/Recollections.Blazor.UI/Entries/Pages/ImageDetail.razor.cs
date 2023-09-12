@@ -131,10 +131,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task DownloadOriginalAsync()
         {
-            byte[] content = await Api.GetImageDataAsync(Model.Original.Url);
-            string url = "data:image/png;base64," + Convert.ToBase64String(content);
-            Log.Debug($"Original downloaded, size '{content.Length}', URL length '{url.Length}'.");
-            await Downloader.FromUrlAsync(Model.Name, url);
+            var stream = await Api.GetImageDataAsync(Model.Original.Url);
+            Log.Debug($"Original downloaded, size '{stream.Length}'.");
+            await Downloader.FromStreamAsync(Model.Name, stream, "image/png");
             Log.Debug($"JS interop completed.");
         }
 

@@ -63,8 +63,8 @@ namespace Neptuo.Recollections.Entries
         public Task<AuthorizedModel<ImageModel>> GetImageAsync(string entryId, string imageId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ImageModel>>($"entries/{entryId}/images/{imageId}"));
 
-        public Task<byte[]> GetImageDataAsync(string url)
-            => faultHandler.Wrap(http.GetByteArrayAsync((settings.BaseUrl + url).Replace("api/api", "api")));
+        public Task<Stream> GetImageDataAsync(string url)
+            => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
 
         public Task UpdateImageAsync(string entryId, ImageModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/images/{model.Id}", model));

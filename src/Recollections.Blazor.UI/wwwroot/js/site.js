@@ -255,5 +255,27 @@ window.Downloader = {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    },
+    FromStreamAsync: async function (name, stream, mimeType) {
+        const arrayBuffer = await stream.arrayBuffer();
+        const blob = new Blob([arrayBuffer], {
+            type: mimeType
+        });
+        const url = URL.createObjectURL(blob);
+        return Downloader.FromUrlAsync(name, url);
     }
 };
+
+window.ImageSource = {
+    Set: async function(element, stream, mimeType) {
+        const arrayBuffer = await stream.arrayBuffer();
+        const blob = new Blob([arrayBuffer], {
+            type: mimeType
+        });
+        const url = URL.createObjectURL(blob);
+        element.onload = () => {
+            URL.revokeObjectURL(url);
+        }
+        element.src = url;
+    }
+}

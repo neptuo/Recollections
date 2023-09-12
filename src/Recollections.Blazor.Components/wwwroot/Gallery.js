@@ -134,13 +134,17 @@ export function initialize(intr, imgs) {
             } else if (images[e.index].provider) {
                 e.itemData.provider = images[e.index].provider;
             } else {
-                e.itemData.provider = images[e.index].provider = new Promise((resolve) => {
-                    interop.invokeMethodAsync("GetImageDataAsync", e.index).then(function (data) {
-                        images[e.index].src = data;
-
-                        console.log(`Loading image at index '${e.index}'`);
-                        resolve(data);
+                e.itemData.provider = images[e.index].provider = new Promise(async resolve => {
+                    const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index);
+                    const arrayBuffer = await stream.arrayBuffer();
+                    const blob = new Blob([arrayBuffer], {
+                        type: "image/png"
                     });
+                    const url = URL.createObjectURL(blob);
+                    images[e.index].src = url;
+
+                    console.log(`Loading image at index '${e.index}'`);
+                    resolve(url);
                 });
             }
         });

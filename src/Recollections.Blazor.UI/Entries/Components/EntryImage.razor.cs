@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,20 @@ namespace Neptuo.Recollections.Entries.Components
     {
         public const string PlaceholderUrl = "/img/thumbnail-placeholder.png";
 
+        private bool hasSourceChanged;
+        private string url;
         private string previousUrl;
 
-        protected string Url { get; private set; }
+        protected Stream Content { get; private set; }
 
         [Inject]
         protected Navigator Navigator { get; set; }
 
         [Inject]
         protected Api Api { get; set; }
+
+        [Inject]
+        protected ImageInterop ImageInterop { get; set; }
 
         [Parameter]
         [CascadingParameter]
@@ -48,6 +54,8 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public EventCallback OnClick { get; set; }
 
+        protected ElementReference Element { get; set; }
+
         protected string GetLinkUrl()
         {
             if (Entry != null)
@@ -63,7 +71,7 @@ namespace Neptuo.Recollections.Entries.Components
         {
             base.OnInitialized();
 
-            previousUrl = Url;
+            previousUrl = url;
         }
 
         protected async override Task OnParametersSetAsync()
@@ -76,19 +84,25 @@ namespace Neptuo.Recollections.Entries.Components
                 if (previousUrl != imageUrl)
                 {
                     previousUrl = imageUrl;
-                    Url = PlaceholderUrl;
-
-                    byte[] content = await Api.GetImageDataAsync(imageUrl);
-                    Url = "data:image/png;base64," + Convert.ToBase64String(content);
+                    url = imageUrl;
+                    hasSourceChanged = true;
+                    Content = await Api.GetImageDataAsync(imageUrl);
                 }
             }
-            else
+            else 
             {
-                Url = PlaceholderUrl;
+                Content = null;
             }
+        }
 
-            if (String.IsNullOrEmpty(Url))
-                Url = PlaceholderUrl;
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            if (Content != null && hasSourceChanged)
+            {
+                hasSourceChanged = false;
+                await ImageInterop.SetAsync(Element, Content);
+            }
         }
 
         private string GetImageUrl()
