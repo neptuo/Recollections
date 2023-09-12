@@ -42,6 +42,9 @@ namespace Neptuo.Recollections.Entries
         public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
+        public Task<TimelineListResponse> GetTimelineListAsync(string userId, int? offset)
+            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"profiles/{userId}/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 

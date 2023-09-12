@@ -3,7 +3,10 @@
 <DocumentTitle Value="Timeline" />
 
 <div class="timeline">
-    <EntryCreate />
+    @if (AllowCreate)
+    {
+        <EntryCreate />
+    }
 
     @foreach (var entry in Entries)
     {

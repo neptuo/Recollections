@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Neptuo;
+using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
 
 namespace Neptuo.Recollections.Accounts.Controllers
 {
@@ -18,13 +20,16 @@ namespace Neptuo.Recollections.Accounts.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly ShareStatusService shareStatus;
+        private readonly TimelineService timeline;
 
-        public ProfileController(UserManager<User> userManager, ShareStatusService shareStatus)
+        public ProfileController(UserManager<User> userManager, ShareStatusService shareStatus, TimelineService timeline)
         {
             Ensure.NotNull(userManager, "userManager");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(timeline, "timeline");
             this.userManager = userManager;
             this.shareStatus = shareStatus;
+            this.timeline = timeline;
         }
 
         [HttpGet("{id}")]
@@ -43,6 +48,15 @@ namespace Neptuo.Recollections.Accounts.Controllers
             result.UserPermission = entity.Id == HttpContext.User.FindUserId() ? Permission.Write : Permission.Read;
 
             return Task.FromResult<IActionResult>(Ok(result));
+        });
+
+        [HttpGet("{id}/timeline/list")]
+        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, string id, int offset) => RunProfileAsync(id, Permission.Read, async entity => 
+        {
+            var query = dataContext.Entries.Where(e => e.UserId == id);
+
+            var (models, hasMore) = await timeline.GetAsync(query, id, offset);
+            return Ok(new TimelineListResponse(models, hasMore));
         });
 
         private void MapEntityToModel(User entity, ProfileModel model)
