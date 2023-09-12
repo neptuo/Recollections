@@ -45,30 +45,32 @@ namespace Neptuo.Recollections.Commons.Components
 
             if (IsInstallable || IsUpdateable)
                 await Tooltip.InitializeAsync(Button);
+
+            if (!IsInstallable && IsUpdateable)
+            {
+                await OnUpdateAvailable.InvokeAsync();
+                await Tooltip.ShowAsync(Button);
+            }
         }
 
-        public void MakeInstallable()
+        public async void MakeInstallable()
         {
             Log.Debug("Installable=True");
+
+            await Tooltip.DisposeAsync(Button);
 
             IsInstallable = true;
             StateHasChanged();
         }
 
-        public void MakeUpdateable()
+        public async void MakeUpdateable()
         {
             Log.Debug("Updateable=True");
+            
+            await Tooltip.DisposeAsync(Button);
 
             IsUpdateable = true;
             StateHasChanged();
-
-            _ = MakeUpdateableAsync();
-        }
-
-        private async Task MakeUpdateableAsync()
-        {
-            await OnUpdateAvailable.InvokeAsync();
-            await Tooltip.ShowAsync(Button);
         }
 
         protected async Task InstallAsync()

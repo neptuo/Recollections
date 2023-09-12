@@ -19,9 +19,9 @@ namespace Neptuo.Recollections
         {
             Ensure.NotNull(services, "services");
 
+#if DEBUG
             ILogFilter logFilter = DefaultLogFilter.Debug;
-
-#if !DEBUG
+#else
             logFilter = DefaultLogFilter.Warning;
 #endif
 

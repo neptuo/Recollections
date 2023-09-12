@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,9 @@ namespace Neptuo.Recollections.Components
 {
     public partial class ListView<T> : ComponentBase
     {
+        [Inject]
+        protected ILog<ListView<T>> Log { get; set; }
+
         [Parameter]
         public bool IsLoading { get; set; }
 
@@ -29,7 +33,7 @@ namespace Neptuo.Recollections.Components
         {
             base.OnParametersSet();
 
-            Console.WriteLine($"LV, count: {Items?.Count}");
+            Log.Debug($"Count: {Items?.Count}");
         }
     }
 }
