@@ -40,7 +40,7 @@ namespace Neptuo.Recollections.Accounts
 
         public async Task<string> FindAsync()
         {
-            string token = await local.GetItemAsStringAsync(key);
+            string token = await local.GetItemAsync<string>(key);
             if (String.IsNullOrEmpty(token))
                 token = await session.GetItemAsync<string>(key);
 
