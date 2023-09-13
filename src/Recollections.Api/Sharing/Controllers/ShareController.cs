@@ -21,14 +21,16 @@ namespace Neptuo.Recollections.Sharing.Controllers
     {
         private readonly DataContext db;
         private readonly IUserNameProvider userNames;
+        private readonly ShareCreator shareCreator;
 
-        public ShareController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus)
+        public ShareController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareCreator shareCreator)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(userNames, "userNames");
             this.db = db;
             this.userNames = userNames;
+            this.shareCreator = shareCreator;
         }
 
         private async Task<IActionResult> GetItemsAsync(IQueryable<ShareBase> query)
@@ -127,85 +129,35 @@ namespace Neptuo.Recollections.Sharing.Controllers
             return await handler(entity);
         }
 
-        // DUPLICATED CODE FROM ProfileController.cs
+        // /DUPLICATED CODE FROM ProfileController.cs
 
 
-        private async Task<IActionResult> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)
-            where T : ShareBase
-        {
-            string userId;
-            string userName = model.UserName;
-            if (userName != null)
-            {
-                userName = userName.Trim();
-                if (userName != ShareStatusService.PublicUserName)
-                    userId = (await userNames.GetUserIdsAsync(new[] { userName })).First();
-                else
-                    userId = ShareStatusService.PublicUserId;
-            }
-            else
-            {
-                userId = ShareStatusService.PublicUserId;
-            }
-
-            if (userId == ShareStatusService.PublicUserId && model.Permission != Permission.Read)
-                return BadRequest();
-
-            T entity = await findQuery(userId).FirstOrDefaultAsync();
-            if (entity == null)
-            {
-                entity = entityFactory();
-                entity.UserId = userId;
-                entity.Permission = (int)model.Permission;
-
-                await db.Set<T>().AddAsync(entity);
-            }
-            else
-            {
-                entity.Permission = (int)model.Permission;
-            }
-
-            await db.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status201Created);
-        }
+        private async Task<IActionResult> ConvertResultAsync(Task<bool> result) => await result
+            ? StatusCode(StatusCodes.Status201Created)
+            : BadRequest();
 
         [HttpPost("entries/{entryId}/sharing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> CreateEntryAsync(string entryId, ShareModel model) => RunEntryAsync(entryId, entry =>
-        {
-            return CreateAsync(
-                model, 
-                userId => db.EntryShares.Where(s => s.EntryId == entryId && s.UserId == userId), 
-                () => new EntryShare(entryId)
-            );
-        });
+        public Task<IActionResult> CreateEntryAsync(string entryId, ShareModel model) => RunEntryAsync(entryId, entry => ConvertResultAsync(shareCreator.CreateEntryAsync(entry, model)));
 
         [HttpPost("stories/{storyId}/sharing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> CreateStoryAsync(string storyId, ShareModel model) => RunStoryAsync(storyId, story =>
-        {
-            return CreateAsync(
-                model,
-                userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId),
-                () => new StoryShare(storyId)
-            );
-        });
+        public Task<IActionResult> CreateStoryAsync(string storyId, ShareModel model) => RunStoryAsync(storyId, story => ConvertResultAsync(shareCreator.CreateStoryAsync(story, model)));
 
         [HttpPost("beings/{beingId}/sharing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> CreateBeingAsync(string beingId, ShareModel model) => RunBeingAsync(beingId, being =>
+        public Task<IActionResult> CreateBeingAsync(string beingId, ShareModel model) => RunBeingAsync(beingId, async being =>
         {
-            return CreateAsync(
-                model,
-                userId => db.BeingShares.Where(s => s.BeingId == beingId && s.UserId == userId),
-                () => new BeingShare(beingId)
-            );
+            if (being.Id == being.UserId && model.UserName != null)
+                return BadRequest();
+
+            return await ConvertResultAsync(shareCreator.CreateBeingAsync(being, model));
         });
 
         [HttpPost("profiles/{profileId}/sharing")]
@@ -214,11 +166,12 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> CreateProfileAsync([FromServices] ShareStatusService shareStatus, [FromServices] UserManager<User> userManager, string profileId, ShareModel model) => RunProfileAsync(shareStatus, userManager, profileId, profile =>
         {
-            return CreateAsync(
-                model,
-                userId => db.ProfileShares.Where(s => s.ProfileId == profileId && s.UserId == userId),
-                () => new ProfileShare(profileId)
-            );
+            // return shareCreator.CreateAsync(
+            //     model,
+            //     userId => db.ProfileShares.Where(s => s.ProfileId == profileId && s.UserId == userId),
+            //     () => new ProfileShare(profileId)
+            // );
+            throw new NotSupportedException("Profile sharing is discontinued");
         });
 
         private async Task<IActionResult> DeleteAsync<T>(string userName, Func<string, IQueryable<T>> findQuery)
@@ -260,6 +213,9 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [HttpDelete("beings/{beingId}/sharing/{userName}")]
         public Task<IActionResult> DeleteBeingAsync(string beingId, string userName) => RunBeingAsync(beingId, async being =>
         {
+            if (being.Id == being.UserId && userName != ShareStatusService.PublicUserName)
+                return BadRequest();
+
             return await DeleteAsync(
                 userName,
                 userId => db.BeingShares.Where(s => s.BeingId == beingId && s.UserId == userId)

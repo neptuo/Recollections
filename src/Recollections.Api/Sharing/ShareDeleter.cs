@@ -49,5 +49,16 @@ namespace Neptuo.Recollections.Sharing
             db.BeingShares.RemoveRange(entities);
             await db.SaveChangesAsync();
         }
+
+        public async Task DeleteBeingShareAsync(string beingId, string userId)
+        {
+            var entity = await db.BeingShares
+                .SingleOrDefaultAsync(s => s.BeingId == beingId && s.UserId == userId);
+
+            if (entity != null)
+                db.BeingShares.Remove(entity);
+            
+            await db.SaveChangesAsync();
+        }
     }
 }

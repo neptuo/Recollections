@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Neptuo.Recollections.Accounts;
+using Neptuo.Events;
+using Neptuo.Events.Handlers;
+using Neptuo.Recollections.Accounts.Events;
+using Neptuo.Recollections.Entries.Events.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
@@ -34,6 +37,10 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddHealthChecks()
                 .AddDbContextCheck<DataContext>("Entries.DataContext");
+
+            services
+                .AddTransient<UserBeingService>()
+                .AddTransient<IEventHandler<UserRegistered>, UserHandler>();
 
             if (environment.IsDevelopment())
                 EnsureDatabase(services);
@@ -96,6 +103,12 @@ namespace Neptuo.Recollections.Entries
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public void Configure(IServiceProvider services)
+        {
+            var events = services.GetRequiredService<IEventHandlerCollection>();
+            events.Add(new ServiceProviderEventHandler<UserRegistered>(services));
         }
     }
 }

@@ -35,6 +35,17 @@ namespace Neptuo.Recollections
             return userId;
         }
 
+        public static string FindUserName(this ClaimsPrincipal user)
+        {
+            Ensure.NotNull(user, "user");
+
+            string userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            if (String.IsNullOrEmpty(userName))
+                return null;
+
+            return userName;
+        }
+
         public static bool IsReadOnly(this IEnumerable<Claim> user)
         {
             Ensure.NotNull(user, "user");

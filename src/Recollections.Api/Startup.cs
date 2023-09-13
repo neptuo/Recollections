@@ -8,7 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Neptuo;
+using Neptuo.Events;
+using Neptuo.Events.Handlers;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
@@ -50,6 +51,11 @@ namespace Neptuo.Recollections
                 .AddControllers()
                 .AddNewtonsoftJson();
 
+            DefaultEventManager eventManager = new DefaultEventManager();
+            services
+                .AddSingleton<IEventDispatcher>(eventManager)
+                .AddSingleton<IEventHandlerCollection>(eventManager);
+
             services.Configure<CorsOptions>(configuration.GetSection("Cors"));
 
             accountsStartup.ConfigureServices(services, environment);
@@ -69,6 +75,7 @@ namespace Neptuo.Recollections
             UseCors(app);
 
             accountsStartup.ConfigureAuthentication(app, environment);
+            entriesStartup.Configure(app.ApplicationServices);
 
             app.UseEndpoints(endpoints =>
             {

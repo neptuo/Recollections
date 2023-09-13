@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Neptuo;
+using Neptuo.Events;
+using Neptuo.Recollections.Accounts.Events;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -88,7 +90,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest model)
+        public async Task<IActionResult> Register([FromServices] IEventDispatcher events, RegisterRequest model)
         {
             var user = new User(model.UserName);
             var result = await userManager.CreateAsync(user, model.Password);
@@ -96,6 +98,8 @@ namespace Neptuo.Recollections.Accounts.Controllers
             var response = new RegisterResponse();
             if (!result.Succeeded)
                 response.ErrorMessages.AddRange(result.Errors.Select(e => e.Description));
+            else
+                await events.PublishAsync(new UserRegistered(user.Id));
 
             return Ok(response);
         }

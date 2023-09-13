@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Neptuo.Recollections.Entries.Events.Handlers;
+using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Controllers;
@@ -93,7 +96,9 @@ public class ConnectionsController : ControllerBase
         if (userId == null)
             return Unauthorized();
 
-        var entity = await db.Connections.SingleOrDefaultAsync(c => (c.UserId == userId && c.OtherUser.UserName == otherUserName) || (c.OtherUserId == userId && c.User.UserName == otherUserName));
+        var entity = await db.Connections
+            .SingleOrDefaultAsync(c => (c.UserId == userId && c.OtherUser.UserName == otherUserName) || (c.OtherUserId == userId && c.User.UserName == otherUserName));
+        
         if (entity == null)
             return NotFound();
 
@@ -107,7 +112,7 @@ public class ConnectionsController : ControllerBase
     }
 
     [HttpPut]
-    public Task<IActionResult> PutAsync(ConnectionModel model) => RunConnectionAsync(model?.OtherUserName, async entity =>
+    public Task<IActionResult> PutAsync([FromServices] UserBeingService userBeings, [FromServices] ShareCreator shareCreator, [FromServices] ShareDeleter shareDeleter, [FromServices] IUserNameProvider userNames, ConnectionModel model) => RunConnectionAsync(model?.OtherUserName, async entity =>
     {
         string userId = HttpContext.User.FindUserId();
         
@@ -155,15 +160,48 @@ public class ConnectionsController : ControllerBase
         }
         
         await db.SaveChangesAsync();
+        await userBeings.EnsureAsync(entity.UserId);
+        await userBeings.EnsureAsync(entity.OtherUserId);
+
+        if (entity.State == 2) 
+        {
+            // Share beings
+            string userName = HttpContext.User.FindUserName();
+
+            string otherUserId;
+            string otherUserName;
+            if (userId == entity.UserId) 
+                otherUserId = entity.OtherUserId;
+            else
+                otherUserId = entity.UserId;
+
+            otherUserName = await userNames.GetUserNameAsync(otherUserId);
+
+            await shareCreator.CreateBeingAsync(userId, otherUserName, Permission.Read);
+            await shareCreator.CreateBeingAsync(otherUserId, userName, Permission.Read);
+        }
+        else if (entity.State == 3 || entity.State == 4)
+        {
+            await RemoveSharedBeingsAsync(shareDeleter, entity);
+        }
 
         return Ok();
     });
-    
+
+    private static async Task RemoveSharedBeingsAsync(ShareDeleter shareDeleter, UserConnection entity)
+    {
+        // Remove shares
+        await shareDeleter.DeleteBeingShareAsync(entity.UserId, entity.OtherUserId);
+        await shareDeleter.DeleteBeingShareAsync(entity.OtherUserId, entity.UserId);
+    }
+
     [HttpDelete("{otherUserName}")]
-    public Task<IActionResult> DeleteAsync(string otherUserName) => RunConnectionAsync(otherUserName, async entity =>
+    public Task<IActionResult> DeleteAsync([FromServices] ShareDeleter shareDeleter, string otherUserName) => RunConnectionAsync(otherUserName, async entity =>
     {
         db.Connections.Remove(entity);
         await db.SaveChangesAsync();
+        
+        await RemoveSharedBeingsAsync(shareDeleter, entity);
 
         return Ok();
     });

@@ -14,6 +14,7 @@ namespace Neptuo.Recollections.Sharing
         {
             services
                 .AddTransient<ShareStatusService>()
+                .AddTransient<ShareCreator>()
                 .AddTransient<ShareDeleter>();
         }
     }

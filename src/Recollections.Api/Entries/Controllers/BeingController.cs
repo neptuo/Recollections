@@ -144,6 +144,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             string userId = User.FindUserId();
 
+            if (userId == entity.Id)
+                return BadRequest();
+
             await shareDeleter.DeleteBeingSharesAsync(id);
 
             db.Beings.Remove(entity);
