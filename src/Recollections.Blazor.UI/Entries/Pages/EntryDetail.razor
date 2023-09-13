@@ -79,13 +79,15 @@
                                     Progress="@(async e => await OnUploadProgressAsync(e))"
                                     DragAndDropContainer="Container" />
                     </PermissionView>
-                    @if (Images != null && Images.Count > 0)
-                    {
-                        <button type="button" class="btn btn-sm btn-primary mr-1" @onclick="(() => Gallery.Open(0))">
-                            <Icon Identifier="images" />
-                            Gallery
-                        </button>
-                    }
+                    <span>
+                        @if (Images != null && Images.Count > 0)
+                        {
+                            <button type="button" class="btn btn-sm btn-primary mr-1" @onclick="(() => Gallery.Open(0))">
+                                <Icon Identifier="images" />
+                                Gallery
+                            </button>
+                        }
+                    </span>
                     <PermissionView Request="@PermissionRequest.Owner">
                         <ShareButton EntryId="@EntryId" />
 
