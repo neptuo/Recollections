@@ -13,6 +13,12 @@
                 </a>
             </li>
             <li>
+                <a class="dropdown-item" href="@Navigator.UrlConnections()">
+                    <Icon Prefix="fas" Identifier="link" />
+                    Connections
+                </a>
+            </li>
+            <li>
                 <a class="dropdown-item" @onclick="OnChangePassword">
                     <Icon Identifier="key" />
                     Change password
@@ -31,6 +37,12 @@
         <a class="nav-link" href="@Navigator.UrlProfile(UserState.UserId)">
             <Icon Identifier="address-card" />
             Profile
+        </a>
+    </li>
+    <li class="d-block d-lg-none">
+        <a class="nav-link" href="@Navigator.UrlConnections()">
+            <Icon Prefix="fas" Identifier="link" />
+            Connections
         </a>
     </li>
     <li class="d-block d-lg-none">

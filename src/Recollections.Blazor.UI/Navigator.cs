@@ -103,6 +103,12 @@ namespace Neptuo.Recollections
         public void OpenProfile(string userId)
             => uri.NavigateTo(UrlProfile(userId));
 
+        public string UrlConnections()
+            => $"/connections";
+
+        public void OpenConnections()
+            => uri.NavigateTo(UrlConnections());
+
         public string UrlTimeline()
             => "/";
 

@@ -1,0 +1,96 @@
+@using Neptuo.Recollections.Accounts
+@page "/connections"
+@layout Commons.Layouts.MainLayout
+
+<DocumentTitle Value="Connections" />
+
+<div class="beings">
+    <Validation ErrorMessages="ErrorMessages" />
+
+    <form @onsubmit="@CreateAsync">
+        <div class="row my-4">
+            <div class="col-md col-sm-12">
+                <input class="form-control" type="text" placeholder="Username..." @bind="UserName" />
+            </div>
+            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                <button class="btn btn-salmon d-block w-100">
+                    <Icon Identifier="plus" />
+                    Send invite
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row">
+        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any connections..." Context="connection">
+            <div class="col-sm-12 col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">
+                                    @connection.OtherUserName
+                                </h5>
+                            </div>
+                            <div class="col-auto">
+                                @if (connection.State == ConnectionState.Pending)
+                                {
+                                    <span>
+                                        <Icon Prefix="fas" Identifier="stopwatch" />
+                                        Pending
+                                    </span>
+                                }
+                                else if(connection.State == ConnectionState.Active)
+                                {
+                                    <span class="text-success">
+                                        <Icon Prefix="fas" Identifier="check" />
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">
+                                        <Icon Prefix="fas" Identifier="times" />
+                                        Rejected
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            @(connection.Role switch {
+                                ConnectionRole.Initiator => "Initiated by me",
+                                ConnectionRole.Acceptor => "Received"
+                            })
+                        </div>
+                        <div class="row g-1 mt-2">
+                            <div class="col d-grid">
+                                @if (connection.State == ConnectionState.Pending && connection.Role == ConnectionRole.Acceptor) 
+                                {
+                                    <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Active))">
+                                        <Icon Prefix="fas" Identifier="check" />
+                                        Accept
+                                    </button>
+                                }
+                            </div>
+                            <div class="col d-grid">
+                                @if (connection.State != ConnectionState.Rejected)
+                                {
+                                    <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Rejected))">
+                                        <Icon Prefix="fas" Identifier="times" />
+                                        Reject
+                                    </button>
+                                }
+                            </div>
+                            <div class="col d-grid">
+                                <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await DeleteAsync(connection))">
+                                    <Icon Prefix="fas" Identifier="trash-alt" />
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ListView>
+    </div>
+</div>
