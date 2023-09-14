@@ -24,7 +24,7 @@ namespace Neptuo.Recollections.Components
             switch (Request)
             {
                 case PermissionRequest.Owner:
-                    return State.IsOwner;
+                    return State.IsEditable;
                 case PermissionRequest.Write:
                     return State.IsEditable;
                 case PermissionRequest.Read:

@@ -48,7 +48,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AuthorizedModel<EntryModel>>> Get(string id)
+        public async Task<ActionResult<AuthorizedModel<EntryModel>>> Get([FromServices] ShareStatusService shareStatus, string id)
         {
             Ensure.NotNullOrEmpty(id, "id");
 
@@ -56,24 +56,19 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity == null)
                 return NotFound();
 
-            Permission permission = Permission.Write;
-            string userId = HttpContext.User.FindUserId();
-            if (entity.UserId != userId)
-            {
-                if (!await shareStatus.IsEntrySharedForReadAsync(id, userId))
-                    return Unauthorized();
-
-                if (!await shareStatus.IsEntrySharedForWriteAsync(id, userId))
-                    permission = Permission.Read;
-            }
+            Permission? permission = await shareStatus.GetEntryPermissionAsync(entity, HttpContext.User.FindUserId());
+            if (permission == null)
+                return Unauthorized();
 
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
 
-            AuthorizedModel<EntryModel> result = new AuthorizedModel<EntryModel>(model);
-            result.OwnerId = entity.UserId;
-            result.OwnerName = await userNames.GetUserNameAsync(entity.UserId);
-            result.UserPermission = permission;
+            var result = new AuthorizedModel<EntryModel>(model)
+            {
+                OwnerId = entity.UserId,
+                OwnerName = await userNames.GetUserNameAsync(entity.UserId, HttpContext.User),
+                UserPermission = permission.Value
+            };
 
             return Ok(result);
         }
@@ -116,7 +111,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             string userId = HttpContext.User.FindUserId();
             if (entity.UserId != userId)
             {
-                if (!await shareStatus.IsEntrySharedForWriteAsync(id, userId))
+                if (!await shareStatus.IsEntrySharedAsCoOwnerAsync(id, userId))
                     return Unauthorized();
             }
 
@@ -142,7 +137,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (entity == null)
                 return NotFound();
 
-            if (entity.UserId != userId)
+            if (!await shareStatus.IsEntrySharedAsCoOwnerAsync(id, userId))
                 return Unauthorized();
 
             await imageService.DeleteAllAsync(entity);

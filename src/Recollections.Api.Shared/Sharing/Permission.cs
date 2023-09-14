@@ -10,6 +10,6 @@ namespace Neptuo.Recollections.Sharing
     public enum Permission
     {
         Read = 0,
-        Write = 1
+        CoOwner = 1
     }
 }

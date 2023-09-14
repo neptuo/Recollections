@@ -83,7 +83,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> Get(string id) => RunBeingAsync(id, Permission.Read, async entity =>
         {
-            Permission permission = Permission.Write;
+            Permission permission = Permission.CoOwner;
             string userId = HttpContext.User.FindUserId();
             if (entity.UserId != userId)
             {
@@ -129,7 +129,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> Update(string id, BeingModel model) => RunBeingAsync(id, Permission.Write, async entity =>
+        public Task<IActionResult> Update(string id, BeingModel model) => RunBeingAsync(id, Permission.CoOwner, async entity =>
         {
             MapModelToEntity(model, entity);
 

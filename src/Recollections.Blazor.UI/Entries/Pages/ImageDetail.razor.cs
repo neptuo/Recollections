@@ -60,7 +60,7 @@ namespace Neptuo.Recollections.Entries.Pages
             UpdateOriginal();
 
             Permissions.IsOwner = Model.UserId == UserState.UserId;
-            Permissions.IsEditable = userPermission == Permission.Write;
+            Permissions.IsEditable = userPermission == Permission.CoOwner;
 
             Markers.Clear();
             Markers.Add(new MapMarkerModel

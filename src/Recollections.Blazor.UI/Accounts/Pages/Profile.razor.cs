@@ -52,7 +52,7 @@ namespace Neptuo.Recollections.Accounts.Pages
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetProfileAsync(UserId);
 
-            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.Write;
+            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == UserId;
 
             StateHasChanged();

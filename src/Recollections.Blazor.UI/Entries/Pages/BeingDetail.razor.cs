@@ -46,7 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetBeingAsync(BeingId);
 
-            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.Write;
+            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
         }
 

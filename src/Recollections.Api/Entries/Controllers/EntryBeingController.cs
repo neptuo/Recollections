@@ -52,7 +52,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPut]
-        public Task<IActionResult> Update(string entryId, List<string> beingIds) => RunEntryAsync(entryId, Permission.Write, async entry =>
+        public Task<IActionResult> Update(string entryId, List<string> beingIds) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
             string userId = HttpContext.User.FindUserId();
             if (userId == null)

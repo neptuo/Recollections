@@ -32,10 +32,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         protected IActionResult PremiumRequired()
             => StatusCode(StatusCodes.Status402PaymentRequired);
 
-        protected Task<IActionResult> RunEntryAsync(string entryId, Func<Entry, Task<IActionResult>> handler)
-            => RunEntryAsync(entryId, null, handler);
-
-        protected async Task<IActionResult> RunEntryAsync(string entryId, Permission? sharePermission, Func<Entry, Task<IActionResult>> handler)
+        protected async Task<IActionResult> RunEntryAsync(string entryId, Permission sharePermission, Func<Entry, Task<IActionResult>> handler)
         {
             Ensure.NotNullOrEmpty(entryId, "entryId");
 
@@ -49,15 +46,12 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return NotFound();
 
             string userId = HttpContext.User.FindUserId();
-            if (entity.UserId != userId)
-            {
-                if (sharePermission == null)
-                    return Unauthorized();
-                else if (sharePermission == Permission.Read && !await shareStatus.IsEntrySharedForReadAsync(entryId, userId))
-                    return Unauthorized();
-                else if (sharePermission == Permission.Write && !await shareStatus.IsEntrySharedForWriteAsync(entryId, userId))
-                    return Unauthorized();
-            }
+            Permission? actualPermission = await shareStatus.GetEntryPermissionAsync(entity, userId);
+            if (actualPermission == null)
+                return Unauthorized();
+
+            if (sharePermission == Permission.CoOwner && actualPermission.Value == Permission.Read)
+                return Unauthorized();
 
             return await handler(entity);
         }
@@ -85,7 +79,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                     return Unauthorized();
                 else if (sharePermission == Permission.Read && !await shareStatus.IsStorySharedForReadAsync(storyId, userId))
                     return Unauthorized();
-                else if (sharePermission == Permission.Write && !await shareStatus.IsStorySharedForWriteAsync(storyId, userId))
+                else if (sharePermission == Permission.CoOwner && !await shareStatus.IsStorySharedForWriteAsync(storyId, userId))
                     return Unauthorized();
             }
 
@@ -110,7 +104,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                     return Unauthorized();
                 else if (sharePermission == Permission.Read && !await shareStatus.IsBeingSharedForReadAsync(beingId, userId))
                     return Unauthorized();
-                else if (sharePermission == Permission.Write && !await shareStatus.IsBeingSharedForWriteAsync(beingId, userId))
+                else if (sharePermission == Permission.CoOwner && !await shareStatus.IsBeingSharedForWriteAsync(beingId, userId))
                     return Unauthorized();
             }
 

@@ -17,16 +17,13 @@ namespace Neptuo.Recollections.Entries.Controllers
     public class BeingEntriesController : Microsoft.AspNetCore.Mvc.ControllerBase
     {
         private readonly DataContext db;
-        private readonly ShareStatusService shareStatus;
         private readonly TimelineService timeline;
 
-        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, TimelineService timeline)
+        public BeingEntriesController(DataContext db, TimelineService timeline)
         {
             Ensure.NotNull(db, "db");
-            Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(timeline, "timeline");
             this.db = db;
-            this.shareStatus = shareStatus;
             this.timeline = timeline;
         }
 

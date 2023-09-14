@@ -45,7 +45,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
             AuthorizedModel<ProfileModel> result = new AuthorizedModel<ProfileModel>(model);
             result.OwnerId = entity.Id;
             result.OwnerName = entity.UserName;
-            result.UserPermission = entity.Id == HttpContext.User.FindUserId() ? Permission.Write : Permission.Read;
+            result.UserPermission = entity.Id == HttpContext.User.FindUserId() ? Permission.CoOwner : Permission.Read;
 
             return Task.FromResult<IActionResult>(Ok(result));
         });
@@ -82,7 +82,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
                     return Unauthorized();
                 else if (sharePermission == Permission.Read && !await shareStatus.IsProfileSharedForReadAsync(profileId, userId))
                     return Unauthorized();
-                else if (sharePermission == Permission.Write)
+                else if (sharePermission == Permission.CoOwner)
                     return Unauthorized();
             }
 

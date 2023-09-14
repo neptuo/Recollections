@@ -112,7 +112,7 @@ namespace Neptuo.Recollections.Entries.Pages
             UpdateOriginal();
 
             Log.Debug($"Entry user permission '{userPermission}'.");
-            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.Write;
+            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Owner.Id;
 
             Markers.Clear();

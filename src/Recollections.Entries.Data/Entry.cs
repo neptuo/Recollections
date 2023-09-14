@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class Entry
+    public class Entry : IOwnerByUser
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
