@@ -27,7 +27,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
         private readonly ShareCreator shareCreator;
 
         public ShareController(DataContext db, AccountsDataContext accountsDb, IUserNameProvider userNames, ShareStatusService shareStatus, ShareCreator shareCreator)
-            : base(db, shareStatus)
+            : base(db, shareStatus, runEntryObserver: query => query.Include(e => e.Story).Include(e => e.Beings))
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(accountsDb, "accountsDb");

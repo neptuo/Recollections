@@ -36,6 +36,7 @@ namespace Neptuo.Recollections.Sharing.Components
         protected List<ShareModel> Items { get; set; }
         protected bool HasPublic { get; set; }
 
+        protected string ErrorMessage { get; set; }
         protected bool IsCopiedToClipboard { get; set; } = false;
 
         protected override void OnParametersSet()
@@ -70,14 +71,29 @@ namespace Neptuo.Recollections.Sharing.Components
 
         protected async Task SaveAsync() 
         {
-            await api.SaveAsync(Items);
-            Modal.Hide();
+            ErrorMessage = null;
+            if (await api.SaveAsync(Items)) 
+            {
+                Modal.Hide();
+            }
+            else
+            {
+                ErrorMessage = "Saving failed. ";
+                if (EntryId != null)
+                    ErrorMessage += "Check that story and beings owners still has co-owner access.";
+                else if (StoryId != null)
+                    ErrorMessage += "Check that entry owners still has co-owner access.";
+                else if (BeingId != null)
+                    ErrorMessage += "Check that entry owners still has at least reader access.";
+
+                ErrorMessage += " If so, try again later, please";
+            }
         }
 
         interface IApi
         {
             Task<List<ShareModel>> GetListAsync();
-            Task SaveAsync(List<ShareModel> model);
+            Task<bool> SaveAsync(List<ShareModel> model);
         }
 
         class EntryApi : IApi
@@ -93,7 +109,7 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.entryId = entryId;
             }
 
-            public Task SaveAsync(List<ShareModel> model)
+            public Task<bool> SaveAsync(List<ShareModel> model)
                 => api.SaveEntryAsync(entryId, model);
 
             public Task<List<ShareModel>> GetListAsync()
@@ -113,7 +129,7 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.storyId = storyId;
             }
 
-            public Task SaveAsync(List<ShareModel> model)
+            public Task<bool> SaveAsync(List<ShareModel> model)
                 => api.SaveStoryAsync(storyId, model);
 
             public Task<List<ShareModel>> GetListAsync()
@@ -133,7 +149,7 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.beingId = beingId;
             }
 
-            public Task SaveAsync(List<ShareModel> model)
+            public Task<bool> SaveAsync(List<ShareModel> model)
                 => api.SaveBeingAsync(beingId, model);
 
             public Task<List<ShareModel>> GetListAsync()

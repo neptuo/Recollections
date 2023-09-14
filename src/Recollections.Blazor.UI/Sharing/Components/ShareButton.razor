@@ -9,6 +9,13 @@
         Share
     </TitleContent>
     <ChildContent>
+        @if (!String.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @ErrorMessage
+            </div>
+        }
+
         <ListView Items="@Items" IsLoading="@AreItemsLoading" Context="model" T="@ShareModel">
             <div class="row my-1" @key="@model.UserName">
                 <div class="col">

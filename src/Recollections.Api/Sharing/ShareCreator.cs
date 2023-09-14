@@ -15,13 +15,16 @@ public class ShareCreator
 {
     private readonly DataContext db;
     private readonly IUserNameProvider userNames;
+    private readonly ShareStatusService shareStatus;
 
-    public ShareCreator(DataContext db, IUserNameProvider userNames)
+    public ShareCreator(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus)
     {
         Ensure.NotNull(db, "db");
         Ensure.NotNull(userNames, "userNames");
+        Ensure.NotNull(shareStatus, "shareStatus");
         this.db = db;
         this.userNames = userNames;
+        this.shareStatus = shareStatus;
     }
 
     private async Task<bool> SaveAsync<T>(Func<string, IQueryable<T>> findQuery, Func<string, T> entityFactory, List<ShareModel> models)
@@ -64,33 +67,73 @@ public class ShareCreator
         return true;
     }
 
-    public Task<bool> SaveEntryAsync(Entry entry, List<ShareModel> models) 
+    private async Task<bool> HasPermissionAsync(string userId, List<ShareModel> models, Permission sharePermission)
     {
-        return SaveAsync(
+        var storyOwnerId = await userNames.GetUserNameAsync(userId);
+        var storyOwnerShare = models.FirstOrDefault(s => s.UserName == storyOwnerId);
+        return storyOwnerShare == null 
+            || (sharePermission == Permission.CoOwner && storyOwnerShare.Permission == Permission.CoOwner)
+            || (sharePermission == Permission.Read && storyOwnerShare.Permission != null);
+    }
+
+    public async Task<bool> SaveEntryAsync(Entry entry, List<ShareModel> models) 
+    {
+        // Ensure story owner has co-owner permission to entry.
+        if (entry.UserId != entry.Story?.UserId)
+        {
+            if (!await HasPermissionAsync(entry.Story.UserId, models, Permission.CoOwner))
+                return false;
+        }
+
+        // Ensure being owner has co-owner permission to entry.
+        foreach (var being in entry.Beings)
+        {
+            if (entry.UserId != being.UserId)
+            {
+                if (!await HasPermissionAsync(being.UserId, models, Permission.CoOwner))
+                    return false;
+            }
+        }
+
+        return await SaveAsync(
             userId => db.EntryShares.Where(s => s.EntryId == entry.Id && s.UserId == userId),
             userId => new EntryShare(entry.Id, userId),
             models
         );
     }
 
-    public Task<bool> SaveStoryAsync(Story story, List<ShareModel> models) 
+    public async Task<bool> SaveStoryAsync(Story story, List<ShareModel> models) 
     {
-        return SaveAsync(
+        // Ensure entry owner has co-owner permission to story.
+        foreach (var entry in db.Entries.Where(e => (e.Story.Id == story.Id || e.Chapter.Story.Id == story.Id) && e.UserId != story.UserId))
+        {
+            if (!await HasPermissionAsync(entry.UserId, models, Permission.CoOwner))
+                return false;
+        }
+
+        return await SaveAsync(
             userId => db.StoryShares.Where(s => s.StoryId == story.Id && s.UserId == userId),
             userId => new StoryShare(story.Id, userId),
             models
         );
     }
 
-    public Task<bool> SaveBeingAsync(Being being, List<ShareModel> models) 
-    {   
+    public async Task<bool> SaveBeingAsync(Being being, List<ShareModel> models) 
+    {
         foreach (var model in models)
         {
             if (being.Id == being.UserId && model.UserName != null)
-                return Task.FromResult(false);
+                return false;
         }
 
-        return SaveAsync(
+        // Ensure entry owner has co-owner permission to being.
+        foreach (var entry in db.Entries.Where(e => e.Beings.Any(b => b.Id == being.Id) && e.UserId != being.UserId))
+        {
+            if (!await HasPermissionAsync(entry.UserId, models, Permission.Read))
+                return false;
+        }
+
+        return await SaveAsync(
             userId => db.BeingShares.Where(s => s.BeingId == being.Id && s.UserId == userId),
             userId => new BeingShare(being.Id, userId),
             models
