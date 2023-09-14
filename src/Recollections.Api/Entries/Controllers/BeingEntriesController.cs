@@ -18,32 +18,32 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
+        private readonly TimelineService timeline;
 
-        public BeingEntriesController(DataContext db, ShareStatusService shareStatus)
+        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, TimelineService timeline)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(timeline, "timeline");
             this.db = db;
             this.shareStatus = shareStatus;
+            this.timeline = timeline;
         }
 
-        [HttpGet("entries")]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [HttpGet("timeline")]
+        [ProducesDefaultResponseType(typeof(TimelineListResponse))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public async Task<ActionResult<List<BeingEntryModel>>> GetStoryEntryList(string beingId)
+        public async Task<IActionResult> List(string beingId, int offset)
         {
             string userId = HttpContext.User.FindUserId();
-            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings.Where(b => b.Id == beingId).SelectMany(b => b.Entries), userId)
-                .OrderBy(e => e.When)
-                .Select(e => new BeingEntryModel()
-                {
-                    Id = e.Id,
-                    Title = e.Title
-                })
-                .ToListAsync();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
 
-            return Ok(models);
+            var query = db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId));
+
+            var (models, hasMore) = await timeline.GetAsync(query, userId, offset);
+            return Ok(new TimelineListResponse(models, hasMore));
         }
     }
 }

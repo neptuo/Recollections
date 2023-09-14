@@ -37,6 +37,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string UserId { get; set; }
 
+        [Parameter]
+        public Func<int, Task<TimelineListResponse>> DataGetter { get; set; }
+
         private int offset;
 
         protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
@@ -60,9 +63,11 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 IsLoading = true;
 
-                TimelineListResponse response = UserId == null
-                    ? await Api.GetTimelineListAsync(offset)
-                    : await Api.GetTimelineListAsync(UserId, offset);
+                TimelineListResponse response = DataGetter != null
+                    ? await DataGetter(offset)
+                    : UserId == null
+                        ? await Api.GetTimelineListAsync(offset)
+                        : await Api.GetTimelineListAsync(UserId, offset);
 
                 Entries.AddRange(response.Entries);
                 HasMore = response.HasMore;

@@ -21,9 +21,6 @@
                 <div class="text">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                <div class="entries">
-                    <BeingEntries BeingId="@Model.Id" />
-                </div>
 
                 <ActionPanel>
                     <PermissionView Request="@PermissionRequest.Owner">
@@ -37,6 +34,14 @@
                         }
                     </PermissionView>
                 </ActionPanel>
+
+                <ul class="nav nav-tabs mt-4">
+                    <li class="nav-item">
+                        <span class="nav-link active">Entries</span>
+                    </li>
+                </ul>
+
+                <Neptuo.Recollections.Entries.Pages.Timeline AllowCreate="false" DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" />
             </div>
         </PermissionContainer>
     </CascadingValue>
