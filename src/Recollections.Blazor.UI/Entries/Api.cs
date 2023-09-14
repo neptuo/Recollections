@@ -35,13 +35,20 @@ namespace Neptuo.Recollections.Entries
 
         private async Task<bool> SaveAsync<T>(string url, T model) 
         {
-            var response = await http.PutAsJsonAsync(url, model);
-            if (response.IsSuccessStatusCode)
-                return true;
-            else if (response.StatusCode == HttpStatusCode.BadRequest)
+            try
+            {
+                var response = await http.PutAsJsonAsync(url, model);
+                if (response.IsSuccessStatusCode)
+                    return true;
+                else if (response.StatusCode == HttpStatusCode.BadRequest)
+                    return false;
+                else
+                    response.EnsureSuccessStatusCode();
+            }
+            catch (UnauthorizedAccessException) 
+            {
                 return false;
-            else
-                response.EnsureSuccessStatusCode();
+            }
 
             return false;
         }

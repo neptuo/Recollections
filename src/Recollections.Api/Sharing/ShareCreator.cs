@@ -140,24 +140,6 @@ public class ShareCreator
         );
     }
 
-    public Task<bool> CreateEntryAsync(Entry entry, ShareModel model) 
-    {
-        return CreateAsync(
-            model, 
-            userId => db.EntryShares.Where(s => s.EntryId == entry.Id && s.UserId == userId), 
-            () => new EntryShare(entry.Id)
-        );
-    }
-
-    public Task<bool> CreateStoryAsync(Story story, ShareModel model) 
-    {
-        return CreateAsync(
-            model, 
-            userId => db.StoryShares.Where(s => s.StoryId == story.Id && s.UserId == userId), 
-            () => new StoryShare(story.Id)
-        );
-    }
-
     public async Task<bool> CreateBeingAsync(string beingId, string userName, Permission permission) 
         => await CreateBeingAsync(await db.Beings.SingleAsync(b => b.Id == beingId), new ShareModel(userName, permission));
 
