@@ -1,17 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
-using Neptuo;
 using Neptuo.Activators;
-using Neptuo.Exceptions.Handlers;
-using Neptuo.Logging;
 using Neptuo.Recollections.Commons.Exceptions;
-using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Beings;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,6 +31,19 @@ namespace Neptuo.Recollections.Entries
             this.http = httpFactory.Create();
             this.settings = settings.Value;
             this.faultHandler = faultHandler;
+        }
+
+        private async Task<bool> SaveAsync<T>(string url, T model) 
+        {
+            var response = await http.PutAsJsonAsync(url, model);
+            if (response.IsSuccessStatusCode)
+                return true;
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
+                return false;
+            else
+                response.EnsureSuccessStatusCode();
+
+            return false;
         }
 
         public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
@@ -101,8 +108,8 @@ namespace Neptuo.Recollections.Entries
         public Task<EntryStoryModel> GetEntryStoryAsync(string entryId)
             => faultHandler.Wrap(http.GetFromJsonAsync<EntryStoryModel>($"entries/{entryId}/story"));
 
-        public Task UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
-            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/story", model));
+        public Task<bool> UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
+            => faultHandler.Wrap(SaveAsync($"entries/{entryId}/story", model));
 
         public Task<List<StoryEntryModel>> GetStoryEntryListAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/entries"));

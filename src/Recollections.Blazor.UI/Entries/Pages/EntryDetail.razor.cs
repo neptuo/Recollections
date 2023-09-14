@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
@@ -38,6 +39,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected PropertyCollection Properties { get; set; }
+
+        [Inject]
+        protected IExceptionHandler ExceptionHandler { get; set; }
 
         [CascadingParameter]
         protected UserState UserState { get; set; }
@@ -378,8 +382,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async void StorySelected(EntryStoryModel model)
         {
-            await Api.UpdateEntryStoryAsync(EntryId, model);
-            await LoadStoryAsync();
+            if (!await Api.UpdateEntryStoryAsync(EntryId, model))
+                ExceptionHandler.Handle(new Exception("Missing required co-owner permission to select the story"));
+            else
+                await LoadStoryAsync();
+            
             StateHasChanged();
         }
 
