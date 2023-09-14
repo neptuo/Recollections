@@ -31,15 +31,11 @@ namespace Neptuo.Recollections.Sharing.Components
         [Parameter]
         public string BeingId { get; set; }
 
-        [Parameter]
-        public string ProfileId { get; set; }
-
         protected bool AreItemsLoading { get; set; }
         protected Modal Modal { get; set; }
         protected List<ShareModel> Items { get; set; }
         protected bool HasPublic { get; set; }
 
-        protected ShareModel NewShare { get; } = new ShareModel();
         protected bool IsCopiedToClipboard { get; set; } = false;
 
         protected override void OnParametersSet()
@@ -52,10 +48,8 @@ namespace Neptuo.Recollections.Sharing.Components
                 api = new StoryApi(Api, StoryId);
             else if (!String.IsNullOrEmpty(BeingId))
                 api = new BeingApi(Api, BeingId);
-            else if (!String.IsNullOrEmpty(ProfileId))
-                api = new ProfileApi(Api, ProfileId);
             else
-                throw Ensure.Exception.InvalidOperation("One of 'entryId' and 'storyId' must be provided.");
+                throw Ensure.Exception.InvalidOperation("One of 'EntryId', 'StoryId' or 'BeingId' must be provided.");
         }
 
         private async Task LoadAsync()
@@ -74,41 +68,24 @@ namespace Neptuo.Recollections.Sharing.Components
             _ = LoadAsync();
         }
 
-        protected async Task OnPublicShareAsync() 
+        private void PermissionChanged(ShareModel model, ChangeEventArgs args)
         {
-            if (HasPublic)
-                return;
-
-            var share = new ShareModel(null, Permission.Read);
-            await api.CreateAsync(share);
-            await LoadAsync();
+            if (args.Value == null)
+                model.Permission = null;
+            else
+                model.Permission = (Permission)args.Value;
         }
 
-        protected async Task OnAddAsync()
+        protected async Task SaveAsync() 
         {
-            if (String.IsNullOrEmpty(NewShare.UserName) || String.IsNullOrWhiteSpace(NewShare.UserName))
-                return;
-
-            NewShare.UserName = NewShare.UserName.Trim();
-
-            await api.CreateAsync(NewShare);
-            await LoadAsync();
-
-            NewShare.UserName = null;
-            NewShare.Permission = Permission.Read;
-        }
-
-        protected async Task OnDeleteAsync(ShareModel model)
-        {
-            await api.DeleteAsync(model);
-            await LoadAsync();
+            await api.SaveAsync(Items);
+            Modal.Hide();
         }
 
         interface IApi
         {
             Task<List<ShareModel>> GetListAsync();
-            Task CreateAsync(ShareModel model);
-            Task DeleteAsync(ShareModel model);
+            Task SaveAsync(List<ShareModel> model);
         }
 
         class EntryApi : IApi
@@ -124,11 +101,8 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.entryId = entryId;
             }
 
-            public Task CreateAsync(ShareModel model)
-                => api.CreateEntryAsync(entryId, model);
-
-            public Task DeleteAsync(ShareModel model)
-                => api.DeleteEntryAsync(entryId, model);
+            public Task SaveAsync(List<ShareModel> model)
+                => api.SaveEntryAsync(entryId, model);
 
             public Task<List<ShareModel>> GetListAsync()
                 => api.GetEntryListAsync(entryId);
@@ -147,11 +121,8 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.storyId = storyId;
             }
 
-            public Task CreateAsync(ShareModel model)
-                => api.CreateStoryAsync(storyId, model);
-
-            public Task DeleteAsync(ShareModel model)
-                => api.DeleteStoryAsync(storyId, model);
+            public Task SaveAsync(List<ShareModel> model)
+                => api.SaveStoryAsync(storyId, model);
 
             public Task<List<ShareModel>> GetListAsync()
                 => api.GetStoryListAsync(storyId);
@@ -170,37 +141,11 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.beingId = beingId;
             }
 
-            public Task CreateAsync(ShareModel model)
-                => api.CreateBeingAsync(beingId, model);
-
-            public Task DeleteAsync(ShareModel model)
-                => api.DeleteBeingAsync(beingId, model);
+            public Task SaveAsync(List<ShareModel> model)
+                => api.SaveBeingAsync(beingId, model);
 
             public Task<List<ShareModel>> GetListAsync()
                 => api.GetBeingListAsync(beingId);
-        }
-
-        class ProfileApi : IApi
-        {
-            private readonly Api api;
-            private readonly string profileId;
-
-            public ProfileApi(Api api, string profileId)
-            {
-                Ensure.NotNull(api, "api");
-                Ensure.NotNull(profileId, "profileId");
-                this.api = api;
-                this.profileId = profileId;
-            }
-
-            public Task CreateAsync(ShareModel model)
-                => api.CreateProfileAsync(profileId, model);
-
-            public Task DeleteAsync(ShareModel model)
-                => api.DeleteProfileAsync(profileId, model);
-
-            public Task<List<ShareModel>> GetListAsync()
-                => api.GetProfileListAsync(profileId);
         }
     }
 }

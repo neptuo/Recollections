@@ -18,14 +18,13 @@ namespace Neptuo.Recollections.Sharing
         /// <summary>
         /// Gets a share permission
         /// </summary>
-        public Permission Permission { get; set; }
+        public Permission? Permission { get; set; }
 
         public ShareModel()
         { }
 
-        public ShareModel(string userName, Permission permission)
+        public ShareModel(string userName, Permission? permission)
         {
-            Ensure.NotNull(permission, "permission");
             UserName = userName;
             Permission = permission;
         }

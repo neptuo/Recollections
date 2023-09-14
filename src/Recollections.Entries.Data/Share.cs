@@ -26,6 +26,14 @@ namespace Neptuo.Recollections.Entries
             Ensure.NotNull(entryId, "entryId");
             EntryId = entryId;
         }
+
+        public EntryShare(string entryId, string userId)
+        {
+            Ensure.NotNull(entryId, "entryId");
+            Ensure.NotNull(userId, "userId");
+            EntryId = entryId;
+            UserId = userId;
+        }
     }
 
     public class StoryShare : ShareBase
@@ -40,6 +48,14 @@ namespace Neptuo.Recollections.Entries
             Ensure.NotNull(storyId, "storyId");
             StoryId = storyId;
         }
+
+        public StoryShare(string storyId, string userId)
+        {
+            Ensure.NotNull(storyId, "storyId");
+            Ensure.NotNull(userId, "userId");
+            StoryId = storyId;
+            UserId = userId;
+        }
     }
 
     public class BeingShare : ShareBase
@@ -53,6 +69,14 @@ namespace Neptuo.Recollections.Entries
         {
             Ensure.NotNull(beingId, "beingId");
             BeingId = beingId;
+        }
+
+        public BeingShare(string beingId, string userId)
+        {
+            Ensure.NotNull(beingId, "beingId");
+            Ensure.NotNull(userId, "userId");
+            BeingId = beingId;
+            UserId = userId;
         }
     }
 

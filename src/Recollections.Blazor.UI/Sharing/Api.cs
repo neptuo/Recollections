@@ -27,37 +27,19 @@ namespace Neptuo.Recollections.Sharing
         public Task<List<ShareModel>> GetEntryListAsync(string entryId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"entries/{entryId}/sharing"));
 
-        public Task CreateEntryAsync(string entryId, ShareModel model)
-            => faultHandler.Wrap(http.PostAsJsonAsync($"entries/{entryId}/sharing", model));
-
-        public Task DeleteEntryAsync(string entryId, ShareModel model)
-            => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}/sharing/{model.UserName}"));
+        public Task SaveEntryAsync(string entryId, List<ShareModel> model)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/sharing", model));
 
         public Task<List<ShareModel>> GetStoryListAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"stories/{storyId}/sharing"));
 
-        public Task CreateStoryAsync(string storyId, ShareModel model)
-            => faultHandler.Wrap(http.PostAsJsonAsync($"stories/{storyId}/sharing", model));
-
-        public Task DeleteStoryAsync(string storyId, ShareModel model)
-            => faultHandler.Wrap(http.DeleteAsync($"stories/{storyId}/sharing/{model.UserName}"));
+        public Task SaveStoryAsync(string storyId, List<ShareModel> model)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"stories/{storyId}/sharing", model));
 
         public Task<List<ShareModel>> GetBeingListAsync(string beingId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"beings/{beingId}/sharing"));
 
-        public Task CreateBeingAsync(string beingId, ShareModel model)
-            => faultHandler.Wrap(http.PostAsJsonAsync($"beings/{beingId}/sharing", model));
-
-        public Task DeleteBeingAsync(string beingId, ShareModel model)
-            => faultHandler.Wrap(http.DeleteAsync($"beings/{beingId}/sharing/{model.UserName}"));
-
-        public Task<List<ShareModel>> GetProfileListAsync(string profileId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"profiles/{profileId}/sharing"));
-
-        public Task CreateProfileAsync(string profileId, ShareModel model)
-            => faultHandler.Wrap(http.PostAsJsonAsync($"profiles/{profileId}/sharing", model));
-
-        public Task DeleteProfileAsync(string profileId, ShareModel model)
-            => faultHandler.Wrap(http.DeleteAsync($"profiles/{profileId}/sharing/{model.UserName}"));
+        public Task SaveBeingAsync(string beingId, List<ShareModel> model)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"beings/{beingId}/sharing", model));
     }
 }

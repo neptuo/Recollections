@@ -9,67 +9,38 @@
         Share
     </TitleContent>
     <ChildContent>
-        <div class="row">
-            <div class="col">
-                <button class="btn btn-primary d-block w-100" @onclick="@OnPublicShareAsync" disabled="@HasPublic">
-                    Make visible for everyone
-                </button>
-            </div>
-        </div>
-        <div class="row mt-1 mb-3">
-            <div class="col text-center text-muted">
-                or share with specific user
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <input @bind="@NewShare.UserName" type="text" class="form-control form-control-sm" placeholder="Username..." />
-            </div>
-            <div class="col-3">
-                <select @bind="@NewShare.Permission" class="form-select form-select-sm">
-                    <option>Read</option>
-                    <option>Write</option>
-                </select>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-sm btn-primary" @onclick="OnAddAsync">
-                    <Icon Identifier="plus" />
-                </button>
-            </div>
-        </div>
-        <hr />
         <ListView Items="@Items" IsLoading="@AreItemsLoading" Context="model" T="@ShareModel">
-            <div class="row" @key="@model.UserName">
+            <div class="row my-1" @key="@model.UserName">
                 <div class="col">
-                    <strong>
+                    <strong class="align-middle">
                         @(model.UserName ?? "public")
                     </strong>
                 </div>
-                <div class="col-3">
-                    <span class="ms-2">
-                        @model.Permission
-                    </span>
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-sm btn-danger" @onclick="@(async () => await OnDeleteAsync(model))">
-                        <Icon Identifier="times" />
-                    </button>
+                <div class="col-7">
+                    <div class="btn-group">
+                        @PermissionButton(model, null, "Not Shared")
+                        @PermissionButton(model, Permission.Read, "Reader")
+                        @if (model.UserName != "public")
+                        {
+                            @PermissionButton(model, Permission.Write, "Co-owner")
+                        }
+                    </div>
                 </div>
             </div>
+            @if (model.UserName == "public")
+            {
+                <hr />
+            }
         </ListView>
-        <hr />
-        <div class="row mt-1 mb-3">
-            <div class="col text-center text-muted">
-                Copy current URL
-            </div>
-        </div>
-        <div class="input-group">
-            <input type="text" readonly value="@Navigator.GetCurrentUrl()" class="form-control" />
-            <div class="input-group-append">
-                <button class="btn btn-@(IsCopiedToClipboard ? "success" : "outline-secondary") m-0" type="button" @onclick="(() => { Interop.CopyToClipboard(Navigator.GetCurrentUrl()); IsCopiedToClipboard = true; })">
-                    <Icon Identifier="copy" />
-                </button>
-            </div>
-        </div>
     </ChildContent>
+    <Buttons>
+        <button class="btn btn-salmon btn-sm" @onclick="SaveAsync">Save</button>
+    </Buttons>
 </Modal>
+
+@code
+{
+    public RenderFragment PermissionButton(ShareModel model, Permission? target, string text) =>
+        @<button type="button" class="btn btn-sm my-0 @(model.Permission == target ? "btn-secondary" : "btn-outline-secondary")" @onclick="@(() => model.Permission = target)">@text</button>
+    ;
+}
