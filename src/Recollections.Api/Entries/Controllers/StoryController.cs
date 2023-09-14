@@ -192,7 +192,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpDelete("{id}")]
-        public Task<IActionResult> Delete(string id) => RunStoryAsync(id, async entity =>
+        public Task<IActionResult> Delete(string id) => RunStoryAsync(id, Permission.CoOwner, async entity =>
         {
             string userId = User.FindUserId();
 

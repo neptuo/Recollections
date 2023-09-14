@@ -64,9 +64,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
             model.RegistrationDate = entity.Created;
         }
 
-        protected Task<IActionResult> RunProfileAsync(string profileId, Func<User, Task<IActionResult>> handler)
-            => RunProfileAsync(profileId, null, handler);
-
         protected async Task<IActionResult> RunProfileAsync(string profileId, Permission? sharePermission, Func<User, Task<IActionResult>> handler)
         {
             Ensure.NotNullOrEmpty(profileId, "profileId");
@@ -85,7 +82,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 else if (sharePermission == Permission.CoOwner)
                     return Unauthorized();
             }
-
+            
             return await handler(entity);
         }
     }

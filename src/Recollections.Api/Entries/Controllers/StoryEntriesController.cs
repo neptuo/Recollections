@@ -34,7 +34,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status401Unauthorized)]
         public async Task<ActionResult<List<StoryEntryModel>>> GetStoryEntryList(string storyId)
         {
-            string userId = HttpContext.User.FindUserId();
+            string userId = User.FindUserId();
             var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                 .Where(e => e.Story.Id == storyId)
                 .OrderBy(e => e.When)
@@ -54,7 +54,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status401Unauthorized)]
         public async Task<ActionResult<List<StoryEntryModel>>> GetChapterEntryList(string storyId, string chapterId)
         {
-            string userId = HttpContext.User.FindUserId();
+            string userId = User.FindUserId();
             var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
                 .Where(e => e.Chapter.Story.Id == storyId && e.Chapter.Id == chapterId)
                 .OrderBy(e => e.When)

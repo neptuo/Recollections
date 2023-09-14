@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class Story
+    public class Story : IOwnerByUser
     {
         [Key]
         public string Id { get; set; }

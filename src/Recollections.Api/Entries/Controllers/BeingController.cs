@@ -81,23 +81,17 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> Get(string id) => RunBeingAsync(id, Permission.Read, async entity =>
+        public Task<IActionResult> Get(string id) => RunBeingAsync(id, Permission.Read, async (entity, permission) =>
         {
-            Permission permission = Permission.CoOwner;
-            string userId = HttpContext.User.FindUserId();
-            if (entity.UserId != userId)
-            {
-                if (!await shareStatus.IsBeingSharedForWriteAsync(id, userId))
-                    permission = Permission.Read;
-            }
-
             BeingModel model = new BeingModel();
             MapEntityToModel(entity, model);
 
-            AuthorizedModel<BeingModel> result = new AuthorizedModel<BeingModel>(model);
-            result.OwnerId = entity.UserId;
-            result.OwnerName = await userNames.GetUserNameAsync(entity.UserId);
-            result.UserPermission = permission;
+            var result = new AuthorizedModel<BeingModel>(model)
+            {
+                OwnerId = entity.UserId,
+                OwnerName = await userNames.GetUserNameAsync(entity.UserId),
+                UserPermission = permission
+            };
 
             return Ok(result);
         });
@@ -140,10 +134,11 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpDelete("{id}")]
-        public Task<IActionResult> Delete(string id) => RunBeingAsync(id, async entity =>
+        public Task<IActionResult> Delete(string id) => RunBeingAsync(id, Permission.CoOwner, async entity =>
         {
             string userId = User.FindUserId();
 
+            // Deleting user's being is forbidden
             if (userId == entity.Id)
                 return BadRequest();
 

@@ -48,18 +48,8 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AuthorizedModel<EntryModel>>> Get([FromServices] ShareStatusService shareStatus, string id)
+        public Task<IActionResult> Get(string id) => RunEntryAsync(id, Permission.Read, async (entity, permission) => 
         {
-            Ensure.NotNullOrEmpty(id, "id");
-
-            Entry entity = await db.Entries.FindAsync(id);
-            if (entity == null)
-                return NotFound();
-
-            Permission? permission = await shareStatus.GetEntryPermissionAsync(entity, HttpContext.User.FindUserId());
-            if (permission == null)
-                return Unauthorized();
-
             EntryModel model = new EntryModel();
             MapEntityToModel(entity, model);
 
@@ -67,11 +57,11 @@ namespace Neptuo.Recollections.Entries.Controllers
             {
                 OwnerId = entity.UserId,
                 OwnerName = await userNames.GetUserNameAsync(entity.UserId, HttpContext.User),
-                UserPermission = permission.Value
+                UserPermission = permission
             };
 
             return Ok(result);
-        }
+        });
 
         [HttpPost]
         public async Task<IActionResult> Create(EntryModel model)
@@ -99,22 +89,12 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, EntryModel model)
+        public Task<IActionResult> Update(string id, EntryModel model) => RunEntryAsync(id, Permission.CoOwner, async entity => 
         {
             if (id != model.Id)
                 return BadRequest();
 
-            Entry entity = await db.Entries.FindAsync(id);
-            if (entity == null)
-                return NotFound();
-
-            string userId = HttpContext.User.FindUserId();
-            if (entity.UserId != userId)
-            {
-                if (!await shareStatus.IsEntrySharedAsCoOwnerAsync(id, userId))
-                    return Unauthorized();
-            }
-
+            string userId = User.FindUserId();
             if (!await freeLimits.CanSetGpsAsync(userId, model.Locations.Count))
                 return PremiumRequired();
 
@@ -124,22 +104,11 @@ namespace Neptuo.Recollections.Entries.Controllers
             await db.SaveChangesAsync();
 
             return NoContent();
-        }
+        });
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public Task<IActionResult> Delete(string id) => RunEntryAsync(id, Permission.CoOwner, async entity => 
         {
-            string userId = HttpContext.User.FindUserId();
-            if (userId == null)
-                return Unauthorized();
-
-            Entry entity = await db.Entries.FindAsync(id);
-            if (entity == null)
-                return NotFound();
-
-            if (!await shareStatus.IsEntrySharedAsCoOwnerAsync(id, userId))
-                return Unauthorized();
-
             await imageService.DeleteAllAsync(entity);
             await shareDeleter.DeleteEntrySharesAsync(id);
 
@@ -147,7 +116,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             await db.SaveChangesAsync();
 
             return Ok();
-        }
+        });
 
         private void MapEntityToModel(Entry entity, EntryModel model)
         {

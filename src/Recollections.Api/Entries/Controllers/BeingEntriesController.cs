@@ -14,12 +14,13 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/beings/{beingId}")]
-    public class BeingEntriesController : Microsoft.AspNetCore.Mvc.ControllerBase
+    public class BeingEntriesController : ControllerBase
     {
         private readonly DataContext db;
         private readonly TimelineService timeline;
 
-        public BeingEntriesController(DataContext db, TimelineService timeline)
+        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, TimelineService timeline)
+            : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(timeline, "timeline");
@@ -31,16 +32,14 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesDefaultResponseType(typeof(TimelineListResponse))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public async Task<IActionResult> List(string beingId, int offset)
+        public Task<IActionResult> List(string beingId, int offset) => RunBeingAsync(beingId, Permission.Read, async being =>
         {
-            string userId = HttpContext.User.FindUserId();
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
+            string userId = User.FindUserId();
+            
             var query = db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId));
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, offset);
             return Ok(new TimelineListResponse(models, hasMore));
-        }
+        });
     }
 }

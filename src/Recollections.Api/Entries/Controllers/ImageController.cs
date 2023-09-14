@@ -83,7 +83,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var model = new ImageModel();
             service.MapEntityToModel(entity, model, entry.UserId);
 
-            var permission = model.UserId == User.FindUserId() || await shareStatus.IsEntrySharedAsCoOwnerAsync(entryId, User.FindUserId()) ? Permission.CoOwner : Permission.Read;
+            var permission = (await shareStatus.GetEntryPermissionAsync(entry, User.FindUserId())).Value;
 
             AuthorizedModel<ImageModel> result = new AuthorizedModel<ImageModel>(model);
             result.OwnerId = entry.UserId;

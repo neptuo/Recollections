@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Sharing
             return isAllowed;
         }
 
-        public async Task<Permission?> GetPermissionAsync<TEntity, TShare>(TEntity entity, IQueryable<TShare> findQuery, string userId) 
+        private async Task<Permission?> GetPermissionAsync<TEntity, TShare>(TEntity entity, IQueryable<TShare> findQuery, string userId) 
             where TEntity : IOwnerByUser
             where TShare: ShareBase
         {
@@ -49,12 +49,6 @@ namespace Neptuo.Recollections.Sharing
             
             return (Permission)permissions.Max();
         }
-
-        public Task<bool> IsEntrySharedForReadAsync(string entryId, string userId)
-            => IsSharedForReadAsync(db.EntryShares.Where(s => s.EntryId == entryId), userId);
-
-        public Task<bool> IsEntrySharedAsCoOwnerAsync(string entryId, string userId)
-            => IsSharedAsCoOwnerAsync(db.EntryShares.Where(s => s.EntryId == entryId), userId);
 
         public Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
             => GetPermissionAsync(entry, db.EntryShares.Where(s => s.EntryId == entry.Id), userId);
@@ -73,6 +67,9 @@ namespace Neptuo.Recollections.Sharing
             return isAllowed;
         }
 
+        public Task<Permission?> GetStoryPermissionAsync(Story story, string userId)
+            => GetPermissionAsync(story, db.StoryShares.Where(s => s.StoryId == story.Id), userId);
+
         public async Task<bool> IsStorySharedForWriteAsync(string storyId, string userId)
         {
             bool isAllowed = await db.StoryShares.AnyAsync(s => s.StoryId == storyId && (s.UserId == userId || s.UserId == PublicUserId) && s.Permission == (int)Permission.CoOwner);
@@ -87,17 +84,8 @@ namespace Neptuo.Recollections.Sharing
             return query.Where(e => e.UserId == userId || db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId));
         }
 
-        public async Task<bool> IsBeingSharedForReadAsync(string beingId, string userId)
-        {
-            bool isAllowed = await db.BeingShares.AnyAsync(s => s.BeingId == beingId && (s.UserId == userId || s.UserId == PublicUserId));
-            return isAllowed;
-        }
-
-        public async Task<bool> IsBeingSharedForWriteAsync(string beingId, string userId)
-        {
-            bool isAllowed = await db.BeingShares.AnyAsync(s => s.BeingId == beingId && (s.UserId == userId || s.UserId == PublicUserId) && s.Permission == (int)Permission.CoOwner);
-            return isAllowed;
-        }
+        public Task<Permission?> GetBeingPermissionAsync(Being being, string userId)
+            => GetPermissionAsync(being, db.BeingShares.Where(s => s.BeingId == being.Id), userId);
 
         public IQueryable<Being> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Being> query, string userId)
         {
