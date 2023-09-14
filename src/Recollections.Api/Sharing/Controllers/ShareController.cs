@@ -38,16 +38,28 @@ namespace Neptuo.Recollections.Sharing.Controllers
             this.shareCreator = shareCreator;
         }
 
-        private async Task<IActionResult> GetItemsAsync(IQueryable<ShareBase> query)
+        private async Task<IActionResult> GetItemsAsync(IQueryable<ShareBase> query, bool limitToPublicOnly = false)
         {
             var userId = HttpContext.User.FindUserId();
-            var otherUserIds = await accountsDb.Connections
-                .Where(c => c.State == 2) // Active only
-                .Where(c => c.UserId == userId || c.OtherUserId == userId)
-                .Select(c => c.UserId == userId ? c.OtherUserId : c.UserId)
-                .ToListAsync();
-                
-            var otherUserNames = (await userNames.GetUserNamesAsync(otherUserIds)).ToList();
+
+            List<string> otherUserIds = null;
+            List<string> otherUserNames = null;
+            if (limitToPublicOnly)
+            {
+                otherUserIds = new List<string>();
+                otherUserNames = new List<string>();
+            }
+            else 
+            {
+                otherUserIds = await accountsDb.Connections
+                    .Where(c => c.State == 2) // Active only
+                    .Where(c => c.UserId == userId || c.OtherUserId == userId)
+                    .Select(c => c.UserId == userId ? c.OtherUserId : c.UserId)
+                    .ToListAsync();
+                    
+                otherUserNames = (await userNames.GetUserNamesAsync(otherUserIds)).ToList();
+            }
+
             otherUserIds.Insert(0, ShareStatusService.PublicUserId);
             otherUserNames.Insert(0, ShareStatusService.PublicUserName);
             
@@ -81,31 +93,21 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, entry =>
-        {
-            return GetItemsAsync(db.EntryShares.Where(s => s.EntryId == entryId));
-        });
+        public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, entry => GetItemsAsync(db.EntryShares.Where(s => s.EntryId == entryId)));
 
         [HttpGet("stories/{storyId}/sharing")]
         [ProducesDefaultResponseType(typeof(ShareModel))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetStoryAsync(string storyId) => RunStoryAsync(storyId, story =>
-        {
-            return GetItemsAsync(db.StoryShares.Where(s => s.StoryId == storyId));
-        });
+        public Task<IActionResult> GetStoryAsync(string storyId) => RunStoryAsync(storyId, story => GetItemsAsync(db.StoryShares.Where(s => s.StoryId == storyId)));
 
         [HttpGet("beings/{beingId}/sharing")]
         [ProducesDefaultResponseType(typeof(ShareModel))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetBeingAsync(string beingId) => RunBeingAsync(beingId, being =>
-        {
-            return GetItemsAsync(db.BeingShares.Where(s => s.BeingId == beingId));
-        });
-
+        public Task<IActionResult> GetBeingAsync(string beingId) => RunBeingAsync(beingId, being => GetItemsAsync(db.BeingShares.Where(s => s.BeingId == beingId), HttpContext.User.FindUserId() == beingId));
 
         private async Task<IActionResult> ConvertResultAsync(Task<bool> result) => await result
             ? StatusCode(StatusCodes.Status200OK)
@@ -128,53 +130,5 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> SaveBeingAsync(string beingId, List<ShareModel> models) => RunBeingAsync(beingId, being => ConvertResultAsync(shareCreator.SaveBeingAsync(being, models)));
-
-        private async Task<IActionResult> DeleteAsync<T>(string userName, Func<string, IQueryable<T>> findQuery)
-            where T : ShareBase
-        {
-            string userId;
-            if (userName != null && userName != ShareStatusService.PublicUserName)
-                userId = (await userNames.GetUserIdsAsync(new[] { userName })).First();
-            else
-                userId = ShareStatusService.PublicUserId;
-
-            T entity = await findQuery(userId).FirstOrDefaultAsync();
-            if (entity == null)
-                return NotFound();
-
-            db.Set<T>().Remove(entity);
-            await db.SaveChangesAsync();
-            return Ok();
-        }
-
-        [HttpDelete("entries/{entryId}/sharing/{userName}")]
-        public Task<IActionResult> DeleteEntryAsync(string entryId, string userName) => RunEntryAsync(entryId, async entry =>
-        {
-            return await DeleteAsync(
-                userName, 
-                userId => db.EntryShares.Where(s => s.EntryId == entryId && s.UserId == userId)
-            );
-        });
-
-        [HttpDelete("stories/{storyId}/sharing/{userName}")]
-        public Task<IActionResult> DeleteStoryAsync(string storyId, string userName) => RunStoryAsync(storyId, async story =>
-        {
-            return await DeleteAsync(
-                userName,
-                userId => db.StoryShares.Where(s => s.StoryId == storyId && s.UserId == userId)
-            );
-        });
-
-        [HttpDelete("beings/{beingId}/sharing/{userName}")]
-        public Task<IActionResult> DeleteBeingAsync(string beingId, string userName) => RunBeingAsync(beingId, async being =>
-        {
-            if (being.Id == being.UserId && userName != ShareStatusService.PublicUserName)
-                return BadRequest();
-
-            return await DeleteAsync(
-                userName,
-                userId => db.BeingShares.Where(s => s.BeingId == beingId && s.UserId == userId)
-            );
-        });
     }
 }

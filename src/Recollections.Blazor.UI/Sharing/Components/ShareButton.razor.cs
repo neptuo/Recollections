@@ -68,14 +68,6 @@ namespace Neptuo.Recollections.Sharing.Components
             _ = LoadAsync();
         }
 
-        private void PermissionChanged(ShareModel model, ChangeEventArgs args)
-        {
-            if (args.Value == null)
-                model.Permission = null;
-            else
-                model.Permission = (Permission)args.Value;
-        }
-
         protected async Task SaveAsync() 
         {
             await api.SaveAsync(Items);

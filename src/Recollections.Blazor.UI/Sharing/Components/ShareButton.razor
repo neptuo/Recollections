@@ -16,7 +16,7 @@
                         @(model.UserName ?? "public")
                     </strong>
                 </div>
-                <div class="col-7">
+                <div class="col-auto">
                     <div class="btn-group">
                         @PermissionButton(model, null, "Not Shared")
                         @PermissionButton(model, Permission.Read, "Reader")
@@ -27,7 +27,7 @@
                     </div>
                 </div>
             </div>
-            @if (model.UserName == "public")
+            @if (model.UserName == "public" && Items.Count > 1)
             {
                 <hr />
             }
