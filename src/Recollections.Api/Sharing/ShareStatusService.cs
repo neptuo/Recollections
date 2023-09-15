@@ -36,29 +36,47 @@ namespace Neptuo.Recollections.Sharing
             return isAllowed;
         }
 
-        private async Task<Permission?> GetPermissionAsync<TEntity, TShare>(TEntity entity, IQueryable<TShare> findQuery, string userId) 
-            where TEntity : IOwnerByUser
+        private async Task<Permission?> GetPermissionAsync<TEntity, TShare>(TEntity entity, IQueryable<TShare> findShareQuery, string userId) 
+            where TEntity : IOwnerByUser, ISharingInherited
             where TShare: ShareBase
         {
             if (entity.UserId == userId)
                 return Permission.CoOwner;
             
-            var permissions = await findQuery.Where(s => s.UserId == userId || s.UserId == PublicUserId).Select(s => s.Permission).ToListAsync();
-            if (permissions.Count == 0)
-                return null;
+            var permissions = await findShareQuery.Where(s => s.UserId == userId || s.UserId == PublicUserId).Select(s => s.Permission).ToListAsync();
+            if (permissions.Count != 0)
+                return (Permission)permissions.Max();
             
-            return (Permission)permissions.Max();
+            return null;
         }
 
         public Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
-            => GetPermissionAsync(entry, db.EntryShares.Where(s => s.EntryId == entry.Id), userId);
+        {
+            IQueryable<ShareBase> findShareQuery = null;
+            if (entry.IsSharingInherited)
+                findShareQuery = db.StoryShares.Where(s => s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Story.Id || s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Chapter.Story.Id);
+            else
+                findShareQuery = db.EntryShares.Where(s => s.EntryId == entry.Id);
+
+            return GetPermissionAsync(entry, findShareQuery, userId);
+        }
 
         public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string userId)
         {
             if (userId == null)
                 userId = PublicUserId;
 
-            return query.Where(e => e.UserId == userId || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId));
+            // IReadOnlyList<string> readerUserIds = await connectionProvider.GetUserIdsWithReaderToAsync(userId);
+            // return query.Where(e => e.UserId == userId || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId) || (e.IsSharingInherited && readerUserIds.Contains(e.UserId)));
+            return query.Where(
+                e => e.UserId == userId 
+                    || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId)
+                    || (e.IsSharingInherited 
+                        && (db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId) 
+                            || db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId)
+                        )
+                    )
+            );
         }
 
         public async Task<bool> IsStorySharedForReadAsync(string storyId, string userId)
