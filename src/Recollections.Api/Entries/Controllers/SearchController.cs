@@ -21,16 +21,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext dataContext;
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
+        private readonly IConnectionProvider connections;
 
-        public SearchController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
+        public SearchController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus, IConnectionProvider connections)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(connections, "connections");
             this.dataContext = dataContext;
             this.userNames = userNames;
             this.shareStatus = shareStatus;
+            this.connections = connections;
         }
 
         [HttpGet]
@@ -45,8 +48,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
             List<SearchEntryModel> result = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
                 .OrderByDescending(e => e.When)
                 .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"))
                 .Skip(offset)

@@ -34,11 +34,11 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status401Unauthorized)]
         public Task<IActionResult> List(string beingId, int offset) => RunBeingAsync(beingId, Permission.Read, async being =>
         {
-            string userId = User.FindUserId();
+            var userId = User.FindUserId();
             
             var query = db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId));
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, offset);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
             return Ok(new TimelineListResponse(models, hasMore));
         });
     }

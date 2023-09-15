@@ -55,7 +55,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         {
             var query = dataContext.Entries.Where(e => e.UserId == id);
 
-            var (models, hasMore) = await timeline.GetAsync(query, id, offset);
+            var (models, hasMore) = await timeline.GetAsync(query, id, Enumerable.Empty<string>(), offset);
             return Ok(new TimelineListResponse(models, hasMore));
         });
 

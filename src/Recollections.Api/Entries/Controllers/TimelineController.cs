@@ -17,22 +17,22 @@ namespace Neptuo.Recollections.Entries.Controllers
     [Authorize]
     public class TimelineController : ControllerBase
     {
-        private readonly DataContext dataContext;
-        private readonly IUserNameProvider userNames;
+        private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
         private readonly TimelineService timeline;
+        private readonly IConnectionProvider connections;
 
-        public TimelineController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus, TimelineService timeline)
-            : base(dataContext, shareStatus)
+        public TimelineController(DataContext db, ShareStatusService shareStatus, TimelineService timeline, IConnectionProvider connections)
+            : base(db, shareStatus)
         {
-            Ensure.NotNull(dataContext, "dataContext");
-            Ensure.NotNull(userNames, "userNames");
+            Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(timeline, "timeline");
-            this.dataContext = dataContext;
-            this.userNames = userNames;
+            Ensure.NotNull(connections, "connectionProvider");
+            this.db = db;
             this.shareStatus = shareStatus;
             this.timeline = timeline;
+            this.connections = connections;
         }
 
         [HttpGet("api/timeline/list")]
@@ -42,11 +42,13 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var query = HttpContext.User.FindUserId() == userId
-                ? shareStatus.OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
-                : dataContext.Entries.Where(e => e.UserId == userId);
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, offset);
+            var query = HttpContext.User.FindUserId() == userId
+                ? shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
+                : db.Entries.Where(e => e.UserId == userId);
+
+            var (models, hasMore) = await timeline.GetAsync(query, userId, connectionReadUserIds, offset);
             return Ok(new TimelineListResponse(models, hasMore));
         }
     }

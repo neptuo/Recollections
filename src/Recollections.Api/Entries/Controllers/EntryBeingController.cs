@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -18,14 +18,17 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
+        private readonly IConnectionProvider connections;
 
-        public EntryBeingController(DataContext db, ShareStatusService shareStatus)
+        public EntryBeingController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
             : base(db, shareStatus, RunEntryObserver)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(connections, "connections");
             this.db = db;
             this.shareStatus = shareStatus;
+            this.connections = connections;
         }
 
         private static IQueryable<Entry> RunEntryObserver(IQueryable<Entry> query)
@@ -70,7 +73,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             foreach (var being in toRemove)
                 entry.Beings.Remove(being);
 
-            var toAdd = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId)
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
+            var toAdd = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectionReadUserIds)
                 .Where(b => beingIds.Contains(b.Id))
                 .ToListAsync();
 

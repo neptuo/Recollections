@@ -23,8 +23,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
         private readonly ShareDeleter shareDeleter;
         private readonly FreeLimitsChecker freeLimits;
+        private readonly IConnectionProvider connections;
 
-        public BeingController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter, FreeLimitsChecker freeLimits)
+        public BeingController(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus, ShareDeleter shareDeleter, FreeLimitsChecker freeLimits, IConnectionProvider connections)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
@@ -32,11 +33,13 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(shareDeleter, "shareDeleter");
             Ensure.NotNull(freeLimits, "freeLimits");
+            Ensure.NotNull(connections, "connections");
             this.db = db;
             this.userNames = userNames;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
             this.freeLimits = freeLimits;
+            this.connections = connections;
         }
 
         [HttpGet]
@@ -50,7 +53,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            List<Being> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId)
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
+            List<Being> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectionReadUserIds)
                 .OrderBy(b => b.Name)
                 .ToListAsync();
 
@@ -62,7 +67,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 MapEntityToModel(entity, model);
 
-                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
                     .Where(e => e.Beings.Contains(entity))
                     .CountAsync();
 

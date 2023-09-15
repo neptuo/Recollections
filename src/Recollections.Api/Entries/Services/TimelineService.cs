@@ -26,7 +26,7 @@ public class TimelineService
         this.shareStatus = shareStatus;
     }
 
-    public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, int offset)
+    public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds, int offset)
     {
         Ensure.NotNullOrEmpty(userId, "userId");
         Ensure.PositiveOrZero(offset, "offset");
@@ -66,7 +66,7 @@ public class TimelineService
             if (entry.BeingCount > 0) 
             {
                 entry.Model.Beings = await shareStatus
-                    .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                    .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
                     .Where(e => e.Id == entry.Model.Id)
                     .SelectMany(e => e.Beings)
                     .OrderBy(b => b.Name)

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -19,14 +19,17 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
+        private readonly IConnectionProvider connections;
 
-        public EntryStoryController(DataContext db, ShareStatusService shareStatus)
+        public EntryStoryController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
             : base(db, shareStatus, RunEntryModifier)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(connections, "connections");
             this.db = db;
             this.shareStatus = shareStatus;
+            this.connections = connections;
         }
 
         private static IQueryable<Entry> RunEntryModifier(IQueryable<Entry> query)
@@ -76,7 +79,9 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             if (model.StoryId != null)
             {
-                story = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId)
+                var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
+                story = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectionReadUserIds)
                     .Where(s => s.Id == model.StoryId)
                     .Include(s => s.Chapters)
                     .FirstOrDefaultAsync();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataContext = Neptuo.Recollections.Entries.DataContext;
 
 namespace Neptuo.Recollections.Sharing
 {
@@ -15,11 +17,14 @@ namespace Neptuo.Recollections.Sharing
         public const string PublicUserName = "public";
 
         private readonly DataContext db;
+        private readonly IConnectionProvider connections;
 
-        public ShareStatusService(DataContext db)
+        public ShareStatusService(DataContext db, IConnectionProvider connections)
         {
             Ensure.NotNull(db, "db");
+            Ensure.NotNull(connections, "connections");
             this.db = db;
+            this.connections = connections;
         }
 
         public async Task<bool> IsSharedForReadAsync<T>(IQueryable<T> findQuery, string userId)
@@ -46,8 +51,9 @@ namespace Neptuo.Recollections.Sharing
             var permissions = await findShareQuery.Where(s => s.UserId == userId || s.UserId == PublicUserId).Select(s => s.Permission).ToListAsync();
             if (permissions.Count != 0)
                 return (Permission)permissions.Max();
-            
-            return null;
+
+            var permission = (Permission?)await connections.GetPermissionAsync(userId, entity.UserId);
+            return permission;
         }
 
         public Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
@@ -61,7 +67,7 @@ namespace Neptuo.Recollections.Sharing
             return GetPermissionAsync(entry, findShareQuery, userId);
         }
 
-        public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string userId)
+        public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds)
         {
             if (userId == null)
                 userId = PublicUserId;
@@ -74,6 +80,7 @@ namespace Neptuo.Recollections.Sharing
                     || (e.IsSharingInherited 
                         && (db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId) 
                             || db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId)
+                            || connectionReadUserIds.Contains(e.UserId)
                         )
                     )
             );
@@ -94,23 +101,23 @@ namespace Neptuo.Recollections.Sharing
             return isAllowed;
         }
 
-        public IQueryable<Story> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Story> query, string userId)
+        public IQueryable<Story> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Story> query, string userId, IEnumerable<string> connectionReadUserIds)
         {
             if (userId == null)
                 userId = PublicUserId;
 
-            return query.Where(e => e.UserId == userId || db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId));
+            return query.Where(e => e.UserId == userId || db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId) || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId)));
         }
 
         public Task<Permission?> GetBeingPermissionAsync(Being being, string userId)
             => GetPermissionAsync(being, db.BeingShares.Where(s => s.BeingId == being.Id), userId);
 
-        public IQueryable<Being> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Being> query, string userId)
+        public IQueryable<Being> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Being> query, string userId, IEnumerable<string> connectionReadUserIds)
         {
             if (userId == null)
                 userId = PublicUserId;
 
-            return query.Where(e => e.UserId == userId || db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId));
+            return query.Where(e => e.UserId == userId || db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId) || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId)));
         }
 
         public async Task<bool> IsProfileSharedForReadAsync(string profileId, string userId)

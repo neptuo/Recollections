@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -19,13 +19,16 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
+        private readonly IConnectionProvider connections;
 
-        public StoryEntriesController(DataContext db, ShareStatusService shareStatus)
+        public StoryEntriesController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(connections, "connections");
             this.db = db;
             this.shareStatus = shareStatus;
+            this.connections = connections;
         }
 
         [HttpGet("entries")]
@@ -34,8 +37,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status401Unauthorized)]
         public async Task<ActionResult<List<StoryEntryModel>>> GetStoryEntryList(string storyId)
         {
-            string userId = User.FindUserId();
-            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
+            var userId = User.FindUserId();
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
+            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
                 .Where(e => e.Story.Id == storyId)
                 .OrderBy(e => e.When)
                 .Select(e => new StoryEntryModel()
@@ -54,8 +59,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status401Unauthorized)]
         public async Task<ActionResult<List<StoryEntryModel>>> GetChapterEntryList(string storyId, string chapterId)
         {
-            string userId = User.FindUserId();
-            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId)
+            var userId = User.FindUserId();
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
+            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
                 .Where(e => e.Chapter.Story.Id == storyId && e.Chapter.Id == chapterId)
                 .OrderBy(e => e.When)
                 .Select(e => new StoryEntryModel()

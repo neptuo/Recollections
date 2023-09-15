@@ -21,16 +21,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext dataContext;
         private readonly ShareStatusService shareStatus;
         private readonly IUserPremiumProvider premiumProvider;
+        private readonly IConnectionProvider connections;
 
-        public CalendarController(DataContext dataContext, ShareStatusService shareStatus, IUserPremiumProvider premiumProvider)
+        public CalendarController(DataContext dataContext, ShareStatusService shareStatus, IUserPremiumProvider premiumProvider, IConnectionProvider connections)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(premiumProvider, "premiumProvider");
+            Ensure.NotNull(connections, "connections");
             this.dataContext = dataContext;
             this.shareStatus = shareStatus;
             this.premiumProvider = premiumProvider;
+            this.connections = connections;
         }
 
         [HttpGet("{year}")]
@@ -48,8 +51,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await premiumProvider.HasPremiumAsync(userId))
                 return PremiumRequired();
 
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
             var result = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
                 .Where(e => e.When.Year == year)
                 .OrderByDescending(e => e.When)
                 .Select(e => new CalendarEntryModel()
@@ -75,8 +80,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
             var result = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
                 .Where(e => e.When.Year == year && e.When.Month == month)
                 .OrderByDescending(e => e.When)
                 .Select(e => new CalendarEntryModel()

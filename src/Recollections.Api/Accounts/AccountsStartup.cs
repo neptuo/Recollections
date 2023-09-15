@@ -38,6 +38,7 @@ namespace Neptuo.Recollections.Accounts
 
             services
                 .AddTransient<IUserNameProvider, DbUserNameProvider>()
+                .AddTransient<IConnectionProvider, DbConnectionProvider>()
                 .AddTransient<IUserPremiumProvider, DbUserPremiumProvider>();
 
             services

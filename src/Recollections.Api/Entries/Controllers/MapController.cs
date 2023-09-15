@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -19,13 +19,16 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext dataContext;
         private readonly ShareStatusService shareStatus;
+        private readonly IConnectionProvider connections;
 
-        public MapController(DataContext dataContext, ShareStatusService shareStatus)
+        public MapController(DataContext dataContext, ShareStatusService shareStatus, IConnectionProvider connections)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(shareStatus, "shareStatus");
+            Ensure.NotNull(connections, "connections");
             this.dataContext = dataContext;
             this.shareStatus = shareStatus;
+            this.connections = connections;
         }
 
         [HttpGet]
@@ -35,8 +38,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+
             List<MapEntryModel> results = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
                 .Select(e => new MapEntryModel()
                 {
                     Id = e.Id,
