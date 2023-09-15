@@ -106,7 +106,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await freeLimits.CanCreateBeingAsync(userId))
                 return PremiumRequired();
 
-            Being entity = new Being();
+            Being entity = new Being()
+            {
+                IsSharingInherited = true
+            };
             MapModelToEntity(model, entity);
             entity.UserId = userId;
             entity.Created = DateTime.Now;

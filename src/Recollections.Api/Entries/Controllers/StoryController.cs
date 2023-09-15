@@ -155,7 +155,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await freeLimits.CanCreateStoryAsync(userId))
                 return PremiumRequired();
 
-            Story entity = new Story();
+            Story entity = new Story()
+            {
+                IsSharingInherited = true
+            };
             MapModelToEntity(model, entity);
             entity.UserId = userId;
             entity.Order = await db.Stories.CountAsync(s => s.UserId == userId) + 1;

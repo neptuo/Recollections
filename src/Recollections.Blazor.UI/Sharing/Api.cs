@@ -25,7 +25,7 @@ namespace Neptuo.Recollections.Sharing
             this.faultHandler = faultHandler;
         }
 
-        private async Task<bool> SaveAsync(string url, List<ShareModel> model) 
+        private async Task<bool> SaveAsync(string url, ShareRootModel model) 
         {
             var response = await http.PutAsJsonAsync(url, model);
             if (response.IsSuccessStatusCode)
@@ -38,22 +38,22 @@ namespace Neptuo.Recollections.Sharing
             return false;
         }
 
-        public Task<List<ShareModel>> GetEntryListAsync(string entryId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"entries/{entryId}/sharing"));
+        public Task<ShareRootModel> GetEntryListAsync(string entryId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<ShareRootModel>($"entries/{entryId}/sharing"));
 
-        public Task<bool> SaveEntryAsync(string entryId, List<ShareModel> model)
+        public Task<bool> SaveEntryAsync(string entryId, ShareRootModel model)
             => faultHandler.Wrap(SaveAsync($"entries/{entryId}/sharing", model));
 
-        public Task<List<ShareModel>> GetStoryListAsync(string storyId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"stories/{storyId}/sharing"));
+        public Task<ShareRootModel> GetStoryListAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<ShareRootModel>($"stories/{storyId}/sharing"));
 
-        public Task<bool> SaveStoryAsync(string storyId, List<ShareModel> model)
+        public Task<bool> SaveStoryAsync(string storyId, ShareRootModel model)
             => faultHandler.Wrap(SaveAsync($"stories/{storyId}/sharing", model));
 
-        public Task<List<ShareModel>> GetBeingListAsync(string beingId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<ShareModel>>($"beings/{beingId}/sharing"));
+        public Task<ShareRootModel> GetBeingListAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<ShareRootModel>($"beings/{beingId}/sharing"));
 
-        public Task<bool> SaveBeingAsync(string beingId, List<ShareModel> model)
+        public Task<bool> SaveBeingAsync(string beingId, ShareRootModel model)
             => faultHandler.Wrap(SaveAsync($"beings/{beingId}/sharing", model));
     }
 }

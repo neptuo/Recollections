@@ -38,7 +38,8 @@ namespace Neptuo.Recollections.Sharing.Controllers
             this.shareCreator = shareCreator;
         }
 
-        private async Task<IActionResult> GetItemsAsync(string ownerId, IQueryable<ShareBase> query, bool limitToPublicOnly = false)
+        private async Task<IActionResult> GetItemsAsync<T>(T entity, IQueryable<ShareBase> query, bool limitToPublicOnly = false)
+            where T : ISharingInherited, IOwnerByUser
         {
             List<string> otherUserIds = null;
             List<string> otherUserNames = null;
@@ -51,8 +52,8 @@ namespace Neptuo.Recollections.Sharing.Controllers
             {
                 otherUserIds = await accountsDb.Connections
                     .Where(c => c.State == 2) // Active only
-                    .Where(c => c.UserId == ownerId || c.OtherUserId == ownerId)
-                    .Select(c => c.UserId == ownerId ? c.OtherUserId : c.UserId)
+                    .Where(c => c.UserId == entity.UserId || c.OtherUserId == entity.UserId)
+                    .Select(c => c.UserId == entity.UserId ? c.OtherUserId : c.UserId)
                     .ToListAsync();
                     
                 otherUserNames = (await userNames.GetUserNamesAsync(otherUserIds)).ToList();
@@ -83,7 +84,7 @@ namespace Neptuo.Recollections.Sharing.Controllers
                 return a.UserName.CompareTo(b.UserName);
             });
 
-            return Ok(result);
+            return Ok(new ShareRootModel(entity.IsSharingInherited, result));
         }
 
         [HttpGet("entries/{entryId}/sharing")]
@@ -91,21 +92,21 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, Permission.CoOwner, entry => GetItemsAsync(entry.UserId, db.EntryShares.Where(s => s.EntryId == entryId)));
+        public Task<IActionResult> GetEntryAsync(string entryId) => RunEntryAsync(entryId, Permission.CoOwner, entry => GetItemsAsync(entry, db.EntryShares.Where(s => s.EntryId == entryId)));
 
         [HttpGet("stories/{storyId}/sharing")]
         [ProducesDefaultResponseType(typeof(ShareModel))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetStoryAsync(string storyId) => RunStoryAsync(storyId, Permission.CoOwner, story => GetItemsAsync(story.UserId, db.StoryShares.Where(s => s.StoryId == storyId)));
+        public Task<IActionResult> GetStoryAsync(string storyId) => RunStoryAsync(storyId, Permission.CoOwner, story => GetItemsAsync(story, db.StoryShares.Where(s => s.StoryId == storyId)));
 
         [HttpGet("beings/{beingId}/sharing")]
         [ProducesDefaultResponseType(typeof(ShareModel))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetBeingAsync(string beingId) => RunBeingAsync(beingId, Permission.CoOwner, being => GetItemsAsync(being.UserId, db.BeingShares.Where(s => s.BeingId == beingId), HttpContext.User.FindUserId() == beingId));
+        public Task<IActionResult> GetBeingAsync(string beingId) => RunBeingAsync(beingId, Permission.CoOwner, being => GetItemsAsync(being, db.BeingShares.Where(s => s.BeingId == beingId), HttpContext.User.FindUserId() == beingId));
 
         private async Task<IActionResult> ConvertResultAsync(Task<bool> result) => await result
             ? StatusCode(StatusCodes.Status200OK)
@@ -115,18 +116,18 @@ namespace Neptuo.Recollections.Sharing.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> SaveEntryAsync(string entryId, List<ShareModel> models) => RunEntryAsync(entryId, Permission.CoOwner, entry => ConvertResultAsync(shareCreator.SaveEntryAsync(entry, models)));
+        public Task<IActionResult> SaveEntryAsync(string entryId, ShareRootModel model) => RunEntryAsync(entryId, Permission.CoOwner, entry => ConvertResultAsync(shareCreator.SaveEntryAsync(entry, model)));
 
         [HttpPut("stories/{storyId}/sharing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> SaveStoryAsync(string storyId, List<ShareModel> models) => RunStoryAsync(storyId, Permission.CoOwner, story => ConvertResultAsync(shareCreator.SaveStoryAsync(story, models)));
+        public Task<IActionResult> SaveStoryAsync(string storyId, ShareRootModel model) => RunStoryAsync(storyId, Permission.CoOwner, story => ConvertResultAsync(shareCreator.SaveStoryAsync(story, model)));
 
         [HttpPut("beings/{beingId}/sharing")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> SaveBeingAsync(string beingId, List<ShareModel> models) => RunBeingAsync(beingId, Permission.CoOwner, being => ConvertResultAsync(shareCreator.SaveBeingAsync(being, models)));
+        public Task<IActionResult> SaveBeingAsync(string beingId, ShareRootModel model) => RunBeingAsync(beingId, Permission.CoOwner, being => ConvertResultAsync(shareCreator.SaveBeingAsync(being, model)));
     }
 }

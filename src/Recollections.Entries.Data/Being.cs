@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class Being : IOwnerByUser
+    public class Being : IOwnerByUser, ISharingInherited
     {
         [Key]
         public string Id { get; set; }
@@ -22,5 +22,7 @@ namespace Neptuo.Recollections.Entries
         public DateTime Created { get; set; }
 
         public IList<Entry> Entries { get; set; } = new List<Entry>();
+
+        public bool IsSharingInherited { get; set; }
     }
 }

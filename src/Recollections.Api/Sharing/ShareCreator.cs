@@ -27,8 +27,9 @@ public class ShareCreator
         this.shareStatus = shareStatus;
     }
 
-    private async Task<bool> SaveAsync<T>(Func<string, IQueryable<T>> findQuery, Func<string, T> entityFactory, List<ShareModel> models)
-        where T : ShareBase
+    private async Task<bool> SaveAsync<TEntity, TShare>(TEntity entity, Func<string, IQueryable<TShare>> findQuery, Func<string, TShare> entityFactory, ShareRootModel model)
+        where TEntity : class, ISharingInherited
+        where TShare : ShareBase
     {
         async Task SaveSingleAsync(ShareModel model, string userId)
         {
@@ -37,51 +38,54 @@ public class ShareCreator
             if (model.Permission == null)
             {
                 if (entity != null)
-                    db.Set<T>().Remove(entity);
+                    db.Set<TShare>().Remove(entity);
             }
             else 
             {
                 if (entity == null)
-                    db.Set<T>().Add(entity = entityFactory(userId));
+                    db.Set<TShare>().Add(entity = entityFactory(userId));
 
                 entity.Permission = (int)model.Permission;
             }
         }
 
-        var publicShare = models.FirstOrDefault(s => s.UserName == ShareStatusService.PublicUserName);
+        var publicShare = model.Models.FirstOrDefault(s => s.UserName == ShareStatusService.PublicUserName);
         if (publicShare != null)
         {
             if (publicShare.Permission != null && publicShare.Permission != Permission.Read)
                 return false;
 
-            models.Remove(publicShare);
+            model.Models.Remove(publicShare);
 
             await SaveSingleAsync(publicShare, ShareStatusService.PublicUserId);
         }
 
-        var userIds = await userNames.GetUserIdsAsync(models.Select(m => m.UserName).ToArray());
-        for (int i = 0; i < models.Count; i++)
-            await SaveSingleAsync(models[i], userIds[i]);
+        var userIds = await userNames.GetUserIdsAsync(model.Models.Select(m => m.UserName).ToArray());
+        for (int i = 0; i < model.Models.Count; i++)
+            await SaveSingleAsync(model.Models[i], userIds[i]);
+
+        entity.IsSharingInherited = model.IsInherited;
+        db.Set<TEntity>().Update(entity);
 
         await db.SaveChangesAsync();
         return true;
     }
 
-    private async Task<bool> HasPermissionAsync(string userId, List<ShareModel> models, Permission sharePermission)
+    private async Task<bool> HasPermissionAsync(string userId, ShareRootModel model, Permission sharePermission)
     {
         var storyOwnerId = await userNames.GetUserNameAsync(userId);
-        var storyOwnerShare = models.FirstOrDefault(s => s.UserName == storyOwnerId);
+        var storyOwnerShare = model.Models.FirstOrDefault(s => s.UserName == storyOwnerId);
         return storyOwnerShare == null 
             || (sharePermission == Permission.CoOwner && storyOwnerShare.Permission == Permission.CoOwner)
             || (sharePermission == Permission.Read && storyOwnerShare.Permission != null);
     }
 
-    public async Task<bool> SaveEntryAsync(Entry entry, List<ShareModel> models) 
+    public async Task<bool> SaveEntryAsync(Entry entry, ShareRootModel model) 
     {
         // Ensure story owner has co-owner permission to entry.
-        if (entry.UserId != entry.Story?.UserId)
+        if (entry.Story != null && entry.UserId != entry.Story.UserId)
         {
-            if (!await HasPermissionAsync(entry.Story.UserId, models, Permission.CoOwner))
+            if (!await HasPermissionAsync(entry.Story.UserId, model, Permission.CoOwner))
                 return false;
         }
 
@@ -90,53 +94,56 @@ public class ShareCreator
         {
             if (entry.UserId != being.UserId)
             {
-                if (!await HasPermissionAsync(being.UserId, models, Permission.CoOwner))
+                if (!await HasPermissionAsync(being.UserId, model, Permission.CoOwner))
                     return false;
             }
         }
 
         return await SaveAsync(
+            entry,
             userId => db.EntryShares.Where(s => s.EntryId == entry.Id && s.UserId == userId),
             userId => new EntryShare(entry.Id, userId),
-            models
+            model
         );
     }
 
-    public async Task<bool> SaveStoryAsync(Story story, List<ShareModel> models) 
+    public async Task<bool> SaveStoryAsync(Story story, ShareRootModel model) 
     {
         // Ensure entry owner has co-owner permission to story.
         foreach (var entry in db.Entries.Where(e => (e.Story.Id == story.Id || e.Chapter.Story.Id == story.Id) && e.UserId != story.UserId))
         {
-            if (!await HasPermissionAsync(entry.UserId, models, Permission.CoOwner))
+            if (!await HasPermissionAsync(entry.UserId, model, Permission.CoOwner))
                 return false;
         }
 
         return await SaveAsync(
+            story,
             userId => db.StoryShares.Where(s => s.StoryId == story.Id && s.UserId == userId),
             userId => new StoryShare(story.Id, userId),
-            models
+            model
         );
     }
 
-    public async Task<bool> SaveBeingAsync(Being being, List<ShareModel> models) 
+    public async Task<bool> SaveBeingAsync(Being being, ShareRootModel model) 
     {
-        foreach (var model in models)
+        foreach (var item in model.Models)
         {
-            if (being.Id == being.UserId && model.UserName != null)
+            if (being.Id == being.UserId && item.UserName != null)
                 return false;
         }
 
         // Ensure entry owner has co-owner permission to being.
         foreach (var entry in db.Entries.Where(e => e.Beings.Any(b => b.Id == being.Id) && e.UserId != being.UserId))
         {
-            if (!await HasPermissionAsync(entry.UserId, models, Permission.Read))
+            if (!await HasPermissionAsync(entry.UserId, model, Permission.Read))
                 return false;
         }
 
         return await SaveAsync(
+            being,
             userId => db.BeingShares.Where(s => s.BeingId == being.Id && s.UserId == userId),
             userId => new BeingShare(being.Id, userId),
-            models
+            model
         );
     }
 

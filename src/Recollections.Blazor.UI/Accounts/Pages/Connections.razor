@@ -64,6 +64,13 @@
                         </div>
                         <div class="row g-1 mt-2">
                             <div class="col d-grid">
+                                @if (connection.State == ConnectionState.Active) 
+                                {
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="@(() => { ShareConnection = connection; ShareModal.Show(); })">
+                                        <Icon Prefix="fas" Identifier="share-alt" />
+                                        Share
+                                    </button>
+                                }
                                 @if (connection.State == ConnectionState.Pending && connection.Role == ConnectionRole.Acceptor) 
                                 {
                                     <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Active))">
@@ -94,3 +101,36 @@
         </ListView>
     </div>
 </div>
+
+<Modal @ref="ShareModal">
+    <TitleContent>
+        @if (ShareConnection != null)
+        {
+            <Icon Prefix="fas" Identifier="share-alt" />
+            <span>Sharing with @ShareConnection.OtherUserName</span>
+        }
+    </TitleContent>
+    <ChildContent>
+        @if (ShareConnection != null)
+        {
+            <div class="text-muted">
+                This setting effects how @ShareConnection.OtherUserName see your entries, beings and stories that don't have sharing explicitly set.
+            </div>
+            <div class="btn-group mt-3 w-100">
+                @PermissionButton(ShareConnection, null, "Not Shared")
+                @PermissionButton(ShareConnection, Permission.Read, "Reader")
+                @PermissionButton(ShareConnection, Permission.CoOwner, "Co-owner")
+            </div>
+        }
+    </ChildContent>
+    <Buttons>
+        <button class="btn btn-salmon btn-sm" @onclick="@(async () => { await SaveAsync(ShareConnection); ShareConnection = null; ShareModal.Hide(); })">Save</button>
+    </Buttons>
+</Modal>
+
+@code
+{
+    public RenderFragment PermissionButton(ConnectionModel model, Permission? target, string text) =>
+        @<button type="button" class="btn btn-sm my-0 @(model.Permission == target ? "btn-secondary" : "btn-outline-secondary")" @onclick="@(() => model.Permission = target)">@text</button>
+    ;
+}

@@ -31,9 +31,9 @@ namespace Neptuo.Recollections.Sharing.Components
         [Parameter]
         public string BeingId { get; set; }
 
-        protected bool AreItemsLoading { get; set; }
+        protected bool IsLoading { get; set; }
         protected Modal Modal { get; set; }
-        protected List<ShareModel> Items { get; set; }
+        protected ShareRootModel Model { get; set; }
         protected bool HasPublic { get; set; }
 
         protected string ErrorMessage { get; set; }
@@ -55,10 +55,10 @@ namespace Neptuo.Recollections.Sharing.Components
 
         private async Task LoadAsync()
         {
-            AreItemsLoading = true;
-            Items = await api.GetListAsync();
-            HasPublic = Items.Any(s => s.UserName == "public");
-            AreItemsLoading = false;
+            IsLoading = true;
+            Model = await api.GetAsync();
+            HasPublic = Model.Models.Any(s => s.UserName == "public");
+            IsLoading = false;
 
             StateHasChanged();
         }
@@ -72,7 +72,7 @@ namespace Neptuo.Recollections.Sharing.Components
         protected async Task SaveAsync() 
         {
             ErrorMessage = null;
-            if (await api.SaveAsync(Items)) 
+            if (await api.SaveAsync(Model)) 
             {
                 Modal.Hide();
             }
@@ -86,14 +86,14 @@ namespace Neptuo.Recollections.Sharing.Components
                 else if (BeingId != null)
                     ErrorMessage += "Check that entry owners still has at least reader access.";
 
-                ErrorMessage += " If so, try again later, please";
+                ErrorMessage += " If so, try again later please.";
             }
         }
 
         interface IApi
         {
-            Task<List<ShareModel>> GetListAsync();
-            Task<bool> SaveAsync(List<ShareModel> model);
+            Task<ShareRootModel> GetAsync();
+            Task<bool> SaveAsync(ShareRootModel model);
         }
 
         class EntryApi : IApi
@@ -109,10 +109,10 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.entryId = entryId;
             }
 
-            public Task<bool> SaveAsync(List<ShareModel> model)
+            public Task<bool> SaveAsync(ShareRootModel model)
                 => api.SaveEntryAsync(entryId, model);
 
-            public Task<List<ShareModel>> GetListAsync()
+            public Task<ShareRootModel> GetAsync()
                 => api.GetEntryListAsync(entryId);
         }
 
@@ -129,10 +129,10 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.storyId = storyId;
             }
 
-            public Task<bool> SaveAsync(List<ShareModel> model)
+            public Task<bool> SaveAsync(ShareRootModel model)
                 => api.SaveStoryAsync(storyId, model);
 
-            public Task<List<ShareModel>> GetListAsync()
+            public Task<ShareRootModel> GetAsync()
                 => api.GetStoryListAsync(storyId);
         }
 
@@ -149,10 +149,10 @@ namespace Neptuo.Recollections.Sharing.Components
                 this.beingId = beingId;
             }
 
-            public Task<bool> SaveAsync(List<ShareModel> model)
+            public Task<bool> SaveAsync(ShareRootModel model)
                 => api.SaveBeingAsync(beingId, model);
 
-            public Task<List<ShareModel>> GetListAsync()
+            public Task<ShareRootModel> GetAsync()
                 => api.GetBeingListAsync(beingId);
         }
     }

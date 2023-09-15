@@ -46,7 +46,8 @@ public class ConnectionsController : ControllerBase
                     ? ConnectionState.Pending
                     : c.State == 2
                         ? ConnectionState.Active
-                        : ConnectionState.Rejected
+                        : ConnectionState.Rejected,
+                Permission = c.UserId == userId ? (Permission?)c.Permission : (Permission?)c.OtherPermission,
             })
             .ToListAsync();
 
@@ -79,7 +80,8 @@ public class ConnectionsController : ControllerBase
         {
             UserId = userId,
             OtherUserId = otherUserId,
-            State = 1
+            State = 1,
+            Permission = (int?)model.Permission
         };
 
         db.Connections.Add(entity);
@@ -116,73 +118,88 @@ public class ConnectionsController : ControllerBase
     {
         string userId = HttpContext.User.FindUserId();
         
-        // Pending
-        if (entity.State == 1) 
-        {   
-            if (model.State == ConnectionState.Active) 
-            {
-                if (entity.UserId == userId)
-                    return BadRequest();
+        bool isStateChanged = false;
+        if (entity.State != (int)model.State || ((entity.State == 3 || entity.State == 4) && model.State != ConnectionState.Rejected))
+        {
+            isStateChanged = true;
 
-                entity.State = 2;
+            // Pending
+            if (entity.State == 1) 
+            {   
+                if (model.State == ConnectionState.Active) 
+                {
+                    if (entity.UserId == userId)
+                        return BadRequest();
+
+                    entity.State = 2;
+                }
+                else if (model.State == ConnectionState.Rejected)
+                {
+                    if (entity.UserId == userId)
+                        entity.State = 4;
+                    else
+                        entity.State = 3;
+                }
             }
-            else if (model.State == ConnectionState.Rejected)
+            // Active
+            else if (entity.State == 2)
             {
-                if (entity.UserId == userId)
-                    entity.State = 4;
+                if (model.State == ConnectionState.Rejected)
+                {
+                    // Reject
+                    if (entity.UserId == userId)
+                        entity.State = 4;
+                    else
+                        entity.State = 3;
+                }
+                else 
+                {
+                    return BadRequest();
+                }
+            }
+            // Rejected
+            else if (entity.State == 3 || entity.State == 4) 
+            {
+                if (model.State == ConnectionState.Active) 
+                    entity.State = 2;
                 else
-                    entity.State = 3;
+                    return BadRequest();
             }
         }
-        // Active
-        else if (entity.State == 2)
-        {
-            if (model.State == ConnectionState.Rejected)
-            {
-                // Reject
-                if (entity.UserId == userId)
-                    entity.State = 4;
-                else
-                    entity.State = 3;
-            }
-            else 
-            {
-                return BadRequest();
-            }
-        }
-        // Rejected
-        else if (entity.State == 3 || entity.State == 4) 
-        {
-            if (model.State == ConnectionState.Active) 
-                entity.State = 2;
-            else
-                return BadRequest();
-        }
+
+        if (entity.UserId == userId)
+            entity.Permission = (int?)model.Permission;
+        else
+            entity.OtherPermission = (int?)model.Permission;
         
         await db.SaveChangesAsync();
-        await userBeings.EnsureAsync(entity.UserId);
-        await userBeings.EnsureAsync(entity.OtherUserId);
 
-        if (entity.State == 2) 
+        if (isStateChanged)
         {
-            // Share beings
-            string userName = HttpContext.User.FindUserName();
+            await userBeings.EnsureAsync(entity.UserId);
+            await userBeings.EnsureAsync(entity.OtherUserId);
 
-            string otherUserId;
-            string otherUserName;
-            if (userId == entity.UserId) 
-                otherUserId = entity.OtherUserId;
-            else
-                otherUserId = entity.UserId;
+            if (entity.State == 2) 
+            {
+                // Share beings
+                string userName = HttpContext.User.FindUserName();
 
-            otherUserName = await userNames.GetUserNameAsync(otherUserId);
+                string otherUserId;
+                string otherUserName;
+                if (userId == entity.UserId) 
+                    otherUserId = entity.OtherUserId;
+                else
+                    otherUserId = entity.UserId;
 
-            await shareCreator.CreateBeingAsync(userId, otherUserName, Permission.Read);
-            await shareCreator.CreateBeingAsync(otherUserId, userName, Permission.Read);
-        }
-        else if (entity.State == 3 || entity.State == 4)
-        {
-            await RemoveSharedBeingsAsync(shareDeleter, entity);
+                otherUserName = await userNames.GetUserNameAsync(otherUserId);
+
+                await shareCreator.CreateBeingAsync(userId, otherUserName, Permission.Read);
+                await shareCreator.CreateBeingAsync(otherUserId, userName, Permission.Read);
+            }
+            else if (entity.State == 3 || entity.State == 4)
+            {
+                await RemoveSharedBeingsAsync(shareDeleter, entity);
+            }
         }
 
         return Ok();

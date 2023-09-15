@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Neptuo.Recollections.Accounts.Components;
-using Neptuo.Recollections.Entries.Beings;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +18,8 @@ public partial class Connections
     [CascadingParameter]
     protected UserState UserState { get; set; }
 
+    protected Modal ShareModal { get; set; }
+    protected ConnectionModel ShareConnection { get; set; }
 
     protected bool IsLoading { get; set; }
 
@@ -59,9 +61,14 @@ public partial class Connections
         await LoadDataAsync();
     }
 
-    protected async Task ChangeStateAsync(ConnectionModel model, ConnectionState newState)
+    protected Task ChangeStateAsync(ConnectionModel model, ConnectionState newState)
     {
         model.State = newState;
+        return SaveAsync(model);
+    }
+
+    protected async Task SaveAsync(ConnectionModel model)
+    {
         await Api.UpdateConnectionAsync(model);
         await LoadDataAsync();
     }

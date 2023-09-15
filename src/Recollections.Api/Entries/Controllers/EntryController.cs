@@ -76,7 +76,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await freeLimits.CanSetGpsAsync(userId, model.Locations.Count))
                 return PremiumRequired();
 
-            Entry entity = new Entry();
+            Entry entity = new Entry()
+            {
+                IsSharingInherited = true
+            };
             MapModelToEntity(model, entity);
             entity.UserId = userId;
             entity.Created = DateTime.Now;
