@@ -32,6 +32,8 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string EntryId { get; set; }
 
+        private string previousImageId;
+
         [Parameter]
         public string ImageId { get; set; }
 
@@ -49,7 +51,18 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             await base.OnInitializedAsync();
             await UserState.EnsureInitializedAsync();
-            await LoadAsync();
+        }
+
+        public override Task SetParametersAsync(ParameterView parameters)
+        {
+            previousImageId = ImageId;
+            return base.SetParametersAsync(parameters);
+        }
+
+        protected async override Task OnParametersSetAsync()
+        {
+            if (previousImageId != ImageId)
+                await LoadAsync();
         }
 
         private async Task LoadAsync()

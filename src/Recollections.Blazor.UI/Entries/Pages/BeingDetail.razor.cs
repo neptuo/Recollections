@@ -24,6 +24,8 @@ namespace Neptuo.Recollections.Entries.Pages
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
+        private string previousBeingId;
+
         [Parameter]
         public string BeingId { get; set; }
 
@@ -38,7 +40,18 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             await base.OnInitializedAsync();
             await UserState.EnsureInitializedAsync();
-            await LoadAsync();
+        }
+
+        public override Task SetParametersAsync(ParameterView parameters)
+        {
+            previousBeingId = BeingId;
+            return base.SetParametersAsync(parameters);
+        }
+
+        protected async override Task OnParametersSetAsync()
+        {
+            if (previousBeingId != BeingId)
+                await LoadAsync();
         }
 
         protected async Task LoadAsync()

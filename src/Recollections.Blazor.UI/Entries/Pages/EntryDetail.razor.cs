@@ -46,6 +46,8 @@ namespace Neptuo.Recollections.Entries.Pages
         [CascadingParameter]
         protected UserState UserState { get; set; }
 
+        private string previousEntryId;
+
         [Parameter]
         public string EntryId { get; set; }
 
@@ -92,11 +94,23 @@ namespace Neptuo.Recollections.Entries.Pages
 
             if (UserState.IsAuthenticated)
                 PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
-            
-            await LoadAsync();
-            await LoadImagesAsync();
-            await LoadStoryAsync();
-            await LoadBeingsAsync();
+        }
+
+        public override Task SetParametersAsync(ParameterView parameters)
+        {
+            previousEntryId = EntryId;
+            return base.SetParametersAsync(parameters);
+        }
+
+        protected async override Task OnParametersSetAsync()
+        {
+            if (previousEntryId != EntryId) 
+            {
+                await LoadAsync();
+                await LoadImagesAsync();
+                await LoadStoryAsync();
+                await LoadBeingsAsync();
+            }
         }
 
         private async Task LoadStoryAsync()
