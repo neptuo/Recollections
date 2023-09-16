@@ -17,9 +17,6 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         public List<string> ErrorMessages { get; } = new List<string>();
 
         public string UserName { get; set; }
@@ -29,7 +26,6 @@ namespace Neptuo.Recollections.Accounts.Pages
         {
             await base.OnInitializedAsync();
 
-            await UserState.EnsureInitializedAsync();
             if (UserState.IsAuthenticated)
                 Navigator.OpenTimeline();
         }

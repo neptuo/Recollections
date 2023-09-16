@@ -21,9 +21,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         private string previousBeingId;
 
         [Parameter]
@@ -35,12 +32,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
         protected BeingIconPicker IconPicker { get; set; }
-
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await UserState.EnsureInitializedAsync();
-        }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {

@@ -23,9 +23,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         [Parameter]
         public int? Year { get; set; }
 
@@ -43,12 +40,6 @@ namespace Neptuo.Recollections.Entries.Pages
             : Year.ToString();
 
         protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
-
-        protected override async Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
-        }
 
         public override async Task SetParametersAsync(ParameterView parameters)
         {

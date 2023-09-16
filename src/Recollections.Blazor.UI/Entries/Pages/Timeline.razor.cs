@@ -28,9 +28,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected ILog<Timeline> Log { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         [Parameter]
         public bool AllowCreate { get; set; } = true;
 
@@ -51,7 +48,6 @@ namespace Neptuo.Recollections.Entries.Pages
             Log.Debug("Timeline.Init");
 
             await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
 
             Log.Debug("Timeline.Load");
             await LoadAsync();

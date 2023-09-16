@@ -15,9 +15,6 @@ public partial class Connections
     [Inject]
     protected Api Api { get; set; }
 
-    [CascadingParameter]
-    protected UserState UserState { get; set; }
-
     protected Modal ShareModal { get; set; }
     protected ConnectionModel ShareConnection { get; set; }
 
@@ -30,11 +27,7 @@ public partial class Connections
 
     protected async override Task OnInitializedAsync()
     {
-        IsLoading = true;
-
         await base.OnInitializedAsync();
-        await UserState.EnsureAuthenticatedAsync();
-
         await LoadDataAsync();
     }
 

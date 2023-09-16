@@ -21,9 +21,6 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public Action<TimelineEntryModel> Selected { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         protected Modal Modal { get; set; }
 
         private int offset;

@@ -30,9 +30,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected IExceptionHandler ExceptionHandler { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         private string previousStoryId;
 
         [Parameter]
@@ -42,12 +39,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected StoryModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
-
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await UserState.EnsureInitializedAsync();
-        }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {

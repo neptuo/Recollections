@@ -19,21 +19,12 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Inject]
         protected UiOptions UiOptions { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         [Parameter]
         public string UserId { get; set; }
 
         protected ProfileModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
-
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await UserState.EnsureInitializedAsync();
-        }
 
         public async override Task SetParametersAsync(ParameterView parameters)
         {

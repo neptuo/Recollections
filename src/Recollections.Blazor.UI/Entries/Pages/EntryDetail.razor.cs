@@ -43,9 +43,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected IExceptionHandler ExceptionHandler { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         private string previousEntryId;
 
         [Parameter]
@@ -90,7 +87,6 @@ namespace Neptuo.Recollections.Entries.Pages
             Log.Debug("OnInitializedAsync");
 
             await base.OnInitializedAsync();
-            await UserState.EnsureInitializedAsync();
 
             if (UserState.IsAuthenticated)
                 PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);

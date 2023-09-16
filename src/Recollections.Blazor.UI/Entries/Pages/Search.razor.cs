@@ -21,9 +21,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected ILog<Search> Log { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         [Inject]
         protected Api Api { get; set; }
 
@@ -49,7 +46,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
             Navigator.LocationChanged += OnLocationChanged;
         }
 

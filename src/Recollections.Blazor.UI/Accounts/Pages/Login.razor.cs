@@ -19,9 +19,6 @@ namespace Neptuo.Recollections.Accounts.Pages
         [Inject]
         protected ILog<Login> Log { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         [Required]
         protected string UserName { get; set; }
 
@@ -34,8 +31,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-
-            await UserState.EnsureInitializedAsync();
+            
             if (UserState.IsAuthenticated)
                 Navigator.OpenTimeline();
         }

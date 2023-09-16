@@ -21,9 +21,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Api Api { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         protected bool IsLoading { get; set; }
 
         public string Title { get; set; }
@@ -36,8 +33,6 @@ namespace Neptuo.Recollections.Entries.Pages
             IsLoading = true;
 
             await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
-
             await LoadDataAsync();
         }
 

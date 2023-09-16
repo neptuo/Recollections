@@ -1,5 +1,6 @@
 ﻿@page "/users/{UserId}"
 @layout Commons.Layouts.MainLayout
+@inherits UserStateComponentBase
 
 <DocumentTitle Value="@(Owner?.Name ?? UserId)" />
 

@@ -37,21 +37,12 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string ImageId { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         private ImageModel original;
         protected ImageModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
-
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await UserState.EnsureInitializedAsync();
-        }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {

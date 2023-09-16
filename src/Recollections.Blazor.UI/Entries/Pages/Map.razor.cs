@@ -23,9 +23,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected PropertyCollection Properties { get; set; }
 
-        [CascadingParameter]
-        protected UserState UserState { get; set; }
-
         protected List<MapEntryModel> Entries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
@@ -37,7 +34,6 @@ namespace Neptuo.Recollections.Entries.Pages
             PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
 
             await base.OnInitializedAsync();
-            await UserState.EnsureAuthenticatedAsync();
 
             await LoadAsync();
         }
