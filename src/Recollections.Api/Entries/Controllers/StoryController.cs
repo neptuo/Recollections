@@ -59,7 +59,6 @@ namespace Neptuo.Recollections.Entries.Controllers
             var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
 
             List<Story> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectionReadUserIds)
-                .OrderByDescending(s => s.Order)
                 .ToListAsync();
 
             List<StoryListModel> models = new List<StoryListModel>();
@@ -100,6 +99,18 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userNames = await this.userNames.GetUserNamesAsync(models.Select(e => e.UserId).ToArray());
             for (int i = 0; i < models.Count; i++)
                 models[i].UserName = userNames[i];
+
+            models.Sort((a, b) => 
+            {
+                int compare = (b.MaxDate ?? DateTime.MinValue).CompareTo(a.MaxDate ?? DateTime.MinValue);
+                if (compare == 0)
+                    compare = (b.MinDate ?? DateTime.MinValue).CompareTo(a.MinDate ?? DateTime.MinValue);
+
+                if (compare == 0)
+                    compare = a.Title.CompareTo(b.Title);
+
+                return compare;
+            });
 
             return Ok(models);
         }
@@ -166,7 +177,6 @@ namespace Neptuo.Recollections.Entries.Controllers
             };
             MapModelToEntity(model, entity);
             entity.UserId = userId;
-            entity.Order = await db.Stories.CountAsync(s => s.UserId == userId) + 1;
             entity.Created = DateTime.Now;
 
             await db.Stories.AddAsync(entity);
@@ -214,12 +224,6 @@ namespace Neptuo.Recollections.Entries.Controllers
             {
                 entry.Chapter = null;
                 db.Entries.Update(entry);
-            }
-
-            foreach (var story in await db.Stories.Where(e => e.UserId == userId && e.Order > entity.Order).ToListAsync())
-            {
-                story.Order--;
-                db.Stories.Update(story);
             }
 
             foreach (var chapter in entity.Chapters)

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class BeingDetail
+    public partial class BeingDetail : UserStateComponentBase
     {
         [Inject]
         protected Api Api { get; set; }

@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Neptuo.Recollections.Migrations;
+
 
 #nullable disable
 
 namespace Neptuo.Recollections.Entries.Migrations
 {
     /// <inheritdoc />
-    public partial class InheritSharing : Migration
+    public partial class InheritSharing : MigrationWithSchema<DataContext>
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -13,21 +15,21 @@ namespace Neptuo.Recollections.Entries.Migrations
             migrationBuilder.AddColumn<bool>(
                 name: "IsSharingInherited",
                 table: "Stories",
-                type: "INTEGER",
+                schema: Schema.Name,
                 nullable: false,
                 defaultValue: false);
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsSharingInherited",
                 table: "Entries",
-                type: "INTEGER",
+                schema: Schema.Name,
                 nullable: false,
                 defaultValue: false);
 
             migrationBuilder.AddColumn<bool>(
                 name: "IsSharingInherited",
                 table: "Beings",
-                type: "INTEGER",
+                schema: Schema.Name,
                 nullable: false,
                 defaultValue: false);
         }
@@ -37,15 +39,18 @@ namespace Neptuo.Recollections.Entries.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "IsSharingInherited",
-                table: "Stories");
+                table: "Stories",
+                schema: Schema.Name);
 
             migrationBuilder.DropColumn(
                 name: "IsSharingInherited",
-                table: "Entries");
+                table: "Entries",
+                schema: Schema.Name);
 
             migrationBuilder.DropColumn(
                 name: "IsSharingInherited",
-                table: "Beings");
+                table: "Beings",
+                schema: Schema.Name);
         }
     }
 }
