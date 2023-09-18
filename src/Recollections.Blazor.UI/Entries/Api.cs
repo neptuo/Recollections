@@ -118,11 +118,11 @@ namespace Neptuo.Recollections.Entries
         public Task<bool> UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
             => faultHandler.Wrap(SaveAsync($"entries/{entryId}/story", model));
 
-        public Task<List<StoryEntryModel>> GetStoryEntryListAsync(string storyId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/entries"));
+        public Task<TimelineListResponse> GetStoryTimelineAsync(string storyId, int? offset)
+            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"stories/{storyId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
-        public Task<List<StoryEntryModel>> GetStoryChapterEntryListAsync(string storyId, string chapterId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryEntryModel>>($"stories/{storyId}/chapters/{chapterId}/entries"));
+        public Task<TimelineListResponse> GetStoryChapterTimelineAsync(string storyId, string chapterId, int? offset)
+            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"stories/{storyId}/chapters/{chapterId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
         public Task<List<BeingListModel>> GetBeingListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<BeingListModel>>("beings"));

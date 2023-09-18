@@ -159,6 +159,10 @@ $dot-diameter: 18px;
     @include narrow;
 }
 
+.entry-detail {
+    @include narrow;
+}
+
 @media (max-width: 768px) {
     @include narrow;
 

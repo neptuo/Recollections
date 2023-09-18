@@ -85,10 +85,13 @@
     }
 </div>
 
-<div class="entry-more">
-    <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="Here I started..." />
-    @if (Entries.Count > 0 && HasMore && !IsLoading) 
-    {
-        <AutoloadNext Intersected="LoadMoreAsync" />
-    }
-</div>
+@if (AllowMore)
+{
+    <div class="entry-more">
+        <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="Here I started..." />
+        @if (Entries.Count > 0 && HasMore && !IsLoading) 
+        {
+            <AutoloadNext Intersected="LoadMoreAsync" />
+        }
+    </div>
+}

@@ -15,64 +15,46 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
     [Route("api/stories/{storyId}")]
-    public class StoryEntriesController : Microsoft.AspNetCore.Mvc.ControllerBase
+    public class StoryEntriesController : ControllerBase
     {
         private readonly DataContext db;
-        private readonly ShareStatusService shareStatus;
-        private readonly IConnectionProvider connections;
+        private readonly TimelineService timeline;
 
-        public StoryEntriesController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
+        public StoryEntriesController(DataContext db, ShareStatusService shareStatus, TimelineService timeline)
+            : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
-            Ensure.NotNull(shareStatus, "shareStatus");
-            Ensure.NotNull(connections, "connections");
+            Ensure.NotNull(timeline, "timeline");
             this.db = db;
-            this.shareStatus = shareStatus;
-            this.connections = connections;
+            this.timeline = timeline;
         }
 
-        [HttpGet("entries")]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [HttpGet("timeline")]
+        [ProducesDefaultResponseType(typeof(TimelineListResponse))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public async Task<ActionResult<List<StoryEntryModel>>> GetStoryEntryList(string storyId)
+        public Task<IActionResult> GetStoryTimeline(string storyId, int offset) => RunStoryAsync(storyId, Permission.Read, async story =>
         {
             var userId = User.FindUserId();
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            
+            var query = db.Entries.Where(e => e.Story.Id == storyId);
 
-            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
-                .Where(e => e.Story.Id == storyId)
-                .OrderBy(e => e.When)
-                .Select(e => new StoryEntryModel()
-                {
-                    Id = e.Id,
-                    Title = e.Title
-                })
-                .ToListAsync();
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
+            return Ok(new TimelineListResponse(models, hasMore));
+        });
 
-            return Ok(models);
-        }
-
-        [HttpGet("chapters/{chapterId}/entries")]
-        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [HttpGet("chapters/{chapterId}/timeline")]
+        [ProducesDefaultResponseType(typeof(TimelineListResponse))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public async Task<ActionResult<List<StoryEntryModel>>> GetChapterEntryList(string storyId, string chapterId)
+        public Task<IActionResult> GetChapterTimeline(string storyId, string chapterId, int offset) => RunStoryAsync(storyId, Permission.Read, async story =>
         {
             var userId = User.FindUserId();
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            
+            var query = db.Entries.Where(e => e.Chapter.Id == chapterId);
 
-            var models = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
-                .Where(e => e.Chapter.Story.Id == storyId && e.Chapter.Id == chapterId)
-                .OrderBy(e => e.When)
-                .Select(e => new StoryEntryModel()
-                {
-                    Id = e.Id,
-                    Title = e.Title
-                })
-                .ToListAsync();
-
-            return Ok(models);
-        }
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
+            return Ok(new TimelineListResponse(models, hasMore));
+        });
     }
 }

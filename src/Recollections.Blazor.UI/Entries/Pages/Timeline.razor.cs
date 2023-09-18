@@ -32,6 +32,9 @@ namespace Neptuo.Recollections.Entries.Pages
         public bool AllowCreate { get; set; } = true;
 
         [Parameter]
+        public bool AllowMore { get; set; } = true;
+
+        [Parameter]
         public string UserId { get; set; }
 
         [Parameter]

@@ -579,6 +579,34 @@ h4 .inline-editor-viewmode .oi {
   margin-left: 0;
 }
 
+.entry-detail .timeline:before {
+  left: 7px;
+}
+.entry-detail .entry .title {
+  position: initial;
+  width: auto;
+  float: none;
+  padding-right: 0;
+  padding-left: 30px;
+  text-align: left;
+  position: relative;
+}
+.entry-detail .entry .title:before {
+  right: auto;
+  left: 0;
+}
+.entry-detail .entry .body {
+  float: none;
+  width: auto;
+}
+.entry-detail .entry-new .date-box {
+  width: 100%;
+  float: none;
+}
+.entry-detail .entry-more {
+  margin-left: 0;
+}
+
 @media (max-width: 768px) {
   .timeline:before {
     left: 7px;
