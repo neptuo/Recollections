@@ -1,9 +1,0 @@
-﻿@foreach (var entry in Models)
-{
-    <div>
-        <Icon Prefix="fas" Identifier="comment-alt" />
-        <a href="@Navigator.UrlEntryDetail(entry.Id)">
-            @entry.Title
-        </a>
-    </div>
-}

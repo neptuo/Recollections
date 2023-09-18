@@ -581,6 +581,7 @@ h4 .inline-editor-viewmode .oi {
 
 .entry-detail .timeline:before {
   left: 7px;
+  border-radius: 4px;
 }
 .entry-detail .entry .title {
   position: initial;
@@ -605,6 +606,14 @@ h4 .inline-editor-viewmode .oi {
 }
 .entry-detail .entry-more {
   margin-left: 0;
+}
+
+.entry-detail .timeline {
+    padding-top: 16px;
+}
+
+.entry-detail .timeline .entry:last-child .body {
+    margin-bottom: 0;
 }
 
 @media (max-width: 768px) {

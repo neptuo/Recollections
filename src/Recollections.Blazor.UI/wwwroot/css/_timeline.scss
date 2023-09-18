@@ -160,7 +160,19 @@ $dot-diameter: 18px;
 }
 
 .entry-detail {
+    .timeline:before {
+        border-radius: 4px;
+    }
+
     @include narrow;
+
+    .entry-detail .timeline {
+        padding-top: 16px;
+    }
+
+    .entry-detail .timeline .entry:last-child .body {
+        margin-bottom: 0;
+    }
 }
 
 @media (max-width: 768px) {
