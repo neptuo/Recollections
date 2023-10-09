@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace Neptuo.Recollections.Sharing.Components
 
         [Parameter]
         public string BeingId { get; set; }
+
+        [CascadingParameter]
+        public UserState UserState { get; set; }
 
         protected bool IsLoading { get; set; }
         protected Modal Modal { get; set; }

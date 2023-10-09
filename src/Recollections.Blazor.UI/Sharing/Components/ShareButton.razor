@@ -11,7 +11,7 @@
                 Share
             </div>
             <div class="mt-1 ms-4 fs-6">
-                @if (Model != null)
+                @if (Model != null && (BeingId == null || UserState.UserId != BeingId))
                 {
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch" id="share-inherited-check" @bind="Model.IsInherited">
