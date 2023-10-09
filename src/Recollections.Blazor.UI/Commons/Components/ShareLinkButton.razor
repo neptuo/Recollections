@@ -1,0 +1,20 @@
+﻿<button class="btn btn-sm btn-success" @onclick="(() => { IsCopiedToClipboard = false; Modal.Show(); })">
+    <Icon Prefix="fas" Identifier="share" />
+</button>
+
+<Modal @ref="@Modal">
+    <TitleContent>
+        <Icon Prefix="fas" Identifier="share" />
+        Share current URL
+    </TitleContent>
+    <ChildContent>
+        <div class="input-group">
+            <input type="text" readonly value="@Navigator.GetCurrentUrl()" class="form-control" />
+            <div class="input-group-append">
+                <button class="btn btn-@(IsCopiedToClipboard ? "success" : "outline-secondary") m-0" type="button" @onclick="(() => { Interop.CopyToClipboard(Navigator.GetCurrentUrl()); IsCopiedToClipboard = true; })">
+                    <Icon Identifier="copy" />
+                </button>
+            </div>
+        </div>
+    </ChildContent>
+</Modal>

@@ -91,6 +91,7 @@
                     </span>
                     <PermissionView Request="@PermissionRequest.Owner">
                         <ShareButton EntryId="@EntryId" />
+                        <ShareLinkButton />
 
                         <button type="button" class="btn btn-sm btn-danger" @onclick="@DeleteAsync" title="Delete Entry">
                             <Icon Identifier="trash-alt" />

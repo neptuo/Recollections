@@ -32,6 +32,7 @@
                     </PermissionView>
                     <PermissionView Request="@PermissionRequest.Owner">
                         <ShareButton StoryId="@Model.Id" />
+                        <ShareLinkButton />
                         <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
                             <Icon Identifier="trash-alt" />
                             Delete Story
