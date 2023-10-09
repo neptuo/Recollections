@@ -32,6 +32,10 @@
                         <h5 class="card-title">
                             <a class="stretched-link" href="@Navigator.UrlBeingDetail(being.Id)">
                                 @being.Name
+                                @if (UserState.UserId == being.Id)
+                                {
+                                    <span class="ms-1">(me)</span>
+                                }
                             </a>
                         </h5>
                         <div>
