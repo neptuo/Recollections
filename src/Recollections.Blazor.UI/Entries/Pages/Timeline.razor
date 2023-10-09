@@ -61,14 +61,6 @@
                         </span>
                     }
 
-                    @if (UserState.UserId != entry.UserId)
-                    {
-                        <span class="information">
-                            <Icon Identifier="user" />
-                            @entry.UserName
-                        </span>
-                    }
-
                     @if (entry.Beings != null)
                     {
                         foreach (var being in entry.Beings)
@@ -78,6 +70,14 @@
                                 @being.Name
                             </span>
                         }
+                    }
+
+                    @if (UserState.UserId != entry.UserId)
+                    {
+                        <span class="information">
+                            <Icon Identifier="user" />
+                            @entry.UserName
+                        </span>
                     }
                 </p>
             </div>
