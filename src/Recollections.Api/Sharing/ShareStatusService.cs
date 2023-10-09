@@ -119,11 +119,5 @@ namespace Neptuo.Recollections.Sharing
 
             return query.Where(e => e.UserId == userId || db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId) || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId)));
         }
-
-        public async Task<bool> IsProfileSharedForReadAsync(string profileId, string userId)
-        {
-            bool isAllowed = await db.ProfileShares.AnyAsync(s => s.ProfileId == profileId && (s.UserId == userId || s.UserId == PublicUserId));
-            return isAllowed;
-        }
     }
 }

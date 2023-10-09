@@ -16,13 +16,14 @@ namespace Neptuo.Recollections.Accounts.Controllers
 {
     [ApiController]
     [Route("api/profiles")]
-    public class ProfileController : ControllerBase
+    public class ProfileController : Neptuo.Recollections.Entries.Controllers.ControllerBase
     {
         private readonly UserManager<User> userManager;
         private readonly ShareStatusService shareStatus;
         private readonly TimelineService timeline;
 
-        public ProfileController(UserManager<User> userManager, ShareStatusService shareStatus, TimelineService timeline)
+        public ProfileController(UserManager<User> userManager, EntriesDataContext entriesDb, ShareStatusService shareStatus, TimelineService timeline)
+            : base(entriesDb, shareStatus)
         {
             Ensure.NotNull(userManager, "userManager");
             Ensure.NotNull(shareStatus, "shareStatus");
@@ -37,9 +38,11 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> GetAsync(string id) => RunProfileAsync(id, Permission.Read, (entity) =>
+        public Task<IActionResult> GetAsync(string id) => RunBeingAsync(id, Permission.Read, async _ =>
         {
             ProfileModel model = new ProfileModel();
+            User entity = await userManager.FindByIdAsync(id);
+
             MapEntityToModel(entity, model);
 
             AuthorizedModel<ProfileModel> result = new AuthorizedModel<ProfileModel>(model);
@@ -47,11 +50,11 @@ namespace Neptuo.Recollections.Accounts.Controllers
             result.OwnerName = entity.UserName;
             result.UserPermission = entity.Id == HttpContext.User.FindUserId() ? Permission.CoOwner : Permission.Read;
 
-            return Task.FromResult<IActionResult>(Ok(result));
+            return Ok(result);
         });
 
         [HttpGet("{id}/timeline/list")]
-        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, string id, int offset) => RunProfileAsync(id, Permission.Read, async entity => 
+        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, string id, int offset) => RunBeingAsync(id, Permission.Read, async _ => 
         {
             var query = dataContext.Entries.Where(e => e.UserId == id);
 
@@ -62,28 +65,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
         private void MapEntityToModel(User entity, ProfileModel model)
         {
             model.RegistrationDate = entity.Created;
-        }
-
-        protected async Task<IActionResult> RunProfileAsync(string profileId, Permission? sharePermission, Func<User, Task<IActionResult>> handler)
-        {
-            Ensure.NotNullOrEmpty(profileId, "profileId");
-
-            User entity = await userManager.FindByIdAsync(profileId);
-            if (entity == null)
-                return NotFound();
-
-            string userId = HttpContext.User.FindUserId();
-            if (entity.Id != userId)
-            {
-                if (sharePermission == null)
-                    return Unauthorized();
-                else if (sharePermission == Permission.Read && !await shareStatus.IsProfileSharedForReadAsync(profileId, userId))
-                    return Unauthorized();
-                else if (sharePermission == Permission.CoOwner)
-                    return Unauthorized();
-            }
-            
-            return await handler(entity);
         }
     }
 }

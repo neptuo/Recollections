@@ -79,18 +79,4 @@ namespace Neptuo.Recollections.Entries
             UserId = userId;
         }
     }
-
-    public class ProfileShare : ShareBase
-    {
-        public string ProfileId { get; set; }
-
-        public ProfileShare()
-        { }
-
-        public ProfileShare(string profileId)
-        {
-            Ensure.NotNull(profileId, "profileId");
-            ProfileId = profileId;
-        }
-    }
 }
