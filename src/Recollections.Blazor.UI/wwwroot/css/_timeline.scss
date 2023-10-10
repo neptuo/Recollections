@@ -166,12 +166,12 @@ $dot-diameter: 18px;
 
     @include narrow;
 
-    .entry-detail .timeline {
+    .timeline {
         padding-top: 16px;
-    }
 
-    .entry-detail .timeline .entry:last-child .body {
-        margin-bottom: 0;
+        .entry:last-child .body {
+            margin-bottom: 0;
+        }
     }
 }
 
