@@ -414,7 +414,7 @@ h4 .inline-editor-viewmode .oi {
   background-size: cover;
 }
 .login .card {
-  background-color: #ffffffdd !important;
+  background-color: rgba(255, 255, 255, 0.8666666667) !important;
 }
 .login .card .card-title {
   margin-bottom: 2rem;
@@ -580,8 +580,10 @@ h4 .inline-editor-viewmode .oi {
 }
 
 .entry-detail .timeline:before {
-  left: 7px;
   border-radius: 4px;
+}
+.entry-detail .timeline:before {
+  left: 7px;
 }
 .entry-detail .entry .title {
   position: initial;
@@ -607,20 +609,17 @@ h4 .inline-editor-viewmode .oi {
 .entry-detail .entry-more {
   margin-left: 0;
 }
-
-.entry-detail .timeline {
-    padding-top: 16px;
+.entry-detail .entry-detail .timeline {
+  padding-top: 16px;
 }
-
-.entry-detail .timeline .entry:last-child .body {
-    margin-bottom: 0;
+.entry-detail .entry-detail .timeline .entry:last-child .body {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {
   .timeline:before {
     left: 7px;
   }
-
   .entry .title {
     position: initial;
     width: auto;
@@ -638,16 +637,13 @@ h4 .inline-editor-viewmode .oi {
     float: none;
     width: auto;
   }
-
   .entry-new .date-box {
     width: 100%;
     float: none;
   }
-
   .entry-more {
     margin-left: 0;
   }
-
   .timeline {
     padding-right: 6px;
     padding-left: 6px;

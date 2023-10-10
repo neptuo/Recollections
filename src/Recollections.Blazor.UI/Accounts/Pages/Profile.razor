@@ -19,15 +19,9 @@
                     @Model.RegistrationDate.ToString(UiOptions.DateFormat)
                 </div>
 
-                <ActionPanel CssClass="mt-3">
+                <ActionPanel CssClass="my-3">
                     <ShareLinkButton />
                 </ActionPanel>
-
-                <ul class="nav nav-pills my-4">
-                    <li class="nav-item">
-                        <span class="nav-link active">Entries</span>
-                    </li>
-                </ul>
 
                 <Neptuo.Recollections.Entries.Pages.Timeline AllowCreate="false" AllowMore="false" UserId="@UserId" />
             </div>

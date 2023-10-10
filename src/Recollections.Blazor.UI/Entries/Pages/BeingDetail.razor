@@ -23,7 +23,7 @@
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
 
-                <ActionPanel>
+                <ActionPanel CssClass="my-3">
                     <PermissionView Request="@PermissionRequest.Owner">
                         <ShareButton BeingId="@Model.Id" />
                         <ShareLinkButton />
@@ -36,15 +36,6 @@
                         }
                     </PermissionView>
                 </ActionPanel>
-
-                <ul class="nav nav-pills my-4">
-                    <li class="nav-item">
-                        <span class="nav-link active">Entries</span>
-                    </li>
-                    <li class="nav-item">
-                        <span class="nav-link">Map</span>
-                    </li>
-                </ul>
 
                 <Neptuo.Recollections.Entries.Pages.Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" />
             </div>
