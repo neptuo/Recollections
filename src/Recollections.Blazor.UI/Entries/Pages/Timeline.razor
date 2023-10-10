@@ -3,87 +3,90 @@
 
 <DocumentTitle Value="Timeline" />
 
-<div class="timeline">
-    @if (AllowCreate)
-    {
-        <EntryCreate />
-    }
+@if (AllowCreate || Entries.Count > 0)
+{
+    <div class="timeline">
+        @if (AllowCreate)
+        {
+            <EntryCreate />
+        }
 
-    @foreach (var entry in Entries)
-    {
-        <div class="entry">
-            <div class="title">
-                <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
-            </div>
-            <div class="body">
-                <h2>
-                    <a href="@Navigator.UrlEntryDetail(entry.Id)">
-                        @entry.Title
-                    </a>
-                </h2>
-                <p>
-                    @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
-                    {
-                        <span class="information">
-                            <Icon Identifier="book" />
-
-                            @entry.StoryTitle
-                            @if (!String.IsNullOrEmpty(entry.ChapterTitle))
-                            {
-                                <span>
-                                    - @entry.ChapterTitle
-                                </span>
-                            }
-                        </span>
-                    }
-
-                    @if (entry.TextWordCount > 0)
-                    {
-                        <span class="information">
-                            <Icon Identifier="quote-right" />
-                            @entry.TextWordCount words
-                        </span>
-                    }
-
-                    @if (entry.GpsCount > 0)
-                    {
-                        <span class="information">
-                            <Icon Prefix="fas" Identifier="location-arrow" />
-                            @entry.GpsCount
-                        </span>
-                    }
-
-                    @if (entry.ImageCount > 0)
-                    {
-                        <span class="information">
-                            <Icon Identifier="image" />
-                            @entry.ImageCount
-                        </span>
-                    }
-
-                    @if (entry.Beings != null)
-                    {
-                        foreach (var being in entry.Beings)
+        @foreach (var entry in Entries)
+        {
+            <div class="entry">
+                <div class="title">
+                    <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
+                </div>
+                <div class="body">
+                    <h2>
+                        <a href="@Navigator.UrlEntryDetail(entry.Id)">
+                            @entry.Title
+                        </a>
+                    </h2>
+                    <p>
+                        @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
                         {
                             <span class="information">
-                                <BeingIcon Identifier="@being.Icon" />
-                                @being.Name
+                                <Icon Identifier="book" />
+
+                                @entry.StoryTitle
+                                @if (!String.IsNullOrEmpty(entry.ChapterTitle))
+                                {
+                                    <span>
+                                        - @entry.ChapterTitle
+                                    </span>
+                                }
                             </span>
                         }
-                    }
 
-                    @if (UserState.UserId != entry.UserId)
-                    {
-                        <span class="information">
-                            <Icon Identifier="user" />
-                            @entry.UserName
-                        </span>
-                    }
-                </p>
+                        @if (entry.TextWordCount > 0)
+                        {
+                            <span class="information">
+                                <Icon Identifier="quote-right" />
+                                @entry.TextWordCount words
+                            </span>
+                        }
+
+                        @if (entry.GpsCount > 0)
+                        {
+                            <span class="information">
+                                <Icon Prefix="fas" Identifier="location-arrow" />
+                                @entry.GpsCount
+                            </span>
+                        }
+
+                        @if (entry.ImageCount > 0)
+                        {
+                            <span class="information">
+                                <Icon Identifier="image" />
+                                @entry.ImageCount
+                            </span>
+                        }
+
+                        @if (entry.Beings != null)
+                        {
+                            foreach (var being in entry.Beings)
+                            {
+                                <span class="information">
+                                    <BeingIcon Identifier="@being.Icon" />
+                                    @being.Name
+                                </span>
+                            }
+                        }
+
+                        @if (UserState.UserId != entry.UserId)
+                        {
+                            <span class="information">
+                                <Icon Identifier="user" />
+                                @entry.UserName
+                            </span>
+                        }
+                    </p>
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+}
 
 @if (AllowMore)
 {

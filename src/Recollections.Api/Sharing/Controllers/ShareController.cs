@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using DataContext = Neptuo.Recollections.Entries.DataContext;
 using AccountsDataContext = Neptuo.Recollections.Accounts.DataContext;
-using System.Runtime.CompilerServices;
 
 namespace Neptuo.Recollections.Sharing.Controllers
 {
