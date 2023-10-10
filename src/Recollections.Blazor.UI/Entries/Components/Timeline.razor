@@ -1,12 +1,9 @@
 ﻿@inherits UserStateComponentBase
 
-@if (AllowCreate || Entries.Count > 0)
+@if (BeforeContent != null || Entries.Count > 0)
 {
     <div class="timeline">
-        @if (AllowCreate)
-        {
-            <EntryCreate />
-        }
+        @BeforeContent
 
         @foreach (var entry in Entries)
         {
@@ -88,7 +85,7 @@
 @if (AllowMore)
 {
     <div class="entry-more">
-        <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="Here I started..." />
+        <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="@NoMoreText" />
         @if (Entries.Count > 0 && HasMore && !IsLoading)
         {
             <AutoloadNext Intersected="LoadMoreAsync" />

@@ -37,7 +37,7 @@
                     </PermissionView>
                 </ActionPanel>
 
-                <Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" />
+                <Timeline DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" NoMoreText="@($"Here {Model.Name} started...")" />
             </div>
         </PermissionContainer>
     </CascadingValue>

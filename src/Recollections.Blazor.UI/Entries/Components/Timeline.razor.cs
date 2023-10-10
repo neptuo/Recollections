@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.RenderTree;
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,13 @@ namespace Neptuo.Recollections.Entries.Components
         protected UiOptions UiOptions { get; set; }
 
         [Inject]
-        protected MarkdownConverter MarkdownConverter { get; set; }
-
-        [Inject]
         protected ILog<Timeline> Log { get; set; }
 
         [Parameter]
-        public bool AllowCreate { get; set; } = true;
+        public RenderFragment BeforeContent { get; set; }
+
+        [Parameter]
+        public string NoMoreText { get; set; } = "Here I started...";
 
         [Parameter]
         public bool AllowMore { get; set; } = true;
