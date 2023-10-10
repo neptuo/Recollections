@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -26,15 +27,22 @@ public class TimelineService
         this.shareStatus = shareStatus;
     }
 
-    public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds, int offset)
+    public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds, int? offset, ListSortDirection direction = ListSortDirection.Descending)
     {
         Ensure.NotNullOrEmpty(userId, "userId");
-        Ensure.PositiveOrZero(offset, "offset");
+
+        if (offset != null)
+            Ensure.PositiveOrZero(offset.Value, "offset");
+
+        if (offset != null)
+            query = query.Skip(offset.Value).Take(PageSize);
+
+        if (direction == ListSortDirection.Ascending)
+            query = query.OrderBy(e => e.When);
+        else
+            query = query.OrderByDescending(e => e.When);
 
         var result = await query
-            .OrderByDescending(e => e.When)
-            .Skip(offset)
-            .Take(PageSize)
             .Select(e => new
             {
                 Model = new TimelineEntryModel()

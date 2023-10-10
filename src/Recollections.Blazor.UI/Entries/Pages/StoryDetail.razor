@@ -16,7 +16,7 @@
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
                 <div class="entries">
-                    <Timeline AllowMore="false" DataGetter="@(offset => Api.GetStoryTimelineAsync(Model.Id, offset))" />
+                    <Timeline DataGetter="@(offset => Api.GetStoryTimelineAsync(Model.Id))" AllowMore="false" />
                 </div>
 
                 <ActionPanel>
@@ -51,7 +51,7 @@
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
                             <div class="entries">
-                                <Timeline DataGetter="@(offset => Api.GetStoryChapterTimelineAsync(Model.Id, chapter.Id, offset))" />
+                                <Timeline DataGetter="@(offset => Api.GetStoryChapterTimelineAsync(Model.Id, chapter.Id))" AllowMore="false" />
                             </div>
 
                             <ActionPanel>

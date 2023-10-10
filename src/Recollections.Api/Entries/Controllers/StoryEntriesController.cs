@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Neptuo.Recollections.Accounts;
-using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,13 +31,13 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesDefaultResponseType(typeof(TimelineListResponse))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public Task<IActionResult> GetStoryTimeline(string storyId, int offset) => RunStoryAsync(storyId, Permission.Read, async story =>
+        public Task<IActionResult> GetStoryTimeline(string storyId) => RunStoryAsync(storyId, Permission.Read, async story =>
         {
             var userId = User.FindUserId();
             
             var query = db.Entries.Where(e => e.Story.Id == storyId);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null, ListSortDirection.Ascending);
             return Ok(new TimelineListResponse(models, hasMore));
         });
 
@@ -47,13 +45,13 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesDefaultResponseType(typeof(TimelineListResponse))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public Task<IActionResult> GetChapterTimeline(string storyId, string chapterId, int offset) => RunStoryAsync(storyId, Permission.Read, async story =>
+        public Task<IActionResult> GetChapterTimeline(string storyId, string chapterId) => RunStoryAsync(storyId, Permission.Read, async story =>
         {
             var userId = User.FindUserId();
             
             var query = db.Entries.Where(e => e.Chapter.Id == chapterId);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null, ListSortDirection.Ascending);
             return Ok(new TimelineListResponse(models, hasMore));
         });
     }
