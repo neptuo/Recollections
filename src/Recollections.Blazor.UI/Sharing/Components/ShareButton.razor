@@ -36,6 +36,13 @@
 
         @if (Model != null)
         {
+            @if (BeingId != null && UserState.UserId == BeingId)
+            {
+                <div class="text-muted mb-3">
+                    This being represents yourself in Recollections. Sharing with other users is managed by your connections. Here you can only select if anonymous people can see your profile.
+                </div>
+            }
+
             @if (Model.IsInherited)
             {
                 <div class="text-muted mb-3">
