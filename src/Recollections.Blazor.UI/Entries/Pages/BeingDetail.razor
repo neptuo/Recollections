@@ -37,7 +37,7 @@
                     </PermissionView>
                 </ActionPanel>
 
-                <Neptuo.Recollections.Entries.Pages.Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" />
+                <Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" />
             </div>
         </PermissionContainer>
     </CascadingValue>

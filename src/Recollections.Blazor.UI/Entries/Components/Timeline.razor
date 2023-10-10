@@ -1,7 +1,4 @@
-﻿@page "/"
-@inherits UserStateComponentBase
-
-<DocumentTitle Value="Timeline" />
+﻿@inherits UserStateComponentBase
 
 @if (AllowCreate || Entries.Count > 0)
 {
@@ -92,7 +89,7 @@
 {
     <div class="entry-more">
         <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="Here I started..." />
-        @if (Entries.Count > 0 && HasMore && !IsLoading) 
+        @if (Entries.Count > 0 && HasMore && !IsLoading)
         {
             <AutoloadNext Intersected="LoadMoreAsync" />
         }

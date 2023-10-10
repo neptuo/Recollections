@@ -16,7 +16,7 @@
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
                 <div class="entries">
-                    <Neptuo.Recollections.Entries.Pages.Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetStoryTimelineAsync(Model.Id, offset))" />
+                    <Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetStoryTimelineAsync(Model.Id, offset))" />
                 </div>
 
                 <ActionPanel>
@@ -51,7 +51,7 @@
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
                             <div class="entries">
-                                <Neptuo.Recollections.Entries.Pages.Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetStoryChapterTimelineAsync(Model.Id, chapter.Id, offset))" />
+                                <Timeline AllowCreate="false" AllowMore="false" DataGetter="@(offset => Api.GetStoryChapterTimelineAsync(Model.Id, chapter.Id, offset))" />
                             </div>
 
                             <ActionPanel>
