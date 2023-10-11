@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Neptuo.Events;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Components;
-using Neptuo.Recollections.Entries.Events;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -23,9 +21,6 @@ namespace Neptuo.Recollections.Entries.Pages
 
         [Inject]
         protected Navigator Navigator { get; set; }
-
-        [Inject]
-        protected IEventDispatcher EventDispatcher { get; set; }
 
         [Inject]
         protected IExceptionHandler ExceptionHandler { get; set; }
@@ -130,8 +125,6 @@ namespace Neptuo.Recollections.Entries.Pages
             entrySelectionChapter = null;
             if (!await Api.UpdateEntryStoryAsync(entry.Id, model))
                 ExceptionHandler.Handle(new Exception("Missing required co-owner permission to select the entry"));
-            else
-                await EventDispatcher.PublishAsync(new StoryEntriesChanged(model.StoryId, model.ChapterId, entry.Id));
         }
     }
 }
