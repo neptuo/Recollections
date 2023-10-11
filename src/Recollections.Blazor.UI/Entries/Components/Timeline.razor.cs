@@ -37,6 +37,9 @@ namespace Neptuo.Recollections.Entries.Components
         public string UserId { get; set; }
 
         [Parameter]
+        public List<TimelineEntryModel> Data { get; set; }
+
+        [Parameter]
         public Func<int, Task<TimelineListResponse>> DataGetter { get; set; }
 
         private int offset;
@@ -52,7 +55,22 @@ namespace Neptuo.Recollections.Entries.Components
             await base.OnInitializedAsync();
 
             Log.Debug("Timeline.Load");
-            await LoadAsync();
+        }
+
+        public async override Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters);
+
+            if (Data != null)
+            {
+                AllowMore = false;
+                Entries.Clear();
+                Entries.AddRange(Data);
+            }
+            else if (Entries.Count == 0)
+            {
+                await LoadAsync();
+            }
         }
 
         private async Task LoadAsync()
