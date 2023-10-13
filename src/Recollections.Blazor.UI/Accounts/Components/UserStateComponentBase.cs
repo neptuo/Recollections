@@ -13,4 +13,7 @@ public abstract  class UserStateComponentBase : ComponentBase
         await base.OnInitializedAsync();
         await UserState.EnsureInitializedAsync();
     }
+
+    protected Task EnsureAuthenticatedAsync()
+        => UserState.EnsureAuthenticatedAsync();
 }

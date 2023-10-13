@@ -33,6 +33,7 @@ namespace Neptuo.Recollections.Entries.Pages
             IsLoading = true;
 
             await base.OnInitializedAsync();
+            await EnsureAuthenticatedAsync();
             await LoadDataAsync();
         }
 

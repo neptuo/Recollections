@@ -11,7 +11,12 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class Timeline
+    public partial class TimelineList
     {
+        protected async override Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+            await EnsureAuthenticatedAsync();
+        }
     }
 }

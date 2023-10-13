@@ -34,6 +34,7 @@ namespace Neptuo.Recollections.Entries.Pages
             PoiToggleButton = new PoiToggleButton(Navigator, Properties, UserState);
 
             await base.OnInitializedAsync();
+            await EnsureAuthenticatedAsync();
 
             await LoadAsync();
         }

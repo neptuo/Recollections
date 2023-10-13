@@ -46,6 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await EnsureAuthenticatedAsync();
             Navigator.LocationChanged += OnLocationChanged;
         }
 

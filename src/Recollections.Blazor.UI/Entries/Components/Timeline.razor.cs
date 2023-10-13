@@ -53,6 +53,7 @@ namespace Neptuo.Recollections.Entries.Components
             Log.Debug("Timeline.Init");
 
             await base.OnInitializedAsync();
+            await EnsureAuthenticatedAsync();
 
             Log.Debug("Timeline.Load");
         }
