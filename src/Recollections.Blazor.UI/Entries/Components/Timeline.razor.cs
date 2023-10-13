@@ -43,6 +43,7 @@ namespace Neptuo.Recollections.Entries.Components
         public Func<int, Task<TimelineListResponse>> DataGetter { get; set; }
 
         private int offset;
+        private Task loadAsyncFromParametersSet;
 
         protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
         protected bool HasMore { get; private set; }
@@ -50,27 +51,34 @@ namespace Neptuo.Recollections.Entries.Components
 
         protected async override Task OnInitializedAsync()
         {
-            Log.Debug("Timeline.Init");
+            Log.Debug("Init");
 
             await base.OnInitializedAsync();
             await EnsureAuthenticatedAsync();
-
-            Log.Debug("Timeline.Load");
         }
 
-        public async override Task SetParametersAsync(ParameterView parameters)
+        protected async override Task OnParametersSetAsync()
         {
-            await base.SetParametersAsync(parameters);
+            await base.OnParametersSetAsync();
 
             if (Data != null)
             {
                 AllowMore = false;
                 Entries.Clear();
                 Entries.AddRange(Data);
+                Log.Debug($"Got parameter Data '{Data.Count}'");
             }
             else if (Entries.Count == 0)
             {
-                await LoadAsync();
+                if (loadAsyncFromParametersSet == null)
+                {
+                    Log.Debug("LoadAsync");
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(t => { loadAsyncFromParametersSet = null; StateHasChanged(); });
+                }
+                else
+                {
+                    Log.Debug("LoadAsync skipped due to pending load operation");
+                }
             }
         }
 
@@ -89,6 +97,8 @@ namespace Neptuo.Recollections.Entries.Components
                 Entries.AddRange(response.Entries);
                 HasMore = response.HasMore;
                 offset = Entries.Count;
+
+                Log.Debug($"Loaded '{response.Entries.Count}' ('{(HasMore ? "has more" : "end of stream")}'), total so far '{Entries.Count}'");
             }
             finally
             {
