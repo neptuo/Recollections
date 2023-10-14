@@ -34,9 +34,6 @@ namespace Neptuo.Recollections.Entries.Components
         public bool AllowMore { get; set; } = true;
 
         [Parameter]
-        public string UserId { get; set; }
-
-        [Parameter]
         public List<TimelineEntryModel> Data { get; set; }
 
         [Parameter]
@@ -84,15 +81,13 @@ namespace Neptuo.Recollections.Entries.Components
 
         private async Task LoadAsync()
         {
+            Ensure.NotNull(DataGetter, "DataGetter");
+
             try
             {
                 IsLoading = true;
 
-                TimelineListResponse response = DataGetter != null
-                    ? await DataGetter(offset)
-                    : UserId == null
-                        ? await Api.GetTimelineListAsync(offset)
-                        : await Api.GetTimelineListAsync(UserId, offset);
+                TimelineListResponse response = await DataGetter(offset);
 
                 Entries.AddRange(response.Entries);
                 HasMore = response.HasMore;

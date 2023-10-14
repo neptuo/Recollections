@@ -1,6 +1,7 @@
 ﻿@page "/users/{UserId}"
 @layout Commons.Layouts.MainLayout
 @inherits UserStateComponentBase
+@inject Entries.Api EntriesApi
 
 <DocumentTitle Value="@(Owner?.Name ?? UserId)" />
 
@@ -23,7 +24,7 @@
                     <ShareLinkButton />
                 </ActionPanel>
 
-                <Timeline UserId="@UserId" NoMoreText="Here the user started..." />
+                <Timeline DataGetter="@(offset => EntriesApi.GetTimelineListAsync(UserId, offset))" NoMoreText="Here the user started..." />
             </div>
         </PermissionContainer>
     </CascadingValue>

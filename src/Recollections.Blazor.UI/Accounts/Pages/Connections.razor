@@ -60,7 +60,8 @@
                         <div class="text-right">
                             @(connection.Role switch {
                                 ConnectionRole.Initiator => "Initiated by me",
-                                ConnectionRole.Acceptor => "Received"
+                                ConnectionRole.Acceptor => "Received",
+                                _ => ""
                             })
                         </div>
                         <div class="row g-1 mt-2">

@@ -1,9 +1,10 @@
 ﻿@page "/"
 @inherits UserStateComponentBase
+@inject Entries.Api Api
 
 <DocumentTitle Value="Timeline" />
 
-<Timeline>
+<Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))">
     <BeforeContent>
         <EntryCreate />
     </BeforeContent>
