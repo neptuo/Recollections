@@ -139,7 +139,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 string previousId = Entries.Where(s => s.Value.Any(e => e.Id == entry.Id)).Select(s => s.Key).FirstOrDefault();
                 if (previousId == Model.Id)
                     Entries[Model.Id] = (await Api.GetStoryTimelineAsync(Model.Id)).Entries;
-                else
+                else if (previousId != null)
                     Entries[previousId] = (await Api.GetStoryChapterTimelineAsync(Model.Id, previousId)).Entries;
 
                 if (model.ChapterId != null)

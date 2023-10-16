@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
@@ -15,16 +14,16 @@ public class ShareCreator
 {
     private readonly DataContext db;
     private readonly IUserNameProvider userNames;
-    private readonly ShareStatusService shareStatus;
+    private readonly IConnectionProvider connections;
 
-    public ShareCreator(DataContext db, IUserNameProvider userNames, ShareStatusService shareStatus)
+    public ShareCreator(DataContext db, IUserNameProvider userNames, IConnectionProvider connections)
     {
         Ensure.NotNull(db, "db");
         Ensure.NotNull(userNames, "userNames");
-        Ensure.NotNull(shareStatus, "shareStatus");
+        Ensure.NotNull(connections, "connections");
         this.db = db;
         this.userNames = userNames;
-        this.shareStatus = shareStatus;
+        this.connections = connections;
     }
 
     private async Task<bool> SaveAsync<TEntity, TShare>(TEntity entity, Func<string, IQueryable<TShare>> findQuery, Func<string, TShare> entityFactory, ShareRootModel model)
@@ -34,13 +33,13 @@ public class ShareCreator
         async Task SaveSingleAsync(ShareModel model, string userId)
         {
             var entity = await findQuery(userId).FirstOrDefaultAsync();
-            
+
             if (model.Permission == null)
             {
                 if (entity != null)
                     db.Set<TShare>().Remove(entity);
             }
-            else 
+            else
             {
                 if (entity == null)
                     db.Set<TShare>().Add(entity = entityFactory(userId));
@@ -75,18 +74,27 @@ public class ShareCreator
     {
         var storyOwnerId = await userNames.GetUserNameAsync(userId);
         var storyOwnerShare = model.Models.FirstOrDefault(s => s.UserName == storyOwnerId);
-        return storyOwnerShare == null 
+        return storyOwnerShare == null
             || (sharePermission == Permission.CoOwner && storyOwnerShare.Permission == Permission.CoOwner)
             || (sharePermission == Permission.Read && storyOwnerShare.Permission != null);
     }
 
-    public async Task<bool> SaveEntryAsync(Entry entry, ShareRootModel model) 
+    public async Task<bool> SaveEntryAsync(Entry entry, ShareRootModel model)
     {
         // Ensure story owner has co-owner permission to entry.
         if (entry.Story != null && entry.UserId != entry.Story.UserId)
         {
-            if (!await HasPermissionAsync(entry.Story.UserId, model, Permission.CoOwner))
-                return false;
+            if (model.IsInherited)
+            {
+                var permission = (Permission?)await connections.GetPermissionAsync(entry.UserId, entry.Story.UserId);
+                if (permission != Permission.CoOwner)
+                    return false;
+            }
+            else
+            {
+                if (!await HasPermissionAsync(entry.Story.UserId, model, Permission.CoOwner))
+                    return false;
+            }
         }
 
         // Ensure being owner has co-owner permission to entry.
@@ -107,13 +115,22 @@ public class ShareCreator
         );
     }
 
-    public async Task<bool> SaveStoryAsync(Story story, ShareRootModel model) 
+    public async Task<bool> SaveStoryAsync(Story story, ShareRootModel model)
     {
         // Ensure entry owner has co-owner permission to story.
         foreach (var entry in db.Entries.Where(e => (e.Story.Id == story.Id || e.Chapter.Story.Id == story.Id) && e.UserId != story.UserId))
         {
-            if (!await HasPermissionAsync(entry.UserId, model, Permission.CoOwner))
-                return false;
+            if (entry.IsSharingInherited)
+            {
+                var permission = (Permission?)await connections.GetPermissionAsync(entry.UserId, story.UserId);
+                if (permission != Permission.CoOwner)
+                    return false;
+            }
+            else
+            {
+                if (!await HasPermissionAsync(entry.UserId, model, Permission.CoOwner))
+                    return false;
+            }
         }
 
         return await SaveAsync(
@@ -124,7 +141,7 @@ public class ShareCreator
         );
     }
 
-    public async Task<bool> SaveBeingAsync(Being being, ShareRootModel model) 
+    public async Task<bool> SaveBeingAsync(Being being, ShareRootModel model)
     {
         foreach (var item in model.Models)
         {
@@ -135,8 +152,17 @@ public class ShareCreator
         // Ensure entry owner has co-owner permission to being.
         foreach (var entry in db.Entries.Where(e => e.Beings.Any(b => b.Id == being.Id) && e.UserId != being.UserId))
         {
-            if (!await HasPermissionAsync(entry.UserId, model, Permission.Read))
-                return false;
+            if (entry.IsSharingInherited)
+            {
+                var permission = (Permission?)await connections.GetPermissionAsync(entry.UserId, being.UserId);
+                if (permission != Permission.CoOwner)
+                    return false;
+            }
+            else
+            {
+                if (!await HasPermissionAsync(entry.UserId, model, Permission.Read))
+                    return false;
+            }
         }
 
         return await SaveAsync(
@@ -147,14 +173,14 @@ public class ShareCreator
         );
     }
 
-    public async Task<bool> CreateBeingAsync(string beingId, string userName, Permission permission) 
+    public async Task<bool> CreateBeingAsync(string beingId, string userName, Permission permission)
         => await CreateBeingAsync(await db.Beings.SingleAsync(b => b.Id == beingId), new ShareModel(userName, permission));
 
     public Task<bool> CreateBeingAsync(Being being, ShareModel model)
     {
         return CreateAsync(
-            model, 
-            userId => db.BeingShares.Where(s => s.BeingId == being.Id && s.UserId == userId), 
+            model,
+            userId => db.BeingShares.Where(s => s.BeingId == being.Id && s.UserId == userId),
             () => new BeingShare(being.Id)
         );
     }
