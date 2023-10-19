@@ -71,7 +71,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPut]
-        public Task<IActionResult> Update(string entryId, EntryStoryUpdateModel model) => RunEntryAsync(entryId, Permission.CoOwner, async (entry, entryPermission) =>
+        public Task<IActionResult> Update(string entryId, EntryStoryUpdateModel model) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
             string userId = User.FindUserId();
             Story story = null;
@@ -93,8 +93,11 @@ namespace Neptuo.Recollections.Entries.Controllers
                 }
                 else if (story.UserId != entry.UserId)
                 {
-                    var storyPermission = await shareStatus.GetStoryPermissionAsync(story, entry.UserId);
-                    if (entryPermission != Permission.CoOwner || storyPermission != Permission.CoOwner)
+                    // Owner of the entry needs co-owner permission to story
+                    // Owner of the story needs co-owner permission to entry
+                    var entryUserStoryPermission = await shareStatus.GetStoryPermissionAsync(story, entry.UserId);
+                    var storyUserEntryPermission = await shareStatus.GetEntryPermissionAsync(entry, story.UserId);
+                    if (entryUserStoryPermission != Permission.CoOwner || storyUserEntryPermission != Permission.CoOwner)
                         return BadRequest();
                 }
             }
