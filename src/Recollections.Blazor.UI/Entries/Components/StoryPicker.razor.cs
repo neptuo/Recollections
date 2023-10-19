@@ -19,7 +19,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected UiOptions UiOptions { get; set; }
 
         [Parameter]
-        public Action<EntryStoryModel> Selected { get; set; }
+        public EventCallback<EntryStoryModel> Selected { get; set; }
 
         protected Modal Modal { get; set; }
 
@@ -28,6 +28,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected bool IsLoading { get; set; }
         protected List<StoryListModel> Stories { get; } = new List<StoryListModel>();
         protected Dictionary<string, List<StoryChapterListModel>> Chapters = new Dictionary<string, List<StoryChapterListModel>>();
+        protected string ErrorMessage { get; set; }
 
         private async Task LoadAsync()
         {
@@ -39,13 +40,12 @@ namespace Neptuo.Recollections.Entries.Components
             StateHasChanged();
         }
 
-        protected void Select(StoryListModel story, StoryChapterListModel chapter)
+        protected async Task SelectAsync(StoryListModel story, StoryChapterListModel chapter)
         {
-            Hide();
-
-            if (Selected != null)
+            ErrorMessage = null;
+            if (Selected.HasDelegate)
             {
-                Selected(new EntryStoryModel()
+                await Selected.InvokeAsync(new EntryStoryModel()
                 {
                     StoryId = story?.Id,
                     StoryTitle = story?.Title,
@@ -53,7 +53,13 @@ namespace Neptuo.Recollections.Entries.Components
                     ChapterTitle = chapter?.Title
                 });
             }
+
+            if (ErrorMessage == null)
+                Hide();
         }
+
+        public void SetErrorMessage(string errorMessage = null) 
+            => ErrorMessage = errorMessage;
 
         protected async Task LoadChaptersAsync(StoryListModel story)
         {
@@ -63,6 +69,7 @@ namespace Neptuo.Recollections.Entries.Components
 
         public void Show()
         {
+            ErrorMessage = null;
             Modal.Show();
 
             if (isFirstShow)

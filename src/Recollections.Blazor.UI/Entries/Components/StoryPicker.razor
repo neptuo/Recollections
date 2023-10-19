@@ -1,9 +1,16 @@
 ﻿<Modal @ref="Modal" Title="Select a Story or Chapter">
     <ChildContent>
+        @if (!String.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @ErrorMessage
+            </div>
+        }
+
         <div class="story-picker">
             <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
                 <div class="story">
-                    <a @onclick="@(() => Select(story, null))">
+                    <a @onclick="(async () => await SelectAsync(story, null))">
                         <span class="title">
                             @story.Title
                         </span>
@@ -15,7 +22,7 @@
                                 @foreach (var chapter in chapters)
                                 {
                                     <li>
-                                        <a @onclick="@(() => Select(story, chapter))">
+                                        <a @onclick="(async () => await SelectAsync(story, chapter))">
                                             @chapter.Title
                                         </a>
                                     </li>
@@ -35,6 +42,6 @@
         </div>
     </ChildContent>
     <Buttons>
-        <button class="btn btn-sm btn-salmon" title="Remove Story/Chapter from Entry" @onclick="(() => Select(null, null))">Clear</button>
+        <button class="btn btn-sm btn-salmon" title="Remove Story/Chapter from Entry" @onclick="(async () => await SelectAsync(null, null))">Clear</button>
     </Buttons>
 </Modal>

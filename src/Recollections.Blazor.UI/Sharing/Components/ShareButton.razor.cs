@@ -68,7 +68,8 @@ namespace Neptuo.Recollections.Sharing.Components
         }
 
         protected void OnShow()
-        { 
+        {
+            ErrorMessage = null;
             Modal.Show();
             _ = LoadAsync();
         }

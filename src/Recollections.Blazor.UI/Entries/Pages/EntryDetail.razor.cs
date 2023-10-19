@@ -390,10 +390,10 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void SelectStory() => StoryPicker.Show();
 
-        protected async void StorySelected(EntryStoryModel model)
+        protected async Task StorySelectedAsync(EntryStoryModel model)
         {
             if (!await Api.UpdateEntryStoryAsync(EntryId, model))
-                ExceptionHandler.Handle(new Exception("Missing required co-owner permission to select the story"));
+                StoryPicker.SetErrorMessage("Missing required co-owner permission to select the story");
             else
                 await LoadStoryAsync();
             
