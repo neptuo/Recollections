@@ -48,12 +48,15 @@ namespace Neptuo.Recollections.Sharing
             if (entity.UserId == userId)
                 return Permission.CoOwner;
             
+            var connectionPermission = (Permission?)await connections.GetPermissionAsync(userId, entity.UserId);
+            if (connectionPermission == null)
+                return null;
+
             var permissions = await findShareQuery.Where(s => s.UserId == userId || s.UserId == PublicUserId).Select(s => s.Permission).ToListAsync();
             if (permissions.Count != 0)
                 return (Permission)permissions.Max();
 
-            var permission = (Permission?)await connections.GetPermissionAsync(userId, entity.UserId);
-            return permission;
+            return connectionPermission;
         }
 
         public Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
@@ -75,14 +78,17 @@ namespace Neptuo.Recollections.Sharing
             // IReadOnlyList<string> readerUserIds = await connectionProvider.GetUserIdsWithReaderToAsync(userId);
             // return query.Where(e => e.UserId == userId || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId) || (e.IsSharingInherited && readerUserIds.Contains(e.UserId)));
             return query.Where(
-                e => e.UserId == userId 
-                    || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId)
-                    || (e.IsSharingInherited 
-                        && (db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId) 
-                            || db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId)
-                            || connectionReadUserIds.Contains(e.UserId)
+                e => e.UserId == userId || (
+                    connectionReadUserIds.Contains(e.UserId) && (
+                        db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId)
+                        || (e.IsSharingInherited
+                            && (db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId)
+                                || db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId)
+                                || connectionReadUserIds.Contains(e.UserId)
+                            )
                         )
                     )
+                )
             );
         }
 
@@ -106,7 +112,14 @@ namespace Neptuo.Recollections.Sharing
             if (userId == null)
                 userId = PublicUserId;
 
-            return query.Where(e => e.UserId == userId || db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId) || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId)));
+            return query.Where(
+                e => e.UserId == userId || (
+                    connectionReadUserIds.Contains(e.UserId) && (
+                        db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId) 
+                        || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId))
+                    )
+                )
+            );
         }
 
         public Task<Permission?> GetBeingPermissionAsync(Being being, string userId)
@@ -117,7 +130,14 @@ namespace Neptuo.Recollections.Sharing
             if (userId == null)
                 userId = PublicUserId;
 
-            return query.Where(e => e.UserId == userId || db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId) || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId)));
+            return query.Where(
+                e => e.UserId == userId || (
+                    connectionReadUserIds.Contains(e.UserId) && (
+                        db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId) 
+                        || (e.IsSharingInherited && connectionReadUserIds.Contains(e.UserId))
+                    )
+                )
+            );
         }
     }
 }

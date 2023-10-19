@@ -33,7 +33,7 @@ public class DbConnectionProvider : IConnectionProvider
     public async Task<int?> GetPermissionAsync(string accessingUserId, string ownerUserId)
     {
         return await db.Connections
-            .Where(c => (c.UserId == accessingUserId && c.OtherUserId == ownerUserId) || (c.UserId == ownerUserId && c.OtherUserId == accessingUserId))
+            .Where(c => ((c.UserId == accessingUserId && c.OtherUserId == ownerUserId) || (c.UserId == ownerUserId && c.OtherUserId == accessingUserId)) && c.State == 2)
             .Select(c => c.UserId == accessingUserId ? c.OtherPermission : c.Permission)
             .SingleOrDefaultAsync();
     }

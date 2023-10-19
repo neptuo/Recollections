@@ -3,6 +3,9 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts;
 
+/// <summary>
+/// Always returns only active connections
+/// </summary>
 public interface IConnectionProvider
 {
     Task<IReadOnlyList<string>> GetUserIdsWithReaderToAsync(string userId);
