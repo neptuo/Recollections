@@ -1,12 +1,12 @@
 # Build sources.
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY . ./
 WORKDIR /src/src/Recollections.Api
 RUN dotnet publish -c Release -r linux-x64 -o /app
 
 # Final image.
-FROM neptuo/aspnet-system-drawing:5.0-buster-slim
+FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["./Recollections.Api"]
