@@ -5,7 +5,13 @@ Manage your recollections
  - [API - https://hub.docker.com/r/neptuo/recollections-api](https://hub.docker.com/r/neptuo/recollections-api)
 
 ## Developer notes
-Here are some tips.
+Here are some tips and tricks.
+
+### Run in dev mode
+We typically run the app(s) from command line and so `dev.ps1` opens Windows Terminal with
+- API started
+- Blazor with `dotnet watch build`
+- Blazor with `dotnet run --no-build`
 
 ### Add migration
 Execute from command line in root git repository folder:
