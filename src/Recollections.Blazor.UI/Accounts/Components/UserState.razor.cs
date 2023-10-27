@@ -127,6 +127,7 @@ namespace Neptuo.Recollections.Accounts.Components
         private void OnLocationChanged(string url)
         {
             SetAuthenticationRequiredOnly(false);
+            StateHasChanged();
         }
 
         private bool LoadUserInfo(string bearerToken)
