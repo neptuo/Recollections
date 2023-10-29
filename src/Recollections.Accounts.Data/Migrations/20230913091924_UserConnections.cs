@@ -27,19 +27,22 @@ namespace Neptuo.Recollections.Accounts.Migrations
                         name: "FK_UserConnections_AspNetUsers_OtherUserId",
                         column: x => x.OtherUserId,
                         principalTable: "AspNetUsers",
+                        principalSchema: Schema.Name,
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_UserConnections_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalSchema: Schema.Name,
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserConnections_OtherUserId",
                 table: "UserConnections",
+                schema: Schema.Name,
                 column: "OtherUserId");
         }
 
