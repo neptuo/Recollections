@@ -145,7 +145,7 @@ public class ShareCreator
     {
         foreach (var item in model.Models)
         {
-            if (being.Id == being.UserId && item.UserName != null)
+            if (being.Id == being.UserId && !(item.UserName == null || item.UserName == ShareStatusService.PublicUserName))
                 return false;
         }
 
