@@ -39,7 +39,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
-                return Unauthorized();
+                userId = ShareStatusService.PublicUserId;
 
             Permission? actualPermission = await permissionGetter(entity, userId);
             if (actualPermission == null)

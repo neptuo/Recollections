@@ -54,9 +54,12 @@ namespace Neptuo.Recollections.Accounts.Controllers
         });
 
         [HttpGet("{id}/timeline/list")]
-        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, string id, int offset) => RunBeingAsync(id, Permission.Read, async _ => 
+        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, [FromServices] IConnectionProvider connections, string id, int offset) => RunBeingAsync(id, Permission.Read, async _ =>
         {
-            var query = dataContext.Entries.Where(e => e.UserId == id).OrderByDescending(e => e.When);
+            var userId = User.FindUserId();
+
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries.Where(e => e.UserId == id).OrderByDescending(e => e.When), userId, connectionReadUserIds);
 
             var (models, hasMore) = await timeline.GetAsync(query, id, Enumerable.Empty<string>(), offset);
             return Ok(new TimelineListResponse(models, hasMore));

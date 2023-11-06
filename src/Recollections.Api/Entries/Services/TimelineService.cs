@@ -29,8 +29,6 @@ public class TimelineService
 
     public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds, int? offset)
     {
-        Ensure.NotNullOrEmpty(userId, "userId");
-
         if (offset != null)
             Ensure.PositiveOrZero(offset.Value, "offset");
 

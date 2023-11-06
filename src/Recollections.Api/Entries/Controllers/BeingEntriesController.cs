@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Storage.File.Protocol;
 using Microsoft.EntityFrameworkCore;
+using Neptuo;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries.Beings;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -17,15 +20,21 @@ namespace Neptuo.Recollections.Entries.Controllers
     public class BeingEntriesController : ControllerBase
     {
         private readonly DataContext db;
+        private readonly ShareStatusService shareStatus;
         private readonly TimelineService timeline;
+        private readonly IConnectionProvider connections;
 
-        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, TimelineService timeline)
+        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, TimelineService timeline, IConnectionProvider connections)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
+            Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(timeline, "timeline");
+            Ensure.NotNull(connections, "connections");
             this.db = db;
+            this.shareStatus = shareStatus;
             this.timeline = timeline;
+            this.connections = connections;
         }
 
         [HttpGet("timeline")]
@@ -35,8 +44,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         public Task<IActionResult> List(string beingId, int offset) => RunBeingAsync(beingId, Permission.Read, async being =>
         {
             var userId = User.FindUserId();
-            
-            var query = db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When);
+
+            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When), userId, connectionReadUserIds);
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
             return Ok(new TimelineListResponse(models, hasMore));
