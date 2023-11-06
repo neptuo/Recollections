@@ -51,7 +51,6 @@ namespace Neptuo.Recollections.Entries.Components
             Log.Debug("Init");
 
             await base.OnInitializedAsync();
-            await EnsureAuthenticatedAsync();
         }
 
         protected async override Task OnParametersSetAsync()
