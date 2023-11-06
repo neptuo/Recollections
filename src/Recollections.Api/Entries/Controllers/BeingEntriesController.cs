@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var userId = User.FindUserId();
             
-            var query = db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId));
+            var query = db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When);
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
             return Ok(new TimelineListResponse(models, hasMore));

@@ -27,7 +27,7 @@ public class TimelineService
         this.shareStatus = shareStatus;
     }
 
-    public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds, int? offset, ListSortDirection direction = ListSortDirection.Descending)
+    public async Task<(List<TimelineEntryModel> models, bool hasMore)> GetAsync(IQueryable<Entry> query, string userId, IEnumerable<string> connectionReadUserIds, int? offset)
     {
         Ensure.NotNullOrEmpty(userId, "userId");
 
@@ -36,11 +36,6 @@ public class TimelineService
 
         if (offset != null)
             query = query.Skip(offset.Value).Take(PageSize);
-
-        if (direction == ListSortDirection.Ascending)
-            query = query.OrderBy(e => e.When);
-        else
-            query = query.OrderByDescending(e => e.When);
 
         var result = await query
             .Select(e => new

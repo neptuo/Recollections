@@ -35,9 +35,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var userId = User.FindUserId();
             
-            var query = db.Entries.Where(e => e.Story.Id == storyId);
+            var query = db.Entries.Where(e => e.Story.Id == storyId).OrderBy(e => e.When);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null, ListSortDirection.Ascending);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null);
             return Ok(new TimelineListResponse(models, hasMore));
         });
 
@@ -49,9 +49,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var userId = User.FindUserId();
             
-            var query = db.Entries.Where(e => e.Chapter.Id == chapterId);
+            var query = db.Entries.Where(e => e.Chapter.Id == chapterId).OrderBy(e => e.When);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null, ListSortDirection.Ascending);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null);
             return Ok(new TimelineListResponse(models, hasMore));
         });
     }

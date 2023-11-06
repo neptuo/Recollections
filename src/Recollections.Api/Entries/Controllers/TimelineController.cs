@@ -44,7 +44,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
 
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.OrderByDescending(e => e.When), userId, connectionReadUserIds);
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, connectionReadUserIds, offset);
             return Ok(new TimelineListResponse(models, hasMore));
