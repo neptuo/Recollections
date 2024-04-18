@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="ExifLib.Standard" Version="1.7.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
