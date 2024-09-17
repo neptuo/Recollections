@@ -13,14 +13,5 @@ namespace Neptuo.Recollections.Entries
     {
         public ImageMaxLengthExceededException()
         { }
-
-        /// <summary>
-        /// Creates a new instance for deserialization.
-        /// </summary>
-        /// <param name="info">A serialization info.</param>
-        /// <param name="context">A streaming context.</param>
-        protected ImageMaxLengthExceededException(SerializationInfo info, StreamingContext context)
-            : base(info, context) 
-        { }
     }
 }

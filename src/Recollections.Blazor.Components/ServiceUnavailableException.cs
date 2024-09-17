@@ -19,14 +19,5 @@ namespace Neptuo.Recollections.Components
         /// </summary>
         public ServiceUnavailableException()
         { }
-
-        /// <summary>
-        /// Creates new instance for deserialization.
-        /// </summary>
-        /// <param name="info">The serialization info.</param>
-        /// <param name="context">The streaming context.</param>
-        protected ServiceUnavailableException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        { }
     }
 }

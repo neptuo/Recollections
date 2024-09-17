@@ -1,9 +1,11 @@
 <Project>
-	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+	<NoWarn>$(NoWarn);NU1701</NoWarn>
+	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Neptuo" Version="6.0.2" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Neptuo" />
+  </ItemGroup>
 </Project>

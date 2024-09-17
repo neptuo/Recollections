@@ -13,14 +13,5 @@ namespace Neptuo.Recollections.Entries
     {
         protected ImageUploadValidationException()
         { }
-
-        /// <summary>
-        /// Creates a new instance for deserialization.
-        /// </summary>
-        /// <param name="info">A serialization info.</param>
-        /// <param name="context">A streaming context.</param>
-        protected ImageUploadValidationException(SerializationInfo info, StreamingContext context)
-            : base(info, context) 
-        { }
     }
 }

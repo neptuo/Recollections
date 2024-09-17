@@ -36,14 +36,5 @@ namespace Neptuo.Recollections.Components
         public FreeLimitsReachedExceptionException(string message, Exception inner)
             : base(message, inner)
         { }
-
-        /// <summary>
-        /// Creates new instance for deserialization.
-        /// </summary>
-        /// <param name="info">The serialization info.</param>
-        /// <param name="context">The streaming context.</param>
-        protected FreeLimitsReachedExceptionException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        { }
     }
 }
