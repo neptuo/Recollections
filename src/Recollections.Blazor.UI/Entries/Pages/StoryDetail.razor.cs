@@ -93,11 +93,13 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void AddChapter()
         {
-            Model.Chapters.Add(new ChapterModel()
+            var chapter = new ChapterModel()
             {
                 Id = Guid.NewGuid().ToString(),
                 Title = "New Chapter"
-            });
+            };
+            Model.Chapters.Add(chapter);
+            Entries[chapter.Id] = new();
         }
 
         protected Task SaveChapterTitleAsync(ChapterModel chapter, string title)
