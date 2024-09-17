@@ -41,7 +41,7 @@ namespace Neptuo.Recollections.Sharing
             return isAllowed;
         }
 
-        private async Task<Permission?> GetPermissionAsync<TEntity, TShare>(TEntity entity, IQueryable<TShare> findShareQuery, string userId) 
+        private async Task<Permission?> GetPermissionAsync<TEntity, TShare>(TEntity entity, IQueryable<TShare> findShareQuery, string userId, bool? isSharingInherited = null) 
             where TEntity : IOwnerByUser, ISharingInherited
             where TShare: ShareBase
         {
@@ -49,7 +49,7 @@ namespace Neptuo.Recollections.Sharing
                 return Permission.CoOwner;
 
             // If inheriting is enabled, we don't care about saved permissions
-            if (entity.IsSharingInherited)
+            if (isSharingInherited ?? entity.IsSharingInherited)
             {
                 // If user is authenticated, check connection permission
                 if (userId != PublicUserId)
@@ -82,15 +82,34 @@ namespace Neptuo.Recollections.Sharing
             return null;
         }
 
-        public Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
+        public async Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
         {
             IQueryable<ShareBase> findShareQuery = null;
+            bool isSharingInherited = entry.IsSharingInherited;
             if (entry.IsSharingInherited)
-                findShareQuery = db.StoryShares.Where(s => s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Story.Id || s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Chapter.Story.Id);
-            else
-                findShareQuery = db.EntryShares.Where(s => s.EntryId == entry.Id);
+            {
+                // If entry inherits sharing, we need look for shares and whether story inherits sharing.
+                var story = await db.Entries
+                    .Where(e => e.Id == entry.Id)
+                    .Select(e => new 
+                    { 
+                        StoryId = e.Story.Id, 
+                        ChapterId = e.Chapter.Id, 
+                        IsSharingInherited = e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited 
+                    })
+                    .SingleOrDefaultAsync();
 
-            return GetPermissionAsync(entry, findShareQuery, userId);
+                if (story.StoryId != null || story.ChapterId != null)
+                    isSharingInherited = story.IsSharingInherited;
+
+                findShareQuery = db.StoryShares.Where(s => s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Story.Id || s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Chapter.Story.Id);
+            }
+            else
+            {
+                findShareQuery = db.EntryShares.Where(s => s.EntryId == entry.Id);
+            }
+
+            return await GetPermissionAsync(entry, findShareQuery, userId, isSharingInherited: isSharingInherited);
         }
 
         public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers)
