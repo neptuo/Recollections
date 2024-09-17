@@ -48,6 +48,20 @@ namespace Neptuo.Recollections.Sharing
             if (entity.UserId == userId)
                 return Permission.CoOwner;
 
+            // If inheriting is enabled, we don't care about saved permissions
+            if (entity.IsSharingInherited)
+            {
+                // If user is authenticated, check connection permission
+                if (userId != PublicUserId)
+                {
+                    var connectionPermission = (Permission?)await connections.GetPermissionAsync(userId, entity.UserId);
+                    if (connectionPermission != null)
+                        return connectionPermission.Value;
+                }
+
+                return null;
+            }
+
             // Find shares for user and public user
             var shares = await findShareQuery
                 .Where(s => s.UserId == userId || s.UserId == PublicUserId)
@@ -58,17 +72,6 @@ namespace Neptuo.Recollections.Sharing
             var userPermission = (Permission?)shares.FirstOrDefault(s => s.UserId == userId)?.Permission;
             if (userPermission != null)
                 return userPermission.Value;
-
-            if (entity.IsSharingInherited)
-            {
-                // If inheritance is enabled and user is authenticated, check connection permission
-                if (userId != PublicUserId)
-                {
-                    var connectionPermission = (Permission?)await connections.GetPermissionAsync(userId, entity.UserId);
-                    if (connectionPermission != null)
-                        return connectionPermission.Value;
-                }
-            }
 
             // Check if exists share for public
             var publicPermission = (Permission?)shares.FirstOrDefault(s => s.UserId == PublicUserId)?.Permission;
