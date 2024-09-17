@@ -15,7 +15,7 @@ public class DbConnectionProvider : IConnectionProvider
         this.db = db;
     }
 
-    public async Task<IReadOnlyList<string>> GetUserIdsWithReaderToAsync(string userId)
+    public async Task<ConnectedUsersModel> GetConnectedUsersForAsync(string userId)
     {
         // Permission
         // 0 = Read
@@ -24,10 +24,20 @@ public class DbConnectionProvider : IConnectionProvider
         // State
         // 2 = Active
 
-        return await db.Connections
-            .Where(c => ((c.UserId == userId && (c.OtherPermission == 0 || c.OtherPermission == 1)) || (c.OtherUserId == userId && (c.Permission == 0 || c.Permission == 1))) && c.State == 2)
-            .Select(c => c.UserId == userId ? c.OtherUserId : c.UserId)
+        var activeConnections = await db.Connections
+            .Where(c => (c.UserId == userId || c.OtherUserId == userId) && c.State == 2)
+            .Select(c => c.UserId == userId ? new { UserId = c.OtherUserId, Permission = c.OtherPermission } : new { UserId = c.UserId, Permission = c.Permission })
             .ToListAsync();
+
+        return new(
+            activeConnections.Select(c => c.UserId).ToList(), 
+            activeConnections.Where(c => c.Permission == 0 || c.Permission == 1).Select(c => c.UserId).ToList()
+        );
+
+        //return await db.Connections
+        //    .Where(c => ((c.UserId == userId && (c.OtherPermission == 0 || c.OtherPermission == 1)) || (c.OtherUserId == userId && (c.Permission == 0 || c.Permission == 1))) && c.State == 2)
+        //    .Select(c => c.UserId == userId ? c.OtherUserId : c.UserId)
+        //    .ToListAsync();
     }
 
     public async Task<int?> GetPermissionAsync(string accessingUserId, string ownerUserId)

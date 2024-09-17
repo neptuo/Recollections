@@ -48,10 +48,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
             List<SearchEntryModel> result = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .OrderByDescending(e => e.When)
                 .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"))
                 .Skip(offset)

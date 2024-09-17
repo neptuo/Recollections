@@ -45,10 +45,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var userId = User.FindUserId();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When), userId, connectionReadUserIds);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When), userId, connectedUsers);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), offset);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, offset);
             return Ok(new TimelineListResponse(models, hasMore));
         });
     }

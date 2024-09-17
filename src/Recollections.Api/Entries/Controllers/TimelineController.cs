@@ -42,10 +42,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.OrderByDescending(e => e.When), userId, connectionReadUserIds);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.OrderByDescending(e => e.When), userId, connectedUsers);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, connectionReadUserIds, offset);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, offset);
             return Ok(new TimelineListResponse(models, hasMore));
         }
     }

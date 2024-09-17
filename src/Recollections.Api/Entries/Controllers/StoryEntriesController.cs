@@ -44,10 +44,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var userId = User.FindUserId();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Story.Id == storyId).OrderBy(e => e.When), userId, connectionReadUserIds);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Story.Id == storyId).OrderBy(e => e.When), userId, connectedUsers);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, null);
             return Ok(new TimelineListResponse(models, hasMore));
         });
 
@@ -59,10 +59,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var userId = User.FindUserId();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Chapter.Id == chapterId).OrderBy(e => e.When), userId, connectionReadUserIds);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Chapter.Id == chapterId).OrderBy(e => e.When), userId, connectedUsers);
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, Enumerable.Empty<string>(), null);
+            var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, null);
             return Ok(new TimelineListResponse(models, hasMore));
         });
     }

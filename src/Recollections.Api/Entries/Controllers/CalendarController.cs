@@ -51,10 +51,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await premiumProvider.HasPremiumAsync(userId))
                 return PremiumRequired();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
             var result = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .Where(e => e.When.Year == year)
                 .OrderByDescending(e => e.When)
                 .Select(e => new CalendarEntryModel()
@@ -80,10 +80,10 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
             var result = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectionReadUserIds)
+                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .Where(e => e.When.Year == year && e.When.Month == month)
                 .OrderByDescending(e => e.When)
                 .Select(e => new CalendarEntryModel()

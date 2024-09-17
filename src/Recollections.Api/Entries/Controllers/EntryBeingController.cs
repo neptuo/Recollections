@@ -73,9 +73,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             foreach (var being in toRemove)
                 entry.Beings.Remove(being);
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            var toAdd = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectionReadUserIds)
+            var toAdd = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectedUsers)
                 .Where(b => beingIds.Contains(b.Id))
                 .ToListAsync();
 

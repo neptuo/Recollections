@@ -56,9 +56,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            List<Story> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectionReadUserIds)
+            List<Story> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectedUsers)
                 .ToListAsync();
 
             List<StoryListModel> models = new List<StoryListModel>();
@@ -74,7 +74,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                     .SelectMany(s => s.Chapters)
                     .CountAsync();
 
-                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
                     .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                     .CountAsync();
 
@@ -83,11 +83,11 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 if (entries > 0)
                 {
-                    DateTime minDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
+                    DateTime minDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
                         .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MinAsync(e => e.When);
 
-                    DateTime maxDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
+                    DateTime maxDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
                         .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MaxAsync(e => e.When);
 
@@ -140,23 +140,17 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Task<IActionResult> Get(string id) => RunStoryAsync(id, Permission.Read, async entity =>
+        public Task<IActionResult> Get(string id) => RunStoryAsync(id, Permission.Read, async (entity, permission) =>
         {
-            Permission permission = Permission.CoOwner;
-            string userId = HttpContext.User.FindUserId();
-            if (entity.UserId != userId)
-            {
-                if (!await shareStatus.IsStorySharedForWriteAsync(id, userId))
-                    permission = Permission.Read;
-            }
-
             StoryModel model = new StoryModel();
             MapEntityToModel(entity, model);
 
-            AuthorizedModel<StoryModel> result = new AuthorizedModel<StoryModel>(model);
-            result.OwnerId = entity.UserId;
-            result.OwnerName = await userNames.GetUserNameAsync(entity.UserId);
-            result.UserPermission = permission;
+            AuthorizedModel<StoryModel> result = new AuthorizedModel<StoryModel>(model)
+            {
+                OwnerId = entity.UserId,
+                OwnerName = await userNames.GetUserNameAsync(entity.UserId),
+                UserPermission = permission
+            };
 
             return Ok(result);
         });

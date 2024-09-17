@@ -53,9 +53,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            List<Being> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectionReadUserIds)
+            List<Being> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectedUsers)
                 .OrderBy(b => b.Name)
                 .ToListAsync();
 
@@ -67,7 +67,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 MapEntityToModel(entity, model);
 
-                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectionReadUserIds)
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
                     .Where(e => e.Beings.Contains(entity))
                     .CountAsync();
 

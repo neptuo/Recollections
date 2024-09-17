@@ -79,9 +79,9 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             if (model.StoryId != null)
             {
-                var connectionReadUserIds = await connections.GetUserIdsWithReaderToAsync(userId);
+                var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-                story = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectionReadUserIds)
+                story = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectedUsers)
                     .Where(s => s.Id == model.StoryId)
                     .Include(s => s.Chapters)
                     .FirstOrDefaultAsync();
