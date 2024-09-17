@@ -103,10 +103,10 @@ namespace Neptuo.Recollections.Sharing
             return query.Where(
                 e => e.UserId == userId || ( // Entry owner
                     (connectedUsers.ActiveUserIds.Contains(e.UserId) || userId == PublicUserId) && (
-                        db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId) // Shared entry
+                        (!e.IsSharingInherited && db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId)) // Shared entry
                         || (e.IsSharingInherited // Entry inherits
-                            && (db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId) // Shared story
-                                || db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId) // Shared story through chapter
+                            && ((!e.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId)) // Shared story
+                                || (!e.Chapter.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId)) // Shared story through chapter
                                 || ((e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited || (e.Story == null && e.Chapter.Story == null)) // Story inherits or is null
                                     && connectedUsers.ReaderUserIds.Contains(e.UserId) // Shared connection
                                 )
@@ -128,7 +128,7 @@ namespace Neptuo.Recollections.Sharing
             return query.Where(
                 e => e.UserId == userId || (
                     (connectedUsers.ActiveUserIds.Contains(e.UserId) || userId == PublicUserId) && (
-                        db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId) 
+                        (!e.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Id && s.UserId == userId))
                         || (e.IsSharingInherited && connectedUsers.ReaderUserIds.Contains(e.UserId))
                     )
                 )
@@ -146,7 +146,7 @@ namespace Neptuo.Recollections.Sharing
             return query.Where(
                 e => e.UserId == userId || (
                     (connectedUsers.ActiveUserIds.Contains(e.UserId) || userId == PublicUserId) && (
-                        db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId) 
+                        (!e.IsSharingInherited && db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId))
                         || (e.IsSharingInherited && connectedUsers.ReaderUserIds.Contains(e.UserId))
                     )
                 )
