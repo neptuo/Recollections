@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage.File.Protocol;
 using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
@@ -45,7 +44,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userId = User.FindUserId();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Story.Id == storyId).OrderBy(e => e.When), userId, connectedUsers);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Story.Id == storyId).OrderBy(e => e.When), [userId, ShareStatusService.PublicUserId], connectedUsers);
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, null);
             return Ok(new TimelineListResponse(models, hasMore));
@@ -60,7 +59,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userId = User.FindUserId();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Chapter.Id == chapterId).OrderBy(e => e.When), userId, connectedUsers);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Chapter.Id == chapterId).OrderBy(e => e.When), [userId, ShareStatusService.PublicUserId], connectedUsers);
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, null);
             return Ok(new TimelineListResponse(models, hasMore));

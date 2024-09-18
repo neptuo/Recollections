@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using DataContext = Neptuo.Recollections.Entries.DataContext;
@@ -113,22 +114,27 @@ namespace Neptuo.Recollections.Sharing
         }
 
         public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers)
-        {
-            if (userId == null)
-                userId = PublicUserId;
+            => OwnedByOrExplicitlySharedWithUser(db, query, [userId], connectedUsers);
 
-            // var connectedUsers = await connectionProvider.GetConnectedUsersForAsync(userId);
-            // return query.Where(e => e.UserId == userId || db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId) || (e.IsSharingInherited && connectedUsers.ReaderUserIds.Contains(e.UserId)));
-            return query.Where(
-                e => e.UserId == userId || ( // Entry owner
-                    (connectedUsers.ActiveUserIds.Contains(e.UserId) || userId == PublicUserId) && (
-                        (!e.IsSharingInherited && db.EntryShares.Any(s => s.EntryId == e.Id && s.UserId == userId)) // Shared entry
-                        || (e.IsSharingInherited // Entry inherits
-                            && ((!e.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Story.Id && s.UserId == userId)) // Shared story
-                                || (!e.Chapter.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && s.UserId == userId)) // Shared story through chapter
-                                || ((e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited || (e.Story == null && e.Chapter.Story == null)) // Story inherits or is null
-                                    && connectedUsers.ReaderUserIds.Contains(e.UserId) // Shared connection
-                                )
+        public IQueryable<Entry> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers)
+            => query.Where(OwnedByOrExplicitlySharedWithUser(db, userIds, connectedUsers));
+
+        private Expression<Func<Entry, bool>> OwnedByOrExplicitlySharedWithUser(DataContext db, string[] userIds, ConnectedUsersModel connectedUsers)
+        {
+            for (int i = 0; i < userIds.Length; i++)
+            {
+                if (userIds[i] == null)
+                    userIds[i] = PublicUserId;
+            }
+
+            return e => userIds.Contains(e.UserId) || ( // Entry owner
+                (connectedUsers.ActiveUserIds.Contains(e.UserId) || userIds.Contains(PublicUserId)) && (
+                    (!e.IsSharingInherited && db.EntryShares.Any(s => s.EntryId == e.Id && userIds.Contains(s.UserId))) // Shared entry
+                    || (e.IsSharingInherited // Entry inherits
+                        && ((!e.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Story.Id && userIds.Contains(s.UserId))) // Shared story
+                            || (!e.Chapter.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && userIds.Contains(s.UserId))) // Shared story through chapter
+                            || ((e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited || (e.Story == null && e.Chapter.Story == null)) // Story inherits or is null
+                                && connectedUsers.ReaderUserIds.Contains(e.UserId) // Shared connection
                             )
                         )
                     )

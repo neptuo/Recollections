@@ -129,14 +129,14 @@ namespace Neptuo.Recollections.Entries.Controllers
                     FileName = imageName,
                     Inline = false
                 };
-                Response.Headers.Add(HeaderNames.ContentDisposition, header.ToString());
+                Response.Headers[HeaderNames.ContentDisposition] = header.ToString();
             }
             else
             {
-                Response.Headers.Add(HeaderNames.CacheControl, CacheHeaderValue);
+                Response.Headers[HeaderNames.CacheControl] = CacheHeaderValue;
             }
 
-            Response.Headers.Add(HeaderNames.ETag, imageId);
+            Response.Headers[HeaderNames.ETag] = imageId;
 
             return File(content, GetFileContentType(imageName));
         });

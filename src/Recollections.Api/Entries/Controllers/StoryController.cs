@@ -74,7 +74,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                     .SelectMany(s => s.Chapters)
                     .CountAsync();
 
-                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
                     .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                     .CountAsync();
 
@@ -83,11 +83,11 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 if (entries > 0)
                 {
-                    DateTime minDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
+                    DateTime minDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
                         .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MinAsync(e => e.When);
 
-                    DateTime maxDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
+                    DateTime maxDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
                         .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
                         .MaxAsync(e => e.When);
 

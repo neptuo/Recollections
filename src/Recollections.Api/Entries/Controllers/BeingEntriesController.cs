@@ -46,7 +46,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userId = User.FindUserId();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When), userId, connectedUsers);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)).OrderByDescending(e => e.When), [userId, ShareStatusService.PublicUserId], connectedUsers);
 
             var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, offset);
             return Ok(new TimelineListResponse(models, hasMore));

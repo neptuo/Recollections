@@ -67,7 +67,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 MapEntityToModel(entity, model);
 
-                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, userId, connectedUsers)
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
                     .Where(e => e.Beings.Contains(entity))
                     .CountAsync();
 
