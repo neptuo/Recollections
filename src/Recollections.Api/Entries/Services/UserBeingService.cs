@@ -69,7 +69,8 @@ public class UserBeingService
                 Id = userId,
                 Name = user.UserName,
                 Icon = "user",
-                UserId = userId
+                UserId = userId,
+                Created = user.Created
             };
 
             db.Beings.Add(being);
