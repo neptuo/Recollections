@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Neptuo;
 using Neptuo.Events;
 using Neptuo.Recollections.Accounts.Events;
+using Neptuo.Recollections.Entries.Events.Handlers;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -63,27 +64,33 @@ namespace Neptuo.Recollections.Accounts.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login([FromServices] UserBeingService userBeings, LoginRequest request)
         {
             User user = await userManager.FindByNameAsync(request.UserName);
             if (user != null)
             {
                 if (await userManager.CheckPasswordAsync(user, request.Password))
+                {
+                    await userBeings.EnsureAsync(user);
                     return CreateJwtToken(user);
+                }
             }
 
             return Ok(new LoginResponse());
         }
 
         [HttpPost("login/token")]
-        public async Task<IActionResult> LoginWithToken(LoginWithTokenRequest request)
+        public async Task<IActionResult> LoginWithToken([FromServices] UserBeingService userBeings, LoginWithTokenRequest request)
         {
             Ensure.NotNull(request, "request");
             if (tokenOptions.Tokens.TryGetValue(request.Token, out var userName))
             {
                 var user = await userManager.FindByNameAsync(userName);
                 if (user != null)
+                {
+                    await userBeings.EnsureAsync(user);
                     return CreateJwtToken(user, true);
+                }
             }
 
             return NotFound();

@@ -58,13 +58,22 @@ public class UserBeingService
         this.users = users;
     }
 
-    public async Task EnsureAsync(string userId)
+    public Task EnsureAsync(string userId) 
+        => EnsureAsync(userId, null);
+
+    public Task EnsureAsync(User user)
     {
-        var being = await db.Beings.SingleOrDefaultAsync(b => b.Id == userId);
-        if (being == null)
+        Ensure.NotNull(user, "user");
+        return EnsureAsync(user.Id, user);
+    }
+
+    private async Task EnsureAsync(string userId, User user)
+    {
+        var beingExists = await db.Beings.AnyAsync(b => b.Id == userId);
+        if (!beingExists)
         {
-            var user = await users.FindByIdAsync(userId);
-            being = new Being()
+            user ??= await users.FindByIdAsync(userId);
+            var being = new Being()
             {
                 Id = userId,
                 Name = user.UserName,
