@@ -177,13 +177,4 @@ $dot-diameter: 18px;
 
 @media (max-width: 768px) {
     @include narrow;
-
-    .timeline {
-        padding-right: 6px;
-        padding-left: 6px;
-
-        &:before {
-            left: 13px;
-        }
-    }
 }

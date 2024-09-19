@@ -644,13 +644,6 @@ h4 .inline-editor-viewmode .oi {
   .entry-more {
     margin-left: 0;
   }
-  .timeline {
-    padding-right: 6px;
-    padding-left: 6px;
-  }
-  .timeline:before {
-    left: 13px;
-  }
 }
 .mappage {
   position: absolute;
