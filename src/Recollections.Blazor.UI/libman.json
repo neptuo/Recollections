@@ -7,10 +7,12 @@
       "destination": "wwwroot/lib/jquery"
     },
     {
-      "library": "font-awesome@5.14.0",
+      "provider": "jsdelivr",
+      "library": "@fortawesome/fontawesome-free@6.5.2",
       "destination": "wwwroot/lib/fontawesome",
       "files": [
-        "css/*",
+        "css/all.css",
+        "css/all.min.css",
         "webfonts/*"
       ]
     },
@@ -22,9 +24,9 @@
         "dist/*"
       ]
     },
-    { 
+    {
       "provider": "unpkg",
-      "library": "bootstrap@5.0.0",
+      "library": "bootstrap@5.3.3",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
         "dist/**"

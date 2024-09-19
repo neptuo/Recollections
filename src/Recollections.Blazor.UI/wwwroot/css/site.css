@@ -530,7 +530,7 @@ h4 .inline-editor-viewmode .oi {
   color: #333;
   white-space: nowrap;
 }
-.entry .body .placeholder {
+.entry .body .value-placeholder {
   color: #aaaaaa;
 }
 .entry:after {
@@ -765,7 +765,7 @@ h4 .inline-editor-viewmode .oi {
 .entry-detail .images .image-placeholder span {
   position: absolute;
 }
-.entry-detail .placeholder {
+.entry-detail .value-placeholder {
   color: #aaaaaa;
 }
 
@@ -847,7 +847,7 @@ h4 .inline-editor-viewmode .oi {
   display: block;
   margin: 0 auto;
 }
-.image-detail .placeholder {
+.image-detail .value-placeholder {
   color: #aaaaaa;
 }
 

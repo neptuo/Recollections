@@ -13,7 +13,7 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public string Identifier { get; set; }
 
-        protected string CssClass => String.IsNullOrEmpty(Identifier) ? "placeholder" : String.Empty;
+        protected string CssClass => String.IsNullOrEmpty(Identifier) ? "value-placeholder" : String.Empty;
         protected string TargetIdentifier => String.IsNullOrEmpty(Identifier) ? "user" : Identifier;
     }
 }
