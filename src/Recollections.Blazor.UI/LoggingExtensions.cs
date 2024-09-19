@@ -22,7 +22,7 @@ namespace Neptuo.Recollections
 #if DEBUG
             ILogFilter logFilter = DefaultLogFilter.Debug;
 #else
-            logFilter = DefaultLogFilter.Warning;
+            ILogFilter logFilter = DefaultLogFilter.Warning;
 #endif
 
             ILogFactory logFactory = new DefaultLogFactory("Root");
