@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -112,6 +114,7 @@ namespace Neptuo.Recollections.Accounts
             {
                 if (context.User.IsReadOnly() && !HttpMethods.IsGet(context.Request.Method))
                 {
+                    context.RequestServices.GetRequiredService<ILogger<AccountsStartup>>().LogInformation($"Non-GET request issued by read-only user at '{context.Request.GetDisplayUrl()}' '{context.Request.Method}'");
                     context.Response.StatusCode = 422;
                     return;
                 }
