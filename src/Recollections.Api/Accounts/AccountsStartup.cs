@@ -58,6 +58,8 @@ namespace Neptuo.Recollections.Accounts
                 .AddJwtBearer(options =>
                 {
                     JwtOptions configuration = this.configuration.GetSection("Jwt").Get<JwtOptions>();
+                    if (configuration == null)
+                        throw new InvalidOperationException("Missing configuration for JWT");
 
                     options.TokenValidationParameters = new TokenValidationParameters
                     {

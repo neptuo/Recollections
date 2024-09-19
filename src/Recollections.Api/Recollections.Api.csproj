@@ -7,6 +7,14 @@
     <StartupObject>Neptuo.Recollections.Program</StartupObject>
   </PropertyGroup>
 
+  <PropertyGroup>
+	<IsPublishable>true</IsPublishable>
+	<EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+	<ContainerRegistry>ghcr.io</ContainerRegistry>
+	<ContainerRepository>neptuo/recollections-api</ContainerRepository>
+	<ContainerImageTag>$(VersionPrefix)-$(RuntimeIdentifier)</ContainerImageTag>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ExifLib.Standard" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
@@ -31,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commons\" />
+	<Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
-
+	
 </Project>

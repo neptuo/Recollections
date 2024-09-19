@@ -27,9 +27,5 @@ dotnet ef migrations add NewMigration --startup-project src\Recollections.Api --
 ### Build docker images
 From repository root:
 ```
-docker build . -f .\docker\Dockerfile.api-bullseye-slim -t neptuo/recollections-api:{version}-bullseye-slim
-docker build . -f .\docker\Dockerfile.api-bullseye-slim-arm32v7 -t neptuo/recollections-api:{version}-bullseye-slim-arm32v7
-
-docker push neptuo/recollections-api:{version}-bullseye-slim
-docker push neptuo/recollections-api:{version}-bullseye-slim-arm32v7
+dotnet publish --os linux --arch x64 /t:PublishContainer
 ```
