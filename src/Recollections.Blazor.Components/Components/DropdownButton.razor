@@ -1,0 +1,50 @@
+<div class="dropdown @CssClass">
+    <button class="btn btn-link py-0 px-2" data-bs-toggle="dropdown">
+        <Icon Identifier="@Icon" />
+    </button>
+    <div class="dropdown-menu">
+        @if (Items != null)
+        {
+            foreach (var item in Items)
+            {
+                if (item is SeparatorItem)
+                {
+                    <hr class="dropdown-divider" />
+                }
+                else if (item is ActionItem action)
+                {
+                    <a class="dropdown-item @action.CssClass" @onclick="@action.OnClick" title="@action.Title">
+                        <Icon Identifier="@action.Icon" />
+                        @action.Text
+                    </a>
+                }
+            }
+        }
+        else
+        {
+            @ChildContent
+        }
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public string Icon { get; set; } = "ellipsis-v";
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    [Parameter]
+    public IReadOnlyCollection<DropdownItem> Items { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public abstract record DropdownItem();
+    public record ActionItem(string Icon, string Text, Action OnClick, string Title = null, string CssClass = null) : DropdownItem;
+    public record SeparatorItem() : DropdownItem
+    {
+        public static readonly SeparatorItem Instance = new SeparatorItem();
+    }
+}

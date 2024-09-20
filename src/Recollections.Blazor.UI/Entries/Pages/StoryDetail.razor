@@ -10,34 +10,20 @@
             <div class="entry-detail">
                 <h2 class="d-flex title">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-                    <div class="ms-1 dropdown">
-                        <button class="btn btn-link py-0 px-2" data-bs-toggle="dropdown">
-                            <Icon Identifier="ellipsis-v" />
-                        </button>
-                        <div class="dropdown-menu">
-                            <PermissionView Request="@PermissionRequest.Write">
-                                <a class="dropdown-item" @onclick="@AddChapter" title="Add Chapter">
-                                    <Icon Identifier="book" />
-                                    Add Chapter
-                                </a>
-                                <a class="dropdown-item" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
-                                    <Icon Identifier="comment-alt" />
-                                    Add Story Entry
-                                </a>
-                            </PermissionView>
-                            <PermissionView Request="@PermissionRequest.Owner">
-                                <ShareButton StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
-                            </PermissionView>
-                                <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
-                            <PermissionView Request="@PermissionRequest.Owner">
-                                <hr class="dropdown-divider" />
-                                <a class="dropdown-item text-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
-                                    <Icon Identifier="trash-alt" />
-                                    Delete Story
-                                </a>
-                            </PermissionView>
-                        </div>
-                    </div>
+                    <DropdownButton CssClass="ms-1">
+                        <PermissionView Request="PermissionRequest.Write">
+                            <DropdownItem Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
+                            <DropdownItem Icon="comment-alt" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
+                        </PermissionView>
+                        <PermissionView Request="PermissionRequest.Owner">
+                            <ShareButton StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
+                        </PermissionView>
+                        <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                        <PermissionView Request="PermissionRequest.Owner">
+                            <DropdownSeparator />
+                            <DropdownItem Icon="trash-alt" Text="Delete Story" OnClick="@(async () => await DeleteAsync())" CssClass="text-danger" Title="Delete Story" />
+                        </PermissionView>
+                    </DropdownButton>
                 </h2>
                 <UserInformation Owner="@Owner" />
                 <div class="text">
@@ -53,23 +39,12 @@
                         <div class="chapter">
                             <h4 class="d-flex">
                                 <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" EditModeCssClass="flex-grow-1" />
-                                <PermissionView Request="@PermissionRequest.Write">
-                                    <div class="ms-1 dropdown">
-                                        <button class="btn btn-link py-0 px-2" data-bs-toggle="dropdown">
-                                            <Icon Identifier="ellipsis-v" />
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" @onclick="@(() => SelectEntry(chapter))" title="Add Chapter Entry">
-                                                <Icon Identifier="plus" />
-                                                Add Entry
-                                            </a>
-                                            <hr class="dropdown-divider" />
-                                            <a class="dropdown-item text-danger" @onclick="@(async () => await DeleteChapterAsync(chapter))" title="Delete Chapter">
-                                                <Icon Identifier="trash-alt" />
-                                                Delete
-                                            </a>
-                                        </div>
-                                    </div>
+                                <PermissionView Request="PermissionRequest.Write">
+                                    <DropdownButton CssClass="ms-1">
+                                        <DropdownItem Icon="plus" Text="Add Entry" OnClick="() => SelectEntry(chapter)" Title="Add Chapter Entry" />
+                                        <DropdownSeparator />
+                                        <DropdownItem Icon="trash-alt" Text="Delete" OnClick="@(async () => await DeleteChapterAsync(chapter))" CssClass="text-danger" Title="Delete Chapter" />
+                                    </DropdownButton> 
                                 </PermissionView>
                             </h4>
                             <div class="text">

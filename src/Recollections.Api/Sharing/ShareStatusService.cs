@@ -92,6 +92,7 @@ namespace Neptuo.Recollections.Sharing
                 // If entry inherits sharing, we need look for shares and whether story inherits sharing.
                 var story = await db.Entries
                     .Where(e => e.Id == entry.Id)
+                    .Where(e => e.Story != null || e.Chapter != null)
                     .Select(e => new 
                     { 
                         StoryId = e.Story.Id, 
@@ -100,7 +101,7 @@ namespace Neptuo.Recollections.Sharing
                     })
                     .SingleOrDefaultAsync();
 
-                if (story.StoryId != null || story.ChapterId != null)
+                if (story != null && (story.StoryId != null || story.ChapterId != null))
                     isSharingInherited = story.IsSharingInherited;
 
                 findShareQuery = db.StoryShares.Where(s => s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Story.Id || s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Chapter.Story.Id);

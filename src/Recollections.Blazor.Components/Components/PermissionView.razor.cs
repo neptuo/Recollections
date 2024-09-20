@@ -19,19 +19,6 @@ namespace Neptuo.Recollections.Components
         [CascadingParameter]
         public PermissionContainerState State { get; set; }
 
-        protected bool IsVisible()
-        {
-            switch (Request)
-            {
-                case PermissionRequest.Owner:
-                    return State.IsEditable;
-                case PermissionRequest.Write:
-                    return State.IsEditable;
-                case PermissionRequest.Read:
-                    return State.IsReadable;
-                default:
-                    throw Ensure.Exception.NotSupported(Request);
-            }
-        }
+        protected bool IsVisible() => State.IsGranted(Request);
     }
 }

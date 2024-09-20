@@ -21,5 +21,13 @@ namespace Neptuo.Recollections.Components
             IsEditable = true;
             IsReadable = true;
         }
+
+        public bool IsGranted(PermissionRequest request) => request switch
+        {
+            PermissionRequest.Owner => IsEditable,
+            PermissionRequest.Write => IsEditable,
+            PermissionRequest.Read => IsReadable,
+            _ => throw Ensure.Exception.NotSupported(request),
+        };
     }
 }
