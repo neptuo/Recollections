@@ -38,11 +38,6 @@
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Commons\Components\ShareLinkButton.razor.cs">
-      <DependentUpon>ShareLinkButton.razor</DependentUpon>
-    </Compile>
-  </ItemGroup>
 
   <!-- GitHubPages publish -->
   <Target Name="PublishGitHubFiles" AfterTargets="ComputeFilesToPublish">

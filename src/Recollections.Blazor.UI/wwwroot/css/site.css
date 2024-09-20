@@ -45,6 +45,20 @@ footer.navbar a:hover {
   text-decoration: underline;
 }
 
+.bottom-bar {
+  z-index: 1050;
+  background: var(--bs-body-bg);
+  border-top: 1px solid var(--bs-border-color-translucent);
+}
+.bottom-bar .items-6 span.text, .bottom-bar .items-5 span.text, .bottom-bar .items-4 span.text, .bottom-bar .items-3 span.text {
+  display: none;
+}
+
+.offcanvas-bottom-menu {
+  --bs-offcanvas-height: 48vh;
+  bottom: 55px;
+}
+
 blockquote {
   color: #aaaaaa;
 }

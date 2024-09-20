@@ -28,6 +28,29 @@
             }
         }
     },
+    Offcanvas: {
+        Initialize: function (interop, container) {
+            let offcanvas = bootstrap.Offcanvas.getInstance(container);
+            if (!offcanvas) {
+                offcanvas = new bootstrap.Offcanvas(container);
+                container.addEventListener("show.bs.offcanvas", () => {
+                    interop.invokeMethodAsync("Offcanvas.VisibilityChanged", true);
+                });
+                container.addEventListener("hide.bs.offcanvas", () => {
+                    interop.invokeMethodAsync("Offcanvas.VisibilityChanged", false);
+                });
+            }
+        },
+        Show: function (container) {
+            bootstrap.Offcanvas.getInstance(container).show()
+        },
+        Hide: function (container) {
+            bootstrap.Offcanvas.getInstance(container).hide();
+        },
+        Dispose: function (container) {
+            bootstrap.Offcanvas.getInstance(container).dispose();
+        }
+    },
     Tooltip: {
         Init: function (container) {
             var tooltip = bootstrap.Tooltip.getInstance(container);

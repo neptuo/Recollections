@@ -1,0 +1,90 @@
+﻿@if (Menu != null && Menu.Bottom.Count > 0)
+{
+    <nav class="fixed-bottom d-block d-sm-none bottom-bar">
+        <div class="container">
+            <div class="row my-2 items-@Menu.Bottom.Count">
+                @foreach (var item in Menu.Bottom)
+                {
+                    <div @key="item" class="col d-grid">
+                        @if (item.Url != null)
+                        {
+                            <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
+                                <a href="@item.Url" class="btn @(IsActive ? "btn-primary" : "bg-light-subtle")">
+                                    <Icon Identifier="@item.Icon" />
+                                    <span class="text">
+                                        @item.Text
+                                    </span>
+                                </a>
+                            </Match>
+                        }
+                        else if (item.Text == "Main menu")
+                        {
+                            <button class="btn bg-light-subtle" @onclick="OnToggleMainMenu">
+                                <Icon Identifier="@item.Icon" />
+                                <span class="text">
+                                    @item.Text
+                                </span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn bg-light-subtle" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                                <Icon Identifier="@item.Icon" />
+                                <span class="text">
+                                    @item.Text
+                                </span>
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <Offcanvas @ref="Offcanvas" Title="Recollections by Neptuo" class="offcanvas-bottom-menu">
+        @if (Menu != null)
+        {
+            <div class="row g-3">
+                @foreach (var item in Menu.Main)
+                    @MainMenuItem(item)
+            </div>
+            <hr />
+            <div class="row g-3">
+                @foreach (var item in Menu.User)
+                    @MainMenuItem(item)
+            </div>
+        }
+    </Offcanvas>
+}
+
+@code
+{
+    RenderFragment MainMenuItem(MenuItem item)
+    {
+        var isLogout = item.Text == "Logout";
+        return 
+            @<div class="col-3">
+                @if (item.Url != null)
+                {
+                    <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
+                        <a href="@item.Url" class="btn @(IsActive ? "btn-primary" : "bg-light-subtle") w-100">
+                            <Icon Identifier="@item.Icon" />
+                            <span class="text d-block text-truncate">
+                                @item.Text
+                            </span>
+                        </a>
+                    </Match>
+                }
+                else
+                {
+                    <button class="btn bg-light-subtle @(isLogout ? "text-danger" : string.Empty) w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                        <Icon Identifier="@item.Icon" />
+                        <span class="text d-block text-truncate">
+                            @item.Text
+                        </span>
+                    </button>
+                }
+            </div>
+        ;
+    }
+}

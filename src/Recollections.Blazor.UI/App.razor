@@ -1,8 +1,10 @@
 ﻿<Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <UserState RouteData="@routeData">
-            <RouteView RouteData="routeData" />
-        </UserState>
+        <CascadingValue Value="@routeData">
+            <UserState RouteData="@routeData">
+                <RouteView RouteData="routeData" />
+            </UserState>
+        </CascadingValue>
     </Found>
     <NotFound>
         <div class="container mt-4">

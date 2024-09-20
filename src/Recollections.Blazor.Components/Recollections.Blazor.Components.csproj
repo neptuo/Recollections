@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    <RazorLangVersion>3.0</RazorLangVersion>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 

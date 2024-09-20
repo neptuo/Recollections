@@ -9,40 +9,18 @@
         <a class="navbar-brand @(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")" href="@Navigator.UrlTimeline()">
             Recollections
         </a>
-        <div class="@(IsMainMenuVisible ? "d-none" : "d-block d-lg-none")">
-            <ul class="navbar-nav small-navbar-nav flex-row">
-                @foreach (var menuItem in MenuItems)
-                {
-                    if (menuItem.IsSmall)
-                    {
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
-                                <Icon Identifier="@menuItem.Icon" />
-                            </NavLink>
-                        </li>
-                    }
-                }
-            </ul>
-        </div>
-
-        <button class="navbar-toggler px-0" type="button" @onclick="ToggleMainMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
         <div class="navbar-collapse justify-content-between menu-collapse @(IsMainMenuVisible ? "menu-show" : "")">
             <ul class="navbar-nav large-navbar-nav w-100">
-                @for (int i = 0; i < MenuItems.Count; i++)
+                @for (int i = 0; i < Menu.Main.Count; i++)
                 {
-                    var menuItem = MenuItems[i];
-                    if (menuItem.IsLarge)
-                    {
-                        <li class="nav-item @(i == MenuItems.Count - 1 ? "me-lg-auto" : "")">
-                            <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
-                                <Icon Identifier="@menuItem.Icon" />
-                                @menuItem.Text
-                            </NavLink>
-                        </li>
-                    }
+                    var menuItem = Menu.Main[i];
+                    <li class="nav-item @(i == Menu.Main.Count - 1 ? "me-lg-auto" : "")">
+                        <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
+                            <Icon Identifier="@menuItem.Icon" />
+                            @menuItem.Text
+                        </NavLink>
+                    </li>
                 }
                 <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
                 <UserInfo OnChangePassword="@(() => { IsMainMenuVisible = false; ChangePasswordModal.Show(); })" />
@@ -61,5 +39,7 @@
 </ExceptionPanel>
 
 @Body
+
+<BottomMenu Menu="@Menu" />
 
 <ChangePasswordModal @ref="ChangePasswordModal" />
