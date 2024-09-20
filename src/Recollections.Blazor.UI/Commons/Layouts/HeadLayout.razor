@@ -1,29 +1,28 @@
 ﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-inverse navbar navbar-expand-lg navbar-dark bg-dark main-navbar sticky-top block-icons">
+<nav class="navbar navbar-inverse navbar navbar-expand-sm navbar-dark bg-dark main-navbar sticky-top block-icons">
     <div class="container">
         <a class="navbar-brand" href="@Navigator.UrlTimeline()">
             <img src="/img/logo.png" width="30" height="30" class="d-inline-block align-top" alt="">
         </a>
+        <span class="navbar-text d-sm-none me-auto">
+            <DocumentTitleViewer />
+        </span>
 
-        <a class="navbar-brand @(IsMainMenuVisible ? "" : "d-none d-md-inline d-lg-none d-xl-inline")" href="@Navigator.UrlTimeline()">
-            Recollections
-        </a>
-
-        <div class="navbar-collapse justify-content-between menu-collapse @(IsMainMenuVisible ? "menu-show" : "")">
-            <ul class="navbar-nav large-navbar-nav w-100">
+        <div class="d-none d-sm-flex navbar-collapse menu-collapse">
+            <ul class="navbar-nav justify-content-between w-100">
                 @for (int i = 0; i < Menu.Main.Count; i++)
                 {
                     var menuItem = Menu.Main[i];
-                    <li class="nav-item @(i == Menu.Main.Count - 1 ? "me-lg-auto" : "")">
+                    <li class="nav-item @(i == Menu.Main.Count - 1 ? "ms-lg-auto" : "")">
                         <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
                             <Icon Identifier="@menuItem.Icon" />
-                            @menuItem.Text
+                            <span class="d-none d-md-inline-block">@menuItem.Text</span>
                         </NavLink>
                     </li>
                 }
                 <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
-                <UserInfo OnChangePassword="@(() => { IsMainMenuVisible = false; ChangePasswordModal.Show(); })" />
+                <UserInfo Menu="@Menu" OnChangePassword="@(() => { IsMainMenuVisible = false; ChangePasswordModal.Show(); })" />
             </ul>
         </div>
     </div>

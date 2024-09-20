@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using Neptuo.Events;
+using Neptuo.Events.Handlers;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Pages;
@@ -16,6 +18,7 @@ public partial class HeadLayout : IDisposable
 {
     [Inject]
     internal Navigator Navigator { get; set; }
+
 
     [CascadingParameter]
     protected UserState UserState { get; set; }

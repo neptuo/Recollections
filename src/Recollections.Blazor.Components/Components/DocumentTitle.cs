@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Events;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,9 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected DocumentTitleInterop Interop { get; set; }
 
+        [Inject]
+        protected IEventDispatcher Events { get; set; }
+
         [Parameter]
         public string Value { get; set; }
 
@@ -22,10 +26,9 @@ namespace Neptuo.Recollections.Components
         {
             await base.OnParametersSetAsync();
 
-            if (String.IsNullOrEmpty(Value))
-                await Interop.SetAsync(Suffix);
-            else
-                await Interop.SetAsync($"{Value} - {Suffix}");
+            string formatted = String.IsNullOrEmpty(Value) ? Suffix : $"{Value} - {Suffix}";
+            await Interop.SetAsync(formatted);
+            await Events.PublishAsync(new DocumentTitleChanged(Value, formatted));
         }
 
         public void Dispose()
@@ -33,4 +36,6 @@ namespace Neptuo.Recollections.Components
             _ = Interop.SetAsync(Suffix);
         }
     }
+
+    public record DocumentTitleChanged(string Value, string Formatted);
 }

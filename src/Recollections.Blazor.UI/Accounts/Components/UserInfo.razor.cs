@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
+using Neptuo.Recollections.Commons.Layouts;
 using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,9 @@ namespace Neptuo.Recollections.Accounts.Components
 
         [CascadingParameter]
         public UserState UserState { get; set; }
+
+        [Parameter]
+        public MenuList Menu { get; set; }
 
         [Parameter]
         public EventCallback OnChangePassword { get; set; }

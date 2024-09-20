@@ -1,61 +1,38 @@
 ﻿@if (UserState.IsAuthenticated)
 {
-    <li class="nav-item dropdown d-none d-lg-block">
+    <li class="nav-item dropdown">
         <a @ref="MeButton" class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
             <Icon Identifier="user-circle" />
-            Me
+            <span class="d-none d-md-inline-block">Me</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
-            <li>
-                <a class="dropdown-item" href="@Navigator.UrlProfile(UserState.UserId)">
-                    <Icon Identifier="address-card" />
-                    Profile
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="@Navigator.UrlConnections()">
-                    <Icon Prefix="fas" Identifier="link" />
-                    Connections
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" @onclick="OnChangePassword">
-                    <Icon Identifier="key" />
-                    Change password
-                </a>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-                <a class="dropdown-item text-danger" @onclick="@LogoutAsync">
-                    <Icon Prefix="fas" Identifier="sign-out-alt" />
-                    Logout
-                </a>
-            </li>
+            @foreach (var item in Menu.User)
+            {
+                if (item.Text == "Logout")
+                {
+                    <li><hr class="dropdown-divider"></li>
+                }
+
+                if (item.Url != null)
+                {
+                    <li>
+                        <a class="dropdown-item" href="@item.Url">
+                            <Icon Identifier="@item.Icon" />
+                            @item.Text
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a class="dropdown-item @(item.Text == "Logout" ? "text-danger": "")" @onclick="item.OnClick">
+                            <Icon Identifier="@item.Icon" />
+                            @item.Text
+                        </a>
+                    </li>
+                }
+            }
         </ul>
-    </li>
-    <li class="d-block d-lg-none">
-        <a class="nav-link" href="@Navigator.UrlProfile(UserState.UserId)">
-            <Icon Identifier="address-card" />
-            Profile
-        </a>
-    </li>
-    <li class="d-block d-lg-none">
-        <a class="nav-link" href="@Navigator.UrlConnections()">
-            <Icon Prefix="fas" Identifier="link" />
-            Connections
-        </a>
-    </li>
-    <li class="d-block d-lg-none">
-        <a class="nav-link" @onclick="OnChangePassword">
-            <Icon Identifier="key" />
-            Change password
-        </a>
-    </li>
-    <li class="d-block d-lg-none">
-        <a class="nav-link text-danger" @onclick="@LogoutAsync">
-            <Icon Prefix="fas" Identifier="sign-out-alt" />
-            Logout
-        </a>
     </li>
 }
 else
@@ -63,13 +40,13 @@ else
     <li class="nav-item">
         <a class="nav-link" @onclick="LoginAsync">
             <Icon Identifier="sign-in-alt" />
-            Login
+            <span class="d-none d-md-inline-block">Login</span>
         </a>
     </li>
     <li class="nav-item">
         <NavLink class="nav-link" href="@Navigator.UrlRegister()">
             <Icon Identifier="user-plus" />
-            Register
+            <span class="d-none d-md-inline-block">Register</span>
         </NavLink>
     </li>
 }
