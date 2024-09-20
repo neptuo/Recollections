@@ -38,6 +38,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ImageInterop>();
             services.AddTransient<OffcanvasInterop>();
             services.AddTransient<IFreeLimitsNotifier, FreeLimitsNotifier>(provider => provider.GetRequiredService<FreeLimitsNotifier>());
+            services.AddSingleton<TemplateService>();
 
             return services;
         }
