@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public string PlaceHolder { get; set; }
 
+        [Parameter]
+        public string EditModeCssClass { get; set; }
+
         [CascadingParameter]
         public FormState FormState { get; set; }
 
@@ -68,6 +71,8 @@ namespace Neptuo.Recollections.Components.Editors
             List<string> cssClass = new List<string>();
             if (!IsEditMode)
                 cssClass.Add("inline-editor-viewmode");
+            else if (!String.IsNullOrEmpty(EditModeCssClass))
+                cssClass.Add(EditModeCssClass);
 
             if (IsEditable)
                 cssClass.Add("inline-editable");
