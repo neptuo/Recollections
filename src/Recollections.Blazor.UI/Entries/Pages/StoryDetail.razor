@@ -8,8 +8,36 @@
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div class="entry-detail">
-                <h2 class="title">
-                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
+                <h2 class="d-flex title">
+                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
+                    <div class="ms-1 dropdown">
+                        <button class="btn btn-link py-0 px-2" data-bs-toggle="dropdown">
+                            <Icon Identifier="ellipsis-v" />
+                        </button>
+                        <div class="dropdown-menu">
+                            <PermissionView Request="@PermissionRequest.Write">
+                                <a class="dropdown-item" @onclick="@AddChapter" title="Add Chapter">
+                                    <Icon Identifier="book" />
+                                    Add Chapter
+                                </a>
+                                <a class="dropdown-item" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
+                                    <Icon Identifier="comment-alt" />
+                                    Add Story Entry
+                                </a>
+                            </PermissionView>
+                            <PermissionView Request="@PermissionRequest.Owner">
+                                <ShareButton StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
+                            </PermissionView>
+                                <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                            <PermissionView Request="@PermissionRequest.Owner">
+                                <hr class="dropdown-divider" />
+                                <a class="dropdown-item text-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
+                                    <Icon Identifier="trash-alt" />
+                                    Delete Story
+                                </a>
+                            </PermissionView>
+                        </div>
+                    </div>
                 </h2>
                 <UserInformation Owner="@Owner" />
                 <div class="text">
@@ -18,27 +46,6 @@
                 <div class="entries">
                     <Timeline Data="@Entries[Model.Id]" />
                 </div>
-
-                <ActionPanel>
-                    <PermissionView Request="@PermissionRequest.Write">
-                        <button type="button" class="btn btn-sm btn-primary" @onclick="@AddChapter" title="Add Chapter">
-                            <Icon Identifier="book" />
-                            Add Chapter
-                        </button>
-                        <button type="button" class="btn btn-sm btn-primary" @onclick="@(() => SelectEntry(null))" title="Add Story Entry">
-                            <Icon Prefix="fas" Identifier="comment-alt" />
-                            Add Story Entry
-                        </button>
-                    </PermissionView>
-                    <PermissionView Request="@PermissionRequest.Owner">
-                        <ShareButton StoryId="@Model.Id" />
-                        <ShareLinkButton />
-                        <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Story">
-                            <Icon Identifier="trash-alt" />
-                            Delete Story
-                        </button>
-                    </PermissionView>
-                </ActionPanel>
 
                 <div class="chapters">
                     @foreach (var chapter in Model.Chapters)

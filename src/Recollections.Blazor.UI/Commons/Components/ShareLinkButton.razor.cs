@@ -17,7 +17,16 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         protected WindowInterop Interop { get; set; }
 
+        [Parameter]
+        public ButtonLayout Layout { get; set; }
+
         protected Modal Modal { get; set; }
         protected bool IsCopiedToClipboard { get; set; }
+
+        protected void OnShow()
+        {
+            IsCopiedToClipboard = false;
+            Modal.Show();
+        }
     }
 }
