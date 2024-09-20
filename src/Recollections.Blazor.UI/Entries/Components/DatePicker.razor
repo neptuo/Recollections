@@ -13,7 +13,7 @@
                     var year = i;
 
                     <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
-                        <button class="btn btn-outline-salmon d-block w-100" @onclick="@(() => OnYearSelected(year))">
+                        <button class="btn btn-outline-primary d-block w-100" @onclick="@(() => OnYearSelected(year))">
                             @i
                         </button>
                     </div>
@@ -37,7 +37,7 @@
                     var monthName = MonthNames[i];
 
                     <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
-                        <button class="btn btn-outline-salmon d-block w-100" @onclick="@(() => OnMonthSelected(month))">
+                        <button class="btn btn-outline-primary d-block w-100" @onclick="@(() => OnMonthSelected(month))">
                             @monthName
                         </button>
                     </div>
@@ -56,7 +56,7 @@
             </h5>
 
             <MonthView Year="@CurrentYear" Month="@CurrentMonth" Context="day">
-                <button class="btn btn-outline-salmon d-block w-100" @onclick="@(() => OnDaySelected(day))">
+                <button class="btn btn-outline-primary d-block w-100" @onclick="@(() => OnDaySelected(day))">
                     @day
                 </button>
             </MonthView>

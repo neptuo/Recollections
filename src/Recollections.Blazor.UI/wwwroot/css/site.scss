@@ -1,10 +1,11 @@
 ﻿@import "_colors.scss";
 
 @import "../lib/bootstrap/scss/functions";
-@import "../lib/bootstrap/scss/variables";
-
 $primary: $accent-color;
+
+@import "../lib/bootstrap/scss/variables";
 $theme-colors: map-merge($theme-colors, ( "primary": $primary ));
+
 @import "../lib/bootstrap/scss/bootstrap";
 @import "../lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css";
 @import "../lib/fontawesome/css/all.css";
@@ -21,6 +22,7 @@ $theme-colors: map-merge($theme-colors, ( "primary": $primary ));
 ::-webkit-scrollbar-thumb {
     background: #52585F;
 }
+
 
 
 a:not([href]):not([tabindex]) {
@@ -128,34 +130,15 @@ a {
     }
 }
 
-.btn-salmon {
-    color: white;
-    border-color: salmon;
-    background-color: salmon;
-
-    &:focus, &:hover {
-        box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
-    }
-
-    &:hover {
-        color: white;
-        background-color: #e87563;
-    }
+.btn-primary {
+    --bs-btn-color: #fff;
 }
 
-.btn-outline-salmon {
-    color: salmon;
-    border-color: salmon;
-    background-color: transparent;
-
-    &:focus, &:hover {
-        box-shadow: 0 0 0 0.2rem rgba(250, 128, 114, .25);
-    }
-
-    &:hover {
-        color: white;
-        background-color: lightsalmon;
-    }
+.btn-primary,
+.btn-outline-primary {
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-color: #fff;
+    --bs-btn-disabled-color: #fff;
 }
 
 .bg-salmon {

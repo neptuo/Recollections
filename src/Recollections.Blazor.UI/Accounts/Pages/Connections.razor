@@ -14,7 +14,7 @@
                 <input class="form-control" type="text" placeholder="Username..." @bind="UserName" />
             </div>
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
-                <button class="btn btn-salmon d-block w-100">
+                <button class="btn btn-primary d-block w-100">
                     <Icon Identifier="plus" />
                     Send invite
                 </button>
@@ -126,7 +126,7 @@
         }
     </ChildContent>
     <Buttons>
-        <button class="btn btn-salmon btn-sm" @onclick="@(async () => { await SaveAsync(ShareConnection); ShareConnection = null; ShareModal.Hide(); })">Save</button>
+        <button class="btn btn-primary btn-sm" @onclick="@(async () => { await SaveAsync(ShareConnection); ShareConnection = null; ShareModal.Hide(); })">Save</button>
     </Buttons>
 </Modal>
 
