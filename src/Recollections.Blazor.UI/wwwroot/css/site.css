@@ -12009,7 +12009,6 @@ a {
 .btn-outline-primary {
   --bs-btn-hover-color: #fff;
   --bs-btn-active-color: #fff;
-  --bs-btn-disabled-color: #fff;
 }
 
 .bg-salmon {
