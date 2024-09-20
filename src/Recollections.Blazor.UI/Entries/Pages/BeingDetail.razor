@@ -8,8 +8,21 @@
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div class="entry-detail">
-                <h2 class="title">
-                    <InlineTextEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" />
+                <h2 class="title d-flex">
+                    <InlineTextEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
+                    <DropdownButton CssClass="ms-1">
+                        <PermissionView Request="PermissionRequest.Owner">
+                            <ShareButton BeingId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
+                        </PermissionView>
+                        <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                        <PermissionView Request="PermissionRequest.Owner">
+                            @if (Model.Id != Model.UserId)
+                            {
+                                <DropdownSeparator />
+                                <DropdownItem Icon="trash-alt" Text="Delete Being" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Being" />
+                            }
+                        </PermissionView>
+                    </DropdownButton>
                 </h2>
                 <h2 class="icon">
                     <InlineLink Value="@Model.Icon" PlaceHolder="user" OnClick="@(() => IconPicker.Show())">
@@ -22,20 +35,6 @@
                 <div class="text">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-
-                <ActionPanel CssClass="my-3">
-                    <PermissionView Request="@PermissionRequest.Owner">
-                        <ShareButton BeingId="@Model.Id" />
-                        <ShareLinkButton />
-                        @if (Model.Id != Model.UserId)
-                        {
-                            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteAsync())" title="Delete Being">
-                                <Icon Identifier="trash-alt" />
-                                Delete Being
-                            </button>
-                        }
-                    </PermissionView>
-                </ActionPanel>
 
                 <Timeline DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" NoMoreText="@($"Here {Model.Name} started...")" />
             </div>

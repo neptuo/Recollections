@@ -10,8 +10,18 @@
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div @ref="Container" class="entry-detail">
-                <h2 class="title">
-                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
+                <h2 class="title d-flex">
+                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
+                    <DropdownButton CssClass="ms-1">
+                        <PermissionView Request="PermissionRequest.Owner">
+                            <ShareButton EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
+                        </PermissionView>
+                        <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                        <PermissionView Request="PermissionRequest.Owner">
+                            <DropdownSeparator />
+                            <DropdownItem Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
+                        </PermissionView>
+                    </DropdownButton>
                 </h2>
                 <div class="datetime">
                     <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
@@ -79,24 +89,6 @@
                                     BearerToken="@UserState.BearerToken"
                                     Progress="@(async e => await OnUploadProgressAsync(e))"
                                     DragAndDropContainer="Container" />
-                    </PermissionView>
-                    <span>
-                        @if (Images != null && Images.Count > 0)
-                        {
-                            <button type="button" class="btn btn-sm btn-primary mr-1" @onclick="(() => Gallery.Open(0))">
-                                <Icon Identifier="images" />
-                                Gallery
-                            </button>
-                        }
-                    </span>
-                    <PermissionView Request="@PermissionRequest.Owner">
-                        <ShareButton EntryId="@EntryId" />
-                        <ShareLinkButton />
-
-                        <button type="button" class="btn btn-sm btn-danger" @onclick="@DeleteAsync" title="Delete Entry">
-                            <Icon Identifier="trash-alt" />
-                            Delete Entry
-                        </button>
                     </PermissionView>
                 </ActionPanel>
             </div>
