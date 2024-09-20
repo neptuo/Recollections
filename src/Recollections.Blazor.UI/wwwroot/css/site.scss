@@ -1,5 +1,15 @@
 ﻿@import "_colors.scss";
 
+@import "../lib/bootstrap/scss/functions";
+@import "../lib/bootstrap/scss/variables";
+
+$primary: $accent-color;
+$theme-colors: map-merge($theme-colors, ( "primary": $primary ));
+@import "../lib/bootstrap/scss/bootstrap";
+@import "../lib/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css";
+@import "../lib/fontawesome/css/all.css";
+@import "../lib/easymde/dist/easymde.min.css";
+
 ::-webkit-scrollbar {
     width: 8px;
 }

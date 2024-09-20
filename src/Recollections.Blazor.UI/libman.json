@@ -12,7 +12,6 @@
       "destination": "wwwroot/lib/fontawesome",
       "files": [
         "css/all.css",
-        "css/all.min.css",
         "webfonts/*"
       ]
     },
@@ -29,7 +28,9 @@
       "library": "bootstrap@5.3.3",
       "destination": "wwwroot/lib/bootstrap",
       "files": [
-        "dist/**"
+        "scss/**",
+        "dist/js/bootstrap.min.js",
+        "dist/js/bootstrap.min.js.map"
       ]
     },
     {
