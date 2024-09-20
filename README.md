@@ -2,7 +2,7 @@
 Manage your recollections
 
 ## Docker
- - [API - https://hub.docker.com/r/neptuo/recollections-api](https://hub.docker.com/r/neptuo/recollections-api)
+Currently published to private repository. 
 
 ## Developer notes
 Here are some tips and tricks.
