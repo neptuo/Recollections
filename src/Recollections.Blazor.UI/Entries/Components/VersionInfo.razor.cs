@@ -13,6 +13,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Inject]
         protected Api Api { get; set; }
 
+        [Parameter]
+        public bool Separator { get; set; } = true;
+
         protected VersionModel ApiVersion { get; private set; }
         protected VersionModel ClientVersion { get; private set; }
 

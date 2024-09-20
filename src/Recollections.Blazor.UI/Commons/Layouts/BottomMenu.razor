@@ -42,18 +42,25 @@
     </nav>
 
     <Offcanvas @ref="Offcanvas" Title="Recollections by Neptuo" class="offcanvas-bottom-menu">
-        @if (Menu != null)
-        {
-            <div class="row g-3">
-                @foreach (var item in Menu.Main)
-                    @MainMenuItem(item)
-            </div>
-            <hr />
-            <div class="row g-3">
-                @foreach (var item in Menu.User)
-                    @MainMenuItem(item)
-            </div>
-        }
+        <HeaderContent>
+            <span class="versions d-grid ms-auto text-end small">
+                <VersionInfo Separator="false" />
+            </span>
+        </HeaderContent>
+        <ChildContent>
+            @if (Menu != null)
+            {
+                <div class="row g-3">
+                    @foreach (var item in Menu.Main)
+                        @MainMenuItem(item)
+                </div>
+                <hr />
+                <div class="row g-3">
+                    @foreach (var item in Menu.User)
+                        @MainMenuItem(item)
+                </div>
+            }
+        </ChildContent>
     </Offcanvas>
 }
 
