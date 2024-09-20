@@ -25,7 +25,7 @@ dotnet ef migrations add NewMigration --startup-project src\Recollections.Api --
 ```
 
 ### Build docker images
-From repository root:
+From the API project folder:
 ```
 dotnet publish --os linux --arch x64 /t:PublishContainer
 ```
