@@ -40,6 +40,7 @@ public class ConnectionsController : ControllerBase
             .Where(c => c.UserId == userId || c.OtherUserId == userId)
             .Select(c => new ConnectionModel() 
             {
+                OtherUserId = c.UserId == userId ? c.OtherUser.Id : c.User.Id,
                 OtherUserName = c.UserId == userId ? c.OtherUser.UserName : c.User.UserName,
                 Role = c.UserId == userId ? ConnectionRole.Initiator : ConnectionRole.Acceptor,
                 State = c.State == 1 

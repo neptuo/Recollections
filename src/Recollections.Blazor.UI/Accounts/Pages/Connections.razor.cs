@@ -15,6 +15,9 @@ public partial class Connections
     [Inject]
     protected Api Api { get; set; }
 
+    [Inject]
+    protected Navigator Navigator { get; set; }
+
     protected Modal ShareModal { get; set; }
     protected ConnectionModel ShareConnection { get; set; }
 

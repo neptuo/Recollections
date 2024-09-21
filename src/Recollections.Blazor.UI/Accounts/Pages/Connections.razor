@@ -24,13 +24,16 @@
 
     <div class="row">
         <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any connections..." Context="connection">
-            <div class="col-sm-12 col-md-3 mb-4">
+            <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
                                 <h5 class="card-title">
-                                    @connection.OtherUserName
+                                    <a href="@Navigator.UrlProfile(connection.OtherUserId)">
+                                        <Icon Identifier="user" />
+                                        @connection.OtherUserName
+                                    </a>
                                 </h5>
                             </div>
                             <div class="col-auto">
@@ -57,7 +60,7 @@
                                 }
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-end">
                             @(connection.Role switch {
                                 ConnectionRole.Initiator => "Initiated by me",
                                 ConnectionRole.Acceptor => "Received",
