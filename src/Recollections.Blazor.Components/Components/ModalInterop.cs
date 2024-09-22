@@ -24,5 +24,11 @@ namespace Neptuo.Recollections.Components
 
         internal void Hide(ElementReference element)
             => jsRuntime.InvokeVoidAsync("Bootstrap.Modal.Hide", element);
+
+        internal void Dispose(ElementReference element)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Modal.Dispose", element);
+
+        internal ValueTask<bool> IsOpenAsync(ElementReference element)
+            => jsRuntime.InvokeAsync<bool>("Bootstrap.Modal.IsOpen", element);
     }
 }

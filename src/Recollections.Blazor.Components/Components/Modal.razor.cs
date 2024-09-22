@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,15 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public partial class Modal
+    public partial class Modal : IDisposable
     {
+        private IDisposable locationChangingToken;
+
         [Inject]
         internal ModalInterop Interop { get; set; }
+
+        [Inject]
+        internal NavigationManager NavigationManager { get; set; }
 
         [Inject]
         internal ILog<Modal> Log { get; set; }
@@ -47,6 +53,27 @@ namespace Neptuo.Recollections.Components
         public ModalSize Size { get; set; } = ModalSize.Normal;
 
         protected ElementReference Container { get; set; }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            locationChangingToken = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+        }
+
+        public void Dispose()
+        {
+            Hide();
+            locationChangingToken.Dispose();
+        }
+
+        private async ValueTask OnLocationChanging(LocationChangingContext context)
+        {
+            if (await Interop.IsOpenAsync(Container))
+            {
+                context.PreventNavigation();
+                Hide();
+            }
+        }
 
         protected override void OnParametersSet()
         {

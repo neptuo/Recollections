@@ -1,31 +1,36 @@
 ﻿window.Bootstrap = {
     Modal: {
         Show: function (container) {
-            var modal = bootstrap.Modal.getInstance(container);
-            if (modal == null) {
-                modal = new bootstrap.Modal(container, {
-                    "show": true,
-                    "focus": true
-                });
-            
-                container.addEventListener('shown.bs.modal', function () {
-                    $(container).find("input").first().trigger('focus');
+            var $container = $(container);
+            if (!$container.data("modal-initialized")) {
+                var modal = new bootstrap.Modal(container, {});
+                $container.data("modal", modal);
+
+                $container.data("modal-initialized", true).on('shown.bs.modal', function () {
+                    var $select = $container.find("[data-select]");
+                    if ($select.length > 0) {
+                        $select[0].setSelectionRange(0, $select[0].value.length)
+                    }
+
+                    const autofocus = $container.find('[data-autofocus]');
+                    if (autofocus.length > 0) {
+                        autofocus.first().trigger('focus');
+                    } else {
+                        $container.find("input").first().trigger('focus');
+                    }
                 });
             }
 
-            modal.show();
+            $container.data("modal").show();
         },
         Hide: function (container) {
-            var modal = bootstrap.Modal.getInstance(container);
-            if (modal != null) {
-                modal.hide();
-            }
+            $(container).data("modal").hide();
+        },
+        IsOpen: function (container) {
+            return $(container).hasClass("show");
         },
         Dispose: function (container) {
-            var modal = bootstrap.Modal.getInstance(container);
-            if (modal != null) {
-                modal.dispose();
-            }
+            $(container).data("modal").dispose();
         }
     },
     Offcanvas: {
