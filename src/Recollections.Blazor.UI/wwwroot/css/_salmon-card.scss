@@ -2,13 +2,11 @@
     border-color: $accent-color;
 
     &.selected {
-        color: white;
-        background-color: lightsalmon;
+        background-color: rgba(250, 128, 114, 0.75);
     }
 
-    &:hover, &:hover a {
-        color: white;
-        background-color: $accent-color;
+    &:hover {
+        background-color: rgba(250, 128, 114, 0.5);
     }
 }
 
