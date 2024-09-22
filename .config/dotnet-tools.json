@@ -6,7 +6,15 @@
       "version": "7.0.11",
       "commands": [
         "dotnet-ef"
-      ]
+      ],
+      "rollForward": false
+    },
+    "excubo.webcompiler": {
+      "version": "4.0.0",
+      "commands": [
+        "webcompiler"
+      ],
+      "rollForward": false
     }
   }
 }
