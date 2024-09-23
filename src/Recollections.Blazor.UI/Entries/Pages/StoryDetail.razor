@@ -30,7 +30,7 @@
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
                 <div class="entries">
-                    <Timeline Data="@Entries[Model.Id]" />
+                    <Timeline Data="@Entries[Model.Id]" ShowStoryInfo="false" />
                 </div>
 
                 <div class="chapters">
@@ -51,7 +51,7 @@
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
                             <div class="entries">
-                                <Timeline Data="@Entries[chapter.Id]" />
+                                <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" />
                             </div>
                         </div>
                     }
