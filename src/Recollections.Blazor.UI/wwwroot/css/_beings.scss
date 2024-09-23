@@ -7,8 +7,9 @@
 
     .being-icon {
         position: absolute;
-        right: 12px;
+        top: var(--bs-card-spacer-y);
+        right: var(--bs-card-spacer-x);
         font-size: 2rem;
-        top: 6px;
+        line-height: 1.5rem;
     }
 }
