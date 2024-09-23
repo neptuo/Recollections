@@ -13,7 +13,7 @@
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Write">
                             <DropdownItem Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
-                            <DropdownItem Icon="comment-alt" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
+                            <DropdownItem Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
                         </PermissionView>
                         <PermissionView Request="PermissionRequest.Owner">
                             <ShareButton StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
