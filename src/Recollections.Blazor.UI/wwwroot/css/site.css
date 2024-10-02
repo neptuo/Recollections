@@ -13477,7 +13477,7 @@ a {
 }
 
 .lnk-dark-arrow {
-  color: black !important;
+  color: var(--bs-body-color) !important;
   text-decoration: none;
 }
 .lnk-dark-arrow:hover {
@@ -13863,7 +13863,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   left: 15%;
   bottom: 0px;
   width: 4px;
-  background: #ddd;
+  background: var(--bs-secondary-bg);
 }
 .timeline:after {
   content: "";
@@ -13918,7 +13918,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   font-size: 180%;
 }
 .entry .body h2 a, .entry .body .h2 a {
-  color: black !important;
+  color: var(--bs-body-color) !important;
   text-decoration: none;
 }
 .entry .body h2 a:hover, .entry .body .h2 a:hover {
@@ -13931,7 +13931,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 }
 .entry .body .information {
   margin-right: 12px;
-  color: #333;
+  color: var(--bs-secondary-color);
   white-space: nowrap;
 }
 .entry .body .value-placeholder {
@@ -13952,7 +13952,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   position: relative;
   margin-left: calc(15% - 34px);
   margin-bottom: 48px;
-  background: white;
+  background: var(--bs-body-bg);
 }
 
 .entry-picker .timeline:before {
@@ -14280,7 +14280,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   background-color: rgba(250, 128, 114, 0.25);
 }
 .stories a {
-  color: black;
+  color: var(--bs-body-color);
   text-decoration: none;
 }
 .stories a:hover {
@@ -14329,7 +14329,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   background-color: rgba(250, 128, 114, 0.25);
 }
 .beings a {
-  color: black;
+  color: var(--bs-body-color);
   text-decoration: none;
 }
 .beings a:hover {
@@ -14372,7 +14372,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   background-color: salmon;
 }
 .search a {
-  color: black;
+  color: var(--bs-body-color);
   text-decoration: none;
 }
 .search a:hover {

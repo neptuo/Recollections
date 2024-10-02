@@ -100,7 +100,7 @@ a {
 }
 
 @mixin dark-arrow() {
-    color: black !important;
+    color: var(--bs-body-color) !important;
     text-decoration: none;
 
     &:hover {

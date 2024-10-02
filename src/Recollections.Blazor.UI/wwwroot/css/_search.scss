@@ -14,7 +14,7 @@
     }
 
     a {
-        color: black;
+        color: var(--bs-body-color);
         text-decoration: none;
 
         &:hover {

@@ -17,7 +17,7 @@ $dot-diameter: 18px;
         left: calc(15%);
         bottom: 0px;
         width: $border-width;
-        background: #ddd;
+        background: var(--bs-secondary-bg);
     }
 
     &:after {
@@ -84,7 +84,7 @@ $dot-diameter: 18px;
 
         .information {
             margin-right: 12px;
-            color: #333;
+            color: var(--bs-secondary-color);
             white-space: nowrap;
         }
 
@@ -111,7 +111,7 @@ $dot-diameter: 18px;
     position: relative;
     margin-left: calc(15% - 34px);
     margin-bottom: 48px;
-    background: white;
+    background: var(--bs-body-bg);
 }
 
 @mixin narrow() {
