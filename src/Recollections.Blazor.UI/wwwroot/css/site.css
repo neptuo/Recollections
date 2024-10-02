@@ -14363,13 +14363,11 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 .search .card {
   border-color: salmon;
 }
-.search .card .information {
-  margin-right: 12px;
-  color: #333;
+.search .card.selected {
+  background-color: rgba(250, 128, 114, 0.5);
 }
-.search .card:hover, .search .card:hover a, .search .card:hover .information {
-  color: white;
-  background-color: salmon;
+.search .card:hover {
+  background-color: rgba(250, 128, 114, 0.25);
 }
 .search a {
   color: var(--bs-body-color);
@@ -14377,6 +14375,9 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 }
 .search a:hover {
   text-decoration: none;
+}
+.search .information {
+  margin-right: 12px;
 }
 
 .calendar .badge, .yearlendar .badge {

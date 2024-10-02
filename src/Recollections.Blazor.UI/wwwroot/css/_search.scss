@@ -1,24 +1,7 @@
 ﻿.search {
-    .card {
-        .information {
-            margin-right: 12px;
-            color: #333;
-        }
-
-        border-color: $accent-color;
-
-        &:hover, &:hover a, &:hover .information {
-            color: white;
-            background-color: $accent-color;
-        }
-    }
-
-    a {
-        color: var(--bs-body-color);
-        text-decoration: none;
-
-        &:hover {
-            text-decoration: none;
-        }
+    @import "_salmon-card.scss";
+    
+    .information {
+        margin-right: 12px;
     }
 }
