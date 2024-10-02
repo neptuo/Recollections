@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Neptuo.Converters;
 using Neptuo.Events;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Commons;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
@@ -71,7 +72,9 @@ namespace Neptuo.Recollections
                 .AddToString<bool>()
                 .AddStringTo<bool>(Boolean.TryParse)
                 .AddToString<int>()
-                .AddStringTo<int>(Int32.TryParse);
+                .AddStringTo<int>(Int32.TryParse)
+                .AddStringTo<ThemeType>(Enum.TryParse)
+                .AddToStringSearchHandler();
         }
 
         private static void ConfigureComponents(RootComponentMappingCollection rootComponents)

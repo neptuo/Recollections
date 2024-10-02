@@ -62,9 +62,11 @@ namespace Neptuo.Recollections.Accounts
 
             if (storage.TryGetValue(key, out var model))
             {
+                log.Debug($"Found property '{key}' with value '{model.Value}'");
                 if (model.Value != null && Converts.Try(model.Value, out T value))
                     return value;
 
+                log.Debug($"Failed to convert '{key}' with value '{model.Value}' to type '{typeof(T).Name}'");
                 return defaultValue;
             }
 

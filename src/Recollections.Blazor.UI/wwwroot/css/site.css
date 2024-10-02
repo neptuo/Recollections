@@ -13452,7 +13452,7 @@ footer.navbar a:hover {
 }
 
 .offcanvas-bottom-menu {
-  --bs-offcanvas-height: 48vh;
+  --bs-offcanvas-height: 54vh;
   bottom: 55px;
 }
 

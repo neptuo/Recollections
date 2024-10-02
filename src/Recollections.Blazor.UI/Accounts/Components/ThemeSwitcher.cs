@@ -2,8 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using Neptuo.Events;
-using Neptuo.Events.Handlers;
 using Neptuo.Logging;
 using Neptuo.Recollections.Components;
 

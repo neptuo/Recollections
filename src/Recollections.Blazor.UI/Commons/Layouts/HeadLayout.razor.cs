@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Neptuo.Events;
-using Neptuo.Events.Handlers;
+using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Pages;
@@ -19,6 +18,8 @@ public partial class HeadLayout : IDisposable
     [Inject]
     internal Navigator Navigator { get; set; }
 
+    [Inject]
+    internal PropertyCollection Properties { get; set; }
 
     [CascadingParameter]
     protected UserState UserState { get; set; }
@@ -30,7 +31,7 @@ public partial class HeadLayout : IDisposable
 
     protected override void OnInitialized()
     {
-        Menu = new MenuList(Navigator, UserState, OnChangePassword);
+        Menu = new MenuList(Navigator, UserState, OnChangePassword, OnChangeTheme);
         base.OnInitialized();
 
         Navigator.LocationChanged += OnLocationChanged;
@@ -41,7 +42,21 @@ public partial class HeadLayout : IDisposable
         Navigator.LocationChanged -= OnLocationChanged;
     }
 
-    protected void OnChangePassword() => ChangePasswordModal.Show();
+    protected void OnChangePassword()
+        => ChangePasswordModal.Show();
+
+    protected async void OnChangeTheme()
+    {
+        var current = await Properties.ThemeAsync();
+        var next = current switch
+        {
+            ThemeType.Light => ThemeType.Dark,
+            ThemeType.Dark => ThemeType.Auto,
+            ThemeType.Auto => ThemeType.Light,
+            _ => throw Ensure.Exception.NotSupported(current)
+        };
+        await Properties.ThemeAsync(next);
+    }
 
     private void OnLocationChanged(string url)
     {
@@ -61,7 +76,7 @@ public class MenuList
     public List<MenuItem> Main { get; } = new();
     public List<MenuItem> User { get; } = new();
 
-    public MenuList(Navigator navigator, UserState userState, Action onChangePassword)
+    public MenuList(Navigator navigator, UserState userState, Action changePassword, Action changeTheme)
     {
         Add(new MenuItem("Main menu", "bars"), Bottom);
         Add(new MenuItem("Timeline", "stream", Url: navigator.UrlTimeline(), PageType: typeof(TimelineList), Match: NavLinkMatch.All), Main, Bottom);
@@ -74,7 +89,8 @@ public class MenuList
 
         Add(new MenuItem("Profile", "address-card", OnClick: () => navigator.OpenProfile(userState.UserId)), User);
         Add(new MenuItem("Connections", "link", Url: navigator.UrlConnections()), User);
-        Add(new MenuItem("Change password", "key", OnClick: onChangePassword), User);
+        Add(new MenuItem("Change password", "key", OnClick: changePassword), User);
+        Add(new MenuItem("Theme", "moon", OnClick: changeTheme), User);
         Add(new MenuItem("Logout", "sign-out-alt", OnClick: () => _ = userState.LogoutAsync()), User);
     }
 
