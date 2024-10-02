@@ -1,4 +1,5 @@
 ﻿using Neptuo;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,29 +11,40 @@ namespace Neptuo.Recollections.Accounts
 {
     public class PropertyCollection
     {
-        private readonly Dictionary<string, UserPropertyModel> storage = new Dictionary<string, UserPropertyModel>();
+        private readonly Dictionary<string, UserPropertyModel> storage = new();
         private readonly Api api;
+        private readonly ILog<PropertyCollection> log;
         private Task ensureTask;
+        private bool wasLoadRequested = false;
 
-        public PropertyCollection(Api api)
+        public event Action ValuesLoaded;
+
+        public PropertyCollection(Api api, ILog<PropertyCollection> log)
         {
             Ensure.NotNull(api, "api");
+            Ensure.NotNull(log, "log");
             this.api = api;
+            this.log = log;
         }
 
         private Task EnsureAsync()
         {
             if (ensureTask == null)
+            {
                 ensureTask = LoadAsync();
+                ensureTask.ContinueWith(t => ValuesLoaded?.Invoke());
+            }
 
             return ensureTask;
         }
 
         private async Task LoadAsync()
         {
+            log.Debug("Loading properties");
             var response = await api.GetPropertiesAsync();
 
             storage.Clear();
+            log.Debug($"Got '{response.Count}' items");
             foreach (var model in response)
                 storage[model.Key] = model;
         }
@@ -41,6 +53,8 @@ namespace Neptuo.Recollections.Accounts
         {
             Ensure.NotNullOrEmpty(key, "key");
 
+            wasLoadRequested = true;
+
             if (!api.IsAuthorized)
                 return defaultValue;
 
@@ -48,7 +62,7 @@ namespace Neptuo.Recollections.Accounts
 
             if (storage.TryGetValue(key, out var model))
             {
-                if (Converts.Try(model.Value, out T value))
+                if (model.Value != null && Converts.Try(model.Value, out T value))
                     return value;
 
                 return defaultValue;
@@ -74,15 +88,25 @@ namespace Neptuo.Recollections.Accounts
             model.Value = rawValue;
 
             await api.SetPropertyAsync(model);
+            
+            ValuesLoaded?.Invoke();
         }
 
-        private static InvalidOperationException NotSupportedKey(string key)
-            => Ensure.Exception.InvalidOperation($"Property '{key}' is not supported.");
+        private InvalidOperationException NotSupportedKey(string key)
+        {
+            log.Debug($"Going to throw for unsupported key '{key}'");
+            return Ensure.Exception.InvalidOperation($"Property '{key}' is not supported.");
+        }
 
         internal void ClearOnUserChanged()
         {
+            log.Debug($"Clear on user changed, {(wasLoadRequested ? "previously has properties" : "not loaded yet")}");
+
             storage.Clear();
             ensureTask = null;
+
+            if (wasLoadRequested && api.IsAuthorized)
+                _ = EnsureAsync();
         }
     }
 }
