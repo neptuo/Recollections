@@ -23,8 +23,8 @@
                         </NavLink>
                     </li>
                 }
-                <PwaInstall OnUpdateAvailable="@(() => IsMainMenuVisible = true)" />
-                <UserInfo Menu="@Menu" OnChangePassword="@(() => { IsMainMenuVisible = false; ChangePasswordModal.Show(); })" />
+                <PwaInstall />
+                <UserInfo Menu="@Menu" OnChangePassword="@(() => { ChangePasswordModal.Show(); })" />
             </ul>
         </div>
     </div>

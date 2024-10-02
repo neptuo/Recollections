@@ -10,13 +10,10 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Commons.Components
 {
-    public partial class PwaInstall : ComponentBase, IAsyncDisposable
+    public partial class PwaInstall : ComponentBase, IDisposable, PwaInstallInterop.IComponent
     {
         [Inject]
         internal PwaInstallInterop Interop { get; set; }
-
-        [Inject]
-        internal TooltipInterop Tooltip { get; set; }
 
         [Inject]
         internal ILog<PwaInstall> Log { get; set; }
@@ -24,12 +21,7 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         internal Navigator Navigator { get; set; }
 
-        [Parameter]
-        public EventCallback OnUpdateAvailable { get; set; }
-
-        protected ElementReference Button { get; set; }
         protected bool IsInstallable { get; set; }
-        protected bool IsUpdateable { get; set; }
 
         protected override void OnInitialized()
         {
@@ -39,58 +31,26 @@ namespace Neptuo.Recollections.Commons.Components
             Interop.Initialize(this);
         }
 
-        protected async override Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (IsInstallable || IsUpdateable)
-                await Tooltip.InitializeAsync(Button);
-
-            if (!IsInstallable && IsUpdateable)
-            {
-                await OnUpdateAvailable.InvokeAsync();
-                await Tooltip.ShowAsync(Button);
-            }
-        }
-
-        public async void MakeInstallable()
+        public void MakeInstallable()
         {
             Log.Debug("Installable=True");
-
-            await Tooltip.DisposeAsync(Button);
 
             IsInstallable = true;
             StateHasChanged();
         }
 
-        public async void MakeUpdateable()
-        {
-            Log.Debug("Updateable=True");
-            
-            await Tooltip.DisposeAsync(Button);
-
-            IsUpdateable = true;
-            StateHasChanged();
-        }
+        public void MakeUpdateable()
+        { }
 
         protected async Task InstallAsync()
         {
-            await Tooltip.HideAsync(Button);
             await Interop.InstallAsync();
             IsInstallable = false;
         }
 
-        protected async Task UpdateAsync()
-        {
-            await Tooltip.HideAsync(Button);
-            await Interop.UpdateAsync();
-        }
-
-        public async ValueTask DisposeAsync()
+        public void Dispose()
         {
             Interop.Remove(this);
-
-            await Tooltip.DisposeAsync(Button);
         }
     }
 }

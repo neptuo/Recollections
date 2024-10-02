@@ -19,11 +19,13 @@
             }
         });
     },
-    installable: function () {
-        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Installable').then(function () { }, function () { setTimeout(Pwa.installable, 1000); });
+    installable: async () => {
+        await Recollections.WaitForDotNet();
+        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Installable');
     },
-    updateable: function () {
-        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Updateable').then(function () { }, function () { setTimeout(Pwa.updateable, 1000); });
+    updateable: async () => {
+        await Recollections.WaitForDotNet();
+        DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Updateable');
     }
 };
 

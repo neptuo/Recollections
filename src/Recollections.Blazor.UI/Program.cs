@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using Neptuo.Converters;
 using Neptuo.Events;
 using Neptuo.Recollections.Accounts;
@@ -38,6 +39,8 @@ namespace Neptuo.Recollections
             // Startup.
             WebAssemblyHost host = builder.Build();
             StartupServices(host.Services);
+
+            await host.Services.GetRequiredService<IJSRuntime>().InvokeVoidAsync("Recollections.DotNetReady");
 
             // Run.
             await host.RunAsync();

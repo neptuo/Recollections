@@ -1,0 +1,28 @@
+@if (IsUpdateable)
+{
+    <LayoutView Layout="@typeof(Layouts.MainLayout)">
+        <h2 class="mt-4">Great news. We have an update for you</h2>
+        <p>
+            Update is already installed and one click away
+        </p>
+
+        <div class="my-4 row g-2">
+            <div class="col-12 col-md-auto d-grid">
+                <button class="btn btn-primary" @onclick="UpdateAsync">
+                    Activate the update
+                </button>
+            </div>
+            <div class="col-12 col-md-auto d-grid">
+                <button class="btn btn-secondary" @onclick="(() => IsUpdateable = false)">
+                    Leave it for the next time
+                </button>
+            </div>
+        </div>
+
+        @* <ReleaseNotes /> *@
+    </LayoutView>
+}
+else
+{
+    @ChildContent
+}

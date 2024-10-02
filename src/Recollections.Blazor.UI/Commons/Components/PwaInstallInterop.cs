@@ -11,10 +11,16 @@ namespace Neptuo.Recollections.Commons.Components
 {
     public class PwaInstallInterop
     {
+        public interface IComponent
+        {
+            void MakeInstallable();
+            void MakeUpdateable();
+        }
+
         private static bool isInstallable;
         private static bool isUpdateable;
 
-        private static List<PwaInstall> editors = new List<PwaInstall>();
+        private static List<IComponent> editors = new List<IComponent>();
         private readonly IJSRuntime jSRuntime;
 
         public PwaInstallInterop(IJSRuntime jSRuntime)
@@ -23,7 +29,7 @@ namespace Neptuo.Recollections.Commons.Components
             this.jSRuntime = jSRuntime;
         }
 
-        public void Initialize(PwaInstall editor)
+        public void Initialize(IComponent editor)
         {
             Ensure.NotNull(editor, "editor");
             editors.Add(editor);
@@ -34,7 +40,7 @@ namespace Neptuo.Recollections.Commons.Components
                 editor.MakeUpdateable();
         }
 
-        public void Remove(PwaInstall editor)
+        public void Remove(IComponent editor)
         {
             Ensure.NotNull(editor, "editor");
             editors.Remove(editor);

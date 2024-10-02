@@ -27,7 +27,6 @@ public partial class HeadLayout : IDisposable
     protected MenuList Menu { get; private set; }
     protected ExceptionPanel ExceptionPanel { get; set; }
     protected ChangePasswordModal ChangePasswordModal { get; set; }
-    protected bool IsMainMenuVisible { get; set; } = false;
 
     protected override void OnInitialized()
     {
