@@ -150,8 +150,11 @@ window.Recollections = {
     },
     SetTitle: function (title) {
         document.title = title;
-    }
+    },
+    WaitForDotNet: () => window.Recollections._DotNetPromise,
+    DotNetReady: () => window.Recollections._DotNetPromiseResolve()
 };
+window.Recollections._DotNetPromise = new Promise(resolve => window.Recollections._DotNetPromiseResolve = resolve);
 
 window.InlineMarkdownEdit = {
     Initialize: function (interop, textArea, value) {
