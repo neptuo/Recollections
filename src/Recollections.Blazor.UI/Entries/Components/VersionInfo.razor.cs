@@ -24,7 +24,16 @@ namespace Neptuo.Recollections.Entries.Components
             await base.OnInitializedAsync();
 
             ClientVersion = new VersionModel(typeof(VersionInfo).Assembly.GetName().Version);
-            ApiVersion = await Api.GetVersionAsync();
+            ApiVersion = await GetApiVersionAsync(Api);
+        }
+
+        private static Task<VersionModel> getApiVersionTask;
+        private static Task<VersionModel> GetApiVersionAsync(Api api)
+        {
+            if (getApiVersionTask == null)
+                getApiVersionTask = api.GetVersionAsync();
+
+            return getApiVersionTask;
         }
     }
 }
