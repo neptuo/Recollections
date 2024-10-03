@@ -10,67 +10,16 @@
         <div class="d-grid gap-3">
             <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
                 <div class="d-flex align-items-start">
-                    <div class="card flex-grow-1 @(SelectedStoryId == story.Id ? "selected" : string.Empty)">
-                        <div class="card-body">
-                            <div class="d-flex">
-                                <h5 class="flex-grow-1 card-title cursor-pointer" @onclick="(async () => await SelectAsync(story, null))">
-                                    @story.Title
-                                </h5>
-                                @if (story.Chapters > 0)
-                                {
-                                    <span class="cursor-pointer" @onclick="(async () => await LoadChaptersAsync(story))" @onclick:stopPropagation="true">
-                                        <Icon Identifier="@((ToggleStates.TryGetValue(story.Id, out var toggledForIcon) && toggledForIcon) ? "chevron-down" : "chevron-left")" CssClass="fs-5" />
-                                    </span>
-                                }
-                            </div>
-                            <div>
-                                @if (story.Chapters > 0)
-                                {
-                                    <div class="chapters cursor-pointer" @onclick="(async () => await LoadChaptersAsync(story))" @onclick:stopPropagation="true">
-                                        <Icon Identifier="book" />
-                                        @story.Chapters chapters
-                                    </div>
-                                }
-
-                                <div class="entries">
-                                    <Icon Prefix="fas" Identifier="comment-alt" />
-                                    @story.Entries entries
-                                </div>
-
-                                @if (story.MinDate != null || story.MaxDate != null)
-                                {
-                                    <div class="dates">
-                                        <Icon Identifier="calendar" />
-                                        <span class="ms-1">
-                                            @if (story.MinDate != null)
-                                            {
-                                                @story.MinDate.Value.ToString(UiOptions.DateFormat)
-                                            }
-
-                                            @if (story.MinDate != story.MaxDate)
-                                            {
-                                                if (story.MinDate != null && story.MaxDate != null)
-                                                {
-                                                    @: -
-                                                }
-
-                                                if (story.MaxDate != null)
-                                                {
-                                                    @story.MaxDate.Value.ToString(UiOptions.DateFormat)
-                                                }
-                                            }
-                                        </span>
-                                    </div>
-                                }
-
-                                @if (UserState.UserId != story.UserId)
-                                {
-                                    <div class="owner">
-                                        <Icon Identifier="user" />
-                                        @story.UserName
-                                    </div>
-                                }
-                            </div>
+                    <StoryCard Model="story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
+                        <AfterTitleContent>
+                            @if (story.Chapters > 0)
+                            {
+                                <span class="cursor-pointer" @onclick="(async () => await LoadChaptersAsync(story))">
+                                    <Icon Identifier="@((ToggleStates.TryGetValue(story.Id, out var toggledForIcon) && toggledForIcon) ? "chevron-down" : "chevron-left")" CssClass="fs-5" />
+                                </span>
+                            }
+                        </AfterTitleContent>
+                        <EndBodyContent>
                             @if (ToggleStates.TryGetValue(story.Id, out var toggled) && toggled && Chapters.TryGetValue(story.Id, out var chapters))
                             {
                                 <hr />
@@ -83,8 +32,8 @@
                                     </div>
                                 }
                             }
-                        </div>
-                    </div>
+                        </EndBodyContent>
+                    </StoryCard>
                     <button class="btn btn-link p-0 mt-2 ms-2 fs-3 text-secondary" @onclick="@(() => { Modal.Hide(); Navigator.OpenStoryDetail(story.Id); })">
                         <Icon Identifier="circle-info" />
                     </button>

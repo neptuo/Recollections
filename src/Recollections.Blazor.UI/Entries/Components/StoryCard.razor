@@ -1,0 +1,97 @@
+@using Neptuo.Recollections.Entries.Stories
+
+<div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
+    <div class="card-body">
+        <div class="d-flex">
+            <h5 class="flex-grow-1 card-title @(OnTitleClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnTitleClick">
+                @Model.Title
+            </h5>
+            @AfterTitleContent
+        </div>
+        <div>
+            @if (Model.Chapters > 0)
+            {
+                <div class="chapters @(OnChaptersClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnChaptersClick">
+                    <Icon Identifier="book" />
+                    @Model.Chapters chapters
+                </div>
+            }
+
+            <div class="entries">
+                <Icon Prefix="fas" Identifier="comment-alt" />
+                @Model.Entries entries
+            </div>
+
+            @if (Model.MinDate != null || Model.MaxDate != null)
+            {
+                <div class="dates">
+                    <Icon Identifier="calendar" />
+                    <span class="ms-1">
+                        @if (Model.MinDate != null)
+                        {
+                            @Model.MinDate.Value.ToString(UiOptions.DateFormat)
+                        }
+
+                        @if (Model.MinDate != Model.MaxDate)
+                        {
+                            if (Model.MinDate != null && Model.MaxDate != null)
+                            {
+                                @: -
+                            }
+
+                            if (Model.MaxDate != null)
+                            {
+                                @Model.MaxDate.Value.ToString(UiOptions.DateFormat)
+                            }
+                        }
+                    </span>
+                </div>
+            }
+
+            @if (UserState.UserId != Model.UserId)
+            {
+                <div class="owner">
+                    <Icon Identifier="user" />
+                    @Model.UserName
+                </div>
+            }
+        </div>
+        @EndBodyContent
+    </div>
+</div>
+
+@code
+{
+    [Inject]
+    protected Entries.Api Api { get; set; }
+
+    [Inject]
+    protected Navigator Navigator { get; set; }
+
+    [Inject]
+    protected UiOptions UiOptions { get; set; }
+
+    [Parameter]
+    public StoryListModel Model { get; set; }
+
+    [Parameter]
+    public RenderFragment AfterTitleContent { get; set; }
+
+    [Parameter]
+    public RenderFragment EndBodyContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnCardClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnTitleClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnChaptersClick { get; set; }
+
+    [Parameter]
+    public string CardCssClass { get; set; }
+
+    [CascadingParameter]
+    public UserState UserState { get; set; }
+}
