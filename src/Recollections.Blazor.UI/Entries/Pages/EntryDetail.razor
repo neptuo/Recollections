@@ -27,14 +27,7 @@
                     <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
                 </div>
                 <div class="story">
-                    <InlineLink Value="@StoryTitle" PlaceHolder="No story..." Icon="book" OnClick="@SelectStory">
-                        <AfterContent>
-                            @if (HasStory)
-                            {
-                                <a class="lnk-salmon-arrow" href="@Navigator.UrlStoryDetail(Story.StoryId)">»</a>
-                            }
-                        </AfterContent>
-                    </InlineLink>
+                    <InlineLink Value="@StoryTitle" PlaceHolder="No story..." Icon="book" OnClick="@SelectStory" />
                 </div>
                 <UserInformation Owner="@Owner" />
                 <div class="being">

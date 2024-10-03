@@ -67,7 +67,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 {
                     title = Story.StoryTitle;
                     if (Story.ChapterId != null)
-                        title += " " + Story.ChapterTitle;
+                        title += " - " + Story.ChapterTitle;
                 }
 
                 return title;
@@ -388,7 +388,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected StoryPicker StoryPicker { get; set; }
 
-        protected void SelectStory() => StoryPicker.Show();
+        protected void SelectStory() => StoryPicker.Show(Story?.StoryId, Story?.ChapterId);
 
         protected async Task StorySelectedAsync(EntryStoryModel model)
         {
