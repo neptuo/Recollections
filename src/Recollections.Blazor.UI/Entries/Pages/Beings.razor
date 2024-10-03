@@ -23,37 +23,7 @@
     <div class="row">
         <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any being..." Context="being">
             <div class="col-sm-12 col-md-3 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="being-icon">
-                            <Icon Identifier="@being.Icon" />
-                        </div>
-
-                        <h5 class="card-title">
-                            <a class="stretched-link" href="@Navigator.UrlBeingDetail(being.Id)">
-                                @being.Name
-                                @if (UserState.UserId == being.Id)
-                                {
-                                    <span class="ms-1">(me)</span>
-                                }
-                            </a>
-                        </h5>
-                        <div>
-                            <div class="entries">
-                                <Icon Prefix="fas" Identifier="comment-alt" />
-                                @being.Entries entries
-                            </div>
-
-                            @if (UserState.UserId != being.UserId)
-                            {
-                                <div class="owner">
-                                    <Icon Identifier="user" />
-                                    @being.UserName
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
+                <BeingCard Model="being" CardCssClass="h-100" OnCardClick="@(() => Navigator.OpenBeingDetail(being.Id))" />
             </div>
         </ListView>
     </div>

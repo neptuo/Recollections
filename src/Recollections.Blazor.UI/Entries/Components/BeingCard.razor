@@ -1,0 +1,55 @@
+@using Neptuo.Recollections.Entries.Beings
+
+<div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
+    <div class="card-body">
+        <div class="being-icon text-center">
+            <Icon Identifier="@Model.Icon" />
+        </div>
+
+        <h5 class="card-title">
+            <a>
+                @Model.Name
+                @if (UserState.UserId == Model.Id)
+                {
+                    <span class="ms-1">(me)</span>
+                }
+            </a>
+        </h5>
+        <div class="entries">
+            <Icon Prefix="fas" Identifier="comment-alt" />
+            @Model.Entries entries
+        </div>
+
+        @if (UserState.UserId != Model.UserId)
+        {
+            <div class="owner">
+                <Icon Identifier="user" />
+                @Model.UserName
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    [Inject]
+    protected Entries.Api Api { get; set; }
+
+    [Inject]
+    protected Navigator Navigator { get; set; }
+
+    [Inject]
+    protected UiOptions UiOptions { get; set; }
+
+    [Parameter]
+    public BeingListModel Model { get; set; }
+
+    [Parameter]
+    public EventCallback OnCardClick { get; set; }
+
+    [Parameter]
+    public string CardCssClass { get; set; }
+
+    [CascadingParameter]
+    public UserState UserState { get; set; }
+}

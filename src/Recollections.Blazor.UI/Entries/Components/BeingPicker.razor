@@ -3,43 +3,13 @@
         <div class="d-grid gap-3">
             <ListView Items="@Beings" IsLoading="@IsLoading" Context="being">
                 <div class="d-flex align-items-start">
-                    <div class="card flex-grow-1 @(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)" @onclick="@(() => OnItemClick(being.Id))">
-                        <div class="card-body">
-                            <div class="being-icon text-center">
-                                <Icon Identifier="@being.Icon" />
-                            </div>
-
-                            <h5 class="card-title">
-                                <a>
-                                    @being.Name
-                                    @if (UserState.UserId == being.Id)
-                                    {
-                                        <span class="ms-1">(me)</span>
-                                    }
-                                </a>
-                            </h5>
-                            <div class="entries">
-                                <Icon Prefix="fas" Identifier="comment-alt" />
-                                @being.Entries entries
-                            </div>
-
-                            @if (UserState.UserId != being.UserId)
-                            {
-                                <div class="owner">
-                                    <Icon Identifier="user" />
-                                    @being.UserName
-                                </div>
-                            }
-                        </div>
-                    </div>
+                    <BeingCard Model="being" OnCardClick="@(() => OnItemClick(being.Id))" CardCssClass="@($"flex-grow-1 {(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)}")" />
                     <button class="btn btn-link py-0 pe-0 ps-2 fs-3 text-secondary" @onclick="@(() => { Modal.Hide(); Navigator.OpenBeingDetail(being.Id); })">
                         <Icon Identifier="circle-info" />
                     </button>
                 </div>
             </ListView>
         </div>
-
-        
     </ChildContent>
     <Buttons>
         <button class="btn btn-primary btn-sm">Save</button>
