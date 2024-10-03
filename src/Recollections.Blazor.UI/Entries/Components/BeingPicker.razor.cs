@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Beings;
 using System;
@@ -17,10 +18,16 @@ namespace Neptuo.Recollections.Entries.Components
         protected Api Api { get; set; }
 
         [Inject]
+        protected Navigator Navigator { get; set; }
+
+        [Inject]
         protected ILog<BeingPicker> Log { get; set; }
 
         [Parameter]
         public EventCallback<List<string>> Selected { get; set; }
+
+        [CascadingParameter]
+        public UserState UserState { get; set; }
 
         protected Modal Modal { get; set; }
 
