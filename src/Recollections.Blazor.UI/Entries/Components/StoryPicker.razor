@@ -1,4 +1,4 @@
-﻿<Modal @ref="Modal" Title="Select a Story or Chapter">
+﻿<Modal @ref="Modal" Title="Select a Story or Chapter" CssClass="stories">
     <ChildContent>
         @if (!String.IsNullOrEmpty(ErrorMessage))
         {
@@ -7,41 +7,92 @@
             </div>
         }
 
-        <div class="story-picker">
+        <div class="d-grid gap-3">
             <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
-                <div class="story">
-                    <a @onclick="(async () => await SelectAsync(story, null))">
-                        <span class="title">
-                            @story.Title
-                        </span>
-                    </a>
-                    <div class="chapters">
-                        @if (Chapters.TryGetValue(story.Id, out var chapters))
-                        {
-                            <ul>
+                <div class="d-flex align-items-start">
+                    <div class="card flex-grow-1 @(SelectedStoryId == story.Id ? "selected" : string.Empty)">
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <h5 class="flex-grow-1 card-title cursor-pointer" @onclick="(async () => await SelectAsync(story, null))">
+                                    @story.Title
+                                </h5>
+                                @if (story.Chapters > 0)
+                                {
+                                    <span class="cursor-pointer" @onclick="(async () => await LoadChaptersAsync(story))" @onclick:stopPropagation="true">
+                                        <Icon Identifier="@((ToggleStates.TryGetValue(story.Id, out var toggledForIcon) && toggledForIcon) ? "chevron-down" : "chevron-left")" CssClass="fs-5" />
+                                    </span>
+                                }
+                            </div>
+                            <div>
+                                @if (story.Chapters > 0)
+                                {
+                                    <div class="chapters cursor-pointer" @onclick="(async () => await LoadChaptersAsync(story))" @onclick:stopPropagation="true">
+                                        <Icon Identifier="book" />
+                                        @story.Chapters chapters
+                                    </div>
+                                }
+
+                                <div class="entries">
+                                    <Icon Prefix="fas" Identifier="comment-alt" />
+                                    @story.Entries entries
+                                </div>
+
+                                @if (story.MinDate != null || story.MaxDate != null)
+                                {
+                                    <div class="dates">
+                                        <Icon Identifier="calendar" />
+                                        <span class="ms-1">
+                                            @if (story.MinDate != null)
+                                            {
+                                                @story.MinDate.Value.ToString(UiOptions.DateFormat)
+                                            }
+
+                                            @if (story.MinDate != story.MaxDate)
+                                            {
+                                                if (story.MinDate != null && story.MaxDate != null)
+                                                {
+                                                    @: -
+                                                }
+
+                                                if (story.MaxDate != null)
+                                                {
+                                                    @story.MaxDate.Value.ToString(UiOptions.DateFormat)
+                                                }
+                                            }
+                                        </span>
+                                    </div>
+                                }
+
+                                @if (UserState.UserId != story.UserId)
+                                {
+                                    <div class="owner">
+                                        <Icon Identifier="user" />
+                                        @story.UserName
+                                    </div>
+                                }
+                            </div>
+                            @if (ToggleStates.TryGetValue(story.Id, out var toggled) && toggled && Chapters.TryGetValue(story.Id, out var chapters))
+                            {
+                                <hr />
                                 @foreach (var chapter in chapters)
                                 {
-                                    <li>
-                                        <a @onclick="(async () => await SelectAsync(story, chapter))">
+                                    <div class="pb-2">
+                                        <a class="@(SelectedChapterId == chapter.Id ? "fw-bold" : string.Empty)" @onclick="(async () => await SelectAsync(story, chapter))" @onclick:stopPropagation="true">
                                             @chapter.Title
                                         </a>
-                                    </li>
+                                    </div>
                                 }
-                            </ul>
-                        }
-                        else
-                        {
-                            <a @onclick="@(async () => await LoadChaptersAsync(story))">
-                                <Icon Identifier="book" />
-                                @story.Chapters chapters
-                            </a>
-                        }
+                            }
+                        </div>
                     </div>
+                    <button class="btn btn-link p-0 mt-2 ms-2 fs-3 text-secondary" @onclick="@(() => { Modal.Hide(); Navigator.OpenStoryDetail(story.Id); })">
+                        <Icon Identifier="circle-info" />
+                    </button>
                 </div>
             </ListView>
         </div>
     </ChildContent>
     <Buttons>
-        <button class="btn btn-sm btn-primary" title="Remove Story/Chapter from Entry" @onclick="(async () => await SelectAsync(null, null))">Clear</button>
+        <button class="btn btn-sm btn-secondary" @onclick="(async () => await SelectAsync(null, null))">Don't select a story</button>
     </Buttons>
 </Modal>

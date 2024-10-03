@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Stories;
 using System;
@@ -16,10 +17,16 @@ namespace Neptuo.Recollections.Entries.Components
         protected Api Api { get; set; }
 
         [Inject]
+        protected Navigator Navigator { get; set; }
+
+        [Inject]
         protected UiOptions UiOptions { get; set; }
 
         [Parameter]
         public EventCallback<EntryStoryModel> Selected { get; set; }
+
+        [CascadingParameter]
+        public UserState UserState { get; set; }
 
         protected Modal Modal { get; set; }
 
@@ -27,8 +34,12 @@ namespace Neptuo.Recollections.Entries.Components
 
         protected bool IsLoading { get; set; }
         protected List<StoryListModel> Stories { get; } = new List<StoryListModel>();
-        protected Dictionary<string, List<StoryChapterListModel>> Chapters = new Dictionary<string, List<StoryChapterListModel>>();
+        protected Dictionary<string, List<StoryChapterListModel>> Chapters = new();
         protected string ErrorMessage { get; set; }
+        protected Dictionary<string, bool> ToggleStates { get; set; } = new();
+
+        protected string SelectedStoryId;
+        protected string SelectedChapterId;
 
         private async Task LoadAsync()
         {
@@ -63,19 +74,44 @@ namespace Neptuo.Recollections.Entries.Components
 
         protected async Task LoadChaptersAsync(StoryListModel story)
         {
-            if (story.Chapters > 0 && !Chapters.ContainsKey(story.Id))
-                Chapters[story.Id] = await Api.GetStoryChapterListAsync(story.Id);
+            if (story.Chapters > 0)
+            {
+                if (!Chapters.ContainsKey(story.Id))
+                {
+                    Chapters[story.Id] = await Api.GetStoryChapterListAsync(story.Id);
+                    ToggleStates[story.Id] = true;
+                }
+                else 
+                {
+                    ToggleStates.TryGetValue(story.Id, out var state);
+                    ToggleStates[story.Id] = !state;
+                }
+            }
         }
 
-        public void Show()
+        public async void Show(string storyId = null, string chapterId = null)
         {
+            SelectedStoryId = storyId;
+            SelectedChapterId = chapterId;
             ErrorMessage = null;
+            ToggleStates.Clear();
+
             Modal.Show();
 
             if (isFirstShow)
             {
                 isFirstShow = false;
-                _ = LoadAsync();
+                await LoadAsync();
+            }
+            
+            if (chapterId != null)
+            {
+                var story = Stories.FirstOrDefault(s => s.Id == storyId);
+                if (story != null)
+                {
+                    await LoadChaptersAsync(story);
+                    StateHasChanged();
+                }
             }
         }
 
