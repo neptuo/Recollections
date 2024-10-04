@@ -28,7 +28,7 @@ public class TemplateService
             declarations.Remove(name);
     }
 
-    public void AddContent(string name, RenderFragment content)
+    public void AddContent(string name, TemplateContent content)
     {
         Ensure.NotNull(name, "name");
         if (declarations.TryGetValue(name, out var placeholder))
@@ -37,7 +37,7 @@ public class TemplateService
             throw Ensure.Exception.InvalidOperation($"Missing placeholder named '{name}'.");
     }
 
-    public void RemoveContent(string name, RenderFragment content)
+    public void RemoveContent(string name, TemplateContent content)
     {
         Ensure.NotNull(name, "name");
         if (declarations.TryGetValue(name, out var placeholder))

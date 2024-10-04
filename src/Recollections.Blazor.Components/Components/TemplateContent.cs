@@ -22,11 +22,11 @@ public class TemplateContent : ComponentBase, IDisposable
 
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        Service.AddContent(Name, ChildContent);
+        Service.AddContent(Name, this);
     }
 
     public void Dispose()
     {
-        Service.RemoveContent(Name, ChildContent);
+        Service.RemoveContent(Name, this);
     }
 }

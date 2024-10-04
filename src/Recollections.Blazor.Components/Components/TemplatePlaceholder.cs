@@ -11,7 +11,7 @@ namespace Neptuo.Recollections.Components;
 
 public class TemplatePlaceholder : ComponentBase, IDisposable
 {
-    private List<RenderFragment> content = new();
+    private HashSet<TemplateContent> content = new();
 
     [Inject]
     protected TemplateService Service { get; set; }
@@ -30,13 +30,13 @@ public class TemplatePlaceholder : ComponentBase, IDisposable
         Service.DisposePlaceholder(Name, this);
     }
 
-    internal void AddContent(RenderFragment content)
+    internal void AddContent(TemplateContent content)
     {
         this.content.Add(content);
         StateHasChanged();
     }
 
-    internal void RemoveContent(RenderFragment content)
+    internal void RemoveContent(TemplateContent content)
     {
         this.content.Remove(content);
         StateHasChanged();
@@ -44,7 +44,11 @@ public class TemplatePlaceholder : ComponentBase, IDisposable
 
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        for (int i = 0; i < content.Count; i++)
-            builder.AddContent(i, content[i]);
+        int i = 0;
+        foreach (TemplateContent fragment in content)
+        {
+            builder.AddContent(i, fragment.ChildContent);
+            i++;
+        }
     }
 }
