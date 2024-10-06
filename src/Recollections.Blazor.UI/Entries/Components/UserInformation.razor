@@ -1,9 +1,9 @@
 ﻿@if (UserState.UserId != Owner.Id)
 {
     <div class="owner">
-        <Icon Identifier="user" />
-        @Owner.Name
-
-        <a class="lnk-salmon-arrow" href="@Navigator.UrlProfile(Owner.Id)">»</a>
+        <span class="cursor-pointer" @onclick="() => Navigator.OpenProfile(Owner.Id)">
+            <Icon Identifier="user" />
+            @Owner.Name
+        </span>
     </div>
 }
