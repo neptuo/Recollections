@@ -102,7 +102,27 @@ namespace Neptuo.Recollections.Sharing
                     .SingleOrDefaultAsync();
 
                 if (story != null && (story.StoryId != null || story.ChapterId != null))
+                {
                     isSharingInherited = story.IsSharingInherited;
+                }
+                else
+                {
+                    // Look if there is a non-user being that a) I own, b) someone share with me
+                    var share = await db.BeingShares
+                        .Where(ds => db.Entries
+                            .SelectMany(e => e.Beings)
+                            .Where(b => b.UserId == userId // Owned beings tagged
+                                || (b.Id != b.UserId && !b.IsSharingInherited && db.BeingShares.Any(s => s.BeingId == b.Id && s.UserId == userId)) // Non-user shared being attached
+                            )
+                            .Select(b => b.Id)
+                            .Contains(ds.BeingId)
+                        )
+                        .OrderByDescending(ds => ds.Permission)
+                        .FirstOrDefaultAsync();
+
+                    if (share != null)
+                        return (Permission)share.Permission;
+                }
 
                 findShareQuery = db.StoryShares.Where(s => s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Story.Id || s.StoryId == db.Entries.Single(e => e.Id == entry.Id).Chapter.Story.Id);
             }
@@ -132,10 +152,17 @@ namespace Neptuo.Recollections.Sharing
                 (connectedUsers.ActiveUserIds.Contains(e.UserId) || userIds.Contains(PublicUserId)) && (
                     (!e.IsSharingInherited && db.EntryShares.Any(s => s.EntryId == e.Id && userIds.Contains(s.UserId))) // Shared entry
                     || (e.IsSharingInherited // Entry inherits
-                        && ((!e.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Story.Id && userIds.Contains(s.UserId))) // Shared story
-                            || (!e.Chapter.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && userIds.Contains(s.UserId))) // Shared story through chapter
-                            || ((e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited || (e.Story == null && e.Chapter.Story == null)) // Story inherits or is null
-                                && connectedUsers.ReaderUserIds.Contains(e.UserId) // Shared connection
+                        && (
+                            ((!e.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Story.Id && userIds.Contains(s.UserId))) // Shared story
+                                || (!e.Chapter.Story.IsSharingInherited && db.StoryShares.Any(s => s.StoryId == e.Chapter.Story.Id && userIds.Contains(s.UserId))) // Shared story through chapter
+                                || ((e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited || (e.Story == null && e.Chapter.Story == null)) // Story inherits or is null
+                                    && connectedUsers.ReaderUserIds.Contains(e.UserId) // Shared connection
+                                )
+                            )
+                            || (e.Beings
+                                .Any(b => userIds.Contains(b.UserId) // Owned beings tagged
+                                    || (b.Id != b.UserId && !b.IsSharingInherited && db.BeingShares.Any(s => s.BeingId == b.Id && userIds.Contains(s.UserId))) // Non-user shared being attached
+                                )
                             )
                         )
                     )
