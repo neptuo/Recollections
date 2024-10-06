@@ -94,10 +94,8 @@ namespace Neptuo.Recollections.Entries.Controllers
                 else if (story.UserId != entry.UserId)
                 {
                     // Owner of the entry needs co-owner permission to story
-                    // Owner of the story needs co-owner permission to entry
                     var entryUserStoryPermission = await shareStatus.GetStoryPermissionAsync(story, entry.UserId);
-                    var storyUserEntryPermission = await shareStatus.GetEntryPermissionAsync(entry, story.UserId);
-                    if (entryUserStoryPermission != Permission.CoOwner || storyUserEntryPermission != Permission.CoOwner)
+                    if (entryUserStoryPermission != Permission.CoOwner)
                         return BadRequest();
                 }
             }

@@ -97,7 +97,7 @@ namespace Neptuo.Recollections.Sharing
                     { 
                         StoryId = e.Story.Id, 
                         ChapterId = e.Chapter.Id, 
-                        IsSharingInherited = e.Story.IsSharingInherited || e.Chapter.Story.IsSharingInherited 
+                        IsSharingInherited = (e.Story != null ? e.Story.IsSharingInherited : false) || (e.Chapter != null ? e.Chapter.Story.IsSharingInherited : false)
                     })
                     .SingleOrDefaultAsync();
 
