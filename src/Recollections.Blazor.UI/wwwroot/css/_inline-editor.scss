@@ -60,6 +60,10 @@
 .inline-editor-viewmode {
     a.inline-editor-value {
         cursor: inherit;
+        
+        &:hover {
+            text-decoration: none;
+        }
     }
 
     &.inline-editable a.inline-editor-value {
