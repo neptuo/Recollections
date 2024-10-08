@@ -12,8 +12,8 @@
                 {
                     var year = i;
 
-                    <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
-                        <button class="btn btn-outline-primary d-block w-100" @onclick="@(() => OnYearSelected(year))">
+                    <div class="col-3 d-flex align-items-stretch p-2 aspect-1">
+                        <button class="btn btn-outline-primary d-block w-100 text-truncate @(Value?.Year == year ? "selected" : "")" @onclick="@(() => OnYearSelected(year))">
                             @i
                         </button>
                     </div>
@@ -36,8 +36,8 @@
                     var month = i + 1;
                     var monthName = MonthNames[i];
 
-                    <div class="col-3 d-flex align-items-stretch py-3 aspect-1">
-                        <button class="btn btn-outline-primary d-block w-100" @onclick="@(() => OnMonthSelected(month))">
+                    <div class="col-3 d-flex align-items-stretch p-2 aspect-1">
+                        <button class="btn btn-outline-primary d-block w-100 text-truncate @(Value?.Year == CurrentYear && Value?.Month == month ? "selected" : "")" @onclick="@(() => OnMonthSelected(month))">
                             @monthName
                         </button>
                     </div>
@@ -56,7 +56,7 @@
             </h5>
 
             <MonthView Year="@CurrentYear" Month="@CurrentMonth" Context="day">
-                <button class="btn btn-outline-primary d-block w-100" @onclick="@(() => OnDaySelected(day))">
+                <button class="btn btn-outline-primary d-block w-100 w-100 text-truncate @(Value?.Year == CurrentYear && Value?.Month == CurrentMonth && Value?.Day == day ? "selected" : "")" @onclick="@(() => OnDaySelected(day))">
                     @day
                 </button>
             </MonthView>
