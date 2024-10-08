@@ -54,7 +54,6 @@ footer.navbar {
 
     a {
         color: $placeholder-color !important;
-        text-decoration: none;
 
         &:hover {
             text-decoration: underline;
@@ -95,38 +94,13 @@ blockquote {
     display: none;
 }
 
-a {
+a:not(.btn,.nav-link,.dropdown-item) {
     cursor: pointer;
-}
-
-@mixin dark-arrow() {
-    color: var(--bs-body-color) !important;
+    color: var(--bs-body-color);
     text-decoration: none;
 
     &:hover {
-        text-decoration: none;
-
-        &::after {
-            position: absolute;
-            color: salmon;
-            content: "»";
-        }
-    }
-}
-
-.lnk-dark-arrow {
-    @include dark-arrow;
-}
-
-.lnk-salmon-arrow {
-    color: inherit;
-    font-weight: bold;
-    text-decoration: none;
-    font-size: 1.4rem;
-    line-height: 1rem;
-
-    &:hover {
-        color: salmon;
+        text-decoration: underline;
     }
 }
 
@@ -140,7 +114,8 @@ a {
     --bs-btn-active-color: #fff;
 }
 
-.bg-salmon {
+.bg-salmon,
+a.bg-salmon {
     color: white;
     background-color: salmon;
 }

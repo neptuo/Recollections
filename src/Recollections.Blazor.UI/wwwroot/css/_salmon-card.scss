@@ -8,13 +8,8 @@
     &:hover {
         background-color: rgba(250, 128, 114, 0.25);
     }
-}
 
-a {
-    color: var(--bs-body-color);
-    text-decoration: none;
-
-    &:hover {
+    a:hover {
         text-decoration: none;
     }
 }

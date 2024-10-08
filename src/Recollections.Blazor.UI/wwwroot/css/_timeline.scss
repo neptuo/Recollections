@@ -76,10 +76,6 @@ $dot-diameter: 18px;
         h2 {
             margin-top: -6px;
             font-size: 180%;
-
-            a {
-                @include dark-arrow;
-            }
         }
 
         .information {
