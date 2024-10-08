@@ -39,7 +39,7 @@ public partial class ThemeSwitcher : ComponentBase, IDisposable
     private async Task ApplyThemeAsync()
     {
         var previousTheme = Theme;
-        Log.Debug($"ApplyThemeAsync '{Theme}', '{previousTheme}'");
+        Log.Debug($"ApplyThemeAsync '{previousTheme}'");
 
         Theme = await Properties.ThemeAsync();
         Log.Debug($"Got theme '{Theme}', previous was '{previousTheme}'");

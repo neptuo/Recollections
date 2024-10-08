@@ -74,6 +74,7 @@ namespace Neptuo.Recollections.Accounts.Components
                 Api.Authorization = null;
                 await TokenStorage.ClearAsync();
 
+                UserProperties.ClearOnUserChanged();
                 UserChanged?.Invoke();
                 UserInfoChanged?.Invoke();
             }

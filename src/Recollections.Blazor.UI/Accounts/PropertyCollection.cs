@@ -107,8 +107,13 @@ namespace Neptuo.Recollections.Accounts
             storage.Clear();
             ensureTask = null;
 
-            if (wasLoadRequested && api.IsAuthorized)
-                _ = EnsureAsync();
+            if (wasLoadRequested)
+            {
+                if (api.IsAuthorized)
+                    _ = EnsureAsync();
+                else
+                    ValuesLoaded?.Invoke();
+            }
         }
     }
 }
