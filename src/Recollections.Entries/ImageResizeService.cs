@@ -28,7 +28,7 @@ namespace Neptuo.Recollections.Entries
         {
             using (var input = IsImage.Load(inputContent))
             {
-                EnsureExifImageRotation(input, inputContent);
+                EnsureExifImageRotation(input);
 
                 int sourceWidth = input.Width;
                 int sourceHeight = input.Height;
@@ -92,7 +92,7 @@ namespace Neptuo.Recollections.Entries
         {
             using (var input = IsImage.Load(inputContent))
             {
-                EnsureExifImageRotation(input, inputContent);
+                EnsureExifImageRotation(input);
 
                 var (width, height) = GetResizedBounds(input.Width, input.Height, desiredWidth);
                 if (width != input.Width)
@@ -117,28 +117,7 @@ namespace Neptuo.Recollections.Entries
             SaveImage(outputContent, target);
         }
 
-        private void EnsureExifImageRotation(IsImage image, Stream imageContent)
-        {
-            imageContent.Position = 0;
-            using (var imageReader = new ImagePropertyReader(imageContent))
-            {
-                ImagePropertyReader.Orientation? orientation = imageReader.FindOrientation();
-                if (orientation != null)
-                {
-                    switch (orientation.Value)
-                    {
-                        case ImagePropertyReader.Orientation.D270:
-                            image.Mutate(x => x.RotateFlip(RotateMode.Rotate90, FlipMode.None));
-                            break;
-                        case ImagePropertyReader.Orientation.D180:
-                            image.Mutate(x => x.RotateFlip(RotateMode.Rotate180, FlipMode.None));
-                            break;
-                        case ImagePropertyReader.Orientation.D90:
-                            image.Mutate(x => x.RotateFlip(RotateMode.Rotate270, FlipMode.None));
-                            break;
-                    }
-                }
-            }
-        }
+        private void EnsureExifImageRotation(IsImage image)
+            => image.Mutate(x => x.AutoOrient());
     }
 }
