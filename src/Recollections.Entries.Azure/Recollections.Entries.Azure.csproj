@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" />
+    
     <PackageReference Include="Microsoft.Azure.Storage.File" />
   </ItemGroup>
 
