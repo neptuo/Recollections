@@ -13471,8 +13471,11 @@ blockquote {
   display: none;
 }
 
-a:not(.btn, .nav-link, .dropdown-item) {
+a {
   cursor: pointer;
+}
+
+a:not(.btn, .nav-link, .dropdown-item) {
   color: var(--bs-body-color);
   text-decoration: none;
 }
@@ -14413,4 +14416,4 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=D:\Development\neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */

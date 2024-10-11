@@ -94,8 +94,11 @@ blockquote {
     display: none;
 }
 
-a:not(.btn,.nav-link,.dropdown-item) {
+a {
     cursor: pointer;
+}
+
+a:not(.btn,.nav-link,.dropdown-item) {
     color: var(--bs-body-color);
     text-decoration: none;
 
