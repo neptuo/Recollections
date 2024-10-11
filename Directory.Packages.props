@@ -7,6 +7,7 @@
 	<PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.2" />
 	<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
 
+	<PackageVersion Include="Aspire.Hosting.AppHost" Version="9.0.0-preview.3.24210.17" />
 	<PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
 	<PackageVersion Include="Blazored.SessionStorage" Version="2.4.0" />
 	<PackageVersion Include="CommonMark.NET" Version="0.15.1" />
