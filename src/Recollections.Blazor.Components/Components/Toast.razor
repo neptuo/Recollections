@@ -1,0 +1,37 @@
+@if (IsVisible)
+{
+    <div class="toast show position-fixed bottom-55 end-0 m-3">
+        <div class="d-flex">
+            <div class="toast-body">
+                @Message
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" @onclick="(() => IsVisible = false)"></button>
+        </div>
+    </div>
+}
+
+@code
+{
+    protected bool IsVisible { get; set; }
+    protected string Message { get; set; }
+
+    private int hideCounter = 0;
+
+    public void Show(string message, int duration = 5000)
+    {
+        hideCounter++;
+        Message = message;
+        IsVisible = true;
+        StateHasChanged();
+
+        Task.Delay(duration).ContinueWith(_ =>
+        {
+            hideCounter--;
+            if (hideCounter == 0)
+            {
+                IsVisible = false;
+                StateHasChanged();
+            }
+        });
+    }
+}

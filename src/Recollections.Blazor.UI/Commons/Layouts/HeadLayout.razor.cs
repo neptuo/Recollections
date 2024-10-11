@@ -27,6 +27,7 @@ public partial class HeadLayout : IDisposable
     protected MenuList Menu { get; private set; }
     protected ExceptionPanel ExceptionPanel { get; set; }
     protected ChangePasswordModal ChangePasswordModal { get; set; }
+    protected Toast ThemeToast { get; set; }
 
     protected override void OnInitialized()
     {
@@ -55,6 +56,7 @@ public partial class HeadLayout : IDisposable
             _ => throw Ensure.Exception.NotSupported(current)
         };
         await Properties.ThemeAsync(next);
+        ThemeToast.Show($"Theme changed to {next}");
     }
 
     private void OnLocationChanged(string url)

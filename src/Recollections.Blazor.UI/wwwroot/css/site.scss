@@ -73,6 +73,14 @@ footer.navbar {
     }
 }
 
+.toast {
+    z-index: 1060;
+}
+
+.bottom-55 {
+    bottom: 55px;
+}
+
 .offcanvas-bottom-menu {
     --bs-offcanvas-height: 54vh;
     bottom: 55px;
@@ -105,6 +113,13 @@ a:not(.btn,.nav-link,.dropdown-item) {
     &:hover {
         text-decoration: underline;
     }
+}
+
+.dropdown-item .fa,
+.dropdown-item .far,
+.dropdown-item .fas {
+    width: 24px;
+    text-align: center;
 }
 
 .btn-primary {
