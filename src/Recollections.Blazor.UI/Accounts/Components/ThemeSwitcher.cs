@@ -18,7 +18,7 @@ public partial class ThemeSwitcher : ComponentBase, IDisposable
     [Inject]
     protected ILog<ThemeSwitcher> Log { get; set; }
 
-    protected ThemeType Theme { get; set; }
+    protected ThemeType? Theme { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
@@ -39,10 +39,8 @@ public partial class ThemeSwitcher : ComponentBase, IDisposable
     private async Task ApplyThemeAsync()
     {
         var previousTheme = Theme;
-        Log.Debug($"ApplyThemeAsync '{previousTheme}'");
-
         Theme = await Properties.ThemeAsync();
-        Log.Debug($"Got theme '{Theme}', previous was '{previousTheme}'");
+        Log.Debug($"Changing theme from '{previousTheme}' to '{Theme}'");
 
         if (previousTheme == Theme)
             return;
@@ -50,8 +48,8 @@ public partial class ThemeSwitcher : ComponentBase, IDisposable
         Interop.Apply(Theme switch {
             ThemeType.Light => "light",
             ThemeType.Dark => "dark",
-            ThemeType.Auto => Interop.GetBrowserPreference(),
-            _ => throw Ensure.Exception.NotSupported(Theme)
+            ThemeType.Auto or null => Interop.GetBrowserPreference(),
+            _ => throw Ensure.Exception.NotSupported(Theme.Value)
         });
     }
 
