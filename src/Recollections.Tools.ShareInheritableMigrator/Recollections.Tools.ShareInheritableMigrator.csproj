@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Neptuo.Recollections</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Recollections.Data.Ef\Recollections.Data.Ef.csproj" />
+    <ProjectReference Include="..\Recollections.Entries.Data\Recollections.Entries.Data.csproj" />
+  </ItemGroup>
+
+</Project>
