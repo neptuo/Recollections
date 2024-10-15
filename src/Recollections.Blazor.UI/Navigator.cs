@@ -64,6 +64,9 @@ namespace Neptuo.Recollections
             return null;
         }
 
+        public string UrlOrigin()
+            => uri.BaseUri;
+
         public string GetCurrentUrl() 
             => uri.ToAbsoluteUri(uri.Uri).ToString();
 
