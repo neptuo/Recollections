@@ -203,6 +203,17 @@ namespace Neptuo.Recollections.Entries
             model.Original = new ImageSourceModel($"{basePath}/original", entity.OriginalWidth, entity.OriginalHeight);
         }
 
+        public void MapEntitiesToModels(List<Image> entities, List<ImageModel> models, string userId)
+        {
+            foreach (Image entity in entities)
+            {
+                var model = new ImageModel();
+                MapEntityToModel(entity, model, userId);
+
+                models.Add(model);
+            }
+        }
+
         public void MapModelToEntity(ImageModel model, Image entity)
         {
             entity.Name = model.Name;

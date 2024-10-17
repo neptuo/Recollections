@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
@@ -31,10 +32,13 @@ namespace Neptuo.Recollections.Entries.Pages
         public string StoryId { get; set; }
 
         protected EntryPicker EntryPicker { get; set; }
+        protected Gallery Gallery { get; set; }
         protected StoryModel Model { get; set; }
         protected Dictionary<string, List<TimelineEntryModel>> Entries { get; set; } = new();
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new();
+        protected List<ImageModel> Images { get; set; }
+        protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
@@ -65,6 +69,18 @@ namespace Neptuo.Recollections.Entries.Pages
             Entries[Model.Id] = entries[0].Entries;
             for (int i = 0; i < Model.Chapters.Count; i++)
                 Entries[Model.Chapters[i].Id] = entries[i + 1].Entries;
+
+            Images = await Api.GetStoryImagesAsync(StoryId);
+            GalleryItems.Clear();
+            foreach (var image in Images)
+            {
+                GalleryItems.Add(new GalleryModel()
+                {
+                    Title = image.Name,
+                    Width = image.Preview.Width,
+                    Height = image.Preview.Height
+                });
+            }
         }
 
         protected Task SaveAsync()
@@ -118,6 +134,26 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Model.Chapters.Remove(chapter);
             return SaveAsync();
+        }
+
+        protected async Task<Stream> OnGetImageDataAsync(int index)
+        {
+            if (index > Images.Count)
+                return null;
+
+            var image = Images[index];
+            var stream = await Api.GetImageDataAsync(image.Preview.Url);
+
+            return stream;
+        }
+
+        protected async Task OnBeforeInternalNavigation(LocationChangingContext context)
+        {
+            if (await Gallery.IsOpenAsync())
+            {
+                _ = Gallery.CloseAsync();
+                context.PreventNavigation();
+            }
         }
 
         private ChapterModel entrySelectionChapter;

@@ -58,13 +58,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .ToListAsync();
 
             List<ImageModel> result = new List<ImageModel>();
-            foreach (Image entity in entities)
-            {
-                var model = new ImageModel();
-                service.MapEntityToModel(entity, model, entry.UserId);
-
-                result.Add(model);
-            }
+            service.MapEntitiesToModels(entities, result, entry.UserId);
 
             return Ok(result);
         });

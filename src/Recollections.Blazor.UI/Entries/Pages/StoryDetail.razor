@@ -1,6 +1,8 @@
 ﻿@page "/stories/{StoryId}"
 @inherits UserStateComponentBase
 
+<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
 @if (Model != null)
 {
     <DocumentTitle Value="@Model.Title" />
@@ -12,6 +14,7 @@
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Write">
+                            <DropdownItem Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
                             <DropdownItem Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
                             <DropdownItem Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
                         </PermissionView>
@@ -56,6 +59,8 @@
                         </div>
                     }
                 </div>
+
+                <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" />
             </div>
         </PermissionContainer>
     </CascadingValue>
