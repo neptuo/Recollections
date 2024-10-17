@@ -100,8 +100,8 @@ namespace Neptuo.Recollections.Entries
         public Task<List<StoryChapterListModel>> GetStoryChapterListAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryChapterListModel>>($"stories/{storyId}/chapters"));
 
-        public Task<List<ImageModel>> GetStoryImagesAsync(string storyId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<ImageModel>>($"stories/{storyId}/images"));
+        public Task<List<EntryImagesModel>> GetStoryImagesAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryImagesModel>>($"stories/{storyId}/images"));
 
         public Task<AuthorizedModel<StoryModel>> GetStoryAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<StoryModel>>($"stories/{storyId}"));

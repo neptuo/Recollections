@@ -60,7 +60,7 @@
                     }
                 </div>
 
-                <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" />
+                <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="OpenImageDetailAsync" />
             </div>
         </PermissionContainer>
     </CascadingValue>

@@ -37,7 +37,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Dictionary<string, List<TimelineEntryModel>> Entries { get; set; } = new();
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new();
-        protected List<ImageModel> Images { get; set; }
+        protected List<EntryImagesModel> Images { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
 
         public override Task SetParametersAsync(ParameterView parameters)
@@ -72,14 +72,17 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Images = await Api.GetStoryImagesAsync(StoryId);
             GalleryItems.Clear();
-            foreach (var image in Images)
+            foreach (var entry in Images)
             {
-                GalleryItems.Add(new GalleryModel()
+                foreach (var image in entry.Images)
                 {
-                    Title = image.Name,
-                    Width = image.Preview.Width,
-                    Height = image.Preview.Height
-                });
+                    GalleryItems.Add(new GalleryModel()
+                    {
+                        Title = image.Name,
+                        Width = image.Preview.Width,
+                        Height = image.Preview.Height
+                    });
+                }
             }
         }
 
@@ -136,15 +139,45 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
+        private bool TryFindImage(int index, out string entryId, out ImageModel image)
+        {
+            int i = 0;
+            foreach (var entry in Images)
+            {
+                foreach (var item in entry.Images)
+                {
+                    if (index == i)
+                    {
+                        image = item;
+                        entryId = entry.EntryId;
+                        return true;
+                    }
+
+                    i++;
+                }
+            }
+
+            entryId = null;
+            image = null;
+            return false;
+        }
+
         protected async Task<Stream> OnGetImageDataAsync(int index)
         {
-            if (index > Images.Count)
+            if (!TryFindImage(index, out _, out var image))
                 return null;
 
-            var image = Images[index];
             var stream = await Api.GetImageDataAsync(image.Preview.Url);
-
             return stream;
+        }
+
+        protected async Task OpenImageDetailAsync(int index)
+        {
+            if (!TryFindImage(index, out var entryId, out var image))
+                return;
+
+            await Gallery.CloseAsync();
+            Navigator.OpenImageDetail(entryId, image.Id);
         }
 
         protected async Task OnBeforeInternalNavigation(LocationChangingContext context)

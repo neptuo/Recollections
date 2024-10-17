@@ -1,9 +1,5 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Primitives;
-using Microsoft.Net.Http.Headers;
 using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
@@ -41,8 +37,14 @@ public class StoryImageController(ImageService service, DataContext db, ShareSta
             .OrderBy(i => i.When)
             .ToListAsync();
 
-        List<ImageModel> result = new List<ImageModel>();
-        service.MapEntitiesToModels(entities, result, entry.UserId);
+        var result = new List<EntryImagesModel>();
+        foreach (var entryImages in entities.GroupBy(i => i.Entry.Id))
+        {
+            var entryModel = new EntryImagesModel();
+            result.Add(entryModel);
+            entryModel.EntryId = entryImages.Key;
+            service.MapEntitiesToModels(entryImages, entryModel.Images, entry.UserId);
+        }
 
         return Ok(result);
     });
