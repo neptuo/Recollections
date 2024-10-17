@@ -1,8 +1,6 @@
 ﻿@page "/entries/{EntryId}"
 @inherits UserStateComponentBase
 
-<NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
-
 @if (Model != null)
 {
     <DocumentTitle Value="@Model.Title" />

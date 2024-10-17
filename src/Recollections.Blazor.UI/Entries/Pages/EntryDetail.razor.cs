@@ -409,15 +409,6 @@ namespace Neptuo.Recollections.Entries.Pages
             await Api.UpdateEntryBeingsAsync(EntryId, beingIds);
             await LoadBeingsAsync();
         }
-
-        protected async Task OnBeforeInternalNavigation(LocationChangingContext context)
-        {
-            if (await Gallery.IsOpenAsync())
-            {
-                _ = Gallery.CloseAsync();
-                context.PreventNavigation();
-            }
-        }
     }
 
     public class UploadImageModel

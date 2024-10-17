@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,15 @@ namespace Neptuo.Recollections.Components
             {
                 await Interop.OpenAsync(indexToOpen.Value);
                 indexToOpen = null;
+            }
+        }
+
+        protected async Task OnBeforeInternalNavigation(LocationChangingContext context)
+        {
+            if (await IsOpenAsync())
+            {
+                _ = CloseAsync();
+                context.PreventNavigation();
             }
         }
 
