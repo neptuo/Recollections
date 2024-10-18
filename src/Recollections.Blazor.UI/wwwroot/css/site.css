@@ -14377,7 +14377,7 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 .calendar .calendar-header,
 .calendar .calendar-cell {
   width: 14.2857142857%;
-  padding: 8px;
+  padding: 0.25rem;
   border: 0px solid #dee2e6;
   border-left-width: 1px;
   border-bottom-width: 1px;
@@ -14431,4 +14431,4 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=D:\Development\neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

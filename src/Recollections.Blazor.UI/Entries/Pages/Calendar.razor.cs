@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
-using Neptuo.Recollections.Accounts.Components;
-using Neptuo.Recollections.Entries.Components;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

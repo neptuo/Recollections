@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Components
+namespace Neptuo.Recollections.Components
 {
     public partial class MonthView
     {
