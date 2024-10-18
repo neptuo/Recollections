@@ -1,0 +1,122 @@
+<Modal @ref="Modal" Title="Select a time">
+    <ChildContent>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-auto text-center">
+                <Icon Identifier="chevron-up" CssClass="cursor-pointer" OnClick="@(() => MutateHour(+1))" />
+                <input class="form-control input-number-noarrows" type="number" min="0" max="23" @bind="Hour" style="width: 45px;" />
+                <Icon Identifier="chevron-down" CssClass="cursor-pointer" OnClick="@(() => MutateHour(-1))" />
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                <span class="h2">:</span>
+            </div>
+            <div class="col-auto text-center">
+                <Icon Identifier="chevron-up" CssClass="cursor-pointer" OnClick="@(() => MutateMinute(+1))" />
+                <input class="form-control input-number-noarrows" type="number" min="0" max="59" @bind="Minute" style="width: 45px;" />
+                <Icon Identifier="chevron-down" CssClass="cursor-pointer" OnClick="@(() => MutateMinute(-1))" />
+            </div>
+            @if (Part == TimePickerPart.Second)
+            {
+                <div class="col-auto d-flex align-items-center">
+                    <span class="h2">:</span>
+                </div>
+                <div class="col-auto text-center">
+                    <Icon Identifier="chevron-up" CssClass="cursor-pointer" OnClick="@(() => MutateSecond(+1))" />
+                    <input class="form-control input-number-noarrows" type="number" min="0" max="59" @bind="Second" style="width: 45px;" />
+                    <Icon Identifier="chevron-down" CssClass="cursor-pointer" OnClick="@(() => MutateSecond(-1))" />
+                </div>
+            }
+            <div class="col"></div>
+        </div>
+    </ChildContent>
+    <Buttons>
+        <button class="btn btn-primary btn-sm" @onclick="@(() => { BindValue(); Hide(); })">Select</button>
+    </Buttons>
+</Modal>
+
+@code
+{
+    protected Modal Modal { get; set; }
+
+    protected int Hour { get; set; }
+    protected int Minute { get; set; }
+    protected int Second { get; set; }
+
+    public void Show() => Modal.Show();
+    public void Hide() => Modal.Hide();
+
+    [Parameter]
+    public Time? Value { get; set; }
+
+    [Parameter]
+    public Action<Time> ValueChanged { get; set; }
+
+    [Parameter]
+    public TimePickerPart Part { get; set; } = TimePickerPart.Minute;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Value != null)
+        {
+            Hour = Value.Value.Hour;
+            Minute = Value.Value.Minute;
+            Second = Value.Value.Second;
+        }
+        else
+        {
+            Hour = Minute = Second = 0;
+        }
+    }
+
+    private void MutateSecond(int change)
+    {
+        var newValue = Second + change;
+        if (newValue < 0)
+        {
+            MutateMinute(-1);
+            newValue = 60 + newValue;
+        }
+        else if (newValue >= 60)
+        {
+            MutateMinute(+1);
+            newValue -= 60;
+        }
+
+        Second = newValue;
+    }
+
+    private void MutateMinute(int change)
+    {
+        var newValue = Minute + change;
+        if (newValue < 0)
+        {
+            MutateHour(-1);
+            newValue = 60 + newValue;
+        }
+        else if (newValue >= 60)
+        {
+            MutateHour(+1);
+            newValue -= 60;
+        }
+
+        Minute = newValue;
+    }
+
+    private void MutateHour(int change)
+    {
+        var newValue = Hour + change;
+        if (newValue < 0)
+            newValue = 24 + newValue;
+        else if (newValue >= 24)
+            newValue -= 24;
+
+        Hour = newValue;
+    }
+
+    private void BindValue()
+    {
+        ValueChanged?.Invoke(new Time { Hour = Hour, Minute = Minute, Second = Second });
+    }
+}

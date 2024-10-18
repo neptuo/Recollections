@@ -13716,6 +13716,18 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   padding: 4px;
 }
 
+input.input-number-noarrows {
+  /* Chrome, Safari, Edge, Opera */
+  /* Firefox */
+}
+input.input-number-noarrows::-webkit-outer-spin-button, input.input-number-noarrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input.input-number-noarrows[type=number] {
+  -moz-appearance: textfield;
+}
+
 .file-upload {
   float: left;
   margin-right: 4px;

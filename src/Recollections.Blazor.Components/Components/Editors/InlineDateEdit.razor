@@ -1,52 +1,29 @@
 ﻿@inherits InlineEdit<DateTime>
 
 <div class="inline-editor @GetDateCssClass() @GetModeCssClass()">
-    @if (IsEditMode)
-    {
-        <form @onsubmit="@OnSaveValueAsync">
-            <div class="col-auto">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text">
-                        <Icon Identifier="calendar-alt" />
-                    </span>
-                    <input @ref="DateInput" type="text" class="form-control" @bind="Value" @bind:format="@Format" autofocus />
-                    @if (IsTimeSelection)
-                    {
-                        <input type="text" class="form-control" @bind="TimeValue" />
-                    }
-                    <button class="btn btn-outline-success btn-save" title="Save changes">
-                        <Icon Identifier="check" />
-                    </button>
-                    <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
-                        <Icon Identifier="times" />
-                    </button>
-                </div>
-            </div>
-        </form>
-    }
-    else
-    {
-        <a class="inline-editor-value" @onclick="@OnEditAsync">
-            <Icon Identifier="pen" />
+    <a class="inline-editor-value" @onclick="@(() => DatePicker.Show())">
+        <Icon Identifier="pen" />
 
-            <Icon Identifier="calendar-alt" />
-            @if (Value == DateTime.MinValue)
-            {
-                <span class="ms-1 inline-editor-content value-placeholder">@(PlaceHolder ?? "No value...")</span>
-            }
-            else
-            {
-                <span class="ms-1 inline-editor-content">
-                    @Value.ToString(Format ?? "yyyy-MM-dd")
-                    
-                    @if (IsTimeSelection)
-                    {
-                        <span class="ms-1">
-                            @Value.ToString(@TimeFormat)
-                        </span>
-                    }
-                </span>
-            }
-        </a>
-    }
+        <Icon Identifier="calendar-alt" />
+        @if (Value == DateTime.MinValue)
+        {
+            <span class="ms-1 inline-editor-content value-placeholder">@(PlaceHolder ?? "No value...")</span>
+        }
+        else
+        {
+            <span class="ms-1 inline-editor-content">
+                @Value.ToString(Format ?? "yyyy-MM-dd")
+                
+                @if (IsTimeSelection)
+                {
+                    <span class="ms-1" @onclick="@(() => TimePicker.Show())" @onclick:stopPropagation="true">
+                        @Value.ToString(@TimeFormat)
+                    </span>
+                }
+            </span>
+        }
+    </a>
 </div>
+
+<DatePicker @ref="DatePicker" Part="DatePickerPart.Day" Value="SelectedDate" ValueChanged="@(date => { SelectedDate = date; BindValue(); })" />
+<TimePicker @ref="TimePicker" Value="SelectedTime" ValueChanged="@(time => { SelectedTime = time; BindValue(); })" />

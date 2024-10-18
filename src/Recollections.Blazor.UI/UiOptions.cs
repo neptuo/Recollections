@@ -11,7 +11,7 @@ namespace Neptuo.Recollections
     public class UiOptions
     {
         public string DateFormat { get; set; }
-        public string DateTimeFormat { get; set; }
+        public string TimeFormat { get; set; }
 
         public int TextPreviewLength { get; set; }
     }
@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             UiOptions uiOptions = new UiOptions();
             uiOptions.DateFormat = "dd.MM.yyyy";
-            uiOptions.DateTimeFormat = "dd.MM.yyyy HH:mm:ss";
+            uiOptions.TimeFormat = "HH:mm";
             uiOptions.TextPreviewLength = 300;
 
             return services.AddSingleton(uiOptions);

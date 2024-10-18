@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Neptuo.Identifiers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,11 +12,9 @@ namespace Neptuo.Recollections.Components.Editors
     public partial class InlineDateEdit
     {
         protected const string TimeFormat = "HH:mm";
-
-        [Inject]
-        protected DatePickerInterop Interop { get; set; }
-
-        protected ElementReference? DateInput { get; set; }
+        
+        protected DatePicker DatePicker { get; set; }
+        protected TimePicker TimePicker { get; set; }
 
         [Parameter]
         public string Format { get; set; }
@@ -25,37 +22,39 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public bool IsTimeSelection { get; set; }
 
-        protected string TimeValue { get; set; }
+        protected Date SelectedDate { get; set; }
+        protected Time SelectedTime { get; set; }
 
         protected override void OnParametersSet() 
         {
             base.OnParametersSet();
 
-            if (IsTimeSelection)
-                TimeValue = Value.ToString(TimeFormat);
-        }
-
-        protected async override Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (IsEditMode)
-                await Interop.InitializeAsync(DateInput.Value, Format);
-        }
-
-        protected async override Task OnValueChangedAsync()
-        {
-            if (DateInput != null)
+            SelectedDate = new Date 
             {
-                string rawValue = await Interop.GetValueAsync(DateInput.Value);
-                if (DateTime.TryParseExact(rawValue, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var value))
-                    Value = value;
+                Year = Value.Year, 
+                Month = Value.Month,
+                Day = Value.Day
+            };
+            SelectedTime = new Time
+            {
+                Hour = Value.Hour,
+                Minute = Value.Minute,
+                Second = Value.Second
+            };
+        }
 
-                if (IsTimeSelection && TimeSpan.TryParse(TimeValue, out var time))
-                    Value = Value.Date.Add(time);
-            }
-
-            await base.OnValueChangedAsync();
+        protected void BindValue()
+        {
+            Value = new DateTime(
+                SelectedDate.Year.Value,
+                SelectedDate.Month.Value,
+                SelectedDate.Day.Value,
+                SelectedTime.Hour,
+                SelectedTime.Minute,
+                SelectedTime.Second
+            );
+            ValueChanged?.Invoke(Value);
+            StateHasChanged();
         }
 
         protected string GetDateCssClass()
