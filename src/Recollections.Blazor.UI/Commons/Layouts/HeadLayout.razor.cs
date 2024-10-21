@@ -80,7 +80,7 @@ public class MenuList
     public MenuList(Navigator navigator, UserState userState, Action changePassword, Action changeTheme)
     {
         Add(new MenuItem("Main menu", "bars"), Bottom);
-        Add(new MenuItem("Timeline", "stream", Url: navigator.UrlTimeline(), PageType: typeof(TimelineList), Match: NavLinkMatch.All), Main, Bottom);
+        Add(new MenuItem("Timeline", "timeline", CssClass: "fa-rotate-270", Url: navigator.UrlTimeline(), PageType: typeof(TimelineList), Match: NavLinkMatch.All), Main, Bottom);
         Add(new MenuItem("Map", "map-marked-alt", Url: navigator.UrlMap()), Main);
         Add(new MenuItem("Calendar", "calendar-alt", Url: navigator.UrlCalendar()), Main);
         Add(new MenuItem("Search", "search", Url: navigator.UrlSearch()), Main, Bottom);
@@ -102,4 +102,13 @@ public class MenuList
     }
 }
 
-public record MenuItem(string Text, string Icon, string Url = null, Type PageType = null, Action OnClick = null, NavLinkMatch Match = NavLinkMatch.Prefix, bool IsNewWindow = false);
+public record MenuItem(
+    string Text, 
+    string Icon, 
+    string Url = null, 
+    Type PageType = null, 
+    Action OnClick = null, 
+    NavLinkMatch Match = NavLinkMatch.Prefix, 
+    bool IsNewWindow = false,
+    string CssClass = ""
+);

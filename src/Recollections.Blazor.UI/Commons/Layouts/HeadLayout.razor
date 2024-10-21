@@ -18,7 +18,7 @@
                     var menuItem = Menu.Main[i];
                     <li class="nav-item @(i == Menu.Main.Count - 1 ? "ms-lg-auto" : "")">
                         <NavLink class="nav-link" href="@menuItem.Url" target="@(menuItem.IsNewWindow ? "_blank" : null)" Match="@menuItem.Match">
-                            <Icon Identifier="@menuItem.Icon" />
+                            <Icon Identifier="@menuItem.Icon" CssClass="@menuItem.CssClass" />
                             <span class="d-none d-md-inline-block">@menuItem.Text</span>
                         </NavLink>
                     </li>

@@ -10,7 +10,7 @@
                         {
                             <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
                                 <a href="@item.Url" class="btn @(IsActive ? "btn-primary" : "bg-light-subtle")">
-                                    <Icon Identifier="@item.Icon" />
+                                    <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                                     <span class="text">
                                         @item.Text
                                     </span>
@@ -20,7 +20,7 @@
                         else if (item.Text == "Main menu")
                         {
                             <button class="btn bg-light-subtle" @onclick="OnToggleMainMenu">
-                                <Icon Identifier="@item.Icon" />
+                                <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                                 <span class="text">
                                     @item.Text
                                 </span>
@@ -29,7 +29,7 @@
                         else
                         {
                             <button class="btn bg-light-subtle" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
-                                <Icon Identifier="@item.Icon" />
+                                <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                                 <span class="text">
                                     @item.Text
                                 </span>
@@ -75,7 +75,7 @@
                 {
                     <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
                         <a href="@item.Url" class="btn @(IsActive ? "btn-primary" : "bg-light-subtle") w-100">
-                            <Icon Identifier="@item.Icon" />
+                            <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                             <span class="text d-block text-truncate">
                                 @item.Text
                             </span>
@@ -85,7 +85,7 @@
                 else
                 {
                     <button class="btn bg-light-subtle @(isLogout ? "text-danger" : string.Empty) w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
-                        <Icon Identifier="@item.Icon" />
+                        <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                         <span class="text d-block text-truncate">
                             @item.Text
                         </span>
