@@ -1,7 +1,12 @@
 ﻿<form @onsubmit="@CreateAsync">
     <div class="entry entry-new">
         <div class="title">
-            <input @ref="WhenInput" class="form-control date-box" type="text" placeholder="Today..." @bind="When" @bind:format="@UiOptions.DateFormat" />
+            <div class="input-group">
+                <input @ref="WhenInput" class="form-control" type="text" placeholder="Today..." value="@When.ToDateTime().ToString(UiOptions.DateFormat)" />
+                <button type="button" class="btn btn-outline-secondary" @onclick="(() => DatePicker.Show())">
+                    <Icon Identifier="calendar-days" />
+                </button>
+            </div>
         </div>
         <div class="body">
             <div class="row align-items-end">
@@ -19,3 +24,5 @@
         </div>
     </div>
 </form>
+
+<DatePicker @ref="DatePicker" @bind-Value="When" @bind-Value:after="StateHasChanged" Part="DatePickerPart.Day" />

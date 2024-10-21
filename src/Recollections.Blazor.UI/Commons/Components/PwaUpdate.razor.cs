@@ -42,11 +42,8 @@ namespace Neptuo.Recollections.Commons.Components
             StateHasChanged();
         }
 
-        protected async Task UpdateAsync()
-        {
-            await Interop.UpdateAsync();
-            IsUpdateable = false;
-        }
+        protected async Task UpdateAsync() 
+            => await Interop.UpdateAsync();
 
         public void Dispose()
         {

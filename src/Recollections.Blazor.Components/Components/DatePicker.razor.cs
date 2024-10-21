@@ -181,6 +181,20 @@ namespace Neptuo.Recollections.Components
         public int? Year;
         public int? Month;
         public int? Day;
+
+        public Date()
+        { }
+
+        public Date(DateTime dateTime)
+        {
+            Year = dateTime.Year;
+            Month = dateTime.Month;
+            Day = dateTime.Day;
+        }
+
+        public DateTime ToDateTime() => Year == null || Month == null || Day == null 
+            ? DateTime.MinValue 
+            : new DateTime(Year.Value, Month.Value, Day.Value);
     }
 
     public enum DatePickerPart

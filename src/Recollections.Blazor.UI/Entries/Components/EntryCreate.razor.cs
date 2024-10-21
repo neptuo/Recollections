@@ -20,29 +20,24 @@ namespace Neptuo.Recollections.Entries.Components
         protected Navigator Navigator { get; set; }
 
         [Inject]
-        protected DatePickerInterop DatePickerInterop { get; set; }
-
-        [Inject]
         protected UiOptions UiOptions { get; set; }
 
+        [Inject]
+        protected ElementReferenceInterop ElementInterop { get; set; }
+
         public string Title { get; set; }
-        public DateTime When { get; set; }
+        public Date When { get; set; }
 
         public List<string> ErrorMessages { get; } = new List<string>();
 
+        protected DatePicker DatePicker { get; set; }
         protected ElementReference WhenInput { get; set; }
 
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
 
-            When = DateTime.Today;
-        }
-
-        protected async override Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-            await DatePickerInterop.InitializeAsync(WhenInput, UiOptions.DateFormat);
+            When = new Date(DateTime.Today);
         }
 
         public async Task CreateAsync()
@@ -51,18 +46,18 @@ namespace Neptuo.Recollections.Entries.Components
 
             if (Validate())
             {
-                EntryModel model = await Api.CreateEntryAsync(new EntryModel(Title, When));
+                EntryModel model = await Api.CreateEntryAsync(new EntryModel(Title, When.ToDateTime()));
                 Navigator.OpenEntryDetail(model.Id);
             }
         }
 
         private async Task BindWhenFromUi()
         {
-            string rawWhen = await DatePickerInterop.GetValueAsync(WhenInput);
+            string rawWhen = await ElementInterop.GetValueAsync(WhenInput);
             if (DateTime.TryParseExact(rawWhen, UiOptions.DateFormat, CultureInfo.CurrentCulture, DateTimeStyles.None, out var when))
-                When = when;
+                When = new Date(when);
             else
-                When = DateTime.MinValue;
+                When = new Date(DateTime.MinValue);
         }
 
         public bool Validate()
@@ -72,7 +67,7 @@ namespace Neptuo.Recollections.Entries.Components
             if (String.IsNullOrEmpty(Title))
                 ErrorMessages.Add("Missing title.");
 
-            if (When == DateTime.MinValue)
+            if (When.ToDateTime() == DateTime.MinValue)
                 ErrorMessages.Add("When should be something meaningful.");
 
             return ErrorMessages.Count == 0;

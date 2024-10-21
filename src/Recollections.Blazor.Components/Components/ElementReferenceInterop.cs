@@ -10,20 +10,15 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class ElementReferenceInterop
+    public class ElementReferenceInterop(IJSRuntime jsRuntime)
     {
-        private readonly IJSRuntime jsRuntime;
-
-        public ElementReferenceInterop(IJSRuntime jsRuntime)
-        {
-            Ensure.NotNull(jsRuntime, "jsRuntime");
-            this.jsRuntime = jsRuntime;
-        }
-
         public ValueTask BlurAsync(ElementReference elementRef) 
             => jsRuntime.InvokeVoidAsync("ElementReference.Blur", elementRef);
 
-        internal ValueTask ScrollIntoViewAsync(ElementReference elementRef)
+        public ValueTask ScrollIntoViewAsync(ElementReference elementRef)
             => jsRuntime.InvokeVoidAsync("ElementReference.ScrollIntoView", elementRef);
+
+        public ValueTask<string> GetValueAsync(ElementReference elementRef)
+            => jsRuntime.InvokeAsync<string>("ElementReference.GetValue", elementRef);
     }
 }

@@ -140,6 +140,9 @@ window.ElementReference = {
     },
     Blur: function (element) {
         element.blur();
+    },
+    GetValue: function (input) {
+        return $(input).val();
     }
 };
 
@@ -265,25 +268,6 @@ window.InlineDateEdit = {
         return $(input).val();
     }
 };
-
-window.DatePicker = {
-    Initialize: function (input, format) {
-        $(input).datepicker({
-            format: format.toLowerCase(),
-            autoclose: true,
-            todayHighlight: true,
-            todayBtn: "linked"
-        });
-    },
-    Destroy: function (input) {
-        if (input != null) {
-            $(input).datepicker("destroy");
-        }
-    },
-    GetValue: function (input) {
-        return $(input).val();
-    }
-}
 
 window.Downloader = {
     FromUrlAsync: function (name, url) {
