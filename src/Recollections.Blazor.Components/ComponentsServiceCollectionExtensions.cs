@@ -22,7 +22,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<InlineTextEditInterop>();
-            services.AddTransient<DatePickerInterop>();
             services.AddTransient<MarkdownConverter>();
             services.AddTransient<Downloader>();
             services.AddTransient<MapInterop>();
