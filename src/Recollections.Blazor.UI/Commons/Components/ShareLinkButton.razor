@@ -21,11 +21,9 @@ else if (Layout == ButtonLayout.DropdownItem)
         <ChildContent>
             <div class="input-group">
                 <input type="text" readonly value="@Navigator.GetCurrentUrl()" class="form-control" />
-                <div class="input-group-append">
-                    <button class="btn btn-@(IsCopiedToClipboard ? "success" : "outline-secondary") m-0" type="button" @onclick="(() => { Interop.CopyToClipboard(Navigator.GetCurrentUrl()); IsCopiedToClipboard = true; })">
-                        <Icon Identifier="copy" />
-                    </button>
-                </div>
+                <button class="btn btn-@(IsCopiedToClipboard ? "success" : "outline-secondary") m-0" type="button" @onclick="(() => { Interop.CopyToClipboard(Navigator.GetCurrentUrl()); IsCopiedToClipboard = true; })">
+                    <Icon Identifier="copy" />
+                </button>
             </div>
         </ChildContent>
     </Modal>
