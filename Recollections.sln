@@ -57,6 +57,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Anything", ".Anything", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Tools.ShareInheritableMigrator", "src\Recollections.Tools.ShareInheritableMigrator\Recollections.Tools.ShareInheritableMigrator.csproj", "{A5EA5594-84A6-49E8-BC69-6AEC4915ED62}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Tools.ImageVariantUpdater", "src\Recollections.Tools.ImageVariantUpdater\Recollections.Tools.ImageVariantUpdater.csproj", "{63014632-E60E-48A6-BF84-B69FA84DF945}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,10 @@ Global
 		{A5EA5594-84A6-49E8-BC69-6AEC4915ED62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5EA5594-84A6-49E8-BC69-6AEC4915ED62}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5EA5594-84A6-49E8-BC69-6AEC4915ED62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63014632-E60E-48A6-BF84-B69FA84DF945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63014632-E60E-48A6-BF84-B69FA84DF945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63014632-E60E-48A6-BF84-B69FA84DF945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63014632-E60E-48A6-BF84-B69FA84DF945}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{C4E6EBB3-0ABD-4BEB-B6FE-29E9271E8997} = {930F0831-13F2-43E9-B548-226D1610F227}
 		{D3B3C78D-7A08-4C2D-B535-FD9A301EB869} = {930F0831-13F2-43E9-B548-226D1610F227}
 		{A5EA5594-84A6-49E8-BC69-6AEC4915ED62} = {930F0831-13F2-43E9-B548-226D1610F227}
+		{63014632-E60E-48A6-BF84-B69FA84DF945} = {930F0831-13F2-43E9-B548-226D1610F227}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {087891FB-93D9-4D03-AFE6-11BD7F9A44F7}
