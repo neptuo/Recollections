@@ -52,7 +52,7 @@ namespace Neptuo.Recollections.Commons.Components
             isInstallable = true;
             isUpdateable = false;
 
-            foreach (var editor in editors)
+            foreach (var editor in editors.ToArray())
                 editor.MakeInstallable();
         }
 
@@ -62,7 +62,7 @@ namespace Neptuo.Recollections.Commons.Components
             isInstallable = false;
             isUpdateable = true;
 
-            foreach (var editor in editors)
+            foreach (var editor in editors.ToArray())
                 editor.MakeUpdateable();
         }
 
