@@ -3,16 +3,16 @@
   <PropertyGroup>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    <VersionPrefix>0.15.0</VersionPrefix>
+    <VersionPrefix>0.15.1</VersionPrefix>
     <StartupObject>Neptuo.Recollections.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup>
-	<IsPublishable>true</IsPublishable>
-	<EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-	<ContainerRegistry>ghcr.io</ContainerRegistry>
-	<ContainerRepository>neptuo/recollections-api</ContainerRepository>
-	<ContainerImageTag>$(VersionPrefix)-$(RuntimeIdentifier)</ContainerImageTag>
+    <IsPublishable>true</IsPublishable>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <ContainerRegistry>ghcr.io</ContainerRegistry>
+    <ContainerRepository>neptuo/recollections-api</ContainerRepository>
+    <ContainerImageTag>$(VersionPrefix)-$(RuntimeIdentifier)</ContainerImageTag>
   </PropertyGroup>
 
   <ItemGroup>
