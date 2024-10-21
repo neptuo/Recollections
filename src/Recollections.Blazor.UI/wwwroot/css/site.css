@@ -13905,7 +13905,7 @@ input.input-number-noarrows[type=number] {
   width: 18px;
   height: 18px;
   border: 4px solid salmon;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
   border-radius: 100%;
   top: 15%;
   right: -11px;

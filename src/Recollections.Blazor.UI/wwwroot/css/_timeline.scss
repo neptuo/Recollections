@@ -50,7 +50,7 @@ $dot-diameter: 18px;
             width: $dot-diameter;
             height: $dot-diameter;
             border: $border-width solid salmon;
-            background-color: #fff;
+            background-color: var(--bs-body-bg);
             border-radius: 100%;
             top: 15%;
             right: -11px;
