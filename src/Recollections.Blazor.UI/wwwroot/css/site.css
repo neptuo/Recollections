@@ -13736,9 +13736,6 @@ input.input-number-noarrows[type=number] {
   display: none;
 }
 
-.main-navbar {
-  z-index: 2;
-}
 .main-navbar.block-icons {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
