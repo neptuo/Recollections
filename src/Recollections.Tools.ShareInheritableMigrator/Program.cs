@@ -5,20 +5,17 @@ using System;
 using System.Linq;
 using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
 
-if (args.Length != 1)
-{
-    Console.WriteLine("Pass one argument with connection string to database.");
+if (!TryGetConfiguration(args, out var connectionString, out var isDryRun, out var skippedEntryIds))
     return;
-}
-
-string connectionString = args[0];
 
 Console.WriteLine("Creating context.");
 using var db = new EntriesDataContext(DbContextOptions<EntriesDataContext>(connectionString, "Entries"), Schema<EntriesDataContext>("Entries"));
 
-// TODO: Implement
+Console.WriteLine("Preparing the query.");
 var entries = await db.Entries
-    .Where(e => !e.IsSharingInherited 
+    .Where(e => !e.IsSharingInherited
+        && !skippedEntryIds.Contains(e.Id)
+        && !db.EntryShares.Any(s => s.EntryId == e.Id)
         && (
             (e.Story != null && !e.Story.IsSharingInherited)
             || (e.Chapter != null && e.Chapter.Story.IsSharingInherited)
@@ -27,17 +24,27 @@ var entries = await db.Entries
     )
     .Include(e => e.Story)
     .Include(e => e.Chapter)
+    .AsNoTracking()
     .ToListAsync();
 
 Console.WriteLine($"Found '{entries.Count}' entries matching the criteria");
-foreach (var entry in entries)
+foreach (var e in entries)
 {
+    Console.WriteLine($"Entry '{e.Id}' marked as 'sharing inherited'");
+    Console.WriteLine($"    {e.Title}");
+    Console.WriteLine($"    {e.UserId}");
+
+    var entry = db.Entries.Find(e.Id);
     entry.IsSharingInherited = true;
-    System.Console.WriteLine($"Entry '{entry.Id}' marked as 'sharing inherited'");
     db.Entries.Update(entry);
 }
 
-await db.SaveChangesAsync();
+if (!isDryRun)
+{
+    Console.WriteLine("Saving changes.");
+    await db.SaveChangesAsync();
+}
+
 Console.WriteLine("Done.");
 
 static DbContextOptions<T> DbContextOptions<T>(string connectionString, string schema)
@@ -60,4 +67,20 @@ static SchemaOptions<T> Schema<T>(string name)
     var schema = new SchemaOptions<T>() { Name = name };
     MigrationWithSchema.SetSchema(schema);
     return schema;
+}
+
+static bool TryGetConfiguration(string[] args, out string connectionString, out bool isDryRun, out string[] skippedEntryIds)
+{
+    connectionString = null;
+    isDryRun = false;
+    skippedEntryIds = [];
+
+    if (args.Length != 1)
+    {
+        Console.WriteLine("Pass one argument with connection string to database.");
+        return false;
+    }
+
+    connectionString = args[0];
+    return true;
 }
