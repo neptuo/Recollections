@@ -40,6 +40,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private ImageModel original;
         protected ImageModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
+        protected EntryModel EntryModel { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
@@ -74,6 +75,9 @@ namespace Neptuo.Recollections.Entries.Pages
                 Altitude = Model.Location.Altitude,
                 IsEditable = true
             });
+
+            if (EntryId != null)
+                (EntryModel, _, _) = await Api.GetEntryAsync(EntryId);
         }
 
         protected async Task SaveNameAsync(string value)

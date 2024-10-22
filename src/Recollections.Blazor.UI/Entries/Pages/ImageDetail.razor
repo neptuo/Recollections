@@ -22,6 +22,10 @@
             <div class="datetime">
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
             </div>
+            @if (EntryId != null)
+            {
+                <InlineLink Icon="comment" Value="@EntryModel.Title" OnClick="@(() => Navigator.OpenEntryDetail(EntryId))" />
+            }
             <UserInformation Owner="@Owner" />
             <div class="gps">
                 <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
