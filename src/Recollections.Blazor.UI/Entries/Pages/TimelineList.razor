@@ -4,7 +4,7 @@
 
 <DocumentTitle Value="Timeline" />
 
-<Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))">
+<Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true">
     <BeforeContent>
         <EntryCreate />
     </BeforeContent>

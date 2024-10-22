@@ -37,6 +37,9 @@ namespace Neptuo.Recollections.Entries.Components
         public bool ShowStoryInfo { get; set; } = true;
 
         [Parameter]
+        public bool ShowYearSeparators { get; set; } = false;
+
+        [Parameter]
         public List<TimelineEntryModel> Data { get; set; }
 
         [Parameter]

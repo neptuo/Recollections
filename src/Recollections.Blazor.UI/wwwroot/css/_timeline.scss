@@ -1,11 +1,11 @@
 ﻿$container-shadow: 0.5rem 0.5rem 2rem 0 rgba(black, 0.2);
-$gutter: 30px;
+$gutter: 36px;
 $border-width: 4px;
 $dot-diameter: 18px;
 
 .timeline {
     width: 100%;
-    padding: 64px 0 0 0;
+    padding: 64px 0 0 6px;
     position: relative;
     font-family: 'Source Sans Pro', sans-serif;
     font-weight: 300;
@@ -28,6 +28,11 @@ $dot-diameter: 18px;
 
     * {
         box-sizing: border-box;
+    }
+
+    .separator {
+        top: 67px;
+        margin-left: calc(15% - 25px);
     }
 }
 
@@ -53,7 +58,7 @@ $dot-diameter: 18px;
             background-color: var(--bs-body-bg);
             border-radius: 100%;
             top: 15%;
-            right: -11px;
+            right: -6px;
         }
 
         h3 {
@@ -113,7 +118,12 @@ $dot-diameter: 18px;
 @mixin narrow() {
     .timeline {
         &:before {
-            left: 7px;
+            left: 13px;
+        }
+
+        .separator {
+            top: 57px; 
+            margin-left: -12px;
         }
     }
 
@@ -123,7 +133,7 @@ $dot-diameter: 18px;
             width: auto;
             float: none;
             padding-right: 0;
-            padding-left: 30px;
+            padding-left: $gutter;
             text-align: left;
             position: relative;
 

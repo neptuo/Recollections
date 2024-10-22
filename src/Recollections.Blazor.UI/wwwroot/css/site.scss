@@ -60,6 +60,10 @@ footer.navbar {
     }
 }
 
+.body-bg {
+    background: var(--bs-body-bg);
+}
+
 .bottom-bar {
     z-index: 1050;
     background: var(--bs-body-bg);

@@ -2,11 +2,22 @@
 
 @if (BeforeContent != null || Entries.Count > 0)
 {
+    var lastYear = 0;
     <div class="timeline">
         @BeforeContent
 
         @foreach (var entry in Entries)
         {
+            if (ShowYearSeparators && entry.When.Year != lastYear)
+            {
+                lastYear = entry.When.Year;
+                <div class="separator sticky-top mb-4">
+                    <div class="badge p-2 d-inline-block bg-secondary">
+                        @lastYear
+                    </div>
+                </div>
+            }
+
             <div class="entry">
                 <div class="title">
                     <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
