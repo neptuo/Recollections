@@ -94,7 +94,7 @@ namespace Neptuo.Recollections
 #if DEBUG
             return "http://localhost:33880/api/";
 #else
-            return "https://api.recollections.neptuo.com/api/";
+            return "https://api.recollections.app/api/";
 #endif
         }
     }
