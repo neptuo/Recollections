@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components;
 
-public class TemplateService
+public class TemplateService(ILog<TemplateService> log)
 {
     private readonly Dictionary<string, TemplatePlaceholder> declarations = new Dictionary<string, TemplatePlaceholder>();
 
@@ -34,7 +35,7 @@ public class TemplateService
         if (declarations.TryGetValue(name, out var placeholder))
             placeholder.AddContent(content);
         else
-            throw Ensure.Exception.InvalidOperation($"Missing placeholder named '{name}'.");
+            log.Info($"Missing placeholder named '{name}'.");
     }
 
     public void RemoveContent(string name, TemplateContent content)
@@ -43,6 +44,6 @@ public class TemplateService
         if (declarations.TryGetValue(name, out var placeholder))
             placeholder.RemoveContent(content);
         else
-            throw Ensure.Exception.InvalidOperation($"Missing placeholder named '{name}'.");
+            log.Info($"Missing placeholder named '{name}'.");
     }
 }
