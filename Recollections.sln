@@ -59,6 +59,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.Tools.ShareIn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recollections.Tools.ImageVariantUpdater", "src\Recollections.Tools.ImageVariantUpdater\Recollections.Tools.ImageVariantUpdater.csproj", "{63014632-E60E-48A6-BF84-B69FA84DF945}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Recollections.AppHost", "src\Recollections.AppHost\Recollections.AppHost.csproj", "{9CC119D0-5E7D-4900-B825-3B5D996420B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,10 @@ Global
 		{63014632-E60E-48A6-BF84-B69FA84DF945}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63014632-E60E-48A6-BF84-B69FA84DF945}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63014632-E60E-48A6-BF84-B69FA84DF945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CC119D0-5E7D-4900-B825-3B5D996420B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC119D0-5E7D-4900-B825-3B5D996420B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC119D0-5E7D-4900-B825-3B5D996420B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC119D0-5E7D-4900-B825-3B5D996420B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
