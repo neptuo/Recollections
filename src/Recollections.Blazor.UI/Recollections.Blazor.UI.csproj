@@ -5,6 +5,7 @@
     <VersionPrefix>0.15.1</VersionPrefix>
     <PublishDomain>recollections.app</PublishDomain>
     <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
+	<InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
