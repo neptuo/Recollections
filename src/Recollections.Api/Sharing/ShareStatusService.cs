@@ -85,6 +85,9 @@ namespace Neptuo.Recollections.Sharing
 
         public async Task<Permission?> GetEntryPermissionAsync(Entry entry, string userId)
         {
+            if (entry.UserId == userId)
+                return Permission.CoOwner;
+
             IQueryable<ShareBase> findShareQuery = null;
             bool isSharingInherited = entry.IsSharingInherited;
             if (entry.IsSharingInherited)
@@ -110,6 +113,7 @@ namespace Neptuo.Recollections.Sharing
                     // Look if there is a non-user being that a) I own, b) someone share with me
                     var share = await db.BeingShares
                         .Where(ds => db.Entries
+                            .Where(e => e.Id == entry.Id)
                             .SelectMany(e => e.Beings)
                             .Where(b => b.UserId == userId // Owned beings tagged
                                 || (b.Id != b.UserId && !b.IsSharingInherited && db.BeingShares.Any(s => s.BeingId == b.Id && s.UserId == userId)) // Non-user shared being attached
