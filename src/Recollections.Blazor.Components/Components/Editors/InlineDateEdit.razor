@@ -1,7 +1,7 @@
 ﻿@inherits InlineEdit<DateTime>
 
 <div class="inline-editor @GetDateCssClass() @GetModeCssClass()">
-    <a class="inline-editor-value" @onclick="@(() => DatePicker.Show())">
+    <a class="inline-editor-value" @onclick="@(() => { if (IsEditable) DatePicker.Show(); })">
         <Icon Identifier="pen" />
 
         <Icon Identifier="calendar-alt" />
@@ -16,7 +16,7 @@
                 
                 @if (IsTimeSelection)
                 {
-                    <span class="ms-1" @onclick="@(() => TimePicker.Show())" @onclick:stopPropagation="true">
+                    <span class="ms-1" @onclick="@(() => { if (IsEditable) TimePicker.Show(); })" @onclick:stopPropagation="true">
                         @Value.ToString(@TimeFormat)
                     </span>
                 }
