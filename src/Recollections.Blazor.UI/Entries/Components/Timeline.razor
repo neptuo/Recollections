@@ -11,10 +11,8 @@
             if (ShowYearSeparators && entry.When.Year != lastYear)
             {
                 lastYear = entry.When.Year;
-                <div class="separator sticky-top mb-4">
-                    <div class="badge p-2 d-inline-block bg-secondary">
-                        @lastYear
-                    </div>
+                <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
+                    @lastYear
                 </div>
             }
 
