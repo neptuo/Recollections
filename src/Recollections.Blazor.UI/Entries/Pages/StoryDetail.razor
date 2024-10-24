@@ -21,7 +21,7 @@
                             <DropdownSeparator />
                         </PermissionView>
                         <PermissionView Request="PermissionRequest.Owner">
-                            <ShareButton StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
+                            <ShareButton Owner="@Owner" StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
                         </PermissionView>
                         <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
                         <PermissionView Request="PermissionRequest.Owner">

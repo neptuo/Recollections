@@ -12,7 +12,7 @@
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Owner">
-                            <ShareButton EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
+                            <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
                         </PermissionView>
                         <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
                         <PermissionView Request="PermissionRequest.Owner">

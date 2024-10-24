@@ -62,24 +62,25 @@ else if (Layout == ButtonLayout.DropdownItem)
                 }
                 else
                 {
+                    if (Owner != null)
+                    {
+                        @Row(Owner.Name, @<span>Owner</span>)
+                    }
+
+                    <hr />
+
                     <ListView Items="@Model.Models" IsLoading="@IsLoading" Context="model" T="@ShareModel">
-                        <div class="row my-1" @key="@model.UserName">
-                            <div class="col">
-                                <strong class="align-middle">
-                                    @(model.UserName ?? "public")
-                                </strong>
+                        @Row(
+                            model.UserName ?? "public", 
+                            @<div class="btn-group">
+                                @PermissionButton(model, null, "Not Shared")
+                                @PermissionButton(model, Permission.Read, "Reader")
+                                @if (model.UserName != "public")
+                                {
+                                    @PermissionButton(model, Permission.CoOwner, "Co-owner")
+                                }
                             </div>
-                            <div class="col-auto">
-                                <div class="btn-group">
-                                    @PermissionButton(model, null, "Not Shared")
-                                    @PermissionButton(model, Permission.Read, "Reader")
-                                    @if (model.UserName != "public")
-                                    {
-                                        @PermissionButton(model, Permission.CoOwner, "Co-owner")
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                        )
                         @if (model.UserName == "public" && Model.Models.Count > 1)
                         {
                             <hr />
@@ -98,5 +99,18 @@ else if (Layout == ButtonLayout.DropdownItem)
 {
     public RenderFragment PermissionButton(ShareModel model, Permission? target, string text) =>
         @<button type="button" class="btn btn-sm my-0 @(model.Permission == target ? "btn-secondary" : "btn-outline-secondary")" @onclick="@(() => model.Permission = target)">@text</button>
+    ;
+
+    public RenderFragment Row(string userName, RenderFragment buttons) =>
+        @<div class="row my-1" @key="@userName">
+            <div class="col">
+                <strong class="align-middle">
+                    @userName
+                </strong>
+            </div>
+            <div class="col-auto">
+                @buttons
+            </div>
+        </div>
     ;
 }

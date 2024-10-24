@@ -34,6 +34,9 @@ namespace Neptuo.Recollections.Sharing.Components
         public string BeingId { get; set; }
 
         [Parameter]
+        public OwnerModel Owner { get; set; }
+
+        [Parameter]
         public ButtonLayout Layout { get; set; }
 
         [CascadingParameter]
