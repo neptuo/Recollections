@@ -1,30 +1,17 @@
 ﻿@if (Layout == ButtonLayout.Button)
 {
-    <button class="btn btn-sm btn-success" @onclick="@OnShow">
+    <button class="btn btn-sm btn-success" @onclick="@OnClick">
         <Icon Prefix="fas" Identifier="share" />
     </button>
 }
 else if (Layout == ButtonLayout.DropdownItem)
 {
-    <a class="dropdown-item" @onclick="@OnShow">
+    <a class="dropdown-item" @onclick="@OnClick">
         <Icon Prefix="fas" Identifier="share" />
         Share a link
     </a>
 }
 
 <TemplateContent Name="Dialogs">
-    <Modal @ref="@Modal">
-        <TitleContent>
-            <Icon Prefix="fas" Identifier="share" />
-            Share current URL
-        </TitleContent>
-        <ChildContent>
-            <div class="input-group">
-                <input type="text" readonly value="@Navigator.GetCurrentUrl()" class="form-control" />
-                <button class="btn btn-@(IsCopiedToClipboard ? "success" : "outline-secondary") m-0" type="button" @onclick="(() => { Interop.CopyToClipboard(Navigator.GetCurrentUrl()); IsCopiedToClipboard = true; })">
-                    <Icon Identifier="copy" />
-                </button>
-            </div>
-        </ChildContent>
-    </Modal>
+    <Toast @ref="Toast" />
 </TemplateContent>

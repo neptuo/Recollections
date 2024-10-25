@@ -20,13 +20,12 @@ namespace Neptuo.Recollections.Commons.Components
         [Parameter]
         public ButtonLayout Layout { get; set; }
 
-        protected Modal Modal { get; set; }
-        protected bool IsCopiedToClipboard { get; set; }
+        protected Toast Toast { get; set; }
 
-        protected void OnShow()
+        protected void OnClick()
         {
-            IsCopiedToClipboard = false;
-            Modal.Show();
+            Interop.CopyToClipboard(Navigator.GetCurrentUrl());
+            Toast.Show("URL copied to the clipboard");
         }
     }
 }
