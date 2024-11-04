@@ -14,9 +14,46 @@
             ],
             "group": "build",
             "presentation": {
-                "reveal": "silent"
+                "reveal": "silent",
+                "panel": "dedicated"
             },
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Blazor watch",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "build",
+                
+            ],
+            "options": { 
+                "cwd": "./src/Recollections.Blazor.UI"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+              "owner": "msbuild",
+              "fileLocation": "relative",
+              "pattern": {
+                "regexp": "^\\s+(error|warning|info)\\s+CS(\\d+)\\s*:\\s*(.*)$",
+                "file": 1,
+                "location": 2,
+                "severity": 3,
+                "code": 4,
+                "message": 5
+              },
+              "background": {
+                "activeOnStart": true,
+                "beginsPattern": "dotnet\\ watch\\ ⌚\\ Started",
+                "endsPattern": "dotnet\\ watch\\ ⏳\\ Waiting\\ for\\ a\\ file\\ to\\ change\\ before\\ restarting\\ dotnet\\.\\.\\."
+              }
+            }
         }
     ]
 }
