@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Neptuo;
 using Neptuo.Recollections;
@@ -35,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 .AddDbSchema(schema)
-                .AddDbContext<TContext>(options => options.UseDbServer(configuration, pathResolver, schema.Name));
+                .AddDbContext<TContext>(options => options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)).UseDbServer(configuration, pathResolver, schema.Name));
 
             return services;
         }
