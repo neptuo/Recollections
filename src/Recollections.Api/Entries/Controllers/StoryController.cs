@@ -61,7 +61,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             List<Story> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectedUsers)
                 .ToListAsync();
 
-            List<StoryListModel> models = new List<StoryListModel>();
+            List<StoryListModel> models = new();
             foreach (Story entity in entities)
             {
                 var model = new StoryListModel();
@@ -74,25 +74,18 @@ namespace Neptuo.Recollections.Entries.Controllers
                     .SelectMany(s => s.Chapters)
                     .CountAsync();
 
-                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
+                var entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
                     .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
-                    .CountAsync();
+                    .Select(e => e.When)
+                    .ToListAsync();
 
                 model.Chapters = chapters;
-                model.Entries = entries;
+                model.Entries = entries.Count;
 
-                if (entries > 0)
+                if (entries.Count > 0)
                 {
-                    DateTime minDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
-                        .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
-                        .MinAsync(e => e.When);
-
-                    DateTime maxDate = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
-                        .Where(e => e.Story.Id == entity.Id || e.Chapter.Story.Id == entity.Id)
-                        .MaxAsync(e => e.When);
-
-                    model.MinDate = minDate;
-                    model.MaxDate = maxDate;
+                    model.MinDate = entries.Min();
+                    model.MaxDate = entries.Max();
                 }
             }
 
