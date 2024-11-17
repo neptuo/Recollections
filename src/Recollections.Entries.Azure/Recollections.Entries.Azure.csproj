@@ -4,9 +4,6 @@
     <RootNamespace>Neptuo.Recollections.Entries</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup Label="Transitive dependencies">
-    <PackageReference Include="Newtonsoft.Json" />
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Storage.File" />
   </ItemGroup>
