@@ -2,6 +2,7 @@
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Components;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -43,6 +44,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected EntryModel EntryModel { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
+        protected LocationEdit LocationEdit { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
         public override Task SetParametersAsync(ParameterView parameters)
@@ -101,14 +103,29 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        protected async Task SaveLocationAsync()
+        protected async Task SaveLocationAsync(LocationModel model = null)
         {
-            Model.Location.Latitude = Markers[0].Latitude;
-            Model.Location.Longitude = Markers[0].Longitude;
-            Model.Location.Altitude = Markers[0].Altitude;
+            if (model == null)
+            {
+                Model.Location.Latitude = Markers[0].Latitude;
+                Model.Location.Longitude = Markers[0].Longitude;
+                Model.Location.Altitude = Markers[0].Altitude;
+            }
+            else
+            {
+                Model.Location.Latitude = Markers[0].Latitude = model.Latitude;
+                Model.Location.Longitude = Markers[0].Longitude = model.Longitude;
+                Model.Location.Altitude = Markers[0].Altitude = model.Altitude;
+            }
 
+            LocationEdit.Hide();
             await SaveAsync();
             StateHasChanged();
+        }
+
+        protected void OnLocationSelected(int index)
+        {
+            LocationEdit.Show(Model.Location);
         }
 
         private async Task SaveAsync()

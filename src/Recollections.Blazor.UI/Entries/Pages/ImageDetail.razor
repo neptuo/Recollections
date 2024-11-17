@@ -29,7 +29,7 @@
             <UserInformation Owner="@Owner" />
             <div class="gps">
                 <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
-                    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" OnClearLocation="@OnClearLocationAsync" />
+                    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
                 </MapToggle>
             </div>
             <div class="text">
@@ -37,5 +37,7 @@
             </div>
             <EntryImage EntryId="@EntryId" Image="@Model" ImageType="@ImageType.Preview" />
         </div>
+
+        <LocationEdit @ref="LocationEdit" Save="@(async location => await SaveLocationAsync(location))" Delete="@OnClearLocationAsync" />
     </PermissionContainer>
 }

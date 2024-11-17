@@ -374,12 +374,12 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        protected Task SaveSelectedLocationAsync()
+        protected Task SaveSelectedLocationAsync(LocationModel model)
         {
             MapMarkerModel marker = Markers[SelectedLocationIndex];
-            marker.Latitude = SelectedLocation.Latitude;
-            marker.Longitude = SelectedLocation.Longitude;
-            marker.Altitude = SelectedLocation.Altitude;
+            marker.Latitude = model.Latitude;
+            marker.Longitude = model.Longitude;
+            marker.Altitude = model.Altitude;
             LocationEdit.Hide();
             return SaveAsync();
         }

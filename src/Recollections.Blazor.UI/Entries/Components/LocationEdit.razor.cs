@@ -10,7 +10,7 @@ partial class LocationEdit
     protected LocationModel SelectedLocation { get; set; }
 
     [Parameter]
-    public EventCallback Save { get; set; }
+    public EventCallback<LocationModel> Save { get; set; }
 
     [Parameter]
     public EventCallback Delete { get; set; }
@@ -22,7 +22,8 @@ partial class LocationEdit
 
     public void Show(LocationModel model)
     {
-        SelectedLocation = model;
+        SelectedLocation = model.Clone();
+        StateHasChanged();
         Modal.Show();
     }
 

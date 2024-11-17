@@ -1,4 +1,4 @@
-<Modal @ref="Modal" Title="Location" OnFormSubmit="@Save">
+<Modal @ref="Modal" Title="Location" OnFormSubmit="@(async () => await Save.InvokeAsync(SelectedLocation))">
     <ChildContent>
         @if (SelectedLocation != null)
         {
@@ -17,7 +17,7 @@
         }
     </ChildContent>
     <Buttons>
-        <button type="button" class="btn btn-sm btn-primary" @onclick="@Save" title="Save Location">
+        <button type="button" class="btn btn-sm btn-primary" @onclick="@(async () => await Save.InvokeAsync(SelectedLocation))" title="Save Location">
             Save
         </button>
         <button type="button" class="btn btn-sm btn-danger" @onclick="@Delete" title="Delete Location">
