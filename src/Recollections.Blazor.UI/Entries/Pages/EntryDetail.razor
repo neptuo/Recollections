@@ -86,34 +86,7 @@
         </PermissionContainer>
     </CascadingValue>
 
-    <Modal @ref="@LocationEdit" Title="Location" OnFormSubmit="@(async () => await SaveSelectedLocationAsync())">
-        <ChildContent>
-            @if (SelectedLocation != null)
-            {
-                <div class="mb-3">
-                    <label for="latitude">Latitude:</label>
-                    <input type="text" class="form-control" @bind="@SelectedLocation.Latitude" />
-                </div>
-                <div class="mb-3">
-                    <label for="latitude">Longitude:</label>
-                    <input type="text" class="form-control" @bind="@SelectedLocation.Longitude" />
-                </div>
-                <div class="mb-3">
-                    <label for="latitude">Altitude:</label>
-                    <input type="text" class="form-control" @bind="@SelectedLocation.Altitude" />
-                </div>
-            }
-        </ChildContent>
-        <Buttons>
-            <button type="button" class="btn btn-sm btn-primary" @onclick="@(async () => await SaveSelectedLocationAsync())" title="Save Location">
-                Save
-            </button>
-            <button type="button" class="btn btn-sm btn-danger" @onclick="@(async () => await DeleteSelectedLocationAsync())" title="Delete Location">
-                <Icon Identifier="trash-alt" />
-                Delete
-            </button>
-        </Buttons>
-    </Modal>
+    <LocationEdit @ref="LocationEdit" Save="@SaveSelectedLocationAsync" Delete="@DeleteSelectedLocationAsync" />
 
     <Modal @ref="@UploadError" Title="Upload Error">
         <ChildContent>

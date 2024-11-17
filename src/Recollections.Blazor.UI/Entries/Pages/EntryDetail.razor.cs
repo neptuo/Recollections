@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
+﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Exceptions.Handlers;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts;
@@ -339,7 +337,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected int SelectedLocationIndex { get; set; }
         protected LocationModel SelectedLocation { get; set; }
-        protected Modal LocationEdit { get; set; }
+        protected LocationEdit LocationEdit { get; set; }
 
         protected void OnLocationSelected(int index)
         {
@@ -362,7 +360,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
                     SelectedLocationIndex = index;
                     SelectedLocation = Model.Locations[index];
-                    LocationEdit.Show();
+                    LocationEdit.Show(SelectedLocation);
                     StateHasChanged();
                 }
             }
