@@ -44,3 +44,11 @@ From the API project folder:
 ```sh
 dotnet publish --os linux --arch x64 /t:PublishContainer
 ```
+
+### Publish blazor project
+
+From the blazor UI project folder:
+
+```sh
+dotnet publish -c Release -p:RunAOTCompilation=true
+```
