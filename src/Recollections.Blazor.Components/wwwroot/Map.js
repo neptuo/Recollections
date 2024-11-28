@@ -1,55 +1,31 @@
 ﻿let isLoaded = false;
+let Leaflet;
 
-export function ensureApi(isPoi) {
+export async function ensureApi() {
     if (isLoaded) {
         return;
     }
 
-    return new Promise(function (resolve, reject) {
-        let options = {};
+    isLoaded = true;
 
-        if (isPoi) {
-            options.poi = true;
-        }
+    const style = document.createElement("link");
+    style.rel = "stylesheet";
+    style.href = "./_content/Recollections.Blazor.Components/leaflet/leaflet.css";
+    document.head.appendChild(style);
 
-        window.Loader.lang = "en";
-        window.Loader.async = true;
-        window.Loader.load(null, options, function () {
-            isLoaded = true;
-            resolve();
-        });
-    });
+    await import('./leaflet/leaflet-src.js');
+    Leaflet = window.L;
 }
 
-export function initialize(container, interop, markers, isZoomed, isResizable, isEditable, isPoi) {
+export function initialize(container, interop, markers, isZoomed, isEditable) {
     let model = null;
 
     const $container = $(container);
     if ($container.data('map') == null) {
-        const map = new SMap($container.find('.map')[0]);
-        map.addDefaultLayer(SMap.DEF_BASE).enable();
-        map.addDefaultControls();
+        const map = Leaflet.map($container.find('.map')[0]);
+        map.zoomControl.setPosition("topright");
 
-        const layer = new SMap.Layer.Marker();
-        map.addLayer(layer).enable();
-
-        if (isResizable) {
-            const sync = new SMap.Control.Sync();
-            map.addControl(sync);
-        }
-
-        if (isPoi) {
-            const poiLayer = new SMap.Layer.Marker(undefined, {
-                poiTooltip: true
-            });
-            map.addLayer(poiLayer).enable();
-
-            var dataProvider = map.createDefaultDataProvider();
-            dataProvider.setOwner(map);
-            dataProvider.addLayer(poiLayer);
-            dataProvider.setMapSet(SMap.MAPSET_BASE);
-            dataProvider.enable();
-        }
+        const layer = null;
 
         model = {
             map: map,
@@ -61,101 +37,104 @@ export function initialize(container, interop, markers, isZoomed, isResizable, i
         };
         $container.data('map', model);
 
+        // Map layer
+        const BackendLayer = L.TileLayer.extend({
+            minZoom: 0,
+            maxZoom: 19,
+            attribution: '<a href="https://api.mapy.cz/copyright" target="_blank">&copy; Seznam.cz a.s. a další</a>',
+            createTile: function (coords, done) {
+                const img = document.createElement('img');
+                img.setAttribute('role', 'presentation');
+
+                async function loadTile() {
+                    await model.interop.invokeMethodAsync("MapInterop.LoadTile", DotNet.createJSObjectReference(img), coords.x, coords.y, coords.z);
+                    done(null, img);
+                };
+                loadTile();
+
+                return img;
+            }
+        });
+        new BackendLayer().addTo(map);
+
+        // Attribution to mapy.cz
+        const LogoControl = Leaflet.Control.extend({
+            options: {
+                position: 'bottomleft',
+            },
+
+            onAdd: () => {
+                const container = Leaflet.DomUtil.create('div');
+                const link = Leaflet.DomUtil.create('a', '', container);
+
+                link.setAttribute('href', 'http://mapy.cz/');
+                link.setAttribute('target', '_blank');
+                link.innerHTML = '<img src="https://api.mapy.cz/img/api/logo.svg" />';
+                Leaflet.DomEvent.disableClickPropagation(link);
+
+                return container;
+            },
+        });
+        new LogoControl().addTo(map);
+
         if (isEditable) {
             bindEvents(model, $container);
         }
     }
 
     model = $container.data('map');
-    var points = setMarkers(model, markers, isEditable);
+    const points = setMarkers(model, markers, isEditable);
 
     model.isAdding = false;
     model.isEmptyPoint = points.length == 0 && !model.isAdditive;
-    if (model.isEmptyPoint) {
-        model.map.setCursor("crosshair");
+
+    $container.find('.map').css("cursor", "");
+    if (model.isEmptyPoint || points.length == 0) {
+        $container.find('.map').css("cursor", "crosshair");
         if (!isZoomed) {
-            model.map.setZoom(1);
+            model.map.setView([0, 0], 1);
         }
     } else {
-        model.map.setCursor("move");
         if (!isZoomed) {
-            var centerZoom = model.map.computeCenterZoom(points);
-            centerZoom[1] = ensureMaxCenterZoom(centerZoom[1]);
-            model.map.setCenterZoom(centerZoom[0], centerZoom[1]);
+            model.map.fitBounds(points, { maxZoom: 14 });
         }
     }
-}
-
-function ensureMaxCenterZoom(zoom) {
-    if (zoom > 13) {
-        zoom = 13;
-    }
-
-    return zoom;
 }
 
 function bindEvents(model, $container) {
-    function dragStart(e) {
-        var node = e.target.getContainer();
-        node[SMap.LAYER_MARKER].style.cursor = "grab";
-    }
-
-    function dragStop(e) {
-        var node = e.target.getContainer();
-        node[SMap.LAYER_MARKER].style.cursor = "";
-        var coords = e.target.getCoords();
-
-        var id = Number.parseInt(e.target.getId());
-        moveMarkerOnCoords(id, coords);
-    }
-
     function mapClick(e) {
         if (model.isEmptyPoint || model.isAdding) {
-            var index = null;
+            var id = null;
             if (model.isEmptyPoint) {
-                index = 0;
+                id = 0;
             }
 
-            var coords = SMap.Coords.fromEvent(e.data.event, model.map);
-            moveMarkerOnCoords(index, coords);
+            model.isAdding = false;
+            moveMarker(model, id, e.latlng.lat, e.latlng.lng);
         }
     }
 
-    function markerClick(e) {
-        if (!("getPOI" in e.target)) {
-            var id = Number.parseInt(e.target.getId());
-            model.interop.invokeMethodAsync("MapInterop.MarkerSelected", id);
-        }
-    }
-
-    function moveMarkerOnCoords(id, coords) {
-        var latitude = coords.y;
-        var longitude = coords.x;
-
-        coords.getAltitude().then(function (altitude) {
-            model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude, altitude);
-        });
-    }
-
-    var signals = model.map.getSignals();
-    signals.addListener(window, "marker-drag-start", dragStart);
-    signals.addListener(window, "marker-drag-stop", dragStop);
-    signals.addListener(window, "map-click", mapClick);
-    signals.addListener(window, "marker-click", markerClick);
+    model.map.on("click", mapClick);
 
     var $addButton = $container.find(".btn-add-location");
 
     $addButton.click(function () {
         model.isAdding = true;
-        model.map.setCursor("crosshair");
+        $container.find('.map').css("cursor", "crosshair");
     });
 
     model.isAdditive = $addButton.length > 0;
 }
 
 function setMarkers(model, markers, isEditable) {
-    model.layer.removeAll();
-    var points = [];
+    if (model.markers) {
+        for (var i = 0; i < model.markers.length; i++) {
+            model.markers[i].remove();
+        }
+    }
+
+    model.markers = [];
+    const points = [];
     for (var i = 0; i < markers.length; i++) {
         if (markers[i].longitude == null && markers[i].latitude == null) {
             continue;
@@ -166,43 +145,61 @@ function setMarkers(model, markers, isEditable) {
             dropColor = "red";
         }
 
-        var options = {
-            title: markers[i].title,
-            url: SMap.CONFIG.img + "/marker/drop-" + dropColor + ".png"
-        };
-        var point = SMap.Coords.fromWGS84(markers[i].longitude, markers[i].latitude);
-        var marker = new SMap.Marker(point, "" + i, options);
+        var icon = Leaflet.icon({
+            iconUrl: "https://api.mapy.cz/img/api/marker/drop-" + dropColor + ".png",
 
-        if (isEditable && markers[i].isEditable) {
-            marker.decorate(SMap.Marker.Feature.Draggable);
-        }
+            iconSize: [22, 31], // size of the icon
+            iconAnchor: [11, 31], // point of the icon which will correspond to marker's location
+            popupAnchor: [11, 0] // point from which the popup should open relative to the iconAnchor
+        });
 
-        model.layer.addMarker(marker);
+        const point = [markers[i].latitude, markers[i].longitude];
         points.push(point);
+
+        const markerOptions = {
+            icon: icon,
+            title: markers[i].title,
+            draggable: isEditable && markers[i].isEditable
+        };
+
+        const marker = Leaflet.marker(point, markerOptions).addTo(model.map);
+        marker.id = i;
+        if (isEditable) {
+            marker.on("click", e => {
+                model.interop.invokeMethodAsync("MapInterop.MarkerSelected", e.target.id);
+            });
+            marker.on("dragend", e => {
+                const latitude = e.target.getLatLng().lat;
+                const longitude = e.target.getLatLng().lng;
+                moveMarker(model, e.target.id, latitude, longitude);
+            });
+        }
+        model.markers.push(marker);
     }
 
     return points;
 }
 
-export function search(container, query) {
-    const model = $(container).data('map');
-    new SMap.Geocoder(query, function (geocoder) {
-        var data = [];
-        var results = geocoder.getResults()[0].results;
-        for (var i = 0; i < results.length; i++) {
-            var result = results[i];
-            data.push({
-                label: result.label,
-                longitude: result.coords.x,
-                latitude: result.coords.y
-            });
-        }
-
-        model.interop.invokeMethodAsync("MapInterop.SearchCompleted", data);
+function moveMarker(model, id, latitude, longitude) {
+    getAltitude(latitude, longitude, altitude => {
+        model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude, altitude);
     });
+}
+
+function getAltitude(latitude, longitude, callback) {
+    fetch(`https://api.mapy.cz/v1/elevation?lang=cs&positions=${longitude}%2C${latitude}&apikey=${ApiKey}`)
+        .then(response => response.json())
+        .then(data => {
+            let altitude = data.items[0].elevation;
+            callback(altitude);
+        })
+        .catch(error => {
+            console.error(`Loading altitude failed: ${error}`);
+            alert("Error loading altitude from API. Please try to move the marker again");
+        });
 }
 
 export function centerAt(container, latitude, longitude) {
     const model = $(container).data('map');
-    model.map.setCenterZoom(SMap.Coords.fromWGS84(longitude, latitude), 15);
+    model.map.setView([latitude, longitude], 17);
 }

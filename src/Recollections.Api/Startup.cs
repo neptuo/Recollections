@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Neptuo.Events;
-using Neptuo.Events.Handlers;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
@@ -51,6 +50,10 @@ namespace Neptuo.Recollections
                 .AddControllers()
                 .AddNewtonsoftJson();
 
+            var yarp = services
+                .AddReverseProxy()
+                .LoadFromConfig(configuration.GetSection("ReverseProxy"));
+
             DefaultEventManager eventManager = new DefaultEventManager();
             services
                 .AddSingleton<IEventDispatcher>(eventManager)
@@ -59,7 +62,7 @@ namespace Neptuo.Recollections
             services.Configure<CorsOptions>(configuration.GetSection("Cors"));
 
             accountsStartup.ConfigureServices(services, environment);
-            entriesStartup.ConfigureServices(services, environment);
+            entriesStartup.ConfigureServices(services, environment, yarp);
             sharingStartup.ConfigureServices(services);
         }
 
@@ -80,6 +83,7 @@ namespace Neptuo.Recollections
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHealthChecks("/health");
+                endpoints.MapReverseProxy().RequireAuthorization();
                 endpoints.MapControllers();
             });
         }

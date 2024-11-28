@@ -1,4 +1,6 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using Microsoft.JSInterop.Implementation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,11 +28,8 @@ namespace Neptuo.Recollections.Components
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
 
-            bool isPointOfInterest = editor.PointOfInterest?.IsEnabled ?? false;
-
             await module.InvokeVoidAsync(
-                "ensureApi",
-                isPointOfInterest
+                "ensureApi"
             );
 
             await module.InvokeVoidAsync(
@@ -39,9 +38,7 @@ namespace Neptuo.Recollections.Components
                 DotNetObjectReference.Create(this),
                 editor.Markers,
                 editor.IsZoomed,
-                editor.IsResizable,
-                editor.IsEditable,
-                isPointOfInterest
+                editor.IsEditable
             );
         }
 
@@ -52,22 +49,9 @@ namespace Neptuo.Recollections.Components
         [JSInvokable("MapInterop.MarkerSelected")]
         public void MarkerSelected(int index) => editor.MarkerSelected?.Invoke(index);
 
-        private TaskCompletionSource<IEnumerable<MapSearchModel>> searchCompletion;
-
-        public Task<IEnumerable<MapSearchModel>> SearchAsync(string searchQuery)
-        {
-            searchCompletion = new TaskCompletionSource<IEnumerable<MapSearchModel>>();
-            _ = module.InvokeVoidAsync("search", editor.Container, searchQuery);
-
-            return searchCompletion.Task;
-        }
-
-        [JSInvokable("MapInterop.SearchCompleted")]
-        public void SearchCompleted(IEnumerable<MapSearchModel> results)
-        {
-            searchCompletion.TrySetResult(results);
-            searchCompletion = null;
-        }
+        [JSInvokable("MapInterop.LoadTile")]
+        public Task LoadTileAsync(JSObjectReference img, int x, int y, int z)
+            => editor.LoadTileAsync(img, x, y, z);
 
         public async Task CenterAtAsync(double latitude, double longitude)
             => await module.InvokeVoidAsync("centerAt", editor.Container, latitude, longitude);

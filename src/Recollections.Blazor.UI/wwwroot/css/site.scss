@@ -109,7 +109,7 @@ a {
     cursor: pointer;
 }
 
-a:not(.btn,.nav-link,.dropdown-item) {
+a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-zoom-in) {
     color: var(--bs-body-color);
     text-decoration: none;
 

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Neptuo.Events;
 using Neptuo.Events.Handlers;
 using Neptuo.Recollections.Accounts.Events;
@@ -13,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Yarp.ReverseProxy.Transforms;
 
 namespace Neptuo.Recollections.Entries
 {
@@ -27,7 +29,7 @@ namespace Neptuo.Recollections.Entries
             this.pathResolver = pathResolver;
         }
 
-        public void ConfigureServices(IServiceCollection services, IHostEnvironment environment)
+        public void ConfigureServices(IServiceCollection services, IHostEnvironment environment, IReverseProxyBuilder yarp)
         {
             ConfigureImages(services);
             ConfigureDatabase(services);
@@ -41,6 +43,16 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddTransient<UserBeingService>()
                 .AddTransient<IEventHandler<UserRegistered>, UserHandler>();
+
+            services
+                .Configure<MapOptions>(configuration.GetSection("Map"));
+
+            yarp
+                .AddTransforms(builderContext =>
+                {
+                    if (builderContext.Route.ClusterId == "maptiles")
+                        builderContext.AddRequestHeader("X-Mapy-Api-Key", builderContext.Services.GetService<IOptions<MapOptions>>().Value.ApiKey);
+                });
 
             if (environment.IsDevelopment())
                 EnsureDatabase(services);

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Neptuo.Activators;
 using Neptuo.Recollections.Commons.Exceptions;
+using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Beings;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class Api
+    public class Api : IMapService
     {
         private readonly HttpClient http;
         private readonly ApiSettings settings;
@@ -61,6 +62,12 @@ namespace Neptuo.Recollections.Entries
 
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
+
+        public Task<string> GetMapApiKeyAsync()
+            => faultHandler.Wrap(http.GetStringAsync("map/apikey"));
+
+        public Task<List<MapSearchModel>> GetGeoLocateListAsync(string query)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<MapSearchModel>>(QueryHelpers.AddQueryString("map/geolocate", "q", query)));
 
         public Task<EntryModel> CreateEntryAsync(EntryModel model)
             => faultHandler.Wrap(http.PostAsJsonAsync<EntryModel, EntryModel>("entries", model));
@@ -170,5 +177,11 @@ namespace Neptuo.Recollections.Entries
 
         public Task<VersionModel> GetVersionAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<VersionModel>($"entries/version"));
+
+        Task<List<MapSearchModel>> IMapService.GetGeoLocateListAsync(string query)
+            => GetGeoLocateListAsync(query);
+
+        Task<Stream> IMapService.GetTileAsync(string type, int x, int y, int z)
+            => faultHandler.Wrap(http.GetStreamAsync($"maptiles/{type}/256/{z}/{x}/{y}"));
     }
 }

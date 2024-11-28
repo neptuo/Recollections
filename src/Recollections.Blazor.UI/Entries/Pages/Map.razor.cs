@@ -63,6 +63,5 @@ namespace Neptuo.Recollections.Entries.Pages
             var entry = Entries[index];
             Navigator.OpenEntryDetail(entry.Id);
         }
-
     }
 }

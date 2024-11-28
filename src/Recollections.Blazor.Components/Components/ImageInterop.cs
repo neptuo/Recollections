@@ -9,17 +9,15 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public class ImageInterop
+    public class ImageInterop(IJSRuntime jsRuntime)
     {
-        private readonly IJSRuntime jsRuntime;
-
-        public ImageInterop(IJSRuntime jsRuntime)
-        {
-            Ensure.NotNull(jsRuntime, "jsRuntime");
-            this.jsRuntime = jsRuntime;
-        }
+        private ValueTask SetInternalAsync(object element, Stream stream)
+            => jsRuntime.InvokeVoidAsync("ImageSource.Set", element, new DotNetStreamReference(stream));
 
         public ValueTask SetAsync(ElementReference element, Stream stream)
-            => jsRuntime.InvokeVoidAsync("ImageSource.Set", element, new DotNetStreamReference(stream));
+            => SetInternalAsync(element, stream);
+
+        public ValueTask SetAsync(IJSObjectReference element, Stream stream)
+            => SetInternalAsync(element, stream);
     }
 }

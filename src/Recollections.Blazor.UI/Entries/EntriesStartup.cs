@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,9 @@ namespace Neptuo.Recollections.Entries
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<Api>();
+            services
+                .AddTransient<Api>()
+                .AddTransient<IMapService, Api>();
         }
     }
 }

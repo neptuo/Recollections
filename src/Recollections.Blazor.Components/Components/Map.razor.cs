@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop.Implementation;
 using Neptuo.Logging;
+using Neptuo.Recollections.Entries;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,7 +18,13 @@ namespace Neptuo.Recollections.Components
         protected MapInterop Interop { get; set; }
 
         [Inject]
+        protected ImageInterop ImageInterop { get; set; }
+
+        [Inject]
         protected ILog<Map> Log { get; set; }
+
+        [Inject]
+        internal IMapService Service { get; set; }
 
         [Parameter]
         public IList<MapMarkerModel> Markers { get; set; }
@@ -31,9 +40,6 @@ namespace Neptuo.Recollections.Components
 
         [Parameter]
         public bool IsAdditive { get; set; }
-
-        [Parameter]
-        public bool IsResizable { get; set; }
 
         [Parameter]
         public IMapToggleButton PointOfInterest { get; set; }
@@ -126,7 +132,7 @@ namespace Neptuo.Recollections.Components
             SearchResults.Clear();
             if (!String.IsNullOrEmpty(SearchQuery))
             {
-                var results = await Interop.SearchAsync(SearchQuery);
+                var results = await Service.GetGeoLocateListAsync(SearchQuery);
                 SearchResults.AddRange(results);
 
                 Log.Debug($"Search, results: {SearchResults.Count}.");
@@ -141,6 +147,14 @@ namespace Neptuo.Recollections.Components
             SearchModal.Hide();
 
             return ValueTask.CompletedTask;
+        }
+
+        internal async Task LoadTileAsync(JSObjectReference img, int x, int y, int z)
+        {
+            var isPointOfInterest = PointOfInterest?.IsEnabled ?? false;
+            var type = isPointOfInterest ? "outdoor" : "basic";
+            var content = await Service.GetTileAsync(type, x, y, z);
+            await ImageInterop.SetAsync(img, content);
         }
     }
 }
