@@ -11,9 +11,9 @@ namespace Neptuo.Recollections
     public class Json
     {
         public T Deserialize<T>(string json)
-            => JsonSerializer.Deserialize<T>(json);
+            => JsonSerializer.Deserialize<T>(json, JsonSerializerOptions.Web);
 
         public string Serialize(object instance)
-            => JsonSerializer.Serialize(instance);
+            => JsonSerializer.Serialize(instance, JsonSerializerOptions.Web);
     }
 }
