@@ -105,6 +105,112 @@ namespace Neptuo.Recollections.Entries.Pages
                 await LoadStoryAsync();
                 await LoadBeingsAsync();
             }
+
+            // MockUploadData();
+        }
+
+        private void MockUploadData()
+        {
+            UploadProgress.Clear();
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 1",
+                    Status = "pending"
+                },
+                new ImageModel()
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 2",
+                    Status = "current",
+                    Uploaded = 0,
+                    Size = 1200
+                },
+                new ImageModel()
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 2",
+                    Status = "current",
+                    Uploaded = 550,
+                    Size = 1200
+                },
+                new ImageModel()
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 2",
+                    Status = "current",
+                    Uploaded = 1200,
+                    Size = 1200
+                },
+                new ImageModel()
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 3",
+                    Status = "done"
+                },
+                new ImageModel()
+                {
+                    Thumbnail = new ImageSourceModel()
+                    {
+                        Url = "entries/51637391-290a-47a4-9f71-65421d5c73a8/images/fdcd127f-bd8a-4172-842d-ae303ee1ece7/thumbnail"
+                    }
+                }
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 4",
+                    Status = "error",
+                    StatusCode = 500
+                },
+                new ImageModel()
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 5",
+                    Status = "done"
+                },
+                new ImageModel()
+                {
+                    Thumbnail = new ImageSourceModel()
+                    {
+                        Url = "entries/51637391-290a-47a4-9f71-65421d5c73a8/images/fdcd127f-bd8a-4172-842d-ae303ee1ece7/thumbnail/22222"
+                    }
+                }
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 5",
+                    Status = "done"
+                },
+                new ImageModel()
+                {
+                    Thumbnail = new ImageSourceModel()
+                    {
+                        Url = "entries/51637391-290a-47a4-9f71-65421d5c73a8/images/fdcd127f-bd8a-4172-842d-ae303ee1ece7/thumbnail/3333"
+                    }
+                }
+            ));
+            UploadProgress.Add(new UploadImageModel(
+                new FileUploadProgress() 
+                {
+                    Name = "Image 5",
+                    Status = "done",
+                    Uploaded = 1200,
+                    Size = 1200
+                },
+                null
+            ));
         }
 
         private async Task LoadStoryAsync()
@@ -414,7 +520,11 @@ namespace Neptuo.Recollections.Entries.Pages
         public FileUploadProgress Progress { get; }
         public ImageModel Image { get; }
 
-        public bool IsSuccess => Progress.Status == "done" && Image != null;
+        public bool IsSuccess => IsDone && Image != null;
+        public bool IsDone => Progress.Status == "done";
+        public bool IsError => Progress.Status == "error";
+        public bool IsPending => Progress.Status == "pending";
+        public bool IsCurrent => Progress.Status == "current";
 
         public string Description
         {
@@ -422,13 +532,13 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 if (Progress.Status == "done")
                     return "Uploaded";
-                else if (Progress.Status == "current" && Progress.Percentual == 100)
+                else if (IsCurrent && Progress.Percentual == 100)
                     return $"Saving...";
-                else if (Progress.Status == "current")
+                else if (IsCurrent)
                     return $"{Progress.Percentual}%";
-                else if (Progress.Status == "error")
-                    return "Error";
-                else if (Progress.Status == "pending")
+                else if (IsError)
+                    return "Failed to upload";
+                else if (IsPending)
                     return "Waiting";
                 else
                     return "Unknown...";
@@ -439,16 +549,33 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             get
             {
-                if (Progress.Status == "done")
-                    return "text-success";
-                else if (Progress.Status == "current")
+                if (IsCurrent)
                     return Progress.Percentual == 0 ? "loading-circle" : $"text-primary";
-                else if (Progress.Status == "error")
-                    return "text-danger";
-                else if (Progress.Status == "pending")
-                    return "text-secondary";
                 else
                     return String.Empty;
+            }
+        }
+
+        public EntryImagePlaceHolderState PlaceHolderState 
+        {
+            get 
+            {
+                if (IsError)
+                    return EntryImagePlaceHolderState.Error;
+                
+                if (IsPending)
+                    return EntryImagePlaceHolderState.Pending;
+
+                if (IsCurrent && Progress.Percentual > 0 && Progress.Percentual < 100)
+                    return EntryImagePlaceHolderState.Progress;
+
+                if (IsCurrent && Progress.Percentual == 100)
+                    return EntryImagePlaceHolderState.Finished;
+
+                if (IsDone)
+                    return EntryImagePlaceHolderState.Success;
+
+                return EntryImagePlaceHolderState.None;
             }
         }
 

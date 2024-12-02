@@ -44,13 +44,22 @@
                     display: none;
                 }
 
-                &:hover button {
-                    display: inline-block;
-                    z-index: 1;
+                &:hover
+                {
+                    text-decoration: none;
+
+                    button {
+                        display: inline-block;
+                        z-index: 1;
+                    }
                 }
             }
 
-            img {
+            img, .img {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
                 /* Container margin + entry-detail padding */
                 width: calc((100vw - 1.5rem - 48px));
                 height: calc((100vw - 1.5rem - 48px) / 4 * 3);
@@ -85,19 +94,6 @@
 
             img:hover {
                 transform: scale(1.05);
-            }
-        }
-
-
-        .image-placeholder {
-            justify-content: center;
-
-            img {
-                opacity: 0.2;
-            }
-
-            span {
-                position: absolute;
             }
         }
     }

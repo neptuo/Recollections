@@ -39,6 +39,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IFreeLimitsNotifier, FreeLimitsNotifier>(provider => provider.GetRequiredService<FreeLimitsNotifier>());
             services.AddSingleton<TemplateService>();
             services.AddTransient<ThemeInterop>();
+            services.AddSingleton<ExceptionPanelSuppression>();
 
             return services;
         }

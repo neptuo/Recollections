@@ -1,1 +1,4 @@
-﻿<span class="@FullCssClass" @onclick="@OnClick"></span>
+﻿@if (!String.IsNullOrEmpty(Identifier))
+{
+    <span class="@FullCssClass" @onclick="@OnClick"></span>
+}

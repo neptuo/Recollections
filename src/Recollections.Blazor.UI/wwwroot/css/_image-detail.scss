@@ -11,10 +11,15 @@
         display: flex;
         align-items: center;
 
-        img {
+        img, .img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 50%;
+            min-height: 200px;
             max-width: 100%;
             max-height: 100%;
-            display: block;
             margin: 0 auto;
         }
     }

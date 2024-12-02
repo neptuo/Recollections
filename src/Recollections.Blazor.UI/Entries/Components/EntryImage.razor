@@ -1,4 +1,7 @@
-﻿<div class="image @(PlaceHolder != null ? "image-placeholder" : String.Empty)">
+﻿@using Neptuo.Logging
+@using System.Text
+
+<div class="@GetContainerCssClass()">
     @if (OnClick.HasDelegate)
     {
         <a href="@GetLinkUrl()" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
@@ -14,17 +17,77 @@
     {
         @RenderImage()
     }
-
-    @if (PlaceHolder != null)
-    {
-        <span class="@PlaceHolderCssClass">@PlaceHolder</span>
-    }
 </div>
 
 @code
 {
-    protected RenderFragment RenderImage() 
+    string GetContainerCssClass()
     {
-        return @<img @ref="@Element" src="@PlaceholderUrl" class="rounded" />;
+        var result = new StringBuilder();
+        result.Append("image justify-content-center");
+
+        if (!IsLoadingNotFound && Content == null && PlaceHolder == null)
+            result.Append(" placeholder-glow");
+
+        return result.ToString();
+    }
+
+    RenderFragment RenderImage() 
+    {
+        if (Content != null)
+        {
+            return @<img @ref="@Element" class="rounded" />;
+        }
+
+        return @<div class="@GetPlaceHolderContainerCssClass()">
+            @if (IsLoadingNotFound || PlaceHolder != null)
+            {
+                <span class="status text-center @PlaceHolderCssClass">
+                    <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
+
+                    @GetPlaceHolder()
+                </span>
+            }
+        </div>;
+    }
+
+    string GetPlaceHolder() => IsLoadingNotFound ? "Not found" : PlaceHolder;
+
+    string GetPlaceHolderIcon() 
+    {
+        if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
+            return "triangle-exclamation";
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Pending)
+            return "hourglass-start";
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Progress)
+            return "hourglass-half";
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Finished)
+            return "hourglass-end";
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Success)
+            return "check";
+
+        return null;
+    }
+
+    string GetPlaceHolderContainerCssClass()
+    {
+        var result = new StringBuilder();
+        result.Append("img rounded");
+
+        bool isAlert = IsLoadingNotFound || PlaceHolderCssClass != null;
+        if (isAlert)
+            result.Append(" alert m-0");
+
+        if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
+            result.Append(" alert-danger");
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Success)
+            result.Append(" alert-success");
+        else if (PlaceHolderCssClass == null)
+            result.Append(" placeholder");
+        else if (isAlert)
+            result.Append(" alert-secondary");
+
+        return result.ToString();
     }
 }
+

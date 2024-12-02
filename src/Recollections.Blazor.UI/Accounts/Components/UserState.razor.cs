@@ -97,7 +97,7 @@ namespace Neptuo.Recollections.Accounts.Components
 
                     Navigator.OpenTimeline();
                 }
-                catch (AggregateException e) when (e.InnerException is HttpRequestException http && http.StatusCode == HttpStatusCode.NotFound)
+                catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
                 {
                     Console.WriteLine(e.GetType().FullName);
                     Navigator.OpenLogin();

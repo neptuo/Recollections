@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,13 +15,12 @@ namespace Neptuo.Recollections.Entries.Components
 {
     public partial class EntryImage
     {
-        public const string PlaceholderUrl = "/img/thumbnail-placeholder.png";
-
         private bool hasSourceChanged;
         private string url;
         private string previousUrl;
 
         protected Stream Content { get; private set; }
+        protected bool IsLoadingNotFound { get; set; }
 
         [Inject]
         protected Navigator Navigator { get; set; }
@@ -28,6 +30,12 @@ namespace Neptuo.Recollections.Entries.Components
 
         [Inject]
         protected ImageInterop ImageInterop { get; set; }
+
+        [Inject]
+        protected ILog<EntryImage> Log { get; set; }
+
+        [Inject]
+        protected ExceptionPanelSuppression ExceptionPanelSuppression { get; set; }
 
         [Parameter]
         [CascadingParameter]
@@ -47,6 +55,9 @@ namespace Neptuo.Recollections.Entries.Components
 
         [Parameter]
         public string PlaceHolderCssClass { get; set; }
+
+        [Parameter]
+        public EntryImagePlaceHolderState PlaceHolderState { get; set; }
 
         [Parameter]
         public RenderFragment ThumbnailContent { get; set; }
@@ -78,20 +89,42 @@ namespace Neptuo.Recollections.Entries.Components
         {
             await base.OnParametersSetAsync();
 
+            string imageUrl = null;
             if (Image != null)
+                imageUrl = FindImageUrl();
+
+            if (imageUrl != null)
             {
-                string imageUrl = GetImageUrl();
                 if (previousUrl != imageUrl)
                 {
+                    IsLoadingNotFound = false;
                     previousUrl = imageUrl;
                     url = imageUrl;
                     hasSourceChanged = true;
-                    Content = await Api.GetImageDataAsync(imageUrl);
+                    _ = LoadImageDataAsync(imageUrl).ContinueWith(_ => StateHasChanged());
                 }
+
+                return;
             }
-            else 
+            else
             {
                 Content = null;
+            }
+        }
+
+        private async Task LoadImageDataAsync(string imageUrl)
+        {
+            using (ExceptionPanelSuppression.Enter<HttpRequestException>(e => e.StatusCode == HttpStatusCode.NotFound))
+            {
+                try
+                {
+                    Content = await Api.GetImageDataAsync(imageUrl);
+                }
+                catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
+                {
+                    Log.Debug("Exception during image download");
+                    IsLoadingNotFound = true;
+                }
             }
         }
 
@@ -105,16 +138,16 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
-        private string GetImageUrl()
+        private string FindImageUrl()
         {
             switch (ImageType)
             {
                 case ImageType.Original:
-                    return Image.Original.Url;
+                    return Image.Original?.Url;
                 case ImageType.Preview:
-                    return Image.Preview.Url;
+                    return Image.Preview?.Url;
                 case ImageType.Thumbnail:
-                    return Image.Thumbnail.Url;
+                    return Image.Thumbnail?.Url;
                 default:
                     throw Ensure.Exception.NotSupported(ImageType);
             }

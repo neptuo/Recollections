@@ -29,6 +29,9 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected WindowInterop WindowInterop { get; set; }
 
+        [Inject]
+        protected ExceptionPanelSuppression Suppressions { get; set; }
+
         [Parameter]
         public RenderFragment UnauthorizedContent { get; set; }
 
@@ -69,14 +72,15 @@ namespace Neptuo.Recollections.Components
             IsNotFound = false;
             IsUnauthorized = false;
             IsVisible = true;
+
+            if (exception is AggregateException aggregateException)
+                exception = aggregateException.InnerException;
+                
             if (IsSkipped(exception))
             {
                 IsVisible = false;
                 return;
             }
-
-            if (exception is AggregateException aggregateException)
-                exception = aggregateException.InnerException;
 
             Log.Debug(exception.ToString());
 
@@ -150,7 +154,7 @@ namespace Neptuo.Recollections.Components
         private static bool IsHttpResponseStatusCode(HttpRequestException exception, int statusCode)
             => exception.StatusCode == (HttpStatusCode)statusCode || exception.Message.Contains($"Response status code does not indicate success: {statusCode}");
 
-        private static bool IsSkipped(Exception exception)
+        private bool IsSkipped(Exception exception)
         {
             Type exceptionType = exception.GetType();
             foreach (Type type in SkippedExceptions)
@@ -158,6 +162,9 @@ namespace Neptuo.Recollections.Components
                 if (type.IsAssignableFrom(exceptionType))
                     return true;
             }
+
+            if (Suppressions.IsMatched(exception))
+                return true;
 
             return false;
         }
