@@ -47,6 +47,13 @@ namespace Neptuo.Recollections.Entries
             services
                 .Configure<MapOptions>(configuration.GetSection("Map"));
 
+            services
+                .AddHttpClient("mapy.cz", (services, http) => 
+                {
+                    http.DefaultRequestHeaders.Add("X-Mapy-Api-Key", services.GetService<IOptions<MapOptions>>().Value.ApiKey);
+                    http.BaseAddress = new Uri("https://api.mapy.cz/", UriKind.Absolute);
+                });
+
             yarp
                 .AddTransforms(builderContext =>
                 {

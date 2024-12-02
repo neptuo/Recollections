@@ -43,8 +43,8 @@ namespace Neptuo.Recollections.Components
         }
 
         [JSInvokable("MapInterop.MarkerMoved")]
-        public void MarkerMoved(int? index, double latitude, double longitude, double? altitude)
-            => editor.MoveMarker(index, latitude, longitude, altitude);
+        public void MarkerMoved(int? index, double latitude, double longitude)
+            => editor.MoveMarker(index, latitude, longitude);
 
         [JSInvokable("MapInterop.MarkerSelected")]
         public void MarkerSelected(int index) => editor.MarkerSelected?.Invoke(index);

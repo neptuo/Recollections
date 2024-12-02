@@ -181,22 +181,7 @@ function setMarkers(model, markers, isEditable) {
 }
 
 function moveMarker(model, id, latitude, longitude) {
-    getAltitude(latitude, longitude, altitude => {
-        model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude, altitude);
-    });
-}
-
-function getAltitude(latitude, longitude, callback) {
-    fetch(`https://api.mapy.cz/v1/elevation?lang=cs&positions=${longitude}%2C${latitude}&apikey=${ApiKey}`)
-        .then(response => response.json())
-        .then(data => {
-            let altitude = data.items[0].elevation;
-            callback(altitude);
-        })
-        .catch(error => {
-            console.error(`Loading altitude failed: ${error}`);
-            alert("Error loading altitude from API. Please try to move the marker again");
-        });
+    model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude);
 }
 
 export function centerAt(container, latitude, longitude) {

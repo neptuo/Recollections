@@ -20,24 +20,9 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [Authorize]
     [Route("api/map/[action]")]
-    public class MapController : Controller
+    public class MapController(DataContext dataContext, ShareStatusService shareStatus, IConnectionProvider connections, IHttpClientFactory httpFactory) : Controller
     {
-        private readonly DataContext dataContext;
-        private readonly ShareStatusService shareStatus;
-        private readonly IConnectionProvider connections;
-        private readonly MapOptions options;
-
-        public MapController(DataContext dataContext, ShareStatusService shareStatus, IConnectionProvider connections, IOptions<MapOptions> options)
-        {
-            Ensure.NotNull(dataContext, "dataContext");
-            Ensure.NotNull(shareStatus, "shareStatus");
-            Ensure.NotNull(connections, "connections");
-            Ensure.NotNull(options, "options");
-            this.dataContext = dataContext;
-            this.shareStatus = shareStatus;
-            this.connections = connections;
-            this.options = options.Value;
-        }
+        private readonly HttpClient http = httpFactory.CreateClient("mapy.cz");
 
         [HttpGet]
         public async Task<IActionResult> List()
@@ -96,7 +81,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpGet]
         public async Task<IActionResult> GeoLocate([FromQuery(Name = "q")] string query)
         {
-            var response = await http.GetAsync($"https://api.mapy.cz/v1/geocode?apikey={options.ApiKey}&query={UrlEncoder.Default.Encode(query)}&limit=10&type=regional&type=poi");
+            var response = await http.GetAsync($"/v1/geocode?query={UrlEncoder.Default.Encode(query)}&limit=10&type=regional&type=poi");
             response.EnsureSuccessStatusCode();
 
             var items = await response.Content.ReadFromJsonAsync<GeoLocateRoot>();
@@ -113,8 +98,6 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             return Ok(result);
         }
-
-        static readonly HttpClient http = new();
 
         public class GeoLocateRoot
         {

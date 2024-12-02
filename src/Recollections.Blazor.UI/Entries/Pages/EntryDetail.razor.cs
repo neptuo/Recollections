@@ -124,7 +124,8 @@ namespace Neptuo.Recollections.Entries.Pages
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Owner.Id;
 
-            Markers.Clear();
+            var imagesCount = Images?.Count ?? 0;
+            Markers.RemoveRange(imagesCount, Markers.Count - imagesCount);
             foreach (var location in Model.Locations)
             {
                 Markers.Add(new MapMarkerModel
@@ -233,7 +234,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await SaveAsync();
         }
 
-        protected Task SaveLocationsAsync()
+        protected async Task SaveLocationsAsync()
         {
             void Map(MapMarkerModel marker, LocationModel location)
             {
@@ -268,7 +269,10 @@ namespace Neptuo.Recollections.Entries.Pages
                 Log.Debug(Json.Serialize(Model.Locations));
             }
 
-            return SaveAsync();
+            await SaveAsync();
+
+            // Reload data as altitude might have been computed
+            await LoadAsync();
         }
 
         protected async Task SaveAsync()

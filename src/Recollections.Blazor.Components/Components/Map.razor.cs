@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public partial class Map : ComponentBase
+    public partial class Map : ComponentBase, IDisposable
     {
         [Inject]
         protected MapInterop Interop { get; set; }
@@ -94,12 +94,17 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        internal void MoveMarker(int? index, double latitude, double longitude, double? altitude)
+        public void Dispose()
+        {
+            Log.Debug("Dispose");
+        }
+
+        internal void MoveMarker(int? index, double latitude, double longitude)
         {
             if (!IsEditable)
                 return;
 
-            Log.Debug($"MoveMarker: {index?.ToString() ?? "<null>"}, {latitude}, {longitude}, {altitude}");
+            Log.Debug($"MoveMarker: {index?.ToString() ?? "<null>"}, {latitude}, {longitude}");
 
             MapMarkerModel marker;
             if (index == null)
@@ -118,7 +123,6 @@ namespace Neptuo.Recollections.Components
             {
                 marker.Latitude = latitude;
                 marker.Longitude = longitude;
-                marker.Altitude = altitude;
                 MarkersChanged?.Invoke();
             }
         }

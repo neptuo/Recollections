@@ -7,10 +7,14 @@ using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Controllers
@@ -92,7 +96,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpPut("{id}")]
-        public Task<IActionResult> Update(string id, EntryModel model) => RunEntryAsync(id, Permission.CoOwner, async entity => 
+        public Task<IActionResult> Update(string id, EntryModel model, [FromServices] IHttpClientFactory httpFactory) => RunEntryAsync(id, Permission.CoOwner, async entity => 
         {
             if (id != model.Id)
                 return BadRequest();
@@ -100,6 +104,26 @@ namespace Neptuo.Recollections.Entries.Controllers
             string userId = User.FindUserId();
             if (!await freeLimits.CanSetGpsAsync(userId, model.Locations.Count))
                 return PremiumRequired();
+
+            HttpClient http = null;
+            for (int i = 0; i < model.Locations.Count; i++)
+            {
+                var location = model.Locations[i];
+                if (location.Longitude != null && location.Latitude != null && location.Altitude == null)
+                {
+                    if (http == null)
+                        http = httpFactory.CreateClient("mapy.cz");
+
+                    var formatNumber = (double? value) => value.Value.ToString(CultureInfo.InvariantCulture);
+                    var httpResponse = await http.GetAsync($"/v1/elevation?lang=cs&positions={formatNumber(location.Longitude)}%2C{formatNumber(location.Latitude)}");
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        var response = await httpResponse.Content.ReadFromJsonAsync<GeoElevationResponse>();
+                        if (response.Items.Length > 0)
+                            location.Altitude = response.Items[0].Elevation;
+                    }
+                }
+            }
 
             MapModelToEntity(model, entity);
 
@@ -162,6 +186,16 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             if (entity.Locations.Count > model.Locations.Count)
                 entity.Locations.RemoveAt(entity.Locations.Count - 1);
+        }
+
+        public class GeoElevationResponse
+        {
+            public GeoElevation[] Items { get; set; }
+        }
+
+        public class GeoElevation
+        {
+            public float Elevation { get; set; }
         }
     }
 }
