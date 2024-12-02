@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    <VersionPrefix>0.15.1</VersionPrefix>
+    <VersionPrefix>0.16.0</VersionPrefix>
     <PublishDomain>recollections.app</PublishDomain>
     <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
-	<InvariantGlobalization>true</InvariantGlobalization>
+	  <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
