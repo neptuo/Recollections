@@ -27,11 +27,14 @@
                 <InlineLink Icon="comment" Value="@EntryModel.Title" OnClick="@(() => Navigator.OpenEntryDetail(EntryId))" />
             }
             <UserInformation Owner="@Owner" />
-            <div class="gps">
-                <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
-                    <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
-                </MapToggle>
-            </div>
+            @if (UserState.IsAuthenticated)
+            {
+                <div class="gps">
+                    <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
+                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
+                    </MapToggle>
+                </div>
+            }
             <div class="text">
                 <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
             </div>

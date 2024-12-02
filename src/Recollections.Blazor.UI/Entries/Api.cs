@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class Api : IMapService
+    public class Api
     {
         private readonly HttpClient http;
         private readonly ApiSettings settings;
@@ -178,10 +178,7 @@ namespace Neptuo.Recollections.Entries
         public Task<VersionModel> GetVersionAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<VersionModel>($"entries/version"));
 
-        Task<List<MapSearchModel>> IMapService.GetGeoLocateListAsync(string query)
-            => GetGeoLocateListAsync(query);
-
-        Task<Stream> IMapService.GetTileAsync(string type, int x, int y, int z)
+        public Task<Stream> GetTileAsync(string type, int x, int y, int z)
             => faultHandler.Wrap(http.GetStreamAsync($"maptiles/{type}/256/{z}/{x}/{y}"));
     }
 }

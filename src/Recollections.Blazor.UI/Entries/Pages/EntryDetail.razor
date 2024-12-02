@@ -31,11 +31,14 @@
                 <div class="being">
                     <InlineLink Value="@BeingsTitle" PlaceHolder="No beings..." Icon="user-friends" OnClick="@SelectBeing" />
                 </div>
-                <div class="gps">
-                    <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
-                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" PointOfInterest="PoiToggleButton" />
-                    </MapToggle>
-                </div>
+                @if (UserState.IsAuthenticated)
+                {
+                    <div class="gps">
+                        <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
+                            <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" />
+                        </MapToggle>
+                    </div>
+                }
                 <div class="text">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>

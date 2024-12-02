@@ -16,7 +16,7 @@ namespace Neptuo.Recollections.Entries
         {
             services
                 .AddTransient<Api>()
-                .AddTransient<IMapService, Api>();
+                .AddTransient<IMapService, ApiMapService>();
         }
     }
 }

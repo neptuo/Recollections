@@ -15,7 +15,7 @@ namespace Neptuo.Recollections.Components
 {
     public partial class ExceptionPanel : ComponentBase, IExceptionHandler<Exception>, IDisposable
     {
-        public static IReadOnlyCollection<Type> SkippedExceptions { get; } = new[] { typeof(UnauthorizedAccessException) };
+        public static IReadOnlyCollection<Type> SkippedExceptions { get; } = [];
 
         [Inject]
         protected ExceptionHandlerBuilder ExceptionHandlerBuilder { get; set; }
@@ -73,11 +73,17 @@ namespace Neptuo.Recollections.Components
             IsUnauthorized = false;
             IsVisible = true;
 
+            Log.Debug($"Incoming exception '{exception.GetType().FullName}'");
+
             if (exception is AggregateException aggregateException)
+            {
                 exception = aggregateException.InnerException;
+                Log.Debug($"Unwrapped as '{exception.GetType().FullName}'");
+            }
                 
             if (IsSkipped(exception))
             {
+                Log.Debug($"Exception '{exception.GetType().FullName}' skipped");
                 IsVisible = false;
                 return;
             }
@@ -127,6 +133,7 @@ namespace Neptuo.Recollections.Components
             else if (exception is UnauthorizedAccessException)
             {
                 IsUnauthorized = true;
+                Log.Debug("UnauthorizedAccessException");
             }
             else if (exception is FreeLimitsReachedExceptionException)
             {

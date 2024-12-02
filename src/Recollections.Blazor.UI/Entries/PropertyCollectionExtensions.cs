@@ -10,13 +10,13 @@ namespace Neptuo.Recollections.Accounts
 {
     public static class PropertyCollectionExtensions
     {
-        private const string PointOfInterest = "Map.PointOfInterest";
+        private const string MapType = "Map.Type";
 
-        public static Task<bool> IsPointOfInterestAsync(this PropertyCollection properties) 
-            => properties.GetAsync(PointOfInterest, false);
+        public static Task<string> MapTypeAsync(this PropertyCollection properties) 
+            => properties.GetAsync(MapType, "basic");
 
-        public static Task IsPointOfInterestAsync(this PropertyCollection properties, bool isEnabled) 
-            => properties.SetAsync(PointOfInterest, isEnabled);
+        public static Task MapTypeAsync(this PropertyCollection properties, string type) 
+            => properties.SetAsync(MapType, type);
 
         
         private const string Theme = "App.Theme";

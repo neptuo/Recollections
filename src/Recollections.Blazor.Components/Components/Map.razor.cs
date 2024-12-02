@@ -41,9 +41,6 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsAdditive { get; set; }
 
-        [Parameter]
-        public IMapToggleButton PointOfInterest { get; set; }
-
         [CascadingParameter]
         public FormState FormState { get; set; }
 
@@ -54,6 +51,8 @@ namespace Neptuo.Recollections.Components
         protected ElementReference SearchInput { get; set; }
         protected string SearchQuery { get; set; }
         protected List<MapSearchModel> SearchResults { get; } = new List<MapSearchModel>();
+        protected Modal TileTypeModal { get; set; }
+        protected string TileType { get; set; }
 
         internal bool IsEditable => FormState?.IsEditable ?? true;
 
@@ -68,9 +67,7 @@ namespace Neptuo.Recollections.Components
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-
-            if (PointOfInterest != null)
-                await PointOfInterest.InitializeAsync();
+            TileType = await Service.GetTypeAsync();
 
             IsInitialized = true;
         }
@@ -151,10 +148,16 @@ namespace Neptuo.Recollections.Components
 
         internal async Task LoadTileAsync(JSObjectReference img, int x, int y, int z)
         {
-            var isPointOfInterest = PointOfInterest?.IsEnabled ?? false;
-            var type = isPointOfInterest ? "outdoor" : "basic";
-            var content = await Service.GetTileAsync(type, x, y, z);
+            var content = await Service.GetTileAsync(TileType, x, y, z);
             await ImageInterop.SetAsync(img, content);
+        }
+
+        protected async Task SelectTypeAsync(string type)
+        {
+            TileType = type;
+            await Interop.RedrawAsync();
+            await Service.SetTypeAsync(type);
+            TileTypeModal.Hide();
         }
     }
 }

@@ -18,44 +18,52 @@
             }
         }
 
-        @if (PointOfInterest != null)
-        {
-            <button class="btn btn-sm btn-light me-1" title="@PointOfInterest.Title" @onclick="PointOfInterest.OnClickAsync">
-                <Icon Identifier="@PointOfInterest.IconIdentifier" />
-            </button>
-        }
+        <button class="btn btn-sm btn-light me-1" @onclick="(() => TileTypeModal.Show())">
+            <Icon Identifier="layer-group" />
+        </button>
 
         <button class="btn btn-sm btn-light btn-search" title="Search" @onclick="@(() => SearchModal.Show())">
             <Icon Identifier="search" />
         </button>
     </div>
 
-    <Modal @ref="SearchModal">
-        <TitleContent>
-            <Icon Prefix="fas" Identifier="search-location" />
-            Search location
-        </TitleContent>
-        <ChildContent>
-            <div class="row">
-                <div class="col">
-                    <input @ref="SearchInput" @bind="SearchQuery" type="text" class="form-control" placeholder="Street, city, country ..." />
+    <TemplateContent Name="Dialogs">
+        <Modal @ref="SearchModal">
+            <TitleContent>
+                <Icon Prefix="fas" Identifier="search-location" />
+                Search location
+            </TitleContent>
+            <ChildContent>
+                <div class="row">
+                    <div class="col">
+                        <input @ref="SearchInput" @bind="SearchQuery" type="text" class="form-control" placeholder="Street, city, country ..." />
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" @onclick="@(async () => await SearchLocationAsync())">Search</button>
+                    </div>
                 </div>
-                <div class="col-auto">
-                    <button class="btn btn-primary" @onclick="@(async () => await SearchLocationAsync())">Search</button>
-                </div>
-            </div>
 
-            @foreach (var searchResult in SearchResults)
-            {
-                <hr />
-                <p>
-                    <a @onclick="@(async () => await SearchResultSelectedAsync(searchResult))">
-                        <strong>@searchResult.Label</strong>
-                    </a>
-                    <br />
-                    @searchResult.Latitude, @searchResult.Longitude
-                </p>
-            }
-        </ChildContent>
-    </Modal>
+                @foreach (var searchResult in SearchResults)
+                {
+                    <hr />
+                    <p>
+                        <a @onclick="@(async () => await SearchResultSelectedAsync(searchResult))">
+                            <strong>@searchResult.Label</strong>
+                        </a>
+                        <br />
+                        @searchResult.Latitude, @searchResult.Longitude
+                    </p>
+                }
+            </ChildContent>
+        </Modal>
+        <Modal @ref="TileTypeModal" Title="Map type">
+            <ChildContent>
+                <div class="btn-group w-100">
+                    <button class="btn btn-@(TileType == "basic" ? "primary" : "secondary")" @onclick="@(() => SelectTypeAsync("basic"))">Basic</button>
+                    <button class="btn btn-@(TileType == "outdoor" ? "primary" : "secondary")" @onclick="@(() => SelectTypeAsync("outdoor"))">Outdoor</button>
+                    <button class="btn btn-@(TileType == "winter" ? "primary" : "secondary")" @onclick="@(() => SelectTypeAsync("winter"))">Winter</button>
+                </div>
+            </ChildContent>
+        </Modal>
+    </TemplateContent>
 </div>

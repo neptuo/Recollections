@@ -25,11 +25,9 @@ export function initialize(container, interop, markers, isZoomed, isEditable) {
         const map = Leaflet.map($container.find('.map')[0]);
         map.zoomControl.setPosition("topright");
 
-        const layer = null;
-
         model = {
             map: map,
-            layer: layer,
+            tiles: null,
             interop: interop,
             isAdditive: false,
             isEmptyPoint: false,
@@ -55,7 +53,9 @@ export function initialize(container, interop, markers, isZoomed, isEditable) {
                 return img;
             }
         });
-        new BackendLayer().addTo(map);
+        const tiles = new BackendLayer();
+        tiles.addTo(map);
+        model.tiles = tiles;
 
         // Attribution to mapy.cz
         const LogoControl = Leaflet.Control.extend({
@@ -202,4 +202,9 @@ function getAltitude(latitude, longitude, callback) {
 export function centerAt(container, latitude, longitude) {
     const model = $(container).data('map');
     model.map.setView([latitude, longitude], 17);
+}
+
+export function redraw(container) {
+    const model = $(container).data('map');
+    model.tiles.redraw();
 }

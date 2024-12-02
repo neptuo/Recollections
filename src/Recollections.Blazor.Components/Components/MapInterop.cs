@@ -55,5 +55,8 @@ namespace Neptuo.Recollections.Components
 
         public async Task CenterAtAsync(double latitude, double longitude)
             => await module.InvokeVoidAsync("centerAt", editor.Container, latitude, longitude);
+
+        public async Task RedrawAsync()
+            => await module.InvokeVoidAsync("redraw", editor.Container);
     }
 }

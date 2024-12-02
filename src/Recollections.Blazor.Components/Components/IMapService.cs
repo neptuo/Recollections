@@ -9,4 +9,6 @@ public interface IMapService
 {
     Task<List<MapSearchModel>> GetGeoLocateListAsync(string query);
     Task<Stream> GetTileAsync(string type, int x, int y, int z);
+    Task<string> GetTypeAsync();
+    Task SetTypeAsync(string type);
 }
