@@ -47,6 +47,9 @@ dotnet publish --os linux --arch x64 /t:PublishContainer
 
 ### Publish blazor project
 
+- Update release notes
+- Remove aspnetcore hotreload script
+
 From the blazor UI project folder:
 
 ```sh
