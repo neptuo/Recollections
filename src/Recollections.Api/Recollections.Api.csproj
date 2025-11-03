@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    <VersionPrefix>0.16.0</VersionPrefix>
+    <VersionPrefix>0.16.1</VersionPrefix>
     <StartupObject>Neptuo.Recollections.Program</StartupObject>
   </PropertyGroup>
 
