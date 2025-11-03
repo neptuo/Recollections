@@ -99,13 +99,17 @@ namespace Neptuo.Recollections.Sharing
                     .Select(e => new 
                     { 
                         StoryId = e.Story.Id, 
-                        ChapterId = e.Chapter.Id, 
+                        ChapterId = e.Chapter.Id,
+                        UserId = e.Story.UserId ?? e.Chapter.Story.UserId,
                         IsSharingInherited = (e.Story != null ? e.Story.IsSharingInherited : false) || (e.Chapter != null ? e.Chapter.Story.IsSharingInherited : false)
                     })
                     .SingleOrDefaultAsync();
 
                 if (story != null && (story.StoryId != null || story.ChapterId != null))
                 {
+                    if (story.UserId == userId)
+                        return Permission.CoOwner;
+
                     isSharingInherited = story.IsSharingInherited;
                 }
                 else
