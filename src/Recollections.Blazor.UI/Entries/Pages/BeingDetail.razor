@@ -32,7 +32,7 @@
                     </InlineLink>
                 </h2>
                 <UserInformation Owner="@Owner" />
-                <div class="text">
+                <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
 
