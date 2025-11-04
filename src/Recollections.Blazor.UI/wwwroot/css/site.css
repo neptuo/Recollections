@@ -14091,11 +14091,7 @@ input.input-number-noarrows[type=number] {
   }
 }
 
-.entry-detail {
-  margin: 24px 0;
-}
 .entry-detail .images {
-  margin: 24px 0;
   display: grid;
   grid-gap: 24px;
 }
@@ -14260,11 +14256,7 @@ input.input-number-noarrows[type=number] {
   padding: 1rem 3rem;
 }
 
-.image-detail {
-  margin: 24px 0;
-}
 .image-detail .image {
-  margin: 24px 0;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;

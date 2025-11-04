@@ -7,7 +7,7 @@
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
-            <div @ref="Container" class="entry-detail">
+            <div @ref="Container" class="entry-detail my-sm-3">
                 <h2 class="title d-flex text-break">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
@@ -42,7 +42,7 @@
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                <div class="images">
+                <div class="images my-3">
                     @if (Images != null)
                     {
                         <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="(async i => { await Gallery.CloseAsync(); Navigator.OpenImageDetail(EntryId, Images[i].Id); })" />
@@ -77,8 +77,6 @@
                             }
                         }
                     }
-
-                    <div class="clear"></div>
                 </div>
 
                 <ActionPanel>

@@ -6,7 +6,7 @@
     <DocumentTitle Value="@Model.Name" />
 
     <PermissionContainer State="@Permissions">
-        <div class="image-detail">
+        <div class="image-detail my-sm-3">
             <h2 class="title d-flex text-break">
                 <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
                 <DropdownButton CssClass="ms-1">

@@ -9,7 +9,7 @@
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
-            <div class="entry-detail">
+            <div class="entry-detail my-sm-3">
                 <h2 class="d-flex title text-break">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
