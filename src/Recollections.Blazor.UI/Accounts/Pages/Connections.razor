@@ -71,7 +71,7 @@
                             <div class="col d-grid">
                                 @if (connection.State == ConnectionState.Active) 
                                 {
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="@(() => { ShareConnection = connection; ShareModal.Show(); })">
+                                    <button type="button" class="btn btn-secondary btn-sm" @onclick="@(() => { ShareConnection = connection; ShareModal.Show(); })">
                                         <Icon Prefix="fas" Identifier="share-alt" />
                                         Share
                                     </button>
