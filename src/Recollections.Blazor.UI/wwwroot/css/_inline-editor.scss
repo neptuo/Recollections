@@ -170,3 +170,7 @@ input.input-number-noarrows
         -moz-appearance: textfield;
     }
 }
+
+.value-placeholder {
+    color: $placeholder-color;
+}
