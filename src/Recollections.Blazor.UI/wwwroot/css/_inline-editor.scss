@@ -68,7 +68,7 @@
         .fa,
         .far,
         .fas {
-            width: 24px;
+            width: $uni-icon-width;
             text-align: center;
         }
     }
@@ -77,18 +77,11 @@
         cursor: pointer;
     }
 
-    .inline-editor-value {
-        position: relative;
-    }
-
-    .oi-pencil, .fa-pen {
-        display: none;
-    }
-
     &.inline-editable:hover {
         .fa::before,
         .fas::before,
         .far::before {
+            // Swap to pen icon on hover
             content: "\f304";
         }
     }

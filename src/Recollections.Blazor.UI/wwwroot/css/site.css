@@ -13667,12 +13667,6 @@ a.bg-salmon {
 .inline-editor-viewmode.inline-editable a.inline-editor-value {
   cursor: pointer;
 }
-.inline-editor-viewmode .inline-editor-value {
-  position: relative;
-}
-.inline-editor-viewmode .oi-pencil, .inline-editor-viewmode .fa-pen {
-  display: none;
-}
 .inline-editor-viewmode.inline-editable:hover .fa::before,
 .inline-editor-viewmode.inline-editable:hover .fas::before,
 .inline-editor-viewmode.inline-editable:hover .far::before {
