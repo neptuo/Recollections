@@ -1,5 +1,4 @@
 ﻿.entry-detail {
-    padding: 24px;
     margin: 24px 0;
 
     .text {
@@ -60,13 +59,18 @@
                 align-items: center;
                 justify-content: center;
 
-                /* Container margin + entry-detail padding */
-                width: calc((100vw - 1.5rem - 48px));
-                height: calc((100vw - 1.5rem - 48px) / 4 * 3);
+                /* Container margin */
+                width: calc((100vw - 1.5rem));
+                height: calc((100vw - 1.5rem) / 4 * 3);
 
                 @media (min-width:520px) {
                     width: 226px;
                     height: 169.5px;
+                    transition: transform 0.5s;
+                    
+                    &:hover {
+                        transform: scale(1.05);
+                    }
                 }
 
                 @media (min-width:768px) {
@@ -88,12 +92,6 @@
                     width: 236px;
                     height: 177px;
                 }
-
-                transition: transform 0.5s;
-            }
-
-            img:hover {
-                transform: scale(1.05);
             }
         }
     }

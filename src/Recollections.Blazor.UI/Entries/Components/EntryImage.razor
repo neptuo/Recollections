@@ -4,7 +4,7 @@
 <div class="@GetContainerCssClass()">
     @if (OnClick.HasDelegate)
     {
-        <a href="@GetLinkUrl()" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
+        <a href="@GetLinkUrl()" class="position-relative" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
             @if (ImageType == Models.ImageType.Thumbnail) 
             {
                 @ThumbnailContent

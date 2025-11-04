@@ -14088,7 +14088,6 @@ input.input-number-noarrows[type=number] {
 }
 
 .entry-detail {
-  padding: 24px;
   margin: 24px 0;
 }
 .entry-detail .text {
@@ -14156,18 +14155,23 @@ input.input-number-noarrows[type=number] {
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  /* Container margin + entry-detail padding */
-  width: calc(100vw - 1.5rem - 48px);
-  height: calc((100vw - 1.5rem - 48px) / 4 * 3);
-  -webkit-transition: -webkit-transform 0.5s;
-  transition: -webkit-transform 0.5s;
-  transition: transform 0.5s;
-  transition: transform 0.5s, -webkit-transform 0.5s;
+  /* Container margin */
+  width: calc(100vw - 1.5rem);
+  height: calc((100vw - 1.5rem) / 4 * 3);
 }
 @media (min-width: 520px) {
   .entry-detail .images .image img, .entry-detail .images .image .img {
     width: 226px;
     height: 169.5px;
+    -webkit-transition: -webkit-transform 0.5s;
+    transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+    transition: transform 0.5s, -webkit-transform 0.5s;
+  }
+  .entry-detail .images .image img:hover, .entry-detail .images .image .img:hover {
+    -webkit-transform: scale(1.05);
+        -ms-transform: scale(1.05);
+            transform: scale(1.05);
   }
 }
 @media (min-width: 768px) {
@@ -14193,11 +14197,6 @@ input.input-number-noarrows[type=number] {
     width: 236px;
     height: 177px;
   }
-}
-.entry-detail .images .image img:hover {
-  -webkit-transform: scale(1.05);
-      -ms-transform: scale(1.05);
-          transform: scale(1.05);
 }
 .entry-detail .value-placeholder {
   color: #aaaaaa;
@@ -14470,4 +14469,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
