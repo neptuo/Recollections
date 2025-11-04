@@ -1,7 +1,7 @@
 ﻿@inherits InlineEdit<DateTime>
 
 <div class="inline-editor @GetDateCssClass() @GetModeCssClass()">
-    <a class="inline-editor-value" @onclick="@(() => { if (IsEditable) DatePicker.Show(); })">
+    <a class="inline-editor-value d-inline-block py-1" @onclick="@(() => { if (IsEditable) DatePicker.Show(); })">
         <Icon Identifier="pen" />
 
         <Icon Identifier="calendar-alt" />

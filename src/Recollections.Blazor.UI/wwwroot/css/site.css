@@ -13658,6 +13658,12 @@ a.bg-salmon {
 .inline-editor-viewmode a.inline-editor-value:hover {
   text-decoration: none;
 }
+.inline-editor-viewmode a.inline-editor-value .fa,
+.inline-editor-viewmode a.inline-editor-value .far,
+.inline-editor-viewmode a.inline-editor-value .fas {
+  width: 24px;
+  text-align: center;
+}
 .inline-editor-viewmode.inline-editable a.inline-editor-value {
   cursor: pointer;
 }
