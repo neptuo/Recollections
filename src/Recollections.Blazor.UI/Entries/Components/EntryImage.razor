@@ -4,7 +4,7 @@
 <div class="@GetContainerCssClass()">
     @if (OnClick.HasDelegate)
     {
-        <a href="@GetLinkUrl()" class="position-relative" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
+        <a href="@GetLinkUrl()" class="position-relative w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
             @if (ImageType == Models.ImageType.Thumbnail) 
             {
                 @ThumbnailContent
@@ -36,7 +36,7 @@
     {
         if (Content != null)
         {
-            return @<img @ref="@Element" class="rounded" />;
+            return @<img @ref="@Element" class="rounded ratio ratio-4x3" />;
         }
 
         return @<div class="@GetPlaceHolderContainerCssClass()">

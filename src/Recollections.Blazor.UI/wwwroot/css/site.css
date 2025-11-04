@@ -14093,13 +14093,8 @@ input.input-number-noarrows[type=number] {
 
 .entry-detail .images {
   display: grid;
-  grid-gap: 24px;
-}
-@media (min-width: 520px) {
-  .entry-detail .images {
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 16px;
-  }
+  grid-gap: 16px;
+  grid-template-columns: 1fr 1fr;
 }
 @media (min-width: 768px) {
   .entry-detail .images {
@@ -14125,10 +14120,6 @@ input.input-number-noarrows[type=number] {
       -ms-flex-align: center;
           align-items: center;
 }
-.entry-detail .images .image a {
-  display: block;
-  margin: 0 auto;
-}
 .entry-detail .images .image a button {
   position: absolute;
   right: 6px;
@@ -14142,24 +14133,8 @@ input.input-number-noarrows[type=number] {
   display: inline-block;
   z-index: 1;
 }
-.entry-detail .images .image img, .entry-detail .images .image .img {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  /* Container margin */
-  width: calc(100vw - 1.5rem);
-  height: calc((100vw - 1.5rem) / 4 * 3);
-}
 @media (min-width: 520px) {
   .entry-detail .images .image img, .entry-detail .images .image .img {
-    width: 226px;
-    height: 169.5px;
     -webkit-transition: -webkit-transform 0.5s;
     transition: -webkit-transform 0.5s;
     transition: transform 0.5s;
@@ -14169,30 +14144,6 @@ input.input-number-noarrows[type=number] {
     -webkit-transform: scale(1.05);
         -ms-transform: scale(1.05);
             transform: scale(1.05);
-  }
-}
-@media (min-width: 768px) {
-  .entry-detail .images .image img, .entry-detail .images .image .img {
-    width: 205.33px;
-    height: 154px;
-  }
-}
-@media (min-width: 992px) {
-  .entry-detail .images .image img, .entry-detail .images .image .img {
-    width: 210px;
-    height: 157.5px;
-  }
-}
-@media (min-width: 1200px) {
-  .entry-detail .images .image img, .entry-detail .images .image .img {
-    width: 200px;
-    height: 160px;
-  }
-}
-@media (min-width: 1400px) {
-  .entry-detail .images .image img, .entry-detail .images .image .img {
-    width: 236px;
-    height: 177px;
   }
 }
 
