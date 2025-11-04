@@ -8,7 +8,7 @@
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div @ref="Container" class="entry-detail">
-                <h2 class="title d-flex">
+                <h2 class="title d-flex text-break">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Owner">
@@ -39,7 +39,7 @@
                         </MapToggle>
                     </div>
                 }
-                <div class="text">
+                <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
                 <div class="images">

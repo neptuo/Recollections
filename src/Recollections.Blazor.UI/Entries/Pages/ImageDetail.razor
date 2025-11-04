@@ -7,7 +7,7 @@
 
     <PermissionContainer State="@Permissions">
         <div class="image-detail">
-            <h2 class="title d-flex">
+            <h2 class="title d-flex text-break">
                 <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
                 <DropdownButton CssClass="ms-1">
                     <DropdownItem Icon="cloud-download" Text="Download Original" OnClick="DownloadOriginalAsync" Title="Download Original Image" />
@@ -35,7 +35,7 @@
                     </MapToggle>
                 </div>
             }
-            <div class="text">
+            <div class="my-3">
                 <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
             </div>
             <EntryImage EntryId="@EntryId" Image="@Model" ImageType="@ImageType.Preview" />
