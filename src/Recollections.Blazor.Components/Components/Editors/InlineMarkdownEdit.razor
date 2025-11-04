@@ -9,9 +9,7 @@
     }
     else
     {
-        <a class="inline-editor-value" @onclick="@OnEditAsync">
-            <Icon Identifier="pen" />
-
+        <a class="inline-editor-value d-inline-block py-1" @onclick="@OnEditAsync">
             @if (String.IsNullOrEmpty(Value))
             {
                 <span class="inline-editor-content value-placeholder">@(PlaceHolder ?? "No value...")</span>

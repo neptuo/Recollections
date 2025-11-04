@@ -2,8 +2,6 @@
 
 <div class="inline-editor @GetDateCssClass() @GetModeCssClass()">
     <a class="inline-editor-value d-inline-block py-1" @onclick="@(() => { if (IsEditable) DatePicker.Show(); })">
-        <Icon Identifier="pen" />
-
         <Icon Identifier="calendar-alt" />
         @if (Value == DateTime.MinValue)
         {

@@ -83,18 +83,13 @@
 
     .oi-pencil, .fa-pen {
         display: none;
-        color: $placeholder-color;
-        font-size: 16px;
-        left: -24px;
-        position: absolute;
-        top: 2px;
     }
 
-    &.inline-editable {
-        &:hover, &:active {
-            .oi-pencil, .fa-pen {
-                display: inline-block;
-            }
+    &.inline-editable:hover {
+        .fa::before,
+        .fas::before,
+        .far::before {
+            content: "\f304";
         }
     }
 }

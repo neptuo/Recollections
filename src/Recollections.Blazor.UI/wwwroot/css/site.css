@@ -13672,14 +13672,11 @@ a.bg-salmon {
 }
 .inline-editor-viewmode .oi-pencil, .inline-editor-viewmode .fa-pen {
   display: none;
-  color: #aaaaaa;
-  font-size: 16px;
-  left: -24px;
-  position: absolute;
-  top: 2px;
 }
-.inline-editor-viewmode.inline-editable:hover .oi-pencil, .inline-editor-viewmode.inline-editable:hover .fa-pen, .inline-editor-viewmode.inline-editable:active .oi-pencil, .inline-editor-viewmode.inline-editable:active .fa-pen {
-  display: inline-block;
+.inline-editor-viewmode.inline-editable:hover .fa::before,
+.inline-editor-viewmode.inline-editable:hover .fas::before,
+.inline-editor-viewmode.inline-editable:hover .far::before {
+  content: "\f304";
 }
 
 h2 .inline-editor-viewmode .fa, .h2 .inline-editor-viewmode .fa {
