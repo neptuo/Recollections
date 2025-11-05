@@ -13395,6 +13395,36 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+[data-bs-theme=dark] .EasyMDEContainer .CodeMirror {
+  color: var(--bs-body-color);
+  border-color: #333;
+  background-color: var(--bs-body-bg);
+}
+[data-bs-theme=dark] .EasyMDEContainer .cm-s-easymde .CodeMirror-cursor {
+  border-color: var(--bs-body-color);
+}
+[data-bs-theme=dark] .EasyMDEContainer .editor-toolbar > .active, [data-bs-theme=dark] .editor-toolbar > button:hover, [data-bs-theme=dark] .editor-preview pre, [data-bs-theme=dark] .cm-s-easymde .cm-comment {
+  background-color: var(--bs-body-bg);
+}
+[data-bs-theme=dark] .EasyMDEContainer .CodeMirror-fullscreen {
+  background: var(--bs-body-bg);
+}
+[data-bs-theme=dark] .editor-toolbar {
+  border-top: 1px solid #333;
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+}
+[data-bs-theme=dark] .editor-toolbar i.separator {
+  border-left: 1px solid #333;
+  border-right: 1px solid #333;
+}
+[data-bs-theme=dark] .editor-toolbar.fullscreen {
+  background: var(--bs-body-bg);
+}
+[data-bs-theme=dark] .editor-preview {
+  background: var(--bs-body-bg);
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }

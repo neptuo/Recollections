@@ -10,6 +10,7 @@ $theme-colors: map-merge($theme-colors, ( "primary": $primary ));
 @import "../lib/bootstrap/scss/bootstrap";
 @import "../lib/fontawesome/css/all.css";
 @import "../lib/easymde/dist/easymde.min.css";
+@import "_easymde.dark.scss";
 
 ::-webkit-scrollbar {
     width: 8px;
