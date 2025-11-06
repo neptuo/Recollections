@@ -13395,6 +13395,14 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.editor-toolbar {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
 [data-bs-theme=dark] .EasyMDEContainer .CodeMirror {
   color: var(--bs-body-color);
   border-color: #333;
@@ -14430,4 +14438,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

@@ -186,20 +186,20 @@ window.InlineMarkdownEdit = {
                 "quote",
                 "horizontal-rule",
                 {
-                    name: "cancel",
-                    className: "fa fa-times float-end",
-                    title: "Close Editor",
-                    action: function (editor) {
-                        interop.invokeMethodAsync("Markdown.OnCancel");
-                    }
-                },
-                {
                     name: "save",
-                    className: "fa fa-check float-end",
+                    className: "fa fa-check ms-auto",
                     title: "Save",
                     action: function (editor) {
                         var value = editor.value();
                         interop.invokeMethodAsync("Markdown.OnSave", value);
+                    }
+                },
+                {
+                    name: "cancel",
+                    className: "fa fa-times",
+                    title: "Close Editor",
+                    action: function (editor) {
+                        interop.invokeMethodAsync("Markdown.OnCancel");
                     }
                 }
             ],
