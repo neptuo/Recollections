@@ -13493,7 +13493,7 @@ footer.navbar a:hover {
 
 .offcanvas-bottom-menu {
   --bs-offcanvas-height: 420px;
-  bottom: 55px;
+  bottom: 54px;
 }
 
 blockquote {
@@ -14430,4 +14430,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
