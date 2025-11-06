@@ -42,11 +42,13 @@
         return @<div class="@GetPlaceHolderContainerCssClass()">
             @if (IsLoadingNotFound || PlaceHolder != null)
             {
-                <span class="status text-center @PlaceHolderCssClass">
-                    <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
+                <div class="d-flex justify-content-center align-items-center">
+                    <span class="status text-center @PlaceHolderCssClass">
+                        <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
 
-                    @GetPlaceHolder()
-                </span>
+                        @GetPlaceHolder()
+                    </span>
+                </div>
             }
         </div>;
     }
@@ -72,7 +74,7 @@
     string GetPlaceHolderContainerCssClass()
     {
         var result = new StringBuilder();
-        result.Append("img rounded");
+        result.Append($"img rounded {(ImageType == Models.ImageType.Thumbnail ? "ratio ratio-4x3" : "")}");
 
         bool isAlert = IsLoadingNotFound || PlaceHolderCssClass != null;
         if (isAlert)
