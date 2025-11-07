@@ -38,7 +38,7 @@ namespace Neptuo.Recollections.Components
 
             await EnsureModuleAsync();
             await module.InvokeVoidAsync(
-                "initialize",
+                "bindForm",
                 DotNetObjectReference.Create(this),
                 editor.FormElement,
                 bearerToken,
