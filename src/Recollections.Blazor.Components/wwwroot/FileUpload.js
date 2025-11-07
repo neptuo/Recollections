@@ -25,7 +25,6 @@ async function storeFilesInDB(files, actionUrl, entityType, entityId) {
     const transaction = db.transaction([STORE_NAME], 'readwrite');
     const store = transaction.objectStore(STORE_NAME);
     
-    const fileDataArray = [];
     const promises = Array.from(files).map(file => {
         return new Promise((resolve, reject) => {
             const fileData = {
@@ -36,16 +35,16 @@ async function storeFilesInDB(files, actionUrl, entityType, entityId) {
                 timestamp: Date.now()
             };
             
-            fileDataArray.push(fileData);
-            
             const request = store.add(fileData);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                fileData.id = request.result;
+                resolve(fileData);
+            };
             request.onerror = () => reject(request.error);
         });
     });
     
-    const ids = await Promise.all(promises);
-    return { ids, fileDataArray };
+    return Promise.all(promises);
 }
 
 async function getStoredFiles() {
@@ -161,70 +160,53 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
         }
     }
 
-    async function addFilesToQueue(items, skipIndexedDB = false) {
-        if (!skipIndexedDB) {
-            try {
-                // Store files in IndexedDB first
-                const { ids, fileDataArray } = await storeFilesInDB(items, form[0].action, entityType, entityId);
-                storedFileIds.push(...ids);
-                storedFileData.push(...fileDataArray);
-                
-                for (var i = 0; i < items.length; i++) {
-                    var file = items[i];
-                    files.push(file);
-                    progress.push({
-                        status: "pending",
-                        statusCode: 0,
-                        name: file.name,
-                        responseText: null,
-                        uploaded: 0,
-                        size: file.size
-                    });
-                }
-
-                if (uploadIndex == -1) {
-                    uploadStep();
-                }
-            } catch (error) {
-                console.error('Failed to store files in IndexedDB:', error);
-                // Fallback to original behavior
-                for (var i = 0; i < items.length; i++) {
-                    var file = items[i];
-                    files.push(file);
-                    progress.push({
-                        status: "pending",
-                        statusCode: 0,
-                        name: file.name,
-                        responseText: null,
-                        uploaded: 0,
-                        size: file.size
-                    });
-                }
-
-                if (uploadIndex == -1) {
-                    uploadStep();
-                }
-            }
-        } else {
-            // Skip IndexedDB storage and use items as stored file data
+    async function storeAndQueueFiles(items) {
+        try {
+            // Store files in IndexedDB first
+            const storedItems = await storeFilesInDB(items, form[0].action, entityType, entityId);
+            
+            addStoredFilesToQueue(storedItems);
+        } catch (error) {
+            console.error('Failed to store files in IndexedDB:', error);
+            // Fallback to original behavior
             for (var i = 0; i < items.length; i++) {
-                var item = items[i];
-                storedFileIds.push(item.id);
-                storedFileData.push(item);
-                files.push(item.file);
+                var file = items[i];
+                files.push(file);
                 progress.push({
                     status: "pending",
                     statusCode: 0,
-                    name: item.file.name,
+                    name: file.name,
                     responseText: null,
                     uploaded: 0,
-                    size: item.file.size
+                    size: file.size
                 });
             }
 
             if (uploadIndex == -1) {
                 uploadStep();
             }
+        }
+    }
+
+    function addStoredFilesToQueue(storedItems) {
+        // Add stored files from IndexedDB to queue
+        for (var i = 0; i < storedItems.length; i++) {
+            var item = storedItems[i];
+            storedFileIds.push(item.id);
+            storedFileData.push(item);
+            files.push(item.file);
+            progress.push({
+                status: "pending",
+                statusCode: 0,
+                name: item.file.name,
+                responseText: null,
+                uploaded: 0,
+                size: item.file.size
+            });
+        }
+
+        if (uploadIndex == -1) {
+            uploadStep();
         }
     }
 
@@ -238,7 +220,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             
             if (filteredFiles.length > 0) {
                 if (confirm(`You have ${filteredFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
-                    await addFilesToQueue(filteredFiles, true);
+                    addStoredFilesToQueue(filteredFiles);
                 } else {
                     await Promise.all(filteredFiles.map(f => removeFileFromDB(f.id)));
                 }
@@ -256,7 +238,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
         e.preventDefault();
     });
     input.change(function () {
-        addFilesToQueue(input[0].files);
+        storeAndQueueFiles(input[0].files);
     });
 
     if (dragAndDropTarget) {
@@ -279,7 +261,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             e.preventDefault();
         });
         dragAndDropTarget.addEventListener('drop', function (e) {
-            addFilesToQueue(e.dataTransfer.files);
+            storeAndQueueFiles(e.dataTransfer.files);
             e.preventDefault();
         });
     }
