@@ -100,6 +100,182 @@ async function getStoredFilesByEntity(entityType, entityId) {
     });
 }
 
+class FileUploadState {
+    constructor(interop, bearerToken, entityType, entityId) {
+        this.interop = interop;
+        this.bearerToken = bearerToken;
+        this.entityType = entityType;
+        this.entityId = entityId;
+        
+        this.uploadIndex = -1;
+        this.progress = [];
+        this.files = [];
+        this.storedFileIds = [];
+        this.storedFileData = [];
+    }
+
+    uploadError(statusCode, message) {
+        this.progress[this.uploadIndex].status = "error";
+        this.progress[this.uploadIndex].statusCode = statusCode;
+        this.progress[this.uploadIndex].responseText = message;
+        this.raiseProgress();
+        this.uploadStep(null);
+    }
+
+    raiseProgress() {
+        this.interop.invokeMethodAsync("FileUpload.OnCompleted", this.progress);
+    }
+
+    resetForm() {
+        this.uploadIndex = -1;
+        this.progress = [];
+        this.files = [];
+        this.storedFileIds = [];
+        this.storedFileData = [];
+    }
+
+    uploadCallback(imagesCount, imagesCompleted, currentSize, currentUploaded, responseText) {
+        for (var i = 0; i < imagesCount; i++) {
+            if (this.progress[i].status != "done" && this.progress[i].status != "error") {
+                if (imagesCompleted > i) {
+                    this.progress[i].status = "done";
+                    this.progress[i].statusCode = 200;
+                }
+
+                if (imagesCompleted == i) {
+                    this.progress[i].status = "current";
+                    this.progress[i].uploaded = currentUploaded;
+                } else if (imagesCompleted - 1 == i) {
+                    if (responseText != null) {
+                        this.progress[i].responseText = responseText;
+                    }
+                }
+            }
+        }
+
+        this.raiseProgress();
+    }
+
+    uploadProgress(loaded, total) {
+        this.uploadCallback(this.files.length, this.uploadIndex, total, loaded, null);
+    }
+
+    uploadStep(responseText) {
+        this.uploadIndex++;
+        this.uploadCallback(this.files.length, this.uploadIndex, 0, 0, responseText);
+
+        if (this.files.length > this.uploadIndex) {
+            const fileData = this.storedFileData[this.uploadIndex];
+            this.uploadFile(
+                this.files[this.uploadIndex],
+                fileData.actionUrl,
+                this.bearerToken,
+                (response) => {
+                    // Remove successfully uploaded file from IndexedDB
+                    if (this.storedFileIds[this.uploadIndex]) {
+                        removeFileFromDB(this.storedFileIds[this.uploadIndex]);
+                    }
+                    this.uploadStep(response);
+                },
+                (statusCode, message) => this.uploadError(statusCode, message),
+                (loaded, total) => this.uploadProgress(loaded, total)
+            );
+        } else {
+            this.resetForm();
+        }
+    }
+
+    static uploadFile(file, url, bearerToken, onCompleted, onError, onProgress) {
+        var formData = new FormData();
+        formData.append("file", file, file.customName || file.name);
+
+        var currentRequest = new XMLHttpRequest();
+        currentRequest.onreadystatechange = function (e) {
+            var request = e.target;
+
+            if (request.readyState == XMLHttpRequest.DONE) {
+                if (request.status == 200) {
+                    var responseText = currentRequest.responseText;
+                    onCompleted(responseText);
+                }
+                else if (request.status != 0 && onError != null) {
+                    onError(currentRequest.status, currentRequest.statusText);
+                }
+            }
+        };
+
+        if (onError != null) {
+            currentRequest.onerror = function (e) {
+                onError(500, e.message);
+            };
+        }
+
+        if (onProgress != null) {
+            currentRequest.upload.onprogress = function (e) {
+                onProgress(e.loaded, e.total);
+            };
+        }
+
+        currentRequest.open("POST", url);
+
+        if (bearerToken != null) {
+            currentRequest.setRequestHeader("Authorization", "Bearer " + bearerToken);
+        }
+
+        currentRequest.send(formData);
+    }
+
+    async storeAndQueueFiles(items, url) {
+        try {
+            // Store files in IndexedDB first
+            const storedItems = await storeFilesInDB(items, url, this.entityType, this.entityId);
+            
+            this.addStoredFilesToQueue(storedItems);
+        } catch (error) {
+            console.error('Failed to store files in IndexedDB:', error);
+            // Fallback to original behavior
+            for (var i = 0; i < items.length; i++) {
+                var file = items[i];
+                this.files.push(file);
+                this.progress.push({
+                    status: "pending",
+                    statusCode: 0,
+                    name: file.name,
+                    responseText: null,
+                    uploaded: 0,
+                    size: file.size
+                });
+            }
+
+            if (this.uploadIndex == -1) {
+                this.uploadStep();
+            }
+        }
+    }
+
+    addStoredFilesToQueue(storedItems) {
+        // Add stored files from IndexedDB to queue
+        for (var i = 0; i < storedItems.length; i++) {
+            var item = storedItems[i];
+            this.storedFileIds.push(item.id);
+            this.storedFileData.push(item);
+            this.files.push(item.file);
+            this.progress.push({
+                status: "pending",
+                statusCode: 0,
+                name: item.file.name,
+                responseText: null,
+                uploaded: 0,
+                size: item.file.size
+            });
+        }
+
+        if (this.uploadIndex == -1) {
+            this.uploadStep();
+        }
+    }
+}
+
 const data = new Map();
 
 export function initialize(interop, form, bearerToken, dragAndDropTarget, entityType, entityId) {
@@ -113,137 +289,8 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
 
     var input = form.find("input[type=file]");
 
-    const state = {
-        uploadIndex: -1,
-        progress: [],
-        files: [],
-        storedFileIds: [],
-        storedFileData: [],
-    }
-    data[entityType + "_" + entityId] = state;
-
-    function uploadError(statusCode, message) {
-        state.progress[state.uploadIndex].status = "error";
-        state.progress[state.uploadIndex].statusCode = statusCode;
-        state.progress[state.uploadIndex].responseText = message;
-        raiseProgress();
-        uploadStep(null);
-    }
-
-    function raiseProgress() {
-        interop.invokeMethodAsync("FileUpload.OnCompleted", state.progress);
-    }
-
-    function resetForm() {
-        state.uploadIndex = -1;
-        state.progress = [];
-        state.files = [];
-        state.storedFileIds = [];
-        state.storedFileData = [];
-        form[0].reset();
-    }
-
-    function uploadCallback(imagesCount, imagesCompleted, currentSize, currentUploaded, responseText) {
-        for (var i = 0; i < imagesCount; i++) {
-            if (state.progress[i].status != "done" && state.progress[i].status != "error") {
-                if (imagesCompleted > i) {
-                    state.progress[i].status = "done";
-                    state.progress[i].statusCode = 200;
-                }
-
-                if (imagesCompleted == i) {
-                    state.progress[i].status = "current";
-                    state.progress[i].uploaded = currentUploaded;
-                } else if (imagesCompleted - 1 == i) {
-                    if (responseText != null) {
-                        state.progress[i].responseText = responseText;
-                    }
-                }
-            }
-        }
-
-        raiseProgress();
-    }
-
-    function uploadProgress(loaded, total) {
-        uploadCallback(input[0].files.length, state.uploadIndex, total, loaded, null);
-    }
-
-    function uploadStep(responseText) {
-        state.uploadIndex++;
-        uploadCallback(state.files.length, state.uploadIndex, 0, 0, responseText);
-
-        if (state.files.length > state.uploadIndex) {
-            const fileData = state.storedFileData[state.uploadIndex];
-            uploadFile(
-                state.files[state.uploadIndex],
-                fileData.actionUrl,
-                bearerToken,
-                (response) => {
-                    // Remove successfully uploaded file from IndexedDB
-                    if (state.storedFileIds[state.uploadIndex]) {
-                        removeFileFromDB(state.storedFileIds[state.uploadIndex]);
-                    }
-                    uploadStep(response);
-                },
-                uploadError,
-                uploadProgress
-            );
-        } else {
-            resetForm();
-        }
-    }
-
-    async function storeAndQueueFiles(items) {
-        try {
-            // Store files in IndexedDB first
-            const storedItems = await storeFilesInDB(items, form[0].action, entityType, entityId);
-            
-            addStoredFilesToQueue(storedItems);
-        } catch (error) {
-            console.error('Failed to store files in IndexedDB:', error);
-            // Fallback to original behavior
-            for (var i = 0; i < items.length; i++) {
-                var file = items[i];
-                state.files.push(file);
-                state.progress.push({
-                    status: "pending",
-                    statusCode: 0,
-                    name: file.name,
-                    responseText: null,
-                    uploaded: 0,
-                    size: file.size
-                });
-            }
-
-            if (state.uploadIndex == -1) {
-                uploadStep();
-            }
-        }
-    }
-
-    function addStoredFilesToQueue(storedItems) {
-        // Add stored files from IndexedDB to queue
-        for (var i = 0; i < storedItems.length; i++) {
-            var item = storedItems[i];
-            state.storedFileIds.push(item.id);
-            state.storedFileData.push(item);
-            state.files.push(item.file);
-            state.progress.push({
-                status: "pending",
-                statusCode: 0,
-                name: item.file.name,
-                responseText: null,
-                uploaded: 0,
-                size: item.file.size
-            });
-        }
-
-        if (state.uploadIndex == -1) {
-            uploadStep();
-        }
-    }
-    state.addStoredFilesToQueue = addStoredFilesToQueue;
+    const state = new FileUploadState(interop, bearerToken, entityType, entityId);
+    data.set(entityType + "_" + entityId, state);
 
     // Initialize by checking for existing files in IndexedDB
     async function initializeStoredFiles() {
@@ -264,8 +311,9 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
         input.click();
         e.preventDefault();
     });
-    input.change(function () {
-        storeAndQueueFiles(input[0].files);
+    input.change(async () => {
+        await state.storeAndQueueFiles(input[0].files, form[0].action);
+        form[0].reset();
     });
 
     if (dragAndDropTarget) {
@@ -288,7 +336,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             e.preventDefault();
         });
         dragAndDropTarget.addEventListener('drop', function (e) {
-            storeAndQueueFiles(e.dataTransfer.files);
+            state.storeAndQueueFiles(e.dataTransfer.files, form[0].action);
             e.preventDefault();
         });
     }
@@ -297,7 +345,10 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
 export async function retry(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
-        data[entityType + "_" + entityId].addStoredFilesToQueue(storedFiles);
+        const state = data.get(entityType + "_" + entityId);
+        if (state) {
+            state.addStoredFilesToQueue(storedFiles);
+        }
     }
 }
 
@@ -314,44 +365,4 @@ export function deleteFile(id) {
 
 export function destroy() {
 
-}
-
-function uploadFile(file, url, bearerToken, onCompleted, onError, onProgress) {
-    var formData = new FormData();
-    formData.append("file", file, file.customName || file.name);
-
-    var currentRequest = new XMLHttpRequest();
-    currentRequest.onreadystatechange = function (e) {
-        var request = e.target;
-
-        if (request.readyState == XMLHttpRequest.DONE) {
-            if (request.status == 200) {
-                var responseText = currentRequest.responseText;
-                onCompleted(responseText);
-            }
-            else if (request.status != 0 && onError != null) {
-                onError(currentRequest.status, currentRequest.statusText);
-            }
-        }
-    };
-
-    if (onError != null) {
-        currentRequest.onerror = function (e) {
-            onError(500, e.message);
-        };
-    }
-
-    if (onProgress != null) {
-        currentRequest.upload.onprogress = function (e) {
-            onProgress(e.loaded, e.total);
-        };
-    }
-
-    currentRequest.open("POST", url);
-
-    if (bearerToken != null) {
-        currentRequest.setRequestHeader("Authorization", "Bearer " + bearerToken);
-    }
-
-    currentRequest.send(formData);
 }
