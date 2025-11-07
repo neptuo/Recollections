@@ -239,6 +239,8 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             if (filteredFiles.length > 0) {
                 if (confirm(`You have ${filteredFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
                     await addFilesToQueue(filteredFiles, true);
+                } else {
+                    await Promise.all(filteredFiles.map(f => removeFileFromDB(f.id)));
                 }
             }
         } catch (error) {
