@@ -15,6 +15,8 @@ function initializeDB() {
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 store.createIndex('timestamp', 'timestamp', { unique: false });
+                store.createIndex('entityType', 'entityType', { unique: false });
+                store.createIndex('entityId', 'entityId', { unique: false });
             }
         };
     });
@@ -67,6 +69,33 @@ async function removeFileFromDB(id) {
         const request = store.delete(id);
         
         request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function getStoredFilesByEntity(entityType, entityId) {
+    const db = await initializeDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const results = [];
+        
+        // Use cursor to filter by both entityType and entityId
+        const request = store.openCursor();
+        
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                const fileData = cursor.value;
+                if (fileData.entityType === entityType && fileData.entityId === entityId) {
+                    results.push(fileData);
+                }
+                cursor.continue();
+            } else {
+                resolve(results);
+            }
+        };
+        
         request.onerror = () => reject(request.error);
     });
 }
@@ -213,10 +242,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
     // Initialize by checking for existing files in IndexedDB
     async function initializeStoredFiles() {
         try {
-            const storedFiles = await getStoredFiles();
-            const filteredFiles = storedFiles.filter(fileData => 
-                fileData.entityType === entityType && fileData.entityId === entityId
-            );
+            const filteredFiles = await getStoredFilesByEntity(entityType, entityId);
             
             if (filteredFiles.length > 0) {
                 if (confirm(`You have ${filteredFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
