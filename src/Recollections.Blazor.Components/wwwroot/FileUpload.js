@@ -61,18 +61,6 @@ async function getStoredFiles() {
     });
 }
 
-async function removeFileFromDB(id) {
-    const db = await initializeDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.delete(id);
-        
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
-}
-
 async function getStoredFilesByEntity(entityType, entityId) {
     const db = await initializeDB();
     return new Promise((resolve, reject) => {
@@ -100,7 +88,19 @@ async function getStoredFilesByEntity(entityType, entityId) {
     });
 }
 
-class FileUploadState {
+async function removeFileFromDB(id) {
+    const db = await initializeDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete(id);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+class EntityUploadQueue {
     constructor(interop, bearerToken, entityType, entityId) {
         this.interop = interop;
         this.bearerToken = bearerToken;
@@ -166,7 +166,7 @@ class FileUploadState {
 
         if (this.files.length > this.uploadIndex) {
             const fileData = this.storedFileData[this.uploadIndex];
-            this.uploadFile(
+            EntityUploadQueue.uploadFile(
                 this.files[this.uploadIndex],
                 fileData.actionUrl,
                 this.bearerToken,
@@ -279,18 +279,17 @@ class FileUploadState {
 const data = new Map();
 
 export function initialize(interop, form, bearerToken, dragAndDropTarget, entityType, entityId) {
+
     form = $(form);
 
     if (form.data('fileUpload') != null)
         return;
 
-    var fileUpload = {};
-    form.data('fileUpload', fileUpload);
+    const state = new EntityUploadQueue(interop, bearerToken, entityType, entityId);
+    data.set(entityType + "_" + entityId, state);
+    form.data('fileUpload', state);
 
     var input = form.find("input[type=file]");
-
-    const state = new FileUploadState(interop, bearerToken, entityType, entityId);
-    data.set(entityType + "_" + entityId, state);
 
     // Initialize by checking for existing files in IndexedDB
     async function initializeStoredFiles() {
@@ -342,7 +341,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
     }
 }
 
-export async function retry(entityType, entityId) {
+export async function retryEntityQueue(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
         const state = data.get(entityType + "_" + entityId);
@@ -352,7 +351,7 @@ export async function retry(entityType, entityId) {
     }
 }
 
-export async function clear(entityType, entityId) {
+export async function clearEntityQueue(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
         await Promise.all(storedFiles.map(f => removeFileFromDB(f.id)));

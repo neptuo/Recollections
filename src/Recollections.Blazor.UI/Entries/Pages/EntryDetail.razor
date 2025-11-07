@@ -128,8 +128,8 @@
 
         </ChildContent>
         <Buttons>
-            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.RetryAsync("entry", EntryId); })">Retry</button>
-            <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.ClearAsync("entry", EntryId); })">
+            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
+            <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.ClearEntityQueueAsync("entry", EntryId); })">
                 <Icon Identifier="trash-alt" CssClass="me-1" />
                 Remove all
             </button>
@@ -168,7 +168,7 @@
 
         </ChildContent>
         <Buttons>
-            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileuploadInterop.RetryAsync("entry", EntryId); })">Retry</button>
+            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileuploadInterop.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
         </Buttons>
     </Modal>
 

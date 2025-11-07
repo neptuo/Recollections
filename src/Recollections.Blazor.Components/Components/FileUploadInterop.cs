@@ -48,16 +48,16 @@ namespace Neptuo.Recollections.Components
             );
         }
 
-        public async Task RetryAsync(string entityType, string entityId)
+        public async Task RetryEntityQueueAsync(string entityType, string entityId)
         {
             await EnsureModuleAsync();
-            await module.InvokeVoidAsync("retry", entityType, entityId);
+            await module.InvokeVoidAsync("retryEntityQueue", entityType, entityId);
         }
 
-        public async Task ClearAsync(string entityType, string entityId)
+        public async Task ClearEntityQueueAsync(string entityType, string entityId)
         {
             await EnsureModuleAsync();
-            await module.InvokeVoidAsync("clear", entityType, entityId);
+            await module.InvokeVoidAsync("clearEntityQueue", entityType, entityId);
         }
 
         public async Task DeleteFileAsync(string fileId)
