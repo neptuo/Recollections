@@ -84,7 +84,9 @@
                         <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
                                     BearerToken="@UserState.BearerToken"
                                     Progress="@(async e => await OnUploadProgressAsync(e))"
-                                    DragAndDropContainer="Container" />
+                                    DragAndDropContainer="Container"
+                                    EntityType="entry"
+                                    EntityId="@EntryId" />
                     </PermissionView>
                 </ActionPanel>
             </div>

@@ -1,5 +1,78 @@
-﻿
-export function initialize(interop, form, bearerToken, dragAndDropTarget) {
+﻿// IndexedDB operations
+const DB_NAME = 'FileUploadDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'pendingUploads';
+
+function initializeDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                store.createIndex('timestamp', 'timestamp', { unique: false });
+            }
+        };
+    });
+}
+
+async function storeFilesInDB(files, actionUrl, entityType, entityId) {
+    const db = await initializeDB();
+    const transaction = db.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    
+    const fileDataArray = [];
+    const promises = Array.from(files).map(file => {
+        return new Promise((resolve, reject) => {
+            const fileData = {
+                file: file,
+                actionUrl: actionUrl,
+                entityType: entityType,
+                entityId: entityId,
+                timestamp: Date.now()
+            };
+            
+            fileDataArray.push(fileData);
+            
+            const request = store.add(fileData);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    });
+    
+    const ids = await Promise.all(promises);
+    return { ids, fileDataArray };
+}
+
+async function getStoredFiles() {
+    const db = await initializeDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+        
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function removeFileFromDB(id) {
+    const db = await initializeDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete(id);
+        
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+export function initialize(interop, form, bearerToken, dragAndDropTarget, entityType, entityId) {
     form = $(form);
 
     if (form.data('fileUpload') != null)
@@ -13,6 +86,8 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget) {
     var uploadIndex = -1;
     var progress = [];
     var files = [];
+    var storedFileIds = [];
+    var storedFileData = [];
 
     function uploadError(statusCode, message) {
         progress[uploadIndex].status = "error";
@@ -30,6 +105,8 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget) {
         uploadIndex = -1;
         progress = [];
         files = [];
+        storedFileIds = [];
+        storedFileData = [];
         form[0].reset();
     }
 
@@ -64,11 +141,18 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget) {
         uploadCallback(files.length, uploadIndex, 0, 0, responseText);
 
         if (files.length > uploadIndex) {
+            const fileData = storedFileData[uploadIndex];
             uploadFile(
                 files[uploadIndex],
-                form[0].action,
+                fileData.actionUrl,
                 bearerToken,
-                uploadStep,
+                (response) => {
+                    // Remove successfully uploaded file from IndexedDB
+                    if (storedFileIds[uploadIndex]) {
+                        removeFileFromDB(storedFileIds[uploadIndex]);
+                    }
+                    uploadStep(response);
+                },
                 uploadError,
                 uploadProgress
             );
@@ -77,18 +161,48 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget) {
         }
     }
 
-    function addFilesToQueue(items) {
-        for (var i = 0; i < items.length; i++) {
-            var file = items[i];
-            files.push(file);
-            progress.push({
-                status: "pending",
-                statusCode: 0,
-                name: file.name,
-                responseText: null,
-                uploaded: 0,
-                size: file.size
-            });
+    async function addFilesToQueue(items) {
+        try {
+            // Store files in IndexedDB first
+            const { ids, fileDataArray } = await storeFilesInDB(items, form[0].action, entityType, entityId);
+            storedFileIds.push(...ids);
+            storedFileData.push(...fileDataArray);
+            
+            for (var i = 0; i < items.length; i++) {
+                var file = items[i];
+                files.push(file);
+                progress.push({
+                    status: "pending",
+                    statusCode: 0,
+                    name: file.name,
+                    responseText: null,
+                    uploaded: 0,
+                    size: file.size
+                });
+            }
+
+            if (uploadIndex == -1) {
+                uploadStep();
+            }
+        } catch (error) {
+            console.error('Failed to store files in IndexedDB:', error);
+            // Fallback to original behavior
+            for (var i = 0; i < items.length; i++) {
+                var file = items[i];
+                files.push(file);
+                progress.push({
+                    status: "pending",
+                    statusCode: 0,
+                    name: file.name,
+                    responseText: null,
+                    uploaded: 0,
+                    size: file.size
+                });
+            }
+
+            if (uploadIndex == -1) {
+                uploadStep();
+            }
         }
     }
 
@@ -98,10 +212,6 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget) {
     });
     input.change(function () {
         addFilesToQueue(input[0].files);
-
-        if (uploadIndex == -1) {
-            uploadStep();
-        }
     });
 
     if (dragAndDropTarget) {
@@ -125,11 +235,6 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget) {
         });
         dragAndDropTarget.addEventListener('drop', function (e) {
             addFilesToQueue(e.dataTransfer.files);
-
-            if (uploadIndex == -1) {
-                uploadStep();
-            }
-
             e.preventDefault();
         });
     }

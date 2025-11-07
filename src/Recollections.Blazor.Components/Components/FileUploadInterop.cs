@@ -26,12 +26,20 @@ namespace Neptuo.Recollections.Components
             this.log = log;
         }
 
-        public async Task InitializeAsync(FileUpload editor, string bearerToken)
+        public async Task InitializeAsync(FileUpload editor, string bearerToken, string entityType, string entityId)
         {
             Editor = editor;
 
             module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
-            await module.InvokeVoidAsync("initialize", DotNetObjectReference.Create(this), editor.FormElement, bearerToken, editor.DragAndDropContainer);
+            await module.InvokeVoidAsync(
+                "initialize",
+                DotNetObjectReference.Create(this),
+                editor.FormElement,
+                bearerToken,
+                editor.DragAndDropContainer,
+                entityType,
+                entityId
+            );
         }
 
         public async Task DestroyAsync()

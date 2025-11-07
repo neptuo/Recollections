@@ -30,6 +30,12 @@ namespace Neptuo.Recollections.Components
         public string BearerToken { get; set; }
 
         [Parameter]
+        public string EntityType { get; set; }
+
+        [Parameter]
+        public string EntityId { get; set; }
+
+        [Parameter]
         public Action<IReadOnlyCollection<FileUploadProgress>> Progress { get; set; }
 
         [Parameter]
@@ -42,7 +48,7 @@ namespace Neptuo.Recollections.Components
             Log.Debug("FileUploadModel.OnAfterRenderAsync");
 
             await base.OnAfterRenderAsync(firstRender);
-            await Interop.InitializeAsync(this, BearerToken);
+            await Interop.InitializeAsync(this, BearerToken, EntityType, EntityId);
         }
 
         internal void OnCompleted(FileUploadProgress[] progresses)
