@@ -44,7 +44,7 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
 
-        public ElementReference FormElement { get; protected set; }
+        internal ElementReference FormElement { get; private set; }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
