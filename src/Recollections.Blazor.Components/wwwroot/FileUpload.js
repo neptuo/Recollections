@@ -161,42 +161,64 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
         }
     }
 
-    async function addFilesToQueue(items) {
-        try {
-            // Store files in IndexedDB first
-            const { ids, fileDataArray } = await storeFilesInDB(items, form[0].action, entityType, entityId);
-            storedFileIds.push(...ids);
-            storedFileData.push(...fileDataArray);
-            
-            for (var i = 0; i < items.length; i++) {
-                var file = items[i];
-                files.push(file);
-                progress.push({
-                    status: "pending",
-                    statusCode: 0,
-                    name: file.name,
-                    responseText: null,
-                    uploaded: 0,
-                    size: file.size
-                });
-            }
+    async function addFilesToQueue(items, skipIndexedDB = false) {
+        if (!skipIndexedDB) {
+            try {
+                // Store files in IndexedDB first
+                const { ids, fileDataArray } = await storeFilesInDB(items, form[0].action, entityType, entityId);
+                storedFileIds.push(...ids);
+                storedFileData.push(...fileDataArray);
+                
+                for (var i = 0; i < items.length; i++) {
+                    var file = items[i];
+                    files.push(file);
+                    progress.push({
+                        status: "pending",
+                        statusCode: 0,
+                        name: file.name,
+                        responseText: null,
+                        uploaded: 0,
+                        size: file.size
+                    });
+                }
 
-            if (uploadIndex == -1) {
-                uploadStep();
+                if (uploadIndex == -1) {
+                    uploadStep();
+                }
+            } catch (error) {
+                console.error('Failed to store files in IndexedDB:', error);
+                // Fallback to original behavior
+                for (var i = 0; i < items.length; i++) {
+                    var file = items[i];
+                    files.push(file);
+                    progress.push({
+                        status: "pending",
+                        statusCode: 0,
+                        name: file.name,
+                        responseText: null,
+                        uploaded: 0,
+                        size: file.size
+                    });
+                }
+
+                if (uploadIndex == -1) {
+                    uploadStep();
+                }
             }
-        } catch (error) {
-            console.error('Failed to store files in IndexedDB:', error);
-            // Fallback to original behavior
+        } else {
+            // Skip IndexedDB storage and use items as stored file data
             for (var i = 0; i < items.length; i++) {
-                var file = items[i];
-                files.push(file);
+                var item = items[i];
+                storedFileIds.push(item.id);
+                storedFileData.push(item);
+                files.push(item.file);
                 progress.push({
                     status: "pending",
                     statusCode: 0,
-                    name: file.name,
+                    name: item.file.name,
                     responseText: null,
                     uploaded: 0,
-                    size: file.size
+                    size: item.file.size
                 });
             }
 
@@ -205,6 +227,27 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             }
         }
     }
+
+    // Initialize by checking for existing files in IndexedDB
+    async function initializeStoredFiles() {
+        try {
+            const storedFiles = await getStoredFiles();
+            const filteredFiles = storedFiles.filter(fileData => 
+                fileData.entityType === entityType && fileData.entityId === entityId
+            );
+            
+            if (filteredFiles.length > 0) {
+                if (confirm(`You have ${filteredFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
+                    await addFilesToQueue(filteredFiles, true);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to retrieve stored files from IndexedDB:', error);
+        }
+    }
+
+    // Start initialization
+    initializeStoredFiles();
 
     form.find("button").click(function (e) {
         input.click();
