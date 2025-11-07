@@ -88,10 +88,6 @@
                             BearerToken="@UserState.BearerToken"
                             DragAndDropContainer="Container"
                         />
-                        @* 
-                        Progress="@(async e => await OnUploadProgressAsync(e))"
-                        StoredFilesDetected="OnStoredFilesDetected" 
-                        *@
                     </PermissionView>
                 </ActionPanel>
             </div>
@@ -172,6 +168,10 @@
         </ChildContent>
         <Buttons>
             <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileUploader.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
+            <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); UploadsToRetry.Clear(); return FileUploader.ClearEntityQueueAsync("entry", EntryId); })">
+                <Icon Identifier="trash-alt" CssClass="me-1" />
+                Remove all
+            </button>
         </Buttons>
     </Modal>
 
