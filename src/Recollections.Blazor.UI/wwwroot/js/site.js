@@ -178,6 +178,7 @@ window.InlineMarkdownEdit = {
                 "|",
                 "bold",
                 "italic",
+                "strikethrough",
                 "|",
                 "unordered-list",
                 "ordered-list",
