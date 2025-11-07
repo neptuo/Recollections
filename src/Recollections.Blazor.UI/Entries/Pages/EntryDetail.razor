@@ -1,6 +1,5 @@
 ﻿@page "/entries/{EntryId}"
 @inherits UserStateComponentBase
-@inject FileUploadInterop FileuploadInterop
 
 @if (Model != null)
 {
@@ -82,13 +81,17 @@
 
                 <ActionPanel>
                     <PermissionView Request="@PermissionRequest.Write">
-                        <FileUpload Url="@Api.ImageUploadUrl(Model.Id)"
-                                    BearerToken="@UserState.BearerToken"
-                                    Progress="@(async e => await OnUploadProgressAsync(e))"
-                                    StoredFilesDetected="OnStoredFilesDetected"
-                                    DragAndDropContainer="Container"
-                                    EntityType="entry"
-                                    EntityId="@EntryId" />
+                        <FileUpload 
+                            EntityType="entry"
+                            EntityId="@EntryId"
+                            Url="@Api.ImageUploadUrl(Model.Id)"
+                            BearerToken="@UserState.BearerToken"
+                            DragAndDropContainer="Container"
+                        />
+                        @* 
+                        Progress="@(async e => await OnUploadProgressAsync(e))"
+                        StoredFilesDetected="OnStoredFilesDetected" 
+                        *@
                     </PermissionView>
                 </ActionPanel>
             </div>
@@ -128,8 +131,8 @@
 
         </ChildContent>
         <Buttons>
-            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
-            <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.ClearEntityQueueAsync("entry", EntryId); })">
+            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileUploader.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
+            <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileUploader.ClearEntityQueueAsync("entry", EntryId); })">
                 <Icon Identifier="trash-alt" CssClass="me-1" />
                 Remove all
             </button>
@@ -168,7 +171,7 @@
 
         </ChildContent>
         <Buttons>
-            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileuploadInterop.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
+            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileUploader.RetryEntityQueueAsync("entry", EntryId); })">Retry</button>
         </Buttons>
     </Modal>
 

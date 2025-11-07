@@ -41,6 +41,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected IExceptionHandler ExceptionHandler { get; set; }
 
+        [Inject]
+        protected FileUploader FileUploader { get; set; }
+
         private string previousEntryId;
 
         [Parameter]
@@ -101,8 +104,13 @@ namespace Neptuo.Recollections.Entries.Pages
                 await LoadImagesAsync();
                 await LoadStoryAsync();
                 await LoadBeingsAsync();
-            }
 
+                FileUploader.AddProgressListener("entry", EntryId, (progresses) => OnUploadProgressAsync(progresses));
+
+                var storedFiles = await FileUploader.GetStoredFilesToRetryAsync("entry", EntryId);
+                if (storedFiles.Length > 0)
+                    OnStoredFilesDetected(storedFiles);
+            }
         }
 
         private async Task LoadStoryAsync()
@@ -340,7 +348,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task DeleteUploadToRetryAsync(FileUploadToRetry retry)
         {
-            await FileuploadInterop.DeleteFileAsync(retry.Id);
+            await FileUploader.DeleteFileAsync(retry.Id);
             UploadsToRetry.Remove(retry);
 
             if (UploadsToRetry.Count == 0)

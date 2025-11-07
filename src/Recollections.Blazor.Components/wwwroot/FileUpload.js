@@ -123,7 +123,7 @@ class EntityUploadQueue {
     }
 
     raiseProgress() {
-        this.interop.invokeMethodAsync("FileUpload.OnCompleted", this.progress);
+        this.interop.invokeMethodAsync("FileUpload.OnProgress", this.progress);
     }
 
     resetForm() {
@@ -238,6 +238,8 @@ class EntityUploadQueue {
                 var file = items[i];
                 this.files.push(file);
                 this.progress.push({
+                    entityType: this.entityType,
+                    entityId: this.entityId,
                     status: "pending",
                     statusCode: 0,
                     name: file.name,
@@ -261,6 +263,8 @@ class EntityUploadQueue {
             this.storedFileData.push(item);
             this.files.push(item.file);
             this.progress.push({
+                entityType: this.entityType,
+                entityId: this.entityId,
                 status: "pending",
                 statusCode: 0,
                 name: item.file.name,
@@ -278,7 +282,7 @@ class EntityUploadQueue {
 
 const data = new Map();
 
-export function bindForm(interop, form, bearerToken, dragAndDropTarget, entityType, entityId) {
+export function bindForm(interop, entityType, entityId, url, bearerToken, form, dragAndDropContainer) {
     form = $(form);
 
     if (form.data('fileUpload') != null)
@@ -290,54 +294,59 @@ export function bindForm(interop, form, bearerToken, dragAndDropTarget, entityTy
 
     var input = form.find("input[type=file]");
 
-    // Initialize by checking for existing files in IndexedDB
-    async function initializeStoredFiles() {
-        try {
-            const storedFiles = await getStoredFilesByEntity(entityType, entityId);
-            if (storedFiles.length > 0) {
-                interop.invokeMethodAsync("FileUpload.OnStoredFilesDetected", storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; }));
-            }
-        } catch (error) {
-            console.error('Failed to retrieve stored files from IndexedDB:', error);
-        }
-    }
+    // // Initialize by checking for existing files in IndexedDB
+    // async function initializeStoredFiles() {
+    //     try {
+    //         const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+    //         if (storedFiles.length > 0) {
+    //             interop.invokeMethodAsync("FileUpload.OnStoredFilesDetected", storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; }));
+    //         }
+    //     } catch (error) {
+    //         console.error('Failed to retrieve stored files from IndexedDB:', error);
+    //     }
+    // }
 
-    // Start initialization
-    initializeStoredFiles();
+    // // Start initialization
+    // initializeStoredFiles();
 
     form.find("button").click(function (e) {
         input.click();
         e.preventDefault();
     });
     input.change(async () => {
-        await state.storeAndQueueFiles(input[0].files, form[0].action);
+        await state.storeAndQueueFiles(input[0].files, url);
         form[0].reset();
     });
 
-    if (dragAndDropTarget) {
-        dragAndDropTarget.addEventListener('drag', function (e) {
+    if (dragAndDropContainer) {
+        dragAndDropContainer.addEventListener('drag', function (e) {
             e.preventDefault();
         });
-        dragAndDropTarget.addEventListener('dragstart', function (e) {
+        dragAndDropContainer.addEventListener('dragstart', function (e) {
             e.preventDefault();
         });
-        dragAndDropTarget.addEventListener('dragend', function (e) {
+        dragAndDropContainer.addEventListener('dragend', function (e) {
             e.preventDefault();
         });
-        dragAndDropTarget.addEventListener('dragover', function (e) {
+        dragAndDropContainer.addEventListener('dragover', function (e) {
             e.preventDefault();
         });
-        dragAndDropTarget.addEventListener('dragenter', function (e) {
+        dragAndDropContainer.addEventListener('dragenter', function (e) {
             e.preventDefault();
         });
-        dragAndDropTarget.addEventListener('dragleave', function (e) {
+        dragAndDropContainer.addEventListener('dragleave', function (e) {
             e.preventDefault();
         });
-        dragAndDropTarget.addEventListener('drop', function (e) {
-            state.storeAndQueueFiles(e.dataTransfer.files, form[0].action);
+        dragAndDropContainer.addEventListener('drop', function (e) {
+            state.storeAndQueueFiles(e.dataTransfer.files, url);
             e.preventDefault();
         });
     }
+}
+
+export async function getEntityStoredFiles(entityType, entityId) {
+    const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+    return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 
 export async function retryEntityQueue(entityType, entityId) {

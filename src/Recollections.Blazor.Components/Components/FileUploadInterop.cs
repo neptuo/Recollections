@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Neptuo;
 using Neptuo.Logging;
 using System;
@@ -15,8 +16,7 @@ namespace Neptuo.Recollections.Components
         private readonly IJSRuntime js;
         private IJSObjectReference module;
         private readonly ILog<FileUploadInterop> log;
-
-        public FileUpload Editor { get; set; }
+        private FileUploader uploader;
 
         public FileUploadInterop(IJSRuntime js, ILog<FileUploadInterop> log)
         {
@@ -32,20 +32,35 @@ namespace Neptuo.Recollections.Components
                 module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
         }
 
-        public async Task InitializeAsync(FileUpload editor, string bearerToken, string entityType, string entityId)
-        {
-            Editor = editor;
+        public void Initialize(FileUploader uploader)
+            => this.uploader = uploader;
 
+        public async Task BindFormAsync(string entityType, string entityId, string url, string bearerToken, ElementReference formElement, ElementReference dragAndDropContainer)
+        {
             await EnsureModuleAsync();
             await module.InvokeVoidAsync(
                 "bindForm",
                 DotNetObjectReference.Create(this),
-                editor.FormElement,
-                bearerToken,
-                editor.DragAndDropContainer,
                 entityType,
-                entityId
+                entityId,
+                url,
+                bearerToken,
+                formElement,
+                dragAndDropContainer
             );
+        }
+
+        [JSInvokable("FileUpload.OnProgress")]
+        public void OnProgress(FileUploadProgress[] progresses)
+        {
+            log.Debug($"FileUploadInterop.OnProgress");
+            uploader.OnProgress(progresses);
+        }
+
+        public async Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync(string entityType, string entityId)
+        {
+            await EnsureModuleAsync();
+            return await module.InvokeAsync<FileUploadToRetry[]>("getEntityStoredFiles", entityType, entityId);
         }
 
         public async Task RetryEntityQueueAsync(string entityType, string entityId)
@@ -69,20 +84,6 @@ namespace Neptuo.Recollections.Components
         public async Task DestroyAsync()
         {
             await module.InvokeVoidAsync("destroy");
-        }
-
-        [JSInvokable("FileUpload.OnCompleted")]
-        public void OnCompleted(FileUploadProgress[] progresses)
-        {
-            log.Debug($"FileUploadInterop.OnCompleted");
-            Editor.OnCompleted(progresses);
-        }
-
-        [JSInvokable("FileUpload.OnStoredFilesDetected")]
-        public void OnStoredFilesDetected(FileUploadToRetry[] retries)
-        {
-            log.Debug($"FileUploadInterop.OnStoredFilesDetected");
-            Editor.OnStoredFilesDetected(retries);
         }
     }
 }

@@ -12,10 +12,12 @@ namespace Neptuo.Recollections.Components
 {
     public partial class FileUpload : ComponentBase, IAsyncDisposable
     {
+        private IAsyncDisposable formBinding;
+
         public const string DefaultText = "Upload Images";
 
         [Inject]
-        protected FileUploadInterop Interop { get; set; }
+        protected FileUploader Uploader { get; set; }
 
         [Inject]
         protected ILog<FileUpload> Log { get; set; }
@@ -24,22 +26,16 @@ namespace Neptuo.Recollections.Components
         public string Text { get; set; } = DefaultText;
 
         [Parameter]
-        public string Url { get; set; }
-
-        [Parameter]
-        public string BearerToken { get; set; }
-
-        [Parameter]
         public string EntityType { get; set; }
 
         [Parameter]
         public string EntityId { get; set; }
 
         [Parameter]
-        public Action<IReadOnlyCollection<FileUploadProgress>> Progress { get; set; }
+        public string Url { get; set; }
 
         [Parameter]
-        public Action<IReadOnlyCollection<FileUploadToRetry>> StoredFilesDetected { get; set; }
+        public string BearerToken { get; set; }
 
         [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
@@ -51,24 +47,15 @@ namespace Neptuo.Recollections.Components
             Log.Debug("FileUploadModel.OnAfterRenderAsync");
 
             await base.OnAfterRenderAsync(firstRender);
-            await Interop.InitializeAsync(this, BearerToken, EntityType, EntityId);
-        }
 
-        internal void OnCompleted(FileUploadProgress[] progresses)
-        {
-            Log.Debug("FileUploadModel.OnCompleted");
-            Progress?.Invoke(progresses);
-        }
-
-        internal void OnStoredFilesDetected(FileUploadToRetry[] retries)
-        {
-            Log.Debug("FileUploadModel.OnStoredFilesDetected");
-            StoredFilesDetected?.Invoke(retries);
+            if (firstRender)
+                formBinding = await Uploader.BindFormAsync(EntityType, EntityId, Url, BearerToken, FormElement, DragAndDropContainer);
         }
 
         public async ValueTask DisposeAsync()
         {
-            await Interop.DestroyAsync();
+            if (formBinding != null)
+                await formBinding.DisposeAsync();
         }
     }
 }

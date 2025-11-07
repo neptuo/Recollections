@@ -19,6 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             Ensure.NotNull(services, "services");
             services.AddTransient<ModalInterop>();
+            services.AddSingleton<FileUploader>();
             services.AddTransient<FileUploadInterop>();
             services.AddTransient<InlineMarkdownEditInterop>();
             services.AddTransient<InlineTextEditInterop>();
