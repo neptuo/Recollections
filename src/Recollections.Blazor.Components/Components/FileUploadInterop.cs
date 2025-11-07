@@ -26,11 +26,17 @@ namespace Neptuo.Recollections.Components
             this.log = log;
         }
 
+        private async Task EnsureModuleAsync()
+        {
+            if (module == null)
+                module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
+        }
+
         public async Task InitializeAsync(FileUpload editor, string bearerToken, string entityType, string entityId)
         {
             Editor = editor;
 
-            module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
+            await EnsureModuleAsync();
             await module.InvokeVoidAsync(
                 "initialize",
                 DotNetObjectReference.Create(this),
@@ -40,6 +46,24 @@ namespace Neptuo.Recollections.Components
                 entityType,
                 entityId
             );
+        }
+
+        public async Task RetryAsync(string entityType, string entityId)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("retry", entityType, entityId);
+        }
+
+        public async Task ClearAsync(string entityType, string entityId)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("clear", entityType, entityId);
+        }
+
+        public async Task DeleteFileAsync(string fileId)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("deleteFile", fileId);
         }
 
         public async Task DestroyAsync()
@@ -52,6 +76,13 @@ namespace Neptuo.Recollections.Components
         {
             log.Debug($"FileUploadInterop.OnCompleted");
             Editor.OnCompleted(progresses);
+        }
+
+        [JSInvokable("FileUpload.OnStoredFilesDetected")]
+        public void OnStoredFilesDetected(FileUploadToRetry[] retries)
+        {
+            log.Debug($"FileUploadInterop.OnStoredFilesDetected");
+            Editor.OnStoredFilesDetected(retries);
         }
     }
 }

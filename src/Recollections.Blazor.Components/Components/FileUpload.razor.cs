@@ -39,6 +39,9 @@ namespace Neptuo.Recollections.Components
         public Action<IReadOnlyCollection<FileUploadProgress>> Progress { get; set; }
 
         [Parameter]
+        public Action<IReadOnlyCollection<FileUploadToRetry>> StoredFilesDetected { get; set; }
+
+        [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
 
         public ElementReference FormElement { get; protected set; }
@@ -55,6 +58,12 @@ namespace Neptuo.Recollections.Components
         {
             Log.Debug("FileUploadModel.OnCompleted");
             Progress?.Invoke(progresses);
+        }
+
+        internal void OnStoredFilesDetected(FileUploadToRetry[] retries)
+        {
+            Log.Debug("FileUploadModel.OnStoredFilesDetected");
+            StoredFilesDetected?.Invoke(retries);
         }
 
         public async ValueTask DisposeAsync()

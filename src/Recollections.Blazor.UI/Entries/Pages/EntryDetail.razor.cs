@@ -75,6 +75,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
         protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
         protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
+        protected List<FileUploadToRetry> UploadsToRetry { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
@@ -292,6 +293,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private void UpdateOriginal() => original = Model.Clone();
 
         protected Modal UploadError { get; set; }
+        protected Modal UploadRetryModal { get; set; }
 
         protected async Task OnUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
         {
@@ -324,6 +326,26 @@ namespace Neptuo.Recollections.Entries.Pages
                 }
             }
 
+            StateHasChanged();
+        }
+
+        protected void OnStoredFilesDetected(IReadOnlyCollection<FileUploadToRetry> retries)
+        {
+            Log.Debug("OnStoredFilesDetected: " + Json.Serialize(retries));
+            UploadsToRetry.Clear();
+            UploadsToRetry.AddRange(retries);
+            StateHasChanged();
+            UploadRetryModal.Show();
+        }
+
+        protected async Task DeleteUploadToRetryAsync(FileUploadToRetry retry)
+        {
+            await FileuploadInterop.DeleteFileAsync(retry.Id);
+            UploadsToRetry.Remove(retry);
+
+            if (UploadsToRetry.Count == 0)
+                UploadRetryModal.Hide();
+                
             StateHasChanged();
         }
 

@@ -6,6 +6,7 @@
     <PublishDomain>recollections.app</PublishDomain>
     <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
 	  <InvariantGlobalization>true</InvariantGlobalization>
+    <WasmFingerprintAssets>false</WasmFingerprintAssets>
   </PropertyGroup>
 
   <ItemGroup>

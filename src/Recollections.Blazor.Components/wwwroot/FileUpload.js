@@ -242,14 +242,14 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
     // Initialize by checking for existing files in IndexedDB
     async function initializeStoredFiles() {
         try {
-            const filteredFiles = await getStoredFilesByEntity(entityType, entityId);
-            
-            if (filteredFiles.length > 0) {
-                if (confirm(`You have ${filteredFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
-                    addStoredFilesToQueue(filteredFiles);
-                } else {
-                    await Promise.all(filteredFiles.map(f => removeFileFromDB(f.id)));
-                }
+            const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+            if (storedFiles.length > 0) {
+                interop.invokeMethodAsync("FileUpload.OnStoredFilesDetected", storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; }));
+                // if (confirm(`You have ${storedFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
+                //     addStoredFilesToQueue(storedFiles);
+                // } else {
+                //     await Promise.all(storedFiles.map(f => removeFileFromDB(f.id)));
+                // }
             }
         } catch (error) {
             console.error('Failed to retrieve stored files from IndexedDB:', error);
@@ -291,6 +291,24 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             e.preventDefault();
         });
     }
+}
+
+export async function retry(entityType, entityId) {
+    const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+    if (storedFiles.length > 0) {
+        addStoredFilesToQueue(storedFiles);
+    }
+}
+
+export async function clear(entityType, entityId) {
+    const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+    if (storedFiles.length > 0) {
+        await Promise.all(storedFiles.map(f => removeFileFromDB(f.id)));
+    }
+}
+
+export function deleteFile(id) {
+    return removeFileFromDB(Number.parseInt(id));
 }
 
 export function destroy() {
