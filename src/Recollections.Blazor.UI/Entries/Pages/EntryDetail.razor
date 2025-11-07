@@ -128,7 +128,11 @@
 
         </ChildContent>
         <Buttons>
-            <button class="btn btn-primary btn-sm" @onclick="@(() => FileuploadInterop.RetryAsync("entry", EntryId))">Retry</button>
+            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.RetryAsync("entry", EntryId); })">Retry</button>
+            <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileuploadInterop.ClearAsync("entry", EntryId); })">
+                <Icon Identifier="trash-alt" CssClass="me-1" />
+                Remove all
+            </button>
         </Buttons>
     </Modal>
     <Modal @ref="@UploadRetryModal" Title="Files from last time to retry">
@@ -164,7 +168,7 @@
 
         </ChildContent>
         <Buttons>
-            <button class="btn btn-primary btn-sm" @onclick="@(() => FileuploadInterop.RetryAsync("entry", EntryId))">Retry</button>
+            <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileuploadInterop.RetryAsync("entry", EntryId); })">Retry</button>
         </Buttons>
     </Modal>
 

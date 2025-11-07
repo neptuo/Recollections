@@ -100,6 +100,8 @@ async function getStoredFilesByEntity(entityType, entityId) {
     });
 }
 
+const data = new Map();
+
 export function initialize(interop, form, bearerToken, dragAndDropTarget, entityType, entityId) {
     form = $(form);
 
@@ -111,47 +113,50 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
 
     var input = form.find("input[type=file]");
 
-    var uploadIndex = -1;
-    var progress = [];
-    var files = [];
-    var storedFileIds = [];
-    var storedFileData = [];
+    const state = {
+        uploadIndex: -1,
+        progress: [],
+        files: [],
+        storedFileIds: [],
+        storedFileData: [],
+    }
+    data[entityType + "_" + entityId] = state;
 
     function uploadError(statusCode, message) {
-        progress[uploadIndex].status = "error";
-        progress[uploadIndex].statusCode = statusCode;
-        progress[uploadIndex].responseText = message;
+        state.progress[state.uploadIndex].status = "error";
+        state.progress[state.uploadIndex].statusCode = statusCode;
+        state.progress[state.uploadIndex].responseText = message;
         raiseProgress();
         uploadStep(null);
     }
 
     function raiseProgress() {
-        interop.invokeMethodAsync("FileUpload.OnCompleted", progress);
+        interop.invokeMethodAsync("FileUpload.OnCompleted", state.progress);
     }
 
     function resetForm() {
-        uploadIndex = -1;
-        progress = [];
-        files = [];
-        storedFileIds = [];
-        storedFileData = [];
+        state.uploadIndex = -1;
+        state.progress = [];
+        state.files = [];
+        state.storedFileIds = [];
+        state.storedFileData = [];
         form[0].reset();
     }
 
     function uploadCallback(imagesCount, imagesCompleted, currentSize, currentUploaded, responseText) {
         for (var i = 0; i < imagesCount; i++) {
-            if (progress[i].status != "done" && progress[i].status != "error") {
+            if (state.progress[i].status != "done" && state.progress[i].status != "error") {
                 if (imagesCompleted > i) {
-                    progress[i].status = "done";
-                    progress[i].statusCode = 200;
+                    state.progress[i].status = "done";
+                    state.progress[i].statusCode = 200;
                 }
 
                 if (imagesCompleted == i) {
-                    progress[i].status = "current";
-                    progress[i].uploaded = currentUploaded;
+                    state.progress[i].status = "current";
+                    state.progress[i].uploaded = currentUploaded;
                 } else if (imagesCompleted - 1 == i) {
                     if (responseText != null) {
-                        progress[i].responseText = responseText;
+                        state.progress[i].responseText = responseText;
                     }
                 }
             }
@@ -161,23 +166,23 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
     }
 
     function uploadProgress(loaded, total) {
-        uploadCallback(input[0].files.length, uploadIndex, total, loaded, null);
+        uploadCallback(input[0].files.length, state.uploadIndex, total, loaded, null);
     }
 
     function uploadStep(responseText) {
-        uploadIndex++;
-        uploadCallback(files.length, uploadIndex, 0, 0, responseText);
+        state.uploadIndex++;
+        uploadCallback(state.files.length, state.uploadIndex, 0, 0, responseText);
 
-        if (files.length > uploadIndex) {
-            const fileData = storedFileData[uploadIndex];
+        if (state.files.length > state.uploadIndex) {
+            const fileData = state.storedFileData[state.uploadIndex];
             uploadFile(
-                files[uploadIndex],
+                state.files[state.uploadIndex],
                 fileData.actionUrl,
                 bearerToken,
                 (response) => {
                     // Remove successfully uploaded file from IndexedDB
-                    if (storedFileIds[uploadIndex]) {
-                        removeFileFromDB(storedFileIds[uploadIndex]);
+                    if (state.storedFileIds[state.uploadIndex]) {
+                        removeFileFromDB(state.storedFileIds[state.uploadIndex]);
                     }
                     uploadStep(response);
                 },
@@ -200,8 +205,8 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             // Fallback to original behavior
             for (var i = 0; i < items.length; i++) {
                 var file = items[i];
-                files.push(file);
-                progress.push({
+                state.files.push(file);
+                state.progress.push({
                     status: "pending",
                     statusCode: 0,
                     name: file.name,
@@ -211,7 +216,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
                 });
             }
 
-            if (uploadIndex == -1) {
+            if (state.uploadIndex == -1) {
                 uploadStep();
             }
         }
@@ -221,10 +226,10 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
         // Add stored files from IndexedDB to queue
         for (var i = 0; i < storedItems.length; i++) {
             var item = storedItems[i];
-            storedFileIds.push(item.id);
-            storedFileData.push(item);
-            files.push(item.file);
-            progress.push({
+            state.storedFileIds.push(item.id);
+            state.storedFileData.push(item);
+            state.files.push(item.file);
+            state.progress.push({
                 status: "pending",
                 statusCode: 0,
                 name: item.file.name,
@@ -234,10 +239,11 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             });
         }
 
-        if (uploadIndex == -1) {
+        if (state.uploadIndex == -1) {
             uploadStep();
         }
     }
+    state.addStoredFilesToQueue = addStoredFilesToQueue;
 
     // Initialize by checking for existing files in IndexedDB
     async function initializeStoredFiles() {
@@ -245,11 +251,6 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
             const storedFiles = await getStoredFilesByEntity(entityType, entityId);
             if (storedFiles.length > 0) {
                 interop.invokeMethodAsync("FileUpload.OnStoredFilesDetected", storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; }));
-                // if (confirm(`You have ${storedFiles.length} pending file uploads. Do you want to resume uploading them?`)) {
-                //     addStoredFilesToQueue(storedFiles);
-                // } else {
-                //     await Promise.all(storedFiles.map(f => removeFileFromDB(f.id)));
-                // }
             }
         } catch (error) {
             console.error('Failed to retrieve stored files from IndexedDB:', error);
@@ -296,7 +297,7 @@ export function initialize(interop, form, bearerToken, dragAndDropTarget, entity
 export async function retry(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
-        addStoredFilesToQueue(storedFiles);
+        data[entityType + "_" + entityId].addStoredFilesToQueue(storedFiles);
     }
 }
 
