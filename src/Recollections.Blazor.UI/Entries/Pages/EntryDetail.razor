@@ -42,42 +42,45 @@
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                <div class="images my-3">
-                    @if (Images != null)
-                    {
-                        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="(async i => { await Gallery.CloseAsync(); Navigator.OpenImageDetail(EntryId, Images[i].Id); })" />
-
-                        @foreach (var image in Images)
+                @if (Images.Count > 0 || UploadProgress?.Count > 0)
+                {
+                    <div class="images my-3">
+                        @if (Images != null)
                         {
-                            <EntryImage @key="image.Id" Image="@image" OnClick="(() => Gallery.Open(Images.IndexOf(image)))">
-                                <ThumbnailContent>
-                                    <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenImageDetail(EntryId, image.Id); })" @onclick:stopPropagation="true">
-                                        <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
-                                    </button>
-                                </ThumbnailContent>
-                            </EntryImage>
-                        }
-                    }
+                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="(async i => { await Gallery.CloseAsync(); Navigator.OpenImageDetail(EntryId, Images[i].Id); })" />
 
-                    @if (UploadProgress != null)
-                    {
-                        foreach (var upload in UploadProgress)
-                        {
-                            @if (upload.IsSuccess)
+                            @foreach (var image in Images)
                             {
-                                <EntryImage Image="@upload.Image" />
-                            }
-                            else
-                            {
-                                <EntryImage
-                                    PlaceHolder="@upload.Description"
-                                    PlaceHolderCssClass="@upload.StatusCssClass"
-                                    PlaceHolderState="@upload.PlaceHolderState"
-                                />
+                                <EntryImage @key="image.Id" Image="@image" OnClick="(() => Gallery.Open(Images.IndexOf(image)))">
+                                    <ThumbnailContent>
+                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenImageDetail(EntryId, image.Id); })" @onclick:stopPropagation="true">
+                                            <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
+                                        </button>
+                                    </ThumbnailContent>
+                                </EntryImage>
                             }
                         }
-                    }
-                </div>
+
+                        @if (UploadProgress != null)
+                        {
+                            foreach (var upload in UploadProgress)
+                            {
+                                @if (upload.IsSuccess)
+                                {
+                                    <EntryImage Image="@upload.Image" />
+                                }
+                                else
+                                {
+                                    <EntryImage
+                                        PlaceHolder="@upload.Description"
+                                        PlaceHolderCssClass="@upload.StatusCssClass"
+                                        PlaceHolderState="@upload.PlaceHolderState"
+                                    />
+                                }
+                            }
+                        }
+                    </div>
+                }
 
                 <ActionPanel>
                     <PermissionView Request="@PermissionRequest.Write">
