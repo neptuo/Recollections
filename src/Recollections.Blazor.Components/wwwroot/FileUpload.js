@@ -346,6 +346,15 @@ export function bindForm(interop, entityType, entityId, url, bearerToken, form, 
 
 export async function getEntityStoredFiles(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+    const queue = data.get(entityType + "_" + entityId);
+    if (queue) {
+        queue.progress.forEach(p => {
+            const index = storedFiles.findIndex(f => f.file.name === p.name);
+            if (index >= 0) {
+                storedFiles.removeAt(index);
+            }
+        });
+    }
     return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 

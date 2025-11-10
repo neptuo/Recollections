@@ -1,5 +1,5 @@
 ﻿export function observe(element, component) {
-    if ("IntersectionObserver" in window) {
+    if ("IntersectionObserver" in window && element) {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
