@@ -148,7 +148,7 @@ a.bg-salmon {
 }
 
 .cursor-pointer {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 
 @import "_loading.scss";

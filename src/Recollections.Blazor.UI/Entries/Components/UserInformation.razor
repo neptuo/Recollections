@@ -1,9 +1,9 @@
 ﻿@if (UserState.UserId != Owner.Id)
 {
-    <div class="owner">
-        <span class="cursor-pointer" @onclick="() => Navigator.OpenProfile(Owner.Id)">
+    <div class="owner inline-editor-viewmode">
+        <a class="inline-editor-value cursor-pointer" @onclick="() => Navigator.OpenProfile(Owner.Id)">
             <Icon Identifier="user" />
             @Owner.Name
-        </span>
+        </a>
     </div>
 }
