@@ -1,15 +1,15 @@
 ﻿@inherits InlineEdit<DateTime>
 
 <div class="inline-editor @GetDateCssClass() @GetModeCssClass()">
-    <a class="inline-editor-value d-inline-block py-1" @onclick="@(() => { if (IsEditable) DatePicker.Show(); })">
+    <a class="inline-editor-value d-inline-block py-1 @(Value == DateTime.MinValue ? "text-muted" : "")" @onclick="@(() => { if (IsEditable) DatePicker.Show(); })">
         <Icon Identifier="calendar-alt" />
-        @if (Value == DateTime.MinValue)
-        {
-            <span class="ms-1 inline-editor-content value-placeholder">@(PlaceHolder ?? "No value...")</span>
-        }
-        else
-        {
-            <span class="ms-1 inline-editor-content">
+        <span class="inline-editor-content">
+            @if (Value == DateTime.MinValue)
+            {
+                @(PlaceHolder ?? "No value...")
+            }
+            else
+            {
                 @Value.ToString(Format ?? "yyyy-MM-dd")
                 
                 @if (IsTimeSelection)
@@ -18,8 +18,8 @@
                         @Value.ToString(@TimeFormat)
                     </span>
                 }
-            </span>
-        }
+            }
+        </span>
     </a>
 </div>
 

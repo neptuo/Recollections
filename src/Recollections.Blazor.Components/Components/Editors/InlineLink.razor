@@ -1,20 +1,22 @@
 ﻿@inherits InlineEdit<string>
 
 <div class="inline-editor inline-link @GetModeCssClass()">
-    <a class="inline-editor-value d-inline-block py-1" @onclick="@OnEditAsync">
+    <a class="inline-editor-value d-inline-block py-1 @(String.IsNullOrEmpty(Value) ? "text-muted" : "")" @onclick="@OnEditAsync">
         @if (!String.IsNullOrEmpty(Icon))
         {
             <Icon Prefix="@IconPrefix" Identifier="@Icon" />
         }
 
-        @if (String.IsNullOrEmpty(Value))
-        {
-            <span class="ms-1 inline-editor-content value-placeholder">@ValueContent(PlaceHolder ?? "No value...")</span>
-        }
-        else
-        {
-            <span class="ms-1 inline-editor-content">@ValueContent(Value)</span>
-        }
+        <span class="ms-1 inline-editor-content">
+            @if (String.IsNullOrEmpty(Value))
+            {
+                @ValueContent(PlaceHolder ?? "No value...")
+            }
+            else
+            {
+                @ValueContent(Value)
+            }
+        </span>
     </a>
 
     @AfterContent

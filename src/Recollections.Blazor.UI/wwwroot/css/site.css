@@ -13766,10 +13766,6 @@ input.input-number-noarrows[type=number] {
   -moz-appearance: textfield;
 }
 
-.value-placeholder {
-  color: #aaaaaa;
-}
-
 .file-upload {
   float: left;
   margin-right: 4px;
@@ -13978,9 +13974,6 @@ input.input-number-noarrows[type=number] {
   margin-right: 12px;
   color: var(--bs-secondary-color);
   white-space: nowrap;
-}
-.entry .body .value-placeholder {
-  color: #aaaaaa;
 }
 .entry:after {
   content: "";

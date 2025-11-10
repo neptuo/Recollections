@@ -17,15 +17,18 @@
     }
     else
     {
-        <a class="inline-editor-value d-inline-block py-1" @onclick="@OnEditAsync">
-            @if (String.IsNullOrEmpty(Value))
-            {
-                <span class="inline-editor-content value-placeholder">@(PlaceHolder ?? "No value...")</span>
-            }
-            else
-            {
-                <span class="inline-editor-content">@Value</span>
-            }
+        var isEmpty = String.IsNullOrEmpty(Value);
+        <a class="inline-editor-value d-inline-block py-1 @(isEmpty ? "text-muted" : "")" @onclick="@OnEditAsync">
+            <span class="inline-editor-content">
+                @if (isEmpty)
+                {
+                    @(PlaceHolder ?? "No value...")
+                }
+                else
+                {
+                    @Value
+                }
+            </span>
         </a>
     }
 </div>
