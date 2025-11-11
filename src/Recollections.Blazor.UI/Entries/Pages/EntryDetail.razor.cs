@@ -44,6 +44,7 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected FileUploader FileUploader { get; set; }
 
+        private IDisposable previousUploadListener;
         private string previousEntryId;
 
         [Parameter]
@@ -105,7 +106,8 @@ namespace Neptuo.Recollections.Entries.Pages
                 await LoadStoryAsync();
                 await LoadBeingsAsync();
 
-                FileUploader.AddProgressListener("entry", EntryId, (progresses) => OnUploadProgressAsync(progresses));
+                previousUploadListener?.Dispose();
+                previousUploadListener = FileUploader.AddProgressListener("entry", EntryId, (progresses) => OnUploadProgressAsync(progresses));
 
                 var storedFiles = await FileUploader.GetStoredFilesToRetryAsync("entry", EntryId);
                 if (storedFiles.Length > 0)
