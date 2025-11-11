@@ -101,11 +101,9 @@ async function removeFileFromDB(id) {
 }
 
 class EntityUploadQueue {
-    constructor(interop, bearerToken, entityType, entityId) {
+    constructor(interop, bearerToken) {
         this.interop = interop;
         this.bearerToken = bearerToken;
-        this.entityType = entityType;
-        this.entityId = entityId;
         
         this.uploadIndex = -1;
         this.progress = [];
@@ -225,10 +223,10 @@ class EntityUploadQueue {
         currentRequest.send(formData);
     }
 
-    async storeAndQueueFiles(items, url) {
+    async storeAndQueueFiles(items, url, entityType, entityId) {
         try {
             // Store files in IndexedDB first
-            const storedItems = await storeFilesInDB(items, url, this.entityType, this.entityId);
+            const storedItems = await storeFilesInDB(items, url, entityType, entityId);
             
             this.addStoredFilesToQueue(storedItems);
         } catch (error) {
@@ -238,8 +236,8 @@ class EntityUploadQueue {
                 var file = items[i];
                 this.files.push(file);
                 this.progress.push({
-                    entityType: this.entityType,
-                    entityId: this.entityId,
+                    entityType: entityType,
+                    entityId: entityId,
                     status: "pending",
                     statusCode: 0,
                     name: file.name,
@@ -263,8 +261,8 @@ class EntityUploadQueue {
             this.storedFileData.push(item);
             this.files.push(item.file);
             this.progress.push({
-                entityType: this.entityType,
-                entityId: this.entityId,
+                entityType: item.entityType,
+                entityId: item.entityId,
                 status: "pending",
                 statusCode: 0,
                 name: item.file.name,
@@ -288,7 +286,7 @@ export function bindForm(interop, entityType, entityId, url, bearerToken, form, 
     if (form.data('fileUpload') != null)
         return;
 
-    const state = new EntityUploadQueue(interop, bearerToken, entityType, entityId);
+    const state = new EntityUploadQueue(interop, bearerToken);
     data.set(entityType + "_" + entityId, state);
     form.data('fileUpload', state);
 
@@ -299,7 +297,7 @@ export function bindForm(interop, entityType, entityId, url, bearerToken, form, 
         e.preventDefault();
     });
     input.change(async () => {
-        await state.storeAndQueueFiles(input[0].files, url);
+        await state.storeAndQueueFiles(input[0].files, url, entityType, entityId);
         form[0].reset();
     });
 
@@ -323,7 +321,7 @@ export function bindForm(interop, entityType, entityId, url, bearerToken, form, 
             e.preventDefault();
         });
         dragAndDropContainer.addEventListener('drop', function (e) {
-            state.storeAndQueueFiles(e.dataTransfer.files, url);
+            state.storeAndQueueFiles(e.dataTransfer.files, url, entityType, entityId);
             e.preventDefault();
         });
     }
