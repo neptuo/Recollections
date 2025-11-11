@@ -279,8 +279,13 @@ class EntityUploadQueue {
 }
 
 const data = new Map();
+let interop;
 
-export function bindForm(interop, entityType, entityId, url, bearerToken, form, dragAndDropContainer) {
+export function initialize(interopValue) {
+    interop = interopValue;
+}
+
+export function bindForm(entityType, entityId, url, bearerToken, form, dragAndDropContainer) {
     form = $(form);
 
     if (form.data('fileUpload') != null)

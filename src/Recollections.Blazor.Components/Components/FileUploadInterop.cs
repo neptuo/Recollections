@@ -15,6 +15,7 @@ namespace Neptuo.Recollections.Components
     {
         private readonly IJSRuntime js;
         private IJSObjectReference module;
+        private bool isInitialized = false;
         private readonly ILog<FileUploadInterop> log;
         private FileUploader uploader;
 
@@ -38,9 +39,18 @@ namespace Neptuo.Recollections.Components
         public async Task BindFormAsync(string entityType, string entityId, string url, string bearerToken, ElementReference formElement, ElementReference dragAndDropContainer)
         {
             await EnsureModuleAsync();
+            
+            if (!isInitialized)
+            {
+                isInitialized = true;
+                await module.InvokeVoidAsync(
+                    "initialize",
+                    DotNetObjectReference.Create(this)
+                );
+            }
+
             await module.InvokeVoidAsync(
                 "bindForm",
-                DotNetObjectReference.Create(this),
                 entityType,
                 entityId,
                 url,
