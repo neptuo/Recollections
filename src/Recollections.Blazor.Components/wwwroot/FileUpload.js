@@ -294,21 +294,6 @@ export function bindForm(interop, entityType, entityId, url, bearerToken, form, 
 
     var input = form.find("input[type=file]");
 
-    // // Initialize by checking for existing files in IndexedDB
-    // async function initializeStoredFiles() {
-    //     try {
-    //         const storedFiles = await getStoredFilesByEntity(entityType, entityId);
-    //         if (storedFiles.length > 0) {
-    //             interop.invokeMethodAsync("FileUpload.OnStoredFilesDetected", storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; }));
-    //         }
-    //     } catch (error) {
-    //         console.error('Failed to retrieve stored files from IndexedDB:', error);
-    //     }
-    // }
-
-    // // Start initialization
-    // initializeStoredFiles();
-
     form.find("button").click(function (e) {
         input.click();
         e.preventDefault();
