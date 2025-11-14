@@ -87,7 +87,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async override Task OnInitializedAsync()
         {
             Log.Debug("OnInitializedAsync");
-
             await base.OnInitializedAsync();
         }
 
@@ -99,7 +98,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async override Task OnParametersSetAsync()
         {
-            if (previousEntryId != EntryId) 
+            if (previousEntryId != EntryId || Model == null) 
             {
                 await LoadAsync();
                 await LoadImagesAsync();

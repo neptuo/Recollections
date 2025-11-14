@@ -101,9 +101,7 @@ async function removeFileFromDB(id) {
 }
 
 class EntityUploadQueue {
-    constructor(bearerToken) {
-        this.bearerToken = bearerToken;
-        
+    constructor() {
         this.uploadIndex = -1;
         this.progress = [];
         this.files = [];
@@ -166,7 +164,7 @@ class EntityUploadQueue {
             EntityUploadQueue.uploadFile(
                 this.files[this.uploadIndex],
                 fileData.actionUrl,
-                this.bearerToken,
+                bearerToken,
                 (response) => {
                     // Remove successfully uploaded file from IndexedDB
                     if (this.storedFileIds[this.uploadIndex]) {
@@ -279,12 +277,14 @@ class EntityUploadQueue {
 
 const data = new Map();
 let interop;
+let bearerToken;
 
 export function initialize(interopValue) {
     interop = interopValue;
 }
 
-export function setBearerToken(bearerToken) {
+export function setBearerToken(bearerTokenValue) {
+    bearerToken = bearerTokenValue;
     // TODO: Make explicit lifetime for bearer token.
     // We don't want to store in indexedDB, but we all can't
     // pass it from EntryDetail, because won't be able to
@@ -292,13 +292,13 @@ export function setBearerToken(bearerToken) {
     // If we pass it separately, we can reupload from a general component.
 }
 
-export function bindForm(entityType, entityId, url, bearerToken, form, dragAndDropContainer) {
+export function bindForm(entityType, entityId, url, form, dragAndDropContainer) {
     form = $(form);
 
     if (form.data('fileUpload') != null)
         return;
 
-    const state = new EntityUploadQueue(bearerToken);
+    const state = new EntityUploadQueue();
     data.set(entityType + "_" + entityId, state);
     form.data('fileUpload', state);
 

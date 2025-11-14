@@ -18,6 +18,7 @@ namespace Neptuo.Recollections.Components
         private bool isInitialized = false;
         private readonly ILog<FileUploadInterop> log;
         private FileUploader uploader;
+        private string bearerToken;
 
         public FileUploadInterop(IJSRuntime js, ILog<FileUploadInterop> log)
         {
@@ -36,7 +37,7 @@ namespace Neptuo.Recollections.Components
         public void Initialize(FileUploader uploader)
             => this.uploader = uploader;
 
-        public async Task BindFormAsync(string entityType, string entityId, string url, string bearerToken, ElementReference formElement, ElementReference dragAndDropContainer)
+        public async Task BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
         {
             await EnsureModuleAsync();
             
@@ -47,6 +48,9 @@ namespace Neptuo.Recollections.Components
                     "initialize",
                     DotNetObjectReference.Create(this)
                 );
+
+                if (!string.IsNullOrEmpty(bearerToken))
+                    await module.InvokeVoidAsync("setBearerToken", this.bearerToken);
             }
 
             await module.InvokeVoidAsync(
@@ -54,7 +58,6 @@ namespace Neptuo.Recollections.Components
                 entityType,
                 entityId,
                 url,
-                bearerToken,
                 formElement,
                 dragAndDropContainer
             );
@@ -93,7 +96,16 @@ namespace Neptuo.Recollections.Components
 
         public async Task DestroyAsync()
         {
+            await EnsureModuleAsync();
             await module.InvokeVoidAsync("destroy");
+        }
+
+        internal async Task SetBearerTokenAsync(string bearerToken)
+        {
+            if (module == null)
+                this.bearerToken = bearerToken;
+            else
+                await module.InvokeVoidAsync("setBearerToken", bearerToken);
         }
     }
 }

@@ -63,9 +63,6 @@ namespace Neptuo.Recollections.Entries
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
-        public Task<string> GetMapApiKeyAsync()
-            => faultHandler.Wrap(http.GetStringAsync("map/apikey"));
-
         public Task<List<MapSearchModel>> GetGeoLocateListAsync(string query)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapSearchModel>>(QueryHelpers.AddQueryString("map/geolocate", "q", query)));
 

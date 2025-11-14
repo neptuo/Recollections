@@ -35,9 +35,6 @@ namespace Neptuo.Recollections.Components
         public string Url { get; set; }
 
         [Parameter]
-        public string BearerToken { get; set; }
-
-        [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
 
         internal ElementReference FormElement { get; private set; }
@@ -49,7 +46,7 @@ namespace Neptuo.Recollections.Components
             await base.OnAfterRenderAsync(firstRender);
 
             if (firstRender)
-                formBinding = await Uploader.BindFormAsync(EntityType, EntityId, Url, BearerToken, FormElement, DragAndDropContainer);
+                formBinding = await Uploader.BindFormAsync(EntityType, EntityId, Url, FormElement, DragAndDropContainer);
         }
 
         public async ValueTask DisposeAsync()

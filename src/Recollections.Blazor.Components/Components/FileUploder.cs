@@ -12,7 +12,7 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     private bool isInitialized;
     private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotifications = [];
 
-    public async Task<IAsyncDisposable> BindFormAsync(string entityType, string entityId, string url, string bearerToken, ElementReference formElement, ElementReference dragAndDropContainer)
+    public async Task<IAsyncDisposable> BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
     {
         if (!isInitialized)
         {
@@ -26,7 +26,6 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
             entityType,
             entityId,
             url,
-            bearerToken,
             formElement,
             dragAndDropContainer
         );
@@ -77,5 +76,10 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     public Task DeleteFileAsync(string fileId)
     {
         return interop.DeleteFileAsync(fileId);
+    }
+
+    public Task SetBearerTokenAsync(string bearerToken)
+    {
+        return interop.SetBearerTokenAsync(bearerToken);
     }
 }
