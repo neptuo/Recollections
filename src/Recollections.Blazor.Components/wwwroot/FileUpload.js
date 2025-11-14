@@ -275,7 +275,7 @@ class EntityUploadQueue {
     }
 }
 
-const data = new Map();
+const queue = new EntityUploadQueue();
 let interop;
 let bearerToken;
 
@@ -293,9 +293,7 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
     if (form.data('fileUpload') != null)
         return;
 
-    const state = new EntityUploadQueue();
-    data.set(entityType + "_" + entityId, state);
-    form.data('fileUpload', state);
+    form.data('fileUpload', queue);
 
     var input = form.find("input[type=file]");
 
@@ -304,7 +302,7 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
         e.preventDefault();
     });
     input.change(async () => {
-        await state.storeAndQueueFiles(input[0].files, url, entityType, entityId);
+        await queue.storeAndQueueFiles(input[0].files, url, entityType, entityId);
         form[0].reset();
     });
 
@@ -328,7 +326,7 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
             e.preventDefault();
         });
         dragAndDropContainer.addEventListener('drop', function (e) {
-            state.storeAndQueueFiles(e.dataTransfer.files, url, entityType, entityId);
+            queue.storeAndQueueFiles(e.dataTransfer.files, url, entityType, entityId);
             e.preventDefault();
         });
     }
@@ -336,25 +334,22 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
 
 export async function getEntityStoredFiles(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
-    const queue = data.get(entityType + "_" + entityId);
-    if (queue) {
-        queue.progress.forEach(p => {
-            const index = storedFiles.findIndex(f => f.file.name === p.name);
-            if (index >= 0) {
-                storedFiles.removeAt(index);
-            }
-        });
-    }
+    queue.progress.forEach(p => {
+        if (p.entityType !== entityType || p.entityId !== entityId)
+            return;
+
+        const index = storedFiles.findIndex(f => f.file.name === p.name);
+        if (index >= 0) {
+            storedFiles.removeAt(index);
+        }
+    });
     return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 
 export async function retryEntityQueue(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
-        const state = data.get(entityType + "_" + entityId);
-        if (state) {
-            state.addStoredFilesToQueue(storedFiles);
-        }
+        queue.addStoredFilesToQueue(storedFiles);
     }
 }
 
