@@ -9,13 +9,27 @@
         </a>
         <span class="navbar-text text-white py-0 fs-4 d-sm-none flex-grow-1 overflow-hidden text-truncate me-auto">
             <DocumentTitleViewer />
-
-            <FileUploadProgressListener>
-                <ChildContent Context="files">
-                    @($"{files.Count(p => p.Status == "done" || p.Status == "error")} / {files.Count})")
-                </ChildContent>
-            </FileUploadProgressListener>
         </span>
+
+        <FileUploadProgressListener>
+            <ChildContent Context="files">
+                @if (files.Length > 0)
+                {
+                    var currentCount = files.Count(p => p.Status == "current");
+                    <div class="navbar-text d-sm-none">
+                        <div>
+                            @($"{files.Count(p => p.Status == "current" || p.Status == "done" || p.Status == "error")} / {files.Length}")
+                        </div>
+                        @if (currentCount > 0)
+                        {
+                            <div class="progress" style="height: 2px">
+                                <div class="progress-bar" style="width: @(files.Where(p => p.Status == "current").Sum(p => p.Percentual) / currentCount)%"></div>
+                            </div>
+                        }
+                    </div>
+                }
+            </ChildContent>
+        </FileUploadProgressListener>
 
         <div class="d-none d-sm-flex navbar-collapse menu-collapse">
             <ul class="navbar-nav justify-content-between w-100">
