@@ -285,11 +285,6 @@ export function initialize(interopValue) {
 
 export function setBearerToken(bearerTokenValue) {
     bearerToken = bearerTokenValue;
-    // TODO: Make explicit lifetime for bearer token.
-    // We don't want to store in indexedDB, but we all can't
-    // pass it from EntryDetail, because won't be able to
-    // reupload outside of EntryDetail.
-    // If we pass it separately, we can reupload from a general component.
 }
 
 export function bindForm(entityType, entityId, url, form, dragAndDropContainer) {

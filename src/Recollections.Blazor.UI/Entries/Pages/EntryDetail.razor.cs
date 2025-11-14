@@ -98,6 +98,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async override Task OnParametersSetAsync()
         {
+            // It's important to check if Model is set, 
+            // because parameters might be set twice we get here.
             if (previousEntryId != EntryId || Model == null) 
             {
                 await LoadAsync();
