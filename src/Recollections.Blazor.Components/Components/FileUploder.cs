@@ -10,7 +10,8 @@ namespace Neptuo.Recollections.Components;
 public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
 {
     private bool isInitialized;
-    private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotifications = [];
+    private List<Action<FileUploadProgress[]>> progressNotifications = [];
+    private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotificationsPerEntity = [];
 
     public async Task<IAsyncDisposable> BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
     {
@@ -38,21 +39,31 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     {
         log.Debug($"FileUploader.OnProgress");
 
+        foreach (var listener in progressNotifications)
+            listener(progresses);
+
         foreach (var g in progresses.GroupBy(p => $"{p.EntityType}_{p.EntityId}"))
         {
-            if (progressNotifications.TryGetValue(g.Key, out var listeners))
+            if (progressNotificationsPerEntity.TryGetValue(g.Key, out var listeners))
             {
                 foreach (var listener in listeners)
                     listener(g.ToArray());
             }
-        };
+        }
+        ;
+    }
+
+    public IDisposable AddProgressListener(Action<FileUploadProgress[]> listener)
+    {
+        progressNotifications.Add(listener);
+        return new DisposableAction(() => progressNotifications.Remove(listener));
     }
 
     public IDisposable AddProgressListener(string entityType, string entityId, Action<FileUploadProgress[]> listener)
     {
         string key = $"{entityType}_{entityId}";
-        if (!progressNotifications.TryGetValue(key, out var listeners))
-            progressNotifications[key] = listeners = [];
+        if (!progressNotificationsPerEntity.TryGetValue(key, out var listeners))
+            progressNotificationsPerEntity[key] = listeners = [];
 
         listeners.Add(listener);
         return new DisposableAction(() => listeners.Remove(listener));

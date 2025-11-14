@@ -9,6 +9,12 @@
         </a>
         <span class="navbar-text text-white py-0 fs-4 d-sm-none flex-grow-1 overflow-hidden text-truncate me-auto">
             <DocumentTitleViewer />
+
+            <FileUploadProgressListener>
+                <ChildContent Context="files">
+                    @($"{files.Count(p => p.Status == "done" || p.Status == "error")} / {files.Count})")
+                </ChildContent>
+            </FileUploadProgressListener>
         </span>
 
         <div class="d-none d-sm-flex navbar-collapse menu-collapse">
