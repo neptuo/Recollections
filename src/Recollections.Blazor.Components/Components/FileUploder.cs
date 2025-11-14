@@ -17,12 +17,12 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     {
         if (!isInitialized)
         {
-            log.Debug("FileUploader.Initialize");
+            log.Debug("Initialize");
             interop.Initialize(this);
             isInitialized = true;
         }
 
-        log.Debug("FileUploader.BindFormAsync");
+        log.Debug("BindFormAsync");
         await interop.BindFormAsync(
             entityType,
             entityId,
@@ -37,7 +37,7 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
 
     internal void OnProgress(FileUploadProgress[] progresses)
     {
-        log.Debug($"FileUploader.OnProgress");
+        log.Debug($"OnProgress '{progresses.Length}' files");
 
         foreach (var listener in progressNotifications)
             listener(progresses);
@@ -50,13 +50,18 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
                     listener(g.ToArray());
             }
         }
-        ;
     }
 
     public IDisposable AddProgressListener(Action<FileUploadProgress[]> listener)
     {
         progressNotifications.Add(listener);
-        return new DisposableAction(() => progressNotifications.Remove(listener));
+        log.Debug($"AddProgressListener global contains '{progressNotifications.Count}' listeners");
+
+        return new DisposableAction(() =>
+        {
+            progressNotifications.Remove(listener);
+            log.Debug($"RemoveProgressListener global remaining '{progressNotifications.Count}' listeners");
+        });
     }
 
     public IDisposable AddProgressListener(string entityType, string entityId, Action<FileUploadProgress[]> listener)
@@ -66,7 +71,12 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
             progressNotificationsPerEntity[key] = listeners = [];
 
         listeners.Add(listener);
-        return new DisposableAction(() => listeners.Remove(listener));
+        log.Debug($"AddProgressListener '{key}' contains '{listeners.Count}' listeners");
+        return new DisposableAction(() =>
+        {
+            listeners.Remove(listener);
+            log.Debug($"RemoveProgressListener '{key}' remaining '{listeners.Count}' listeners");
+        });
     }
 
     public Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync(string entityType, string entityId)

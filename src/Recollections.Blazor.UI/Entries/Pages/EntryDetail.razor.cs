@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class EntryDetail
+    public partial class EntryDetail : IDisposable
     {
         [Inject]
         protected Api Api { get; set; }
@@ -100,7 +100,7 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             // It's important to check if Model is set, 
             // because parameters might be set twice we get here.
-            if (previousEntryId != EntryId || Model == null) 
+            if (previousEntryId != EntryId || Model == null)
             {
                 await LoadAsync();
                 await LoadImagesAsync();
@@ -114,6 +114,11 @@ namespace Neptuo.Recollections.Entries.Pages
                 if (storedFiles.Length > 0)
                     OnStoredFilesDetected(storedFiles);
             }
+        }
+        
+        public void Dispose()
+        {
+            previousUploadListener?.Dispose();
         }
 
         private async Task LoadStoryAsync()
@@ -308,7 +313,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task OnUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
         {
-            Log.Debug("OnUploadProgressAsync: " + Json.Serialize(progresses));
+            Log.Debug($"{EntryId}: OnUploadProgressAsync: " + Json.Serialize(progresses));
 
             UploadProgress.Clear();
             if (progresses.All(p => p.Status == "done" || p.Status == "error"))
@@ -323,6 +328,7 @@ namespace Neptuo.Recollections.Entries.Pages
                         UploadError.Show();
                 }
 
+                Log.Debug($"{EntryId}: All uploads done, reloading images.");
                 await LoadImagesAsync();
             }
             else
