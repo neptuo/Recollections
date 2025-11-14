@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Neptuo.Recollections.Components;
 
 public record FileUploadProgress(
+    string Id,
     string EntityType,
     string EntityId,
     string Name,

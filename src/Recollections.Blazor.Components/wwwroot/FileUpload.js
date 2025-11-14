@@ -258,6 +258,7 @@ class EntityUploadQueue {
             this.storedFileData.push(item);
             this.files.push(item.file);
             this.progress.push({
+                id: `${item.id}`,
                 entityType: item.entityType,
                 entityId: item.entityId,
                 status: "pending",
