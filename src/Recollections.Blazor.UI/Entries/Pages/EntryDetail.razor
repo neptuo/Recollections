@@ -115,12 +115,20 @@
                 <tbody>
                     @foreach (var error in UploadErrors)
                     {
+                        var description = "";
+                        if (error.StatusCode == 400)
+                            description = "File is too large.";
+                        else if (error.StatusCode == 402)
+                            description = "Premium required.";
+                        else
+                            description = "Unexpected server error.";
+
                         <tr>
                             <td>
-                                @error.Progress.Name
+                                @error.Name
                             </td>
                             <td>
-                                @error.Description (@error.Progress.StatusCode)
+                                @description (@error.StatusCode)
                             </td>
                         </tr>
                     }

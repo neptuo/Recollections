@@ -77,8 +77,8 @@ namespace Neptuo.Recollections.Entries.Pages
         }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
-        protected List<UploadImageModel> UploadProgress { get; } = new List<UploadImageModel>();
-        protected List<UploadErrorModel> UploadErrors { get; } = new List<UploadErrorModel>();
+        protected List<UploadImageModel> UploadProgress { get; } = [];
+        protected List<FileUploadProgress> UploadErrors { get; } = [];
         protected List<FileUploadToRetry> UploadsToRetry { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
@@ -319,10 +319,10 @@ namespace Neptuo.Recollections.Entries.Pages
             if (progresses.All(p => p.Status == "done" || p.Status == "error"))
             {
                 UploadErrors.Clear();
-                UploadErrors.AddRange(progresses.Where(p => p.Status == "error").Select(p => new UploadErrorModel(p)));
+                UploadErrors.AddRange(progresses.Where(p => p.Status == "error"));
                 if (UploadErrors.Count > 0)
                 {
-                    if (UploadErrors.All(e => e.Progress.StatusCode == 402))
+                    if (UploadErrors.All(e => e.StatusCode == 402))
                         FreeLimitsNotifier.Show();
                     else
                         UploadError.Show();
@@ -522,30 +522,6 @@ namespace Neptuo.Recollections.Entries.Pages
             Ensure.NotNull(progress, "progress");
             Progress = progress;
             Image = image;
-        }
-    }
-
-    public class UploadErrorModel
-    {
-        public FileUploadProgress Progress { get; }
-
-        public UploadErrorModel(FileUploadProgress progress)
-        {
-            Ensure.NotNull(progress, "progress");
-            Progress = progress;
-        }
-
-        public string Description
-        {
-            get
-            {
-                if (Progress.StatusCode == 400)
-                    return "File is too large.";
-                else if (Progress.StatusCode == 402)
-                    return "Premium required.";
-                else
-                    return "Unexpected server error.";
-            }
         }
     }
 }
