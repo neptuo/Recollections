@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Components
         public string CssClass { get; set; }
 
         [Parameter]
-        public Action OnClick { get; set; }
+        public EventCallback OnClick { get; set; }
 
         protected string FullCssClass { get; set; }
 
@@ -35,7 +35,7 @@ namespace Neptuo.Recollections.Components
                 " ", 
                 Prefix, 
                 "fa-" + Identifier, 
-                OnClick != null ? "cursor-pointer" : null,
+                OnClick.HasDelegate ? "cursor-pointer" : null,
                 CssClass
             );
         }

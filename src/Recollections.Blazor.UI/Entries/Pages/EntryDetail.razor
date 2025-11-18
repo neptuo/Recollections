@@ -65,16 +65,16 @@
                         {
                             foreach (var upload in UploadProgress)
                             {
-                                @if (upload.IsSuccess)
+                                @if (upload.IsDone && upload.Tag != null)
                                 {
-                                    <EntryImage Image="@upload.Image" />
+                                    <EntryImage Image="@(upload.Tag as ImageModel)" />
                                 }
                                 else
                                 {
                                     <EntryImage
-                                        PlaceHolder="@upload.Description"
-                                        PlaceHolderCssClass="@upload.StatusCssClass"
-                                        PlaceHolderState="@upload.PlaceHolderState"
+                                        PlaceHolder="@upload.StatusDescription"
+                                        PlaceHolderCssClass="@(upload.IsCurrent ? (upload.Percentual == 0 ? "loading-circle" : $"text-primary") : "")"
+                                        PlaceHolderState="@GetPlaceHolderState(upload)"
                                     />
                                 }
                             }
@@ -115,20 +115,12 @@
                 <tbody>
                     @foreach (var error in UploadErrors)
                     {
-                        var description = "";
-                        if (error.StatusCode == 400)
-                            description = "File is too large.";
-                        else if (error.StatusCode == 402)
-                            description = "Premium required.";
-                        else
-                            description = "Unexpected server error.";
-
                         <tr>
                             <td>
                                 @error.Name
                             </td>
                             <td>
-                                @description (@error.StatusCode)
+                                @error.ErrorDescription (@error.StatusCode)
                             </td>
                         </tr>
                     }

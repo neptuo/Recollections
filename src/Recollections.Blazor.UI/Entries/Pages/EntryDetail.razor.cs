@@ -77,7 +77,7 @@ namespace Neptuo.Recollections.Entries.Pages
         }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
-        protected List<UploadImageModel> UploadProgress { get; } = [];
+        protected List<FileUploadProgress> UploadProgress { get; } = [];
         protected List<FileUploadProgress> UploadErrors { get; } = [];
         protected List<FileUploadToRetry> UploadsToRetry { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
@@ -108,7 +108,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 await LoadBeingsAsync();
 
                 previousUploadListener?.Dispose();
-                previousUploadListener = FileUploader.AddProgressListener("entry", EntryId, (progresses) => OnUploadProgressAsync(progresses));
+                previousUploadListener = FileUploader.AddProgressListener("entry", EntryId, (progresses) => _ = OnUploadProgressAsync(progresses));
 
                 var storedFiles = await FileUploader.GetStoredFilesToRetryAsync("entry", EntryId);
                 if (storedFiles.Length > 0)
@@ -343,7 +343,7 @@ namespace Neptuo.Recollections.Entries.Pages
                             image = Json.Deserialize<ImageModel>(progress.ResponseText);
                     }
 
-                    UploadProgress.Add(new UploadImageModel(progress, image));
+                    UploadProgress.Add(progress);
                 }
             }
 
@@ -451,77 +451,25 @@ namespace Neptuo.Recollections.Entries.Pages
             await Api.UpdateEntryBeingsAsync(EntryId, beingIds);
             await LoadBeingsAsync();
         }
-    }
 
-    public class UploadImageModel
-    {
-        public FileUploadProgress Progress { get; }
-        public ImageModel Image { get; }
-
-        public bool IsSuccess => IsDone && Image != null;
-        public bool IsDone => Progress.Status == "done";
-        public bool IsError => Progress.Status == "error";
-        public bool IsPending => Progress.Status == "pending";
-        public bool IsCurrent => Progress.Status == "current";
-
-        public string Description
+        private EntryImagePlaceHolderState GetPlaceHolderState(FileUploadProgress progress)
         {
-            get
-            {
-                if (Progress.Status == "done")
-                    return "Uploaded";
-                else if (IsCurrent && Progress.Percentual == 100)
-                    return $"Saving...";
-                else if (IsCurrent)
-                    return $"{Progress.Percentual}%";
-                else if (IsError)
-                    return "Failed to upload";
-                else if (IsPending)
-                    return "Waiting";
-                else
-                    return "Unknown...";
-            }
-        }
+            if (progress.IsError)
+                return EntryImagePlaceHolderState.Error;
 
-        public string StatusCssClass
-        {
-            get
-            {
-                if (IsCurrent)
-                    return Progress.Percentual == 0 ? "loading-circle" : $"text-primary";
-                else
-                    return String.Empty;
-            }
-        }
+            if (progress.IsPending)
+                return EntryImagePlaceHolderState.Pending;
 
-        public EntryImagePlaceHolderState PlaceHolderState 
-        {
-            get 
-            {
-                if (IsError)
-                    return EntryImagePlaceHolderState.Error;
-                
-                if (IsPending)
-                    return EntryImagePlaceHolderState.Pending;
+            if (progress.IsCurrent && progress.Percentual > 0 && progress.Percentual < 100)
+                return EntryImagePlaceHolderState.Progress;
 
-                if (IsCurrent && Progress.Percentual > 0 && Progress.Percentual < 100)
-                    return EntryImagePlaceHolderState.Progress;
+            if (progress.IsCurrent && progress.Percentual == 100)
+                return EntryImagePlaceHolderState.Finished;
 
-                if (IsCurrent && Progress.Percentual == 100)
-                    return EntryImagePlaceHolderState.Finished;
+            if (progress.IsDone)
+                return EntryImagePlaceHolderState.Success;
 
-                if (IsDone)
-                    return EntryImagePlaceHolderState.Success;
-
-                return EntryImagePlaceHolderState.None;
-            }
-        }
-
-        public UploadImageModel(FileUploadProgress progress, ImageModel image)
-        {
-            Ensure.NotNull(progress, "progress");
-            Progress = progress;
-            Image = image;
+            return EntryImagePlaceHolderState.None;
         }
     }
 }
