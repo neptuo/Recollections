@@ -30,9 +30,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Json Json { get; set; }
 
         [Inject]
-        protected IFreeLimitsNotifier FreeLimitsNotifier { get; set; }
-
-        [Inject]
         protected ILog<EntryDetail> Log { get; set; }
 
         [Inject]
@@ -78,8 +75,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
         protected List<FileUploadProgress> UploadProgress { get; } = [];
-        protected List<FileUploadProgress> UploadErrors { get; } = [];
-        protected List<FileUploadToRetry> UploadsToRetry { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
@@ -109,10 +104,6 @@ namespace Neptuo.Recollections.Entries.Pages
 
                 previousUploadListener?.Dispose();
                 previousUploadListener = FileUploader.AddProgressListener("entry", EntryId, (progresses) => _ = OnUploadProgressAsync(progresses));
-
-                var storedFiles = await FileUploader.GetStoredFilesToRetryAsync("entry", EntryId);
-                if (storedFiles.Length > 0)
-                    OnStoredFilesDetected(storedFiles);
             }
         }
         
@@ -308,9 +299,6 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private void UpdateOriginal() => original = Model.Clone();
 
-        protected Modal UploadError { get; set; }
-        protected Modal UploadRetryModal { get; set; }
-
         protected async Task OnUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
         {
             Log.Debug($"{EntryId}: OnUploadProgressAsync: " + Json.Serialize(progresses));
@@ -318,16 +306,6 @@ namespace Neptuo.Recollections.Entries.Pages
             UploadProgress.Clear();
             if (progresses.All(p => p.Status == "done" || p.Status == "error"))
             {
-                UploadErrors.Clear();
-                UploadErrors.AddRange(progresses.Where(p => p.Status == "error"));
-                if (UploadErrors.Count > 0)
-                {
-                    if (UploadErrors.All(e => e.StatusCode == 402))
-                        FreeLimitsNotifier.Show();
-                    else
-                        UploadError.Show();
-                }
-
                 Log.Debug($"{EntryId}: All uploads done, reloading images.");
                 await LoadImagesAsync();
             }
@@ -347,26 +325,6 @@ namespace Neptuo.Recollections.Entries.Pages
                 }
             }
 
-            StateHasChanged();
-        }
-
-        protected void OnStoredFilesDetected(IReadOnlyCollection<FileUploadToRetry> retries)
-        {
-            Log.Debug("OnStoredFilesDetected: " + Json.Serialize(retries));
-            UploadsToRetry.Clear();
-            UploadsToRetry.AddRange(retries);
-            StateHasChanged();
-            UploadRetryModal.Show();
-        }
-
-        protected async Task DeleteUploadToRetryAsync(FileUploadToRetry retry)
-        {
-            await FileUploader.DeleteFileAsync(retry.Id);
-            UploadsToRetry.Remove(retry);
-
-            if (UploadsToRetry.Count == 0)
-                UploadRetryModal.Hide();
-                
             StateHasChanged();
         }
 
