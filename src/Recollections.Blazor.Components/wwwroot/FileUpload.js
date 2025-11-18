@@ -15,6 +15,7 @@ function initializeDB() {
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 store.createIndex('timestamp', 'timestamp', { unique: false });
+                store.createIndex('userId', 'userId', { unique: false });
                 store.createIndex('entityType', 'entityType', { unique: false });
                 store.createIndex('entityId', 'entityId', { unique: false });
             }
@@ -32,6 +33,7 @@ async function storeFiles(files, actionUrl, entityType, entityId) {
             const storedFile = {
                 file: file,
                 actionUrl: actionUrl,
+                userId: userId,
                 entityType: entityType,
                 entityId: entityId,
                 timestamp: Date.now()
@@ -53,18 +55,6 @@ async function storeFiles(files, actionUrl, entityType, entityId) {
     return Promise.all(promises);
 }
 
-async function getStoredFiles() {
-    const db = await initializeDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.getAll();
-        
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
 async function getStoredFilesByEntity(entityType, entityId) {
     const db = await initializeDB();
     return new Promise((resolve, reject) => {
@@ -79,7 +69,7 @@ async function getStoredFilesByEntity(entityType, entityId) {
             const cursor = event.target.result;
             if (cursor) {
                 const fileData = cursor.value;
-                if (fileData.entityType === entityType && fileData.entityId === entityId) {
+                if (fileData.userId == userId && fileData.entityType === entityType && fileData.entityId === entityId) {
                     results.push(fileData);
                 }
                 cursor.continue();
@@ -250,13 +240,15 @@ class EntityUploadQueue {
 
 const queue = new EntityUploadQueue();
 let interop;
+let userId;
 let bearerToken;
 
 export function initialize(interopValue) {
     interop = interopValue;
 }
 
-export function setBearerToken(bearerTokenValue) {
+export function setBearerToken(userIdValue, bearerTokenValue) {
+    userId = userIdValue;
     bearerToken = bearerTokenValue;
 }
 

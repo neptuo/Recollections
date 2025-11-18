@@ -18,6 +18,8 @@ namespace Neptuo.Recollections.Components
         private bool isInitialized = false;
         private readonly ILog<FileUploadInterop> log;
         private FileUploader uploader;
+
+        private string userId;
         private string bearerToken;
 
         public FileUploadInterop(IJSRuntime js, ILog<FileUploadInterop> log)
@@ -50,7 +52,7 @@ namespace Neptuo.Recollections.Components
                 );
 
                 if (!string.IsNullOrEmpty(bearerToken))
-                    await module.InvokeVoidAsync("setBearerToken", this.bearerToken);
+                    await SetBearerTokenAsync(userId, bearerToken);
             }
 
             await module.InvokeVoidAsync(
@@ -107,12 +109,17 @@ namespace Neptuo.Recollections.Components
             await module.InvokeVoidAsync("destroy");
         }
 
-        internal async Task SetBearerTokenAsync(string bearerToken)
+        internal async Task SetBearerTokenAsync(string userId, string bearerToken)
         {
             if (module == null)
+            {
+                this.userId = userId;
                 this.bearerToken = bearerToken;
+            }
             else
-                await module.InvokeVoidAsync("setBearerToken", bearerToken);
+            {
+                await module.InvokeVoidAsync("setBearerToken", userId, bearerToken);
+            }
         }
     }
 }

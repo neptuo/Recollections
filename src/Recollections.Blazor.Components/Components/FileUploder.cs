@@ -117,8 +117,8 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
         return interop.DeleteFileAsync(fileId);
     }
 
-    public Task SetBearerTokenAsync(string bearerToken)
+    public Task SetBearerTokenAsync(string userId, string bearerToken)
     {
-        return interop.SetBearerTokenAsync(bearerToken);
+        return interop.SetBearerTokenAsync(userId, bearerToken);
     }
 }

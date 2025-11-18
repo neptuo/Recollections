@@ -14,7 +14,7 @@ public class FileUploadBearerToken(FileUploader fileUploader) : UserStateCompone
 
         UserState.UserChanged += OnUserChanged;
         if (UserState.IsAuthenticated)
-            await fileUploader.SetBearerTokenAsync(UserState.BearerToken);
+            await SetBearerTokenAsync();
     }
 
     public void Dispose()
@@ -24,6 +24,10 @@ public class FileUploadBearerToken(FileUploader fileUploader) : UserStateCompone
 
     private void OnUserChanged()
     {
-        _ = fileUploader.SetBearerTokenAsync(UserState.BearerToken);
+        _ = SetBearerTokenAsync();
     }
+
+    private Task SetBearerTokenAsync()
+        => fileUploader.SetBearerTokenAsync(UserState.UserId, UserState.BearerToken);
+
 }
