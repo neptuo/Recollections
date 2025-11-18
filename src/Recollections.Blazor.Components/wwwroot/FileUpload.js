@@ -28,7 +28,7 @@ async function storeFiles(files, actionUrl, entityType, entityId) {
     const store = transaction.objectStore(STORE_NAME);
     
     const promises = Array.from(files).map(file => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async resolve => {
             const storedFile = {
                 file: file,
                 actionUrl: actionUrl,
@@ -36,13 +36,17 @@ async function storeFiles(files, actionUrl, entityType, entityId) {
                 entityId: entityId,
                 timestamp: Date.now()
             };
-            
+
             const request = store.add(storedFile);
             request.onsuccess = () => {
                 storedFile.id = request.result;
                 resolve(storedFile);
             };
-            request.onerror = () => reject(request.error);
+            request.onerror = () => {
+                console.error('Failed to store file in IndexedDB:', request.error);
+                storedFile.id = null;
+                resolve(storedFile);
+            };
         });
     });
     
@@ -120,7 +124,6 @@ class EntityUploadQueue {
     reset() {
         this.uploadIndex = -1;
         this.progress = [];
-        this.files = [];
         this.storedFiles = [];
     }
 
@@ -147,17 +150,17 @@ class EntityUploadQueue {
     }
 
     uploadProgress(loaded, total) {
-        this.uploadCallback(this.files.length, this.uploadIndex, total, loaded, null);
+        this.uploadCallback(this.storedFiles.length, this.uploadIndex, total, loaded, null);
     }
 
     uploadStep(responseText) {
         this.uploadIndex++;
-        this.uploadCallback(this.files.length, this.uploadIndex, 0, 0, responseText);
+        this.uploadCallback(this.storedFiles.length, this.uploadIndex, 0, 0, responseText);
 
-        if (this.files.length > this.uploadIndex) {
+        if (this.storedFiles.length > this.uploadIndex) {
             const storedFile = this.storedFiles[this.uploadIndex];
             EntityUploadQueue.uploadFile(
-                this.files[this.uploadIndex],
+                this.storedFiles[this.uploadIndex].file,
                 storedFile.actionUrl,
                 bearerToken,
                 (response) => {
@@ -216,34 +219,9 @@ class EntityUploadQueue {
         currentRequest.send(formData);
     }
 
-    async storeAndQueueFiles(items, url, entityType, entityId) {
-        try {
-            const storedItems = await storeFiles(items, url, entityType, entityId);
-            this.addStoredFilesToQueue(storedItems);
-        } catch (error) {
-            // TODO: Should we support scenario when IndexedDB is not available? Probably yes.
-            console.error('Failed to store files in IndexedDB:', error);
-
-            // Fallback to original behavior
-            for (var i = 0; i < items.length; i++) {
-                var file = items[i];
-                this.files.push(file);
-                this.progress.push({
-                    entityType: entityType,
-                    entityId: entityId,
-                    status: "pending",
-                    statusCode: 0,
-                    name: file.name,
-                    responseText: null,
-                    uploaded: 0,
-                    size: file.size
-                });
-            }
-
-            if (this.uploadIndex == -1) {
-                this.uploadStep();
-            }
-        }
+    async storeAndQueueFiles(items, actionUrl, entityType, entityId) {
+        const storedItems = await storeFiles(items, actionUrl, entityType, entityId);
+        this.addStoredFilesToQueue(storedItems);
     }
 
     addStoredFilesToQueue(storedItems) {
@@ -251,7 +229,6 @@ class EntityUploadQueue {
         for (var i = 0; i < storedItems.length; i++) {
             var item = storedItems[i];
             this.storedFiles.push(item);
-            this.files.push(item.file);
             this.progress.push({
                 id: item.id ? `${item.id}` : null,
                 entityType: item.entityType,
