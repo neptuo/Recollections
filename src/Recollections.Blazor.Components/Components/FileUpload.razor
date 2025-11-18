@@ -18,7 +18,7 @@
             <thead>
                 <tr>
                     <th scope="col">File</th>
-                    <th scope="col">Error</th>
+                    <td></td>
                 </tr>
             </thead>
             <tbody>
@@ -27,9 +27,13 @@
                     <tr>
                         <td>
                             @error.Name
+                            <br />
+                            <small class="text-warning">
+                                @error.ErrorDescription (@error.StatusCode)
+                            </small>
                         </td>
-                        <td>
-                            @error.ErrorDescription (@error.StatusCode)
+                        <td style="width: 1%">
+                            <Icon Identifier="trash-alt" OnClick="@(() => DeleteUploadErrorAsync(error))" CssClass="text-danger" />
                         </td>
                     </tr>
                 }
@@ -45,28 +49,24 @@
         </button>
     </Buttons>
 </Modal>
-<Modal @ref="@UploadRetryModal" Title="Files from last time to retry" IsClosable="false">
+<Modal @ref="@UploadRetry" Title="Unfinished files from last time" IsClosable="false">
     <ChildContent>
-        <Alert Mode="AlertMode.Warning" Message="@($"Some uploads ({UploadsToRetry.Count}) did not finished last time.")" />
+        <Alert Mode="AlertMode.Warning" Message="@($"Some uploads ({UploadRetries.Count}) did not finish last time.")" />
 
         <table class="table table-sm table-hover">
             <thead>
                 <tr>
                     <th scope="col">File</th>
-                    <th scope="col">Size</th>
                     <td></td>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var retry in UploadsToRetry)
+                @foreach (var retry in UploadRetries)
                 {
                     var item = retry;
                     <tr>
                         <td>
                             @retry.Name
-                        </td>
-                        <td>
-                            @retry.Size
                         </td>
                         <td style="width: 1%">
                             <Icon Identifier="trash-alt" OnClick="@(() => DeleteUploadToRetryAsync(item))" CssClass="text-danger" />
@@ -78,8 +78,8 @@
 
     </ChildContent>
     <Buttons>
-        <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); return FileUploader.RetryEntityQueueAsync(EntityType, EntityId); })">Retry</button>
-        <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadRetryModal.Hide(); UploadsToRetry.Clear(); return FileUploader.ClearEntityQueueAsync(EntityType, EntityId); })">
+        <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.RetryEntityQueueAsync(EntityType, EntityId); })">Retry</button>
+        <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.ClearEntityQueueAsync(EntityType, EntityId); })">
             <Icon Identifier="trash-alt" CssClass="me-1" />
             Remove all
         </button>
