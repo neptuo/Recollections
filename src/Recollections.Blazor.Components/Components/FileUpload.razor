@@ -7,7 +7,7 @@
 </form>
 
 
-<Modal @ref="@UploadError" Title="Upload Error">
+<Modal @ref="@UploadError" Title="Upload Error" IsClosable="false">
     <ChildContent>
         @{
             var message = $"Some uploads ({UploadErrors.Count}) finished with errors.";
@@ -45,7 +45,7 @@
         </button>
     </Buttons>
 </Modal>
-<Modal @ref="@UploadRetryModal" Title="Files from last time to retry">
+<Modal @ref="@UploadRetryModal" Title="Files from last time to retry" IsClosable="false">
     <ChildContent>
         <Alert Mode="AlertMode.Warning" Message="@($"Some uploads ({UploadsToRetry.Count}) did not finished last time.")" />
 

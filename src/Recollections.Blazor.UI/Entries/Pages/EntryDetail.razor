@@ -74,7 +74,7 @@
                                     <EntryImage
                                         PlaceHolder="@upload.StatusDescription"
                                         PlaceHolderCssClass="@(upload.IsCurrent ? (upload.Percentual == 0 ? "loading-circle" : $"text-primary") : "")"
-                                        PlaceHolderState="@GetPlaceHolderState(upload)"
+                                        PlaceHolderState="@GetImagePlaceHolderState(upload)"
                                     />
                                 }
                             }

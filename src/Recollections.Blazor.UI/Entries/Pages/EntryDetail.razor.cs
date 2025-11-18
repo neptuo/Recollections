@@ -410,7 +410,7 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadBeingsAsync();
         }
 
-        private EntryImagePlaceHolderState GetPlaceHolderState(FileUploadProgress progress)
+        private EntryImagePlaceHolderState GetImagePlaceHolderState(FileUploadProgress progress)
         {
             if (progress.IsError)
                 return EntryImagePlaceHolderState.Error;

@@ -52,6 +52,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public ModalSize Size { get; set; } = ModalSize.Normal;
 
+        [Parameter]
+        public bool IsClosable { get; set; } = true;
+
         protected ElementReference Container { get; set; }
 
         protected override void OnInitialized()

@@ -1,4 +1,4 @@
-﻿<div @ref="Container" class="modal fade @CssClass" tabindex="-1" role="dialog">
+﻿<div @ref="Container" class="modal fade @CssClass" tabindex="-1" role="dialog" data-bs-backdrop="@(!IsClosable ? "static" : "true")" data-bs-keyboard="@(!IsClosable ? "false" : "true")">
     <div class="@DialogCssClass" role="document">
         <form @onsubmit="@OnFormSubmit" @onsubmit:preventDefault="true">
             <div class="modal-content">
@@ -13,14 +13,20 @@
                             @Title
                         }
                     </h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    @if (IsClosable)
+                    {
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    }
                 </div>
                 <div class="modal-body">
                     @ChildContent
                 </div>
                 <div class="modal-footer">
                     @Buttons
-                    <button type="button" class="btn btn-default btn-light btn-sm" @onclick="@OnCloseButtonClick">@CloseButtonText</button>
+                    @if (IsClosable)
+                    {
+                        <button type="button" class="btn btn-default btn-light btn-sm" @onclick="@OnCloseButtonClick">@CloseButtonText</button>
+                    }
                 </div>
             </div>
         </form>
