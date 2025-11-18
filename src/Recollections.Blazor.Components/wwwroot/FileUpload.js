@@ -118,7 +118,7 @@ class EntityUploadQueue {
     }
 
     raiseProgress() {
-        interop.invokeMethodAsync("FileUpload.OnProgress", this.progress);
+        interop.invokeMethodAsync("FileUpload.OnChange", this.progress);
     }
 
     reset() {
@@ -127,7 +127,7 @@ class EntityUploadQueue {
         this.storedFiles = [];
     }
 
-    uploadCallback(imagesCount, imagesCompleted, currentSize, currentUploaded, responseText) {
+    uploadCallback(imagesCount, imagesCompleted, responseText) {
         for (var i = 0; i < imagesCount; i++) {
             if (this.progress[i].status != "done" && this.progress[i].status != "error") {
                 if (imagesCompleted > i) {
@@ -137,7 +137,7 @@ class EntityUploadQueue {
 
                 if (imagesCompleted == i) {
                     this.progress[i].status = "current";
-                    this.progress[i].uploaded = currentUploaded;
+                    this.progress[i].uploaded = 0;
                 } else if (imagesCompleted - 1 == i) {
                     if (responseText != null) {
                         this.progress[i].responseText = responseText;
@@ -150,12 +150,12 @@ class EntityUploadQueue {
     }
 
     uploadProgress(loaded, total) {
-        this.uploadCallback(this.storedFiles.length, this.uploadIndex, total, loaded, null);
+        interop.invokeMethodAsync("FileUpload.OnProgress", this.uploadIndex, total, loaded);
     }
 
     uploadStep(responseText) {
         this.uploadIndex++;
-        this.uploadCallback(this.storedFiles.length, this.uploadIndex, 0, 0, responseText);
+        this.uploadCallback(this.storedFiles.length, this.uploadIndex, responseText);
 
         if (this.storedFiles.length > this.uploadIndex) {
             const storedFile = this.storedFiles[this.uploadIndex];

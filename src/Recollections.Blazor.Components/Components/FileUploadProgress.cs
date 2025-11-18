@@ -20,6 +20,8 @@ public record FileUploadProgress(
     int Uploaded
 )
 {
+    public int Uploaded { get; internal set; } = Uploaded;
+
     public int Percentual
     {
         get
@@ -31,4 +33,6 @@ public record FileUploadProgress(
             return percentual;
         }
     }
+
+    public object Tag { get; set; }
 }

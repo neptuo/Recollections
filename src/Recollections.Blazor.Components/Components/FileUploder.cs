@@ -10,6 +10,7 @@ namespace Neptuo.Recollections.Components;
 public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
 {
     private bool isInitialized;
+    private FileUploadProgress[] lastProgresses;
     private List<Action<FileUploadProgress[]>> progressNotifications = [];
     private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotificationsPerEntity = [];
 
@@ -35,10 +36,8 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
         return new AsyncDisposableAction(() => Task.CompletedTask);
     }
 
-    internal void OnProgress(FileUploadProgress[] progresses)
+    private void RaiseProgressNotification(FileUploadProgress[] progresses)
     {
-        log.Debug($"OnProgress '{progresses.Length}' files");
-
         foreach (var listener in progressNotifications)
             listener(progresses);
 
@@ -50,6 +49,25 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
                     listener(g.ToArray());
             }
         }
+    }
+
+    internal void OnChange(FileUploadProgress[] progresses)
+    {
+        log.Debug($"OnChange '{progresses.Length}' files");
+        lastProgresses = progresses;
+        RaiseProgressNotification(progresses);
+    }
+
+    internal void OnProgress(int index, int total, int loaded)
+    {
+        log.Debug($"OnProgress '{index}: {total}' loaded '{loaded}' bytes");
+        if (lastProgresses == null)
+            return;
+
+        if (lastProgresses.Length > index)
+            lastProgresses[index].Uploaded = loaded;
+        
+        RaiseProgressNotification(lastProgresses);
     }
 
     public IDisposable AddProgressListener(Action<FileUploadProgress[]> listener)

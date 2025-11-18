@@ -63,11 +63,18 @@ namespace Neptuo.Recollections.Components
             );
         }
 
+        [JSInvokable("FileUpload.OnChange")]
+        public void OnChange(FileUploadProgress[] progresses)
+        {
+            log.Debug($"FileUploadInterop.OnChange");
+            uploader.OnChange(progresses);
+        }
+
         [JSInvokable("FileUpload.OnProgress")]
-        public void OnProgress(FileUploadProgress[] progresses)
+        public void OnProgress(int index, int total, int loaded)
         {
             log.Debug($"FileUploadInterop.OnProgress");
-            uploader.OnProgress(progresses);
+            uploader.OnProgress(index, total, loaded);
         }
 
         public async Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync(string entityType, string entityId)

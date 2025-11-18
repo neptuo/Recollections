@@ -337,7 +337,11 @@ namespace Neptuo.Recollections.Entries.Pages
                 {
                     ImageModel image = null;
                     if (progress.Status == "done" && progress.ResponseText != null)
-                        image = Json.Deserialize<ImageModel>(progress.ResponseText);
+                    {
+                        image = progress.Tag as ImageModel;
+                        if (image == null)
+                            image = Json.Deserialize<ImageModel>(progress.ResponseText);
+                    }
 
                     UploadProgress.Add(new UploadImageModel(progress, image));
                 }
