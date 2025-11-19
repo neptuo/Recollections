@@ -103,12 +103,16 @@ class EntityUploadQueue {
         this.progress[this.uploadIndex].status = "error";
         this.progress[this.uploadIndex].statusCode = statusCode;
         this.progress[this.uploadIndex].responseText = message;
-        this.raiseProgress();
+        this.raiseChanged();
         this.uploadStep(null);
     }
 
-    raiseProgress() {
+    raiseChanged() {
         interop.invokeMethodAsync("FileUpload.OnChange", this.progress);
+    }
+
+    raiseProgress(loaded, total) {
+        interop.invokeMethodAsync("FileUpload.OnProgress", this.uploadIndex, total, loaded);
     }
 
     reset() {
@@ -136,11 +140,7 @@ class EntityUploadQueue {
             }
         }
 
-        this.raiseProgress();
-    }
-
-    uploadProgress(loaded, total) {
-        interop.invokeMethodAsync("FileUpload.OnProgress", this.uploadIndex, total, loaded);
+        this.raiseChanged();
     }
 
     uploadStep(responseText) {
@@ -162,7 +162,7 @@ class EntityUploadQueue {
                     this.uploadStep(response);
                 },
                 (statusCode, message) => this.uploadError(statusCode, message),
-                (loaded, total) => this.uploadProgress(loaded, total)
+                (loaded, total) => this.raiseProgress(loaded, total)
             );
         } else {
             this.reset();
@@ -234,6 +234,8 @@ class EntityUploadQueue {
 
         if (this.uploadIndex == -1) {
             this.uploadStep();
+        } else {
+            this.raiseChanged();
         }
     }
 }
