@@ -13900,7 +13900,7 @@ input.input-number-noarrows[type=number] {
 
 .timeline {
   width: 100%;
-  padding: 64px 0 0 6px;
+  padding: 1rem 0 0 6px;
   position: relative;
   font-family: "Source Sans Pro", sans-serif;
   font-weight: 300;
@@ -13908,7 +13908,7 @@ input.input-number-noarrows[type=number] {
 .timeline:before {
   content: "";
   position: absolute;
-  top: 0px;
+  top: 1rem;
   left: 15%;
   bottom: 0px;
   width: 4px;
@@ -14026,6 +14026,7 @@ input.input-number-noarrows[type=number] {
 }
 
 .entry-detail .timeline:before {
+  top: 20px;
   border-radius: 4px;
 }
 .entry-detail .timeline:before {

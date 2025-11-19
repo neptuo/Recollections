@@ -4,16 +4,18 @@
 {
     var lastYear = 0;
     <div class="timeline">
+        @if (ShowYearSeparators)
+        {
+            @Separator("Now")
+        }
+
         @BeforeContent
 
         @foreach (var entry in Entries)
         {
             if (ShowYearSeparators && entry.When.Year != lastYear)
             {
-                lastYear = entry.When.Year;
-                <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
-                    @lastYear
-                </div>
+                @Separator(entry.When.Year)
             }
 
             <div class="entry">
@@ -100,4 +102,14 @@
             <AutoloadNext Intersected="LoadMoreAsync" />
         }
     </div>
+}
+
+@code
+{
+    RenderFragment Separator<T>(T content)
+    {
+        return @<div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
+            @content
+        </div>;
+    }
 }
