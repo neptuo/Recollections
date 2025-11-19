@@ -191,6 +191,7 @@ namespace Neptuo.Recollections.Accounts.Components
 
         public async Task EnsureAuthenticatedAsync()
         {
+            Log.Debug($"EnsureAuthenticatedAsync");
             IsAuthenticationRequired = true;
             StateHasChanged();
         }
