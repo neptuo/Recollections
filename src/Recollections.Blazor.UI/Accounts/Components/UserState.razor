@@ -1,7 +1,12 @@
 ﻿<CascadingValue Value="@this">
-    @if (IsAuthenticationRequired)
+    @if (IsEnsureInitializedPage && !initializationSource.Task.IsCompleted)
     {
-        <Neptuo.Recollections.Accounts.Pages.Login />
+        <div class="container mt-4">
+            <h5 class="text-center">
+                <Icon Identifier="user-clock" />
+                Verifying your cookie...
+            </h5>
+        </div>
     }
     else if (IsTokenProcessing)
     {
@@ -11,6 +16,10 @@
                 Processing your invitation token...
             </h5>
         </div>
+    }
+    else if ((IsEnsureAuthenticatedPage || IsAuthenticationRequired) && !IsAuthenticated)
+    {
+        <Neptuo.Recollections.Accounts.Pages.Login />
     }
     else
     {

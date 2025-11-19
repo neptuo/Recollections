@@ -79,12 +79,6 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Gallery Gallery { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
 
-        protected async override Task OnInitializedAsync()
-        {
-            Log.Debug("OnInitializedAsync");
-            await base.OnInitializedAsync();
-        }
-
         public override Task SetParametersAsync(ParameterView parameters)
         {
             previousEntryId = EntryId;
@@ -93,9 +87,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async override Task OnParametersSetAsync()
         {
-            // It's important to check if Model is set, 
-            // because parameters might be set twice we get here.
-            if (previousEntryId != EntryId || Model == null)
+            if (previousEntryId != EntryId)
             {
                 await LoadAsync();
                 await LoadImagesAsync();

@@ -40,12 +40,6 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
 
-        protected async override Task OnInitializedAsync()
-        {
-            await base.OnInitializedAsync();
-            await EnsureAuthenticatedAsync();
-        }
-
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             int? prevYear = Year;

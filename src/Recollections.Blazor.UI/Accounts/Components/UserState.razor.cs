@@ -50,7 +50,9 @@ namespace Neptuo.Recollections.Accounts.Components
         public bool IsAuthenticated => BearerToken != null;
 
         protected bool IsTokenProcessing { get; set; }
-        protected bool IsAuthenticationRequired { get; set; }
+        protected bool IsEnsureInitializedPage => typeof(UserStateComponentBase).IsAssignableFrom(RouteData?.PageType);
+        protected bool IsEnsureAuthenticatedPage => typeof(UserStateAuthenticatedComponentBase).IsAssignableFrom(RouteData?.PageType);
+        protected bool IsAuthenticationRequired { get; private set; }
 
         private async Task SetAuthorizationAsync(string bearerToken, bool isPersistent, bool isStore = true)
         {
@@ -127,7 +129,6 @@ namespace Neptuo.Recollections.Accounts.Components
 
         private void OnLocationChanged(string url)
         {
-            SetAuthenticationRequiredOnly(false);
             StateHasChanged();
         }
 
@@ -172,19 +173,11 @@ namespace Neptuo.Recollections.Accounts.Components
 
         private void SetAuthenticationRequired(bool isRequired)
         {
-            SetAuthenticationRequiredOnly(isRequired);
-
             Log.Debug($"IsAuthenticated: '{IsAuthenticated}', PageType: '{RouteData?.PageType?.Name}'.");
             if (IsAuthenticated && RouteData?.PageType == typeof(Pages.Login))
                 Navigator.OpenTimeline();
             else
                 StateHasChanged();
-        }
-
-        private void SetAuthenticationRequiredOnly(bool isRequired)
-        {
-            Log.Debug($"SetAuthenticationRequired to '{isRequired}'.");
-            IsAuthenticationRequired = isRequired;
         }
 
         public async Task LogoutAsync()
@@ -198,10 +191,8 @@ namespace Neptuo.Recollections.Accounts.Components
 
         public async Task EnsureAuthenticatedAsync()
         {
-            await EnsureInitializedAsync();
-
-            if (!IsAuthenticated)
-                SetAuthenticationRequired(true);
+            IsAuthenticationRequired = true;
+            StateHasChanged();
         }
     }
 }
