@@ -27,6 +27,12 @@
                             </div>
                         }
                     </div>
+                    @if (files.Any(p => p.Status == "error"))
+                    {
+                        <div class="navbar-text d-sm-none ms-2">
+                            <Icon Identifier="exclamation-triangle" CssClass="text-warning" />
+                        </div>
+                    }
                 }
             </ChildContent>
         </FileUploadProgressListener>
