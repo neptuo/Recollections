@@ -14290,6 +14290,9 @@ input.input-number-noarrows[type=number] {
 .stories .card a:hover {
   text-decoration: none;
 }
+.stories .information {
+  color: var(--bs-secondary-color);
+}
 
 .entry-detail .chapter {
   margin-top: 1.5rem !important;
@@ -14324,6 +14327,9 @@ input.input-number-noarrows[type=number] {
   right: var(--bs-card-spacer-x);
   font-size: 2rem;
   line-height: 1.5rem;
+}
+.beings .information {
+  color: var(--bs-secondary-color);
 }
 
 .icon-picker .modal-body .btn {

@@ -15,14 +15,14 @@
                 }
             </a>
         </h5>
-        <div class="entries">
+        <div class="information">
             <Icon Prefix="fas" Identifier="comment-alt" />
-            @Model.Entries entries
+            @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
         </div>
 
         @if (UserState.UserId != Model.UserId)
         {
-            <div class="owner">
+            <div class="information">
                 <Icon Identifier="user" />
                 @Model.UserName
             </div>

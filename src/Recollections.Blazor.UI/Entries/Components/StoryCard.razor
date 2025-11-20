@@ -11,20 +11,20 @@
         <div>
             @if (Model.Chapters > 0)
             {
-                <div class="chapters @(OnChaptersClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnChaptersClick">
+                <div class="information @(OnChaptersClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnChaptersClick">
                     <Icon Identifier="book" />
                     @Model.Chapters chapters
                 </div>
             }
 
-            <div class="entries">
+            <div class="information">
                 <Icon Prefix="fas" Identifier="comment-alt" />
-                @Model.Entries entries
+                @(Model.Entries == 1 ? "entry" : "entries")
             </div>
 
             @if (Model.MinDate != null || Model.MaxDate != null)
             {
-                <div class="dates">
+                <div class="information">
                     <Icon Identifier="calendar" />
                     <span class="ms-1">
                         @if (Model.MinDate != null)
@@ -50,7 +50,7 @@
 
             @if (UserState.UserId != Model.UserId)
             {
-                <div class="owner">
+                <div class="information">
                     <Icon Identifier="user" />
                     @Model.UserName
                 </div>
