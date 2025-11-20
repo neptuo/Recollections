@@ -3,7 +3,7 @@
         <div class="d-grid gap-3">
             <ListView Items="@Beings" IsLoading="@IsLoading" Context="being">
                 <div class="d-flex align-items-start">
-                    <BeingCard Model="being" OnCardClick="@(() => OnItemClick(being.Id))" CardCssClass="@($"flex-grow-1 {(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)}")" />
+                    <BeingCard Model="being" OnCardClick="@(() => OnItemClick(being.Id))" CardCssClass="@($"no-hover flex-grow-1 {(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)}")" />
                     <button class="btn btn-link py-0 pe-0 ps-2 fs-3 text-secondary" @onclick="@(() => { Modal.Hide(); Navigator.OpenBeingDetail(being.Id); })">
                         <Icon Identifier="circle-info" />
                     </button>

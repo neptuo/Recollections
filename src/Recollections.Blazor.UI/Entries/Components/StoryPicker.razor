@@ -13,7 +13,7 @@
                     @{
                         var state = StoryStates.GetValueOrDefault(story.Id) ?? (StoryStates[story.Id] = new());
                     }
-                    <StoryCard Model="@story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
+                    <StoryCard Model="@story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"no-hover flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
                         <AfterTitleContent>
                             @if (story.Chapters > 0)
                             {

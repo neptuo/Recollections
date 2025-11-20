@@ -14267,7 +14267,7 @@ input.input-number-noarrows[type=number] {
 .stories .card.selected {
   background-color: rgba(250, 128, 114, 0.5);
 }
-.stories .card:hover {
+.stories .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
 }
 .stories .card a:hover {
@@ -14292,7 +14292,7 @@ input.input-number-noarrows[type=number] {
 .beings .card.selected {
   background-color: rgba(250, 128, 114, 0.5);
 }
-.beings .card:hover {
+.beings .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
 }
 .beings .card a:hover {
@@ -14329,7 +14329,7 @@ input.input-number-noarrows[type=number] {
 .search .card.selected {
   background-color: rgba(250, 128, 114, 0.5);
 }
-.search .card:hover {
+.search .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
 }
 .search .card a:hover {

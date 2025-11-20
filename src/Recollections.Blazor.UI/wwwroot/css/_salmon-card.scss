@@ -5,7 +5,7 @@
         background-color: rgba(250, 128, 114, 0.5);
     }
 
-    &:hover {
+    &:hover:not(.no-hover) {
         background-color: rgba(250, 128, 114, 0.25);
     }
 
