@@ -10,22 +10,34 @@
         <div class="d-grid gap-3">
             <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
                 <div class="d-flex align-items-start">
-                    <StoryCard Model="story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
+                    @{
+                        var state = StoryStates.GetValueOrDefault(story.Id) ?? (StoryStates[story.Id] = new());
+                    }
+                    <StoryCard Model="@story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
                         <AfterTitleContent>
                             @if (story.Chapters > 0)
                             {
-                                <Icon
-                                    OnClick="@(async () => await LoadChaptersAsync(story))"
-                                    Identifier="@((ToggleStates.TryGetValue(story.Id, out var toggledForIcon) && toggledForIcon) ? "chevron-down" : "chevron-left")" 
-                                    CssClass="fs-5 cursor-pointer chapter-toggle"
-                                />
+                                if (state.IsLoading)
+                                {
+                                    <div class="spinner-border spinner-border-sm">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <Icon
+                                        OnClick="@(async () => await LoadChaptersAsync(story))"
+                                        Identifier="@(state.IsExpanded ? "chevron-down" : "chevron-left")" 
+                                        CssClass="fs-5 cursor-pointer chapter-toggle"
+                                    />
+                                }
                             }
                         </AfterTitleContent>
                         <EndBodyContent>
-                            @if (ToggleStates.TryGetValue(story.Id, out var toggled) && toggled && Chapters.TryGetValue(story.Id, out var chapters))
+                            @if (state.IsExpanded && state.Chapters != null)
                             {
                                 <hr />
-                                @foreach (var chapter in chapters)
+                                @foreach (var chapter in state.Chapters)
                                 {
                                     <div class="pb-2">
                                         <a class="@(SelectedChapterId == chapter.Id ? "fw-bold" : string.Empty)" @onclick="(async () => await SelectAsync(story, chapter))" @onclick:stopPropagation="true">

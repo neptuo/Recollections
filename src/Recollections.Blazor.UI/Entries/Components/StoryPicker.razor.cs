@@ -34,9 +34,8 @@ namespace Neptuo.Recollections.Entries.Components
 
         protected bool IsLoading { get; set; }
         protected List<StoryListModel> Stories { get; } = new List<StoryListModel>();
-        protected Dictionary<string, List<StoryChapterListModel>> Chapters = new();
         protected string ErrorMessage { get; set; }
-        protected Dictionary<string, bool> ToggleStates { get; set; } = new();
+        private Dictionary<string, StoryState> StoryStates { get; set; } = new();
 
         protected string SelectedStoryId;
         protected string SelectedChapterId;
@@ -69,23 +68,30 @@ namespace Neptuo.Recollections.Entries.Components
                 Hide();
         }
 
-        public void SetErrorMessage(string errorMessage = null) 
+        public void SetErrorMessage(string errorMessage = null)
             => ErrorMessage = errorMessage;
 
         protected async Task LoadChaptersAsync(StoryListModel story)
         {
             if (story.Chapters > 0)
             {
-                if (!Chapters.ContainsKey(story.Id))
+                if (!StoryStates.TryGetValue(story.Id, out var state))
+                    StoryStates[story.Id] = state = new ();
+
+                if (state.Chapters == null)
                 {
-                    Chapters[story.Id] = await Api.GetStoryChapterListAsync(story.Id);
-                    ToggleStates[story.Id] = true;
+                    try
+                    {
+                        state.IsLoading = true;
+                        state.Chapters = await Api.GetStoryChapterListAsync(story.Id);
+                    }
+                    finally
+                    {
+                        state.IsLoading = false;
+                    }
                 }
-                else 
-                {
-                    ToggleStates.TryGetValue(story.Id, out var state);
-                    ToggleStates[story.Id] = !state;
-                }
+
+                state.IsExpanded = !state.IsExpanded;
             }
         }
 
@@ -94,7 +100,7 @@ namespace Neptuo.Recollections.Entries.Components
             SelectedStoryId = storyId;
             SelectedChapterId = chapterId;
             ErrorMessage = null;
-            ToggleStates.Clear();
+            StoryStates.Clear();
 
             Modal.Show();
 
@@ -103,7 +109,7 @@ namespace Neptuo.Recollections.Entries.Components
                 isFirstShow = false;
                 await LoadAsync();
             }
-            
+
             if (chapterId != null)
             {
                 var story = Stories.FirstOrDefault(s => s.Id == storyId);
@@ -116,5 +122,12 @@ namespace Neptuo.Recollections.Entries.Components
         }
 
         public void Hide() => Modal.Hide();
+    }
+    
+    class StoryState
+    {
+        public bool IsLoading { get; set; }
+        public bool IsExpanded { get; set; }
+        public List<StoryChapterListModel> Chapters { get; set; }
     }
 }
