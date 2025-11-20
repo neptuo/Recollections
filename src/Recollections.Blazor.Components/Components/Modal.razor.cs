@@ -53,6 +53,9 @@ namespace Neptuo.Recollections.Components
         public ModalSize Size { get; set; } = ModalSize.Normal;
 
         [Parameter]
+        public bool IsOverflow { get; set; }
+
+        [Parameter]
         public bool IsClosable { get; set; } = true;
 
         protected ElementReference Container { get; set; }
@@ -96,6 +99,9 @@ namespace Neptuo.Recollections.Components
                 default:
                     throw Ensure.Exception.NotSupported(Size.ToString());
             }
+
+        if (IsOverflow)
+            DialogCssClass += " modal-overflow";
         }
 
         protected void OnCloseButtonClick()

@@ -13570,6 +13570,16 @@ a.bg-salmon {
             flex: 1 1 auto !important;
   }
 }
+.modal .modal-overflow .modal-body {
+  max-height: calc(100vh - 142px - 1rem);
+  overflow: auto;
+}
+
+@media (min-width: 576px) {
+  .modal .modal-overflow .modal-body {
+    max-height: calc(100vh - 142px - 2.5rem);
+  }
+}
 .loading-bar {
   display: inline-block;
   position: relative;

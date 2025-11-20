@@ -157,6 +157,17 @@ a.bg-salmon {
     }
 }
 
+.modal .modal-overflow .modal-body {
+    max-height: calc(100vh - 142px - 1rem);
+    overflow: auto;
+}
+
+@media (min-width: 576px) {
+    .modal .modal-overflow .modal-body {
+        max-height: calc(100vh - 142px - 2.5rem);
+    }
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";
