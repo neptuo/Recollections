@@ -14281,29 +14281,9 @@ input.input-number-noarrows[type=number] {
   margin-bottom: 1.5rem;
 }
 
-.story-picker .story {
-  padding: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-.story-picker .story .title {
-  display: block;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.story-picker .story .chapters {
-  padding-right: 0.5rem;
-}
-.story-picker .story .chapters ul {
-  padding-left: 20px;
-}
-.story-picker .story:first-child {
-  padding-top: 0;
-}
-.story-picker .story:last-child {
-  padding-bottom: 0;
-  border-bottom-width: 0;
+.story-picker .chapter-toggle {
+  margin: calc(var(--bs-card-spacer-y) * -1) calc(var(--bs-card-spacer-x) * -1);
+  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
 }
 
 .beings .card {
@@ -14432,4 +14412,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

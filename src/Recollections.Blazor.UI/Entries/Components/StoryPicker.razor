@@ -1,4 +1,4 @@
-﻿<Modal @ref="Modal" Title="Select a Story or Chapter" CssClass="stories">
+﻿<Modal @ref="Modal" Title="Select a Story or Chapter" CssClass="stories story-picker">
     <ChildContent>
         @if (!String.IsNullOrEmpty(ErrorMessage))
         {
@@ -14,9 +14,11 @@
                         <AfterTitleContent>
                             @if (story.Chapters > 0)
                             {
-                                <span class="cursor-pointer" @onclick="(async () => await LoadChaptersAsync(story))">
-                                    <Icon Identifier="@((ToggleStates.TryGetValue(story.Id, out var toggledForIcon) && toggledForIcon) ? "chevron-down" : "chevron-left")" CssClass="fs-5" />
-                                </span>
+                                <Icon
+                                    OnClick="@(async () => await LoadChaptersAsync(story))"
+                                    Identifier="@((ToggleStates.TryGetValue(story.Id, out var toggledForIcon) && toggledForIcon) ? "chevron-down" : "chevron-left")" 
+                                    CssClass="fs-5 cursor-pointer chapter-toggle"
+                                />
                             }
                         </AfterTitleContent>
                         <EndBodyContent>
