@@ -15,6 +15,7 @@
         {
             if (ShowYearSeparators && entry.When.Year != lastYear)
             {
+                lastYear = entry.When.Year;
                 @Separator(entry.When.Year)
             }
 
