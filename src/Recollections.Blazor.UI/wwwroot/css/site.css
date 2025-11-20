@@ -14278,14 +14278,13 @@ input.input-number-noarrows[type=number] {
   margin: 0 auto;
 }
 
-.stories .card {
-  border-color: salmon;
-}
 .stories .card.selected {
   background-color: rgba(250, 128, 114, 0.5);
+  border-color: salmon;
 }
 .stories .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
+  border-color: salmon;
 }
 .stories .card a:hover {
   text-decoration: none;
@@ -14301,19 +14300,30 @@ input.input-number-noarrows[type=number] {
   margin-bottom: 1.5rem;
 }
 
-.story-picker .chapter-toggle {
-  margin: calc(var(--bs-card-spacer-y) * -1) calc(var(--bs-card-spacer-x) * -1);
-  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+.story-picker .card-header .fa,
+.story-picker .card-header .fas {
+  margin-top: calc(var(--bs-card-cap-padding-y) * -1);
+  margin-bottom: calc(var(--bs-card-cap-padding-y) * -1);
+  padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
+  width: 52px;
+  text-align: center;
+}
+.story-picker .card-header .fa:last-child,
+.story-picker .card-header .fas:last-child {
+  margin-right: calc(var(--bs-card-cap-padding-x) * -1);
+}
+.story-picker hr {
+  margin-left: calc(var(--bs-card-spacer-x) * -1);
+  margin-right: calc(var(--bs-card-spacer-x) * -1);
 }
 
-.beings .card {
-  border-color: salmon;
-}
 .beings .card.selected {
   background-color: rgba(250, 128, 114, 0.5);
+  border-color: salmon;
 }
 .beings .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
+  border-color: salmon;
 }
 .beings .card a:hover {
   text-decoration: none;
@@ -14323,9 +14333,9 @@ input.input-number-noarrows[type=number] {
 }
 .beings .being-icon {
   position: absolute;
-  top: var(--bs-card-spacer-y);
+  top: 56px;
   right: var(--bs-card-spacer-x);
-  font-size: 2rem;
+  font-size: 1.4rem;
   line-height: 1.5rem;
 }
 .beings .information {
@@ -14346,14 +14356,13 @@ input.input-number-noarrows[type=number] {
   opacity: 0.5;
 }
 
-.search .card {
-  border-color: salmon;
-}
 .search .card.selected {
   background-color: rgba(250, 128, 114, 0.5);
+  border-color: salmon;
 }
 .search .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
+  border-color: salmon;
 }
 .search .card a:hover {
   text-decoration: none;

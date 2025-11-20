@@ -1,6 +1,20 @@
 ﻿.story-picker {
-    .chapter-toggle {
-        margin: calc(var(--bs-card-spacer-y) * -1) calc(var(--bs-card-spacer-x) * -1);
-        padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+    .card-header .fa, 
+    .card-header .fas {
+        margin-top: calc(var(--bs-card-cap-padding-y) * -1);
+        margin-bottom: calc(var(--bs-card-cap-padding-y) * -1);
+
+        &:last-child {
+            margin-right: calc(var(--bs-card-cap-padding-x) * -1);
+        }
+
+        padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
+        width: 52px;
+        text-align: center;
+    }
+
+    hr {
+        margin-left: calc(var(--bs-card-spacer-x) * -1);
+        margin-right: calc(var(--bs-card-spacer-x) * -1);
     }
 }

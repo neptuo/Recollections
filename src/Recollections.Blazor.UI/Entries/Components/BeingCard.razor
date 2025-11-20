@@ -1,20 +1,22 @@
 @using Neptuo.Recollections.Entries.Beings
 
 <div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
-    <div class="card-body">
-        <div class="being-icon text-center">
-            <Icon Identifier="@Model.Icon" />
-        </div>
-
-        <h5 class="card-title">
-            <a>
+    <div class="card-header">
+        <div class="d-flex">
+            <h5 class="flex-grow-1 mb-0">
                 @Model.Name
                 @if (UserState.UserId == Model.Id)
                 {
                     <span class="ms-1">(me)</span>
                 }
-            </a>
-        </h5>
+            </h5>
+            @AfterTitleContent
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="being-icon text-center">
+            <Icon Identifier="@Model.Icon" />
+        </div>
         <div class="information">
             <Icon Prefix="fas" Identifier="comment-alt" />
             @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
@@ -43,6 +45,9 @@
 
     [Parameter]
     public BeingListModel Model { get; set; }
+
+    [Parameter]
+    public RenderFragment AfterTitleContent { get; set; }
 
     [Parameter]
     public EventCallback OnCardClick { get; set; }

@@ -9,49 +9,45 @@
 
         <div class="d-grid gap-3">
             <ListView Items="@Stories" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
-                <div class="d-flex align-items-start">
-                    @{
-                        var state = StoryStates.GetValueOrDefault(story.Id) ?? (StoryStates[story.Id] = new());
-                    }
-                    <StoryCard Model="@story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"no-hover flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
-                        <AfterTitleContent>
-                            @if (story.Chapters > 0)
+                @{
+                    var state = StoryStates.GetValueOrDefault(story.Id) ?? (StoryStates[story.Id] = new());
+                }
+                <StoryCard Model="@story" OnTitleClick="@(async () => await SelectAsync(story, null))" OnChaptersClick="@(async () => await LoadChaptersAsync(story))" CardCssClass="@($"no-hover flex-grow-1 {(SelectedStoryId == story.Id ? "selected" : string.Empty)}")">
+                    <AfterTitleContent>
+                        @if (story.Chapters > 0)
+                        {
+                            if (state.IsLoading)
                             {
-                                if (state.IsLoading)
-                                {
-                                    <div class="spinner-border spinner-border-sm">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <Icon
-                                        OnClick="@(async () => await LoadChaptersAsync(story))"
-                                        Identifier="@(state.IsExpanded ? "chevron-down" : "chevron-left")" 
-                                        CssClass="fs-5 cursor-pointer chapter-toggle"
-                                    />
-                                }
+                                <div class="spinner-border spinner-border-sm">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             }
-                        </AfterTitleContent>
-                        <EndBodyContent>
-                            @if (state.IsExpanded && state.Chapters != null)
+                            else
                             {
-                                <hr />
-                                @foreach (var chapter in state.Chapters)
-                                {
-                                    <div class="pb-2">
-                                        <a class="@(SelectedChapterId == chapter.Id ? "fw-bold" : string.Empty)" @onclick="(async () => await SelectAsync(story, chapter))" @onclick:stopPropagation="true">
-                                            @chapter.Title
-                                        </a>
-                                    </div>
-                                }
+                                <Icon
+                                    OnClick="@(async () => await LoadChaptersAsync(story))"
+                                    Identifier="@(state.IsExpanded ? "chevron-down" : "chevron-left")" 
+                                    CssClass="fs-5 cursor-pointer chapter-toggle"
+                                />
                             }
-                        </EndBodyContent>
-                    </StoryCard>
-                    <button class="btn btn-link p-0 mt-2 ms-2 fs-3 text-secondary" @onclick="@(() => { Modal.Hide(); Navigator.OpenStoryDetail(story.Id); })">
-                        <Icon Identifier="circle-info" />
-                    </button>
-                </div>
+                        }
+                        <Icon Identifier="circle-info fs-5" OnClick="@(() => { Modal.Hide(); Navigator.OpenStoryDetail(story.Id); })" />
+                    </AfterTitleContent>
+                    <EndBodyContent>
+                        @if (state.IsExpanded && state.Chapters != null)
+                        {
+                            <hr />
+                            @foreach (var chapter in state.Chapters)
+                            {
+                                <div class="pb-2">
+                                    <a class="@(SelectedChapterId == chapter.Id ? "fw-bold" : string.Empty)" @onclick="(async () => await SelectAsync(story, chapter))" @onclick:stopPropagation="true">
+                                        @chapter.Title
+                                    </a>
+                                </div>
+                            }
+                        }
+                    </EndBodyContent>
+                </StoryCard>
             </ListView>
         </div>
     </ChildContent>

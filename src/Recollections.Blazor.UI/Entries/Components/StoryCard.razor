@@ -1,13 +1,15 @@
 @using Neptuo.Recollections.Entries.Stories
 
 <div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
-    <div class="card-body">
+    <div class="card-header">
         <div class="d-flex">
-            <h5 class="flex-grow-1 card-title @(OnTitleClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnTitleClick">
+            <h5 class="flex-grow-1 mb-0 @(OnTitleClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnTitleClick">
                 @Model.Title
             </h5>
             @AfterTitleContent
         </div>
+    </div>
+    <div class="card-body">
         <div>
             @if (Model.Chapters > 0)
             {
