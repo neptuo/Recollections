@@ -19,7 +19,7 @@
 
             <div class="information">
                 <Icon Prefix="fas" Identifier="comment-alt" />
-                @(Model.Entries == 1 ? "entry" : "entries")
+                @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
             </div>
 
             @if (Model.MinDate != null || Model.MaxDate != null)
