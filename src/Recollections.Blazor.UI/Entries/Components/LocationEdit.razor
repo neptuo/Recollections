@@ -17,10 +17,10 @@
         }
     </ChildContent>
     <Buttons>
-        <button type="button" class="btn btn-sm btn-primary" @onclick="@(async () => await Save.InvokeAsync(SelectedLocation))" title="Save Location">
+        <button type="button" class="btn btn-primary btn-sm-expand" @onclick="@(async () => await Save.InvokeAsync(SelectedLocation))" title="Save Location">
             Save
         </button>
-        <button type="button" class="btn btn-sm btn-danger" @onclick="@Delete" title="Delete Location">
+        <button type="button" class="btn btn-secondary" @onclick="@Delete" title="Delete Location">
             <Icon Identifier="trash-alt" />
             Delete
         </button>

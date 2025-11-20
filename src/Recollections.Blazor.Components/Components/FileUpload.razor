@@ -42,8 +42,8 @@
 
     </ChildContent>
     <Buttons>
-        <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileUploader.RetryEntityQueueAsync(EntityType, EntityId); })">Retry</button>
-        <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadError.Hide(); return FileUploader.ClearEntityQueueAsync(EntityType, EntityId); })">
+        <button class="btn btn-primary btn-sm-expand" @onclick="@(() => { UploadError.Hide(); return FileUploader.RetryEntityQueueAsync(EntityType, EntityId); })">Retry</button>
+        <button class="btn btn-secondary" @onclick="@(() => { UploadError.Hide(); return FileUploader.ClearEntityQueueAsync(EntityType, EntityId); })">
             <Icon Identifier="trash-alt" CssClass="me-1" />
             Remove all
         </button>
@@ -78,8 +78,8 @@
 
     </ChildContent>
     <Buttons>
-        <button class="btn btn-primary btn-sm" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.RetryEntityQueueAsync(EntityType, EntityId); })">Retry</button>
-        <button class="btn btn-secondary btn-sm" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.ClearEntityQueueAsync(EntityType, EntityId); })">
+        <button class="btn btn-primary btn-sm-expand" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.RetryEntityQueueAsync(EntityType, EntityId); })">Retry</button>
+        <button class="btn btn-secondary" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.ClearEntityQueueAsync(EntityType, EntityId); })">
             <Icon Identifier="trash-alt" CssClass="me-1" />
             Remove all
         </button>

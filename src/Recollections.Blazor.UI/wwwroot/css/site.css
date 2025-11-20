@@ -13563,6 +13563,13 @@ a.bg-salmon {
   cursor: pointer !important;
 }
 
+@media (max-width: 767px) {
+  .modal .btn-sm-expand {
+    -webkit-box-flex: 1 !important;
+        -ms-flex: 1 1 auto !important;
+            flex: 1 1 auto !important;
+  }
+}
 .loading-bar {
   display: inline-block;
   position: relative;

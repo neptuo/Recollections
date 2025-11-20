@@ -151,6 +151,12 @@ a.bg-salmon {
     cursor: pointer !important;
 }
 
+@media (max-width: 767px) {
+    .modal .btn-sm-expand {
+        flex: 1 1 auto !important; // flex-fill
+    }
+}
+
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";
