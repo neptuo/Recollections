@@ -2,8 +2,8 @@
 
 <div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
     <div class="card-header">
-        <div class="d-flex">
-            <h5 class="flex-grow-1 mb-0">
+        <div class="d-flex align-items-center">
+            <h5 class="flex-grow-1 py-2 mb-0">
                 @Model.Name
                 @if (UserState.UserId == Model.Id)
                 {
