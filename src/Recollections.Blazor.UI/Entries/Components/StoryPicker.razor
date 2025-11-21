@@ -36,10 +36,10 @@
                     <EndBodyContent>
                         @if (state.IsExpanded && state.Chapters != null)
                         {
-                            <hr />
                             @foreach (var chapter in state.Chapters)
                             {
-                                <div class="pb-2">
+                                <div>
+                                    <hr />
                                     <a class="@(SelectedChapterId == chapter.Id ? "fw-bold" : string.Empty)" @onclick="(async () => await SelectAsync(story, chapter))" @onclick:stopPropagation="true">
                                         @chapter.Title
                                     </a>

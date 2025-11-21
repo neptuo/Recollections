@@ -5,6 +5,11 @@
         position: relative;
         
         @import "_card-header-icons.scss";
+
+        .fa, .fas {
+            width: 24px;
+            text-align: center;
+        }
     }
 
     .being-icon {

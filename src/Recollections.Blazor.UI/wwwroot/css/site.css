@@ -14343,6 +14343,10 @@ input.input-number-noarrows[type=number] {
 .beings .card .card-header .fas:last-child {
   margin-right: calc(var(--bs-card-cap-padding-x) * -1);
 }
+.beings .card .fa, .beings .card .fas {
+  width: 24px;
+  text-align: center;
+}
 .beings .being-icon {
   font-size: 1.4rem;
   line-height: 1.5rem;
