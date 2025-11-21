@@ -14344,9 +14344,6 @@ input.input-number-noarrows[type=number] {
   margin-right: calc(var(--bs-card-cap-padding-x) * -1);
 }
 .beings .being-icon {
-  position: absolute;
-  top: 70px;
-  right: var(--bs-card-spacer-x);
   font-size: 1.4rem;
   line-height: 1.5rem;
 }

@@ -14,21 +14,25 @@
         </div>
     </div>
     <div class="card-body">
-        <div class="being-icon text-center">
-            <Icon Identifier="@Model.Icon" />
-        </div>
-        <div class="information">
-            <Icon Prefix="fas" Identifier="comment-alt" />
-            @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
-        </div>
+        <div class="d-flex">
+            <div class="flex-grow-1">
+                <div class="information">
+                    <Icon Prefix="fas" Identifier="comment-alt" />
+                    @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
+                </div>
 
-        @if (UserState.UserId != Model.UserId)
-        {
-            <div class="information">
-                <Icon Identifier="user" />
-                @Model.UserName
+                @if (UserState.UserId != Model.UserId)
+                {
+                    <div class="information">
+                        <Icon Identifier="user" />
+                        @Model.UserName
+                    </div>
+                }
             </div>
-        }
+            <div class="being-icon">
+                <Icon Identifier="@Model.Icon" />
+            </div>
+        </div>
     </div>
 </div>
 
