@@ -1,12 +1,12 @@
 <Project>
   <PropertyGroup>
-	<FrameworkPackageVersion>9.0.0</FrameworkPackageVersion>
+	<FrameworkPackageVersion>10.0.0</FrameworkPackageVersion>
   </PropertyGroup>
   <ItemGroup>
 	<!-- Transitive dependencies -->
 	<PackageVersion Include="System.Runtime.Caching" Version="$(FrameworkPackageVersion)" />
-	<PackageVersion Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-	<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+	<PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.3" />
+	<PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
 
 	<!-- Actual dependencies -->
 	<PackageVersion Include="Aspire.Hosting.AppHost" Version="$(FrameworkPackageVersion)" />
@@ -34,9 +34,9 @@
 	<PackageVersion Include="Neptuo" Version="6.0.2" />
 	<PackageVersion Include="Neptuo.Events" Version="1.3.1" />
 	<PackageVersion Include="Neptuo.Exceptions" Version="1.2.2" />
-	<PackageVersion Include="SixLabors.ImageSharp" Version="3.1.5" />
+	<PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
 	<PackageVersion Include="System.Drawing.Common" Version="$(FrameworkPackageVersion)" />
-	<PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.2.0" />
-	<PackageVersion Include="Yarp.ReverseProxy" Version="2.2.0" />
+	<PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+	<PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
   </ItemGroup>
 </Project>
