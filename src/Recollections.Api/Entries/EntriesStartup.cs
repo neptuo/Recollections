@@ -50,7 +50,10 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddHttpClient("mapy.cz", (services, http) => 
                 {
-                    http.DefaultRequestHeaders.Add("X-Mapy-Api-Key", services.GetService<IOptions<MapOptions>>().Value.ApiKey);
+                    string apiKey = services.GetService<IOptions<MapOptions>>().Value.ApiKey;
+                    if (!string.IsNullOrEmpty(apiKey))
+                        http.DefaultRequestHeaders.Add("X-Mapy-Api-Key", apiKey);
+                    
                     http.BaseAddress = new Uri("https://api.mapy.cz/", UriKind.Absolute);
                 });
 
@@ -58,7 +61,11 @@ namespace Neptuo.Recollections.Entries
                 .AddTransforms(builderContext =>
                 {
                     if (builderContext.Route.ClusterId == "maptiles")
-                        builderContext.AddRequestHeader("X-Mapy-Api-Key", builderContext.Services.GetService<IOptions<MapOptions>>().Value.ApiKey);
+                    {
+                        string apiKey = builderContext.Services.GetService<IOptions<MapOptions>>().Value.ApiKey;
+                        if (!string.IsNullOrEmpty(apiKey))
+                            builderContext.AddRequestHeader("X-Mapy-Api-Key", apiKey);
+                    }
                 });
 
             if (environment.IsDevelopment())
