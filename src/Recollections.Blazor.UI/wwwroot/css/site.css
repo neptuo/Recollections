@@ -13500,8 +13500,11 @@ footer.navbar a:hover {
 }
 
 .offcanvas-bottom-menu {
-  --bs-offcanvas-height: 380px;
+  --bs-offcanvas-height: 320px;
   bottom: 52px;
+}
+.offcanvas-bottom-menu .versions {
+  font-size: 0.6rem;
 }
 
 blockquote {
@@ -13855,19 +13858,6 @@ input.input-number-noarrows[type=number] {
     font-size: 1rem;
     padding: 0.375rem 0.75rem;
     border-radius: 0.25rem;
-  }
-}
-@media (max-width: 510px) {
-  footer {
-    font-size: 13px;
-  }
-  footer .navbar-text {
-    padding: 0;
-  }
-}
-@media (max-width: 410px) {
-  .versions {
-    display: none;
   }
 }
 .exception-panel {

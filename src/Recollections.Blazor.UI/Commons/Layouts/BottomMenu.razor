@@ -41,11 +41,23 @@
         </div>
     </nav>
 
-    <Offcanvas @ref="Offcanvas" Title="Recollections by Neptuo" class="offcanvas-bottom-menu">
-        <HeaderContent>
-            <span class="versions d-grid ms-auto text-end small">
+    <Offcanvas @ref="Offcanvas" class="offcanvas-bottom-menu">
+        <TitleContent>
+            <div>Recollections by Neptuo</div>
+            <div class="versions">
                 <VersionInfo Separator="false" />
-            </span>
+            </div>
+        </TitleContent>
+        <HeaderContent>
+            @foreach (var item in Menu.User.Where(m => m.Text == "Logout"))
+            {
+                <button class="btn p-1 border-0 text-danger ms-auto" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                    <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
+                    <span class="text d-inline text-truncate">
+                        @item.Text
+                    </span>
+                </button>
+            }
         </HeaderContent>
         <ChildContent>
             @if (Menu != null)
@@ -56,7 +68,7 @@
                 </div>
                 <hr />
                 <div class="row g-1">
-                    @foreach (var item in Menu.User)
+                    @foreach (var item in Menu.User.Where(m => m.Text != "Logout"))
                         @MainMenuItem(item)
                 </div>
             }
@@ -84,7 +96,7 @@
                 }
                 else
                 {
-                    <button class="btn p-1 border-0 @(isLogout ? "text-danger" : string.Empty) w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                    <button class="btn p-1 border-0 w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
                         <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                         <span class="text d-block text-truncate">
                             @item.Text

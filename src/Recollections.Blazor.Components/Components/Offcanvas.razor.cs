@@ -22,6 +22,9 @@ public partial class Offcanvas : System.IDisposable
     public string Title { get; set; }
 
     [Parameter]
+    public RenderFragment TitleContent { get; set; }
+
+    [Parameter]
     public RenderFragment HeaderContent { get; set; }
 
     [Parameter]

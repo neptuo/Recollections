@@ -87,8 +87,12 @@ footer.navbar {
 }
 
 .offcanvas-bottom-menu {
-    --bs-offcanvas-height: 380px;
+    --bs-offcanvas-height: 320px;
     bottom: 52px;
+
+    .versions {
+        font-size: .6rem;
+    }
 }
 
 blockquote {
@@ -238,22 +242,6 @@ a.bg-salmon {
             padding: .375rem .75rem;
             border-radius: .25rem;
         }
-    }
-}
-
-@media (max-width:510px) {
-    footer {
-        font-size: 13px;
-
-        .navbar-text {
-            padding: 0;
-        }
-    }
-}
-
-@media (max-width: 410px) {
-    .versions {
-        display: none;
     }
 }
 
