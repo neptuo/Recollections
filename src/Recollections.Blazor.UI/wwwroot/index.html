@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no" />
     <meta name="theme-color" content="#212529" />
 
+    <link rel="preload" id="webassembly" />
     <link rel="preload" href="/lib/fontawesome/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
     <link rel="preload" href="/img/logo.png" as="image" type="image/png" />
+
+    <script type="importmap"></script>
 
     <title>Recollections</title>
     <base href="/" />
@@ -34,7 +37,7 @@
     <script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
     <script src="js/site.js"></script>
     <script src="service-worker.register.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
     <script src="_framework/aspnetcore-browser-refresh.js"></script>
 </body>
 </html>
