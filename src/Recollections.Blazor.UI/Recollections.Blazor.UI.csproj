@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="JavaScript" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="wwwroot\index.html" CopyToOutputDirectory="PreserveNewest" />
     <Content Remove="**\*.svg" />
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
