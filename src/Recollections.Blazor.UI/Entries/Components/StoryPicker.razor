@@ -1,10 +1,15 @@
-﻿<Modal @ref="Modal" Title="Select a Story or Chapter" CssClass="stories story-picker" IsOverflow="true">
+﻿<Modal @ref="Modal" Title="Select a Story or Chapter" CssClass="stories story-picker" IsOverflow="true" AutoFocus="false">
     <ChildContent>
         @if (!String.IsNullOrEmpty(ErrorMessage))
         {
             <div class="alert alert-danger">
                 @ErrorMessage
             </div>
+        }
+
+        @if (!IsLoading && AllStories.Count > 0)
+        {
+            <input type="text" class="form-control mb-3" @bind="SearchQuery" @bind:event="oninput" @bind:after="OnSearch" placeholder="Type to filter stories..." />
         }
 
         <div class="d-grid gap-3">

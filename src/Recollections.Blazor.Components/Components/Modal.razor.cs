@@ -58,6 +58,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsClosable { get; set; } = true;
 
+        [Parameter]
+        public bool AutoFocus { get; set; } = true;
+
         protected ElementReference Container { get; set; }
 
         protected override void OnInitialized()

@@ -6,7 +6,13 @@
                 var modal = new bootstrap.Modal(container, {});
                 $container.data("modal", modal);
 
-                $container.data("modal-initialized", true).on('shown.bs.modal', function () {
+                $container.data("modal-initialized", true);
+                
+                $container.on('shown.bs.modal', function () {
+                    if ($container.data("autofocus") === undefined) {
+                        return;
+                    }
+
                     var $select = $container.find("[data-select]");
                     if ($select.length > 0) {
                         $select[0].setSelectionRange(0, $select[0].value.length)

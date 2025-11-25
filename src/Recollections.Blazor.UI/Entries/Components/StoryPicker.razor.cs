@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Stories;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class StoryPicker
+    public partial class StoryPicker(ILog<StoryPicker> log)
     {
         [Inject]
         protected Api Api { get; set; }
@@ -33,18 +34,22 @@ namespace Neptuo.Recollections.Entries.Components
         private bool isFirstShow = true;
 
         protected bool IsLoading { get; set; }
-        protected List<StoryListModel> Stories { get; } = new List<StoryListModel>();
+        protected List<StoryListModel> AllStories { get; } = [];
+        protected List<StoryListModel> Stories { get; } = [];
         protected string ErrorMessage { get; set; }
         private Dictionary<string, StoryState> StoryStates { get; set; } = new();
 
         protected string SelectedStoryId;
         protected string SelectedChapterId;
 
+        protected string SearchQuery { get; set; }
+
         private async Task LoadAsync()
         {
             IsLoading = true;
-            Stories.Clear();
-            Stories.AddRange(await Api.GetStoryListAsync());
+            AllStories.Clear();
+            AllStories.AddRange(await Api.GetStoryListAsync());
+            OnSearch();
             IsLoading = false;
 
             StateHasChanged();
@@ -95,12 +100,28 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
+        protected void OnSearch()
+        {
+            log.Debug($"OnSearch '{SearchQuery}'");
+
+            Stories.Clear();
+            if (String.IsNullOrEmpty(SearchQuery))
+            {
+                Stories.AddRange(AllStories);
+                return;
+            }
+
+            string searchQuery = SearchQuery.ToLower().Trim();
+            Stories.AddRange(AllStories.Where(m => m.Title.Contains(SearchQuery, StringComparison.CurrentCultureIgnoreCase)));
+        }
+
         public async void Show(string storyId = null, string chapterId = null)
         {
             SelectedStoryId = storyId;
             SelectedChapterId = chapterId;
             ErrorMessage = null;
             StoryStates.Clear();
+            SearchQuery = null;
 
             Modal.Show();
 
@@ -109,10 +130,15 @@ namespace Neptuo.Recollections.Entries.Components
                 isFirstShow = false;
                 await LoadAsync();
             }
+            else
+            {
+                OnSearch();
+                StateHasChanged();
+            }
 
             if (chapterId != null)
             {
-                var story = Stories.FirstOrDefault(s => s.Id == storyId);
+                var story = AllStories.FirstOrDefault(s => s.Id == storyId);
                 if (story != null)
                 {
                     await LoadChaptersAsync(story);
