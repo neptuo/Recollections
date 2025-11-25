@@ -2,14 +2,14 @@
 {
     <nav class="fixed-bottom d-block d-sm-none bottom-bar">
         <div class="container">
-            <div class="row my-2 items-@Menu.Bottom.Count">
+            <div class="row my-2 gx-1 items-@Menu.Bottom.Count">
                 @foreach (var item in Menu.Bottom)
                 {
                     <div @key="item" class="col d-grid">
                         @if (item.Url != null)
                         {
                             <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
-                                <a href="@item.Url" class="btn @(IsActive ? "btn-primary" : "bg-light-subtle")">
+                                <a href="@item.Url" class="btn border-0 @(IsActive ? "text-primary" : "")">
                                     <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                                     <span class="text">
                                         @item.Text
@@ -19,7 +19,7 @@
                         }
                         else if (item.Text == "Main menu")
                         {
-                            <button class="btn bg-light-subtle" @onclick="OnToggleMainMenu">
+                            <button class="btn border-0" @onclick="OnToggleMainMenu">
                                 <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                                 <span class="text">
                                     @item.Text
@@ -28,7 +28,7 @@
                         }
                         else
                         {
-                            <button class="btn bg-light-subtle" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                            <button class="btn border-0" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
                                 <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                                 <span class="text">
                                     @item.Text
@@ -50,12 +50,12 @@
         <ChildContent>
             @if (Menu != null)
             {
-                <div class="row g-3">
+                <div class="row g-1">
                     @foreach (var item in Menu.Main)
                         @MainMenuItem(item)
                 </div>
                 <hr />
-                <div class="row g-3">
+                <div class="row g-1">
                     @foreach (var item in Menu.User)
                         @MainMenuItem(item)
                 </div>
@@ -74,7 +74,7 @@
                 @if (item.Url != null)
                 {
                     <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
-                        <a href="@item.Url" class="btn @(IsActive ? "btn-primary" : "bg-light-subtle") w-100">
+                        <a href="@item.Url" class="btn p-1 border-0 @(IsActive ? "text-primary" : "") w-100">
                             <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                             <span class="text d-block text-truncate">
                                 @item.Text
@@ -84,7 +84,7 @@
                 }
                 else
                 {
-                    <button class="btn bg-light-subtle @(isLogout ? "text-danger" : string.Empty) w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                    <button class="btn p-1 border-0 @(isLogout ? "text-danger" : string.Empty) w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
                         <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                         <span class="text d-block text-truncate">
                             @item.Text
