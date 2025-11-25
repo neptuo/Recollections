@@ -1,5 +1,5 @@
-﻿using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.File;
+﻿using Azure.Storage.Files.Shares;
+using Azure.Storage.Files.Shares.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -22,28 +22,25 @@ namespace Neptuo.Recollections.Entries
             this.options = options.Value;
         }
 
-        private CloudFileDirectory GetRootDirectory()
+        private ShareDirectoryClient GetRootDirectory()
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(options.ConnectionString);
-
-            CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
-            CloudFileShare share = fileClient.GetShareReference("entries");
+            ShareClient share = new ShareClient(options.ConnectionString, "entries");
 
             if (!share.Exists())
                 throw Ensure.Exception.InvalidOperation("Missing file share.");
 
-            CloudFileDirectory rootDir = share.GetRootDirectoryReference();
+            ShareDirectoryClient rootDir = share.GetRootDirectoryClient();
             return rootDir;
         }
 
-        private async Task<CloudFileDirectory> GetDirectoryAsync(Entry entry)
+        private async Task<ShareDirectoryClient> GetDirectoryAsync(Entry entry)
         {
-            CloudFileDirectory rootDirectory = GetRootDirectory();
+            ShareDirectoryClient rootDirectory = GetRootDirectory();
 
-            CloudFileDirectory userDirectory = rootDirectory.GetDirectoryReference(entry.UserId);
+            ShareDirectoryClient userDirectory = rootDirectory.GetSubdirectoryClient(entry.UserId);
             await userDirectory.CreateIfNotExistsAsync();
 
-            CloudFileDirectory entryDirectory = userDirectory.GetDirectoryReference(entry.Id);
+            ShareDirectoryClient entryDirectory = userDirectory.GetSubdirectoryClient(entry.Id);
             await entryDirectory.CreateIfNotExistsAsync();
 
             return entryDirectory;
@@ -67,38 +64,43 @@ namespace Neptuo.Recollections.Entries
             }
         }
 
-        private async Task<CloudFile> GetFileAsync(Entry entry, Image image, ImageType type)
+        private async Task<ShareFileClient> GetFileAsync(Entry entry, Image image, ImageType type)
         {
-            CloudFileDirectory entryDirectory = await GetDirectoryAsync(entry);
+            ShareDirectoryClient entryDirectory = await GetDirectoryAsync(entry);
             string fileName = GetImageFileName(image, type);
 
-            CloudFile imageFile = entryDirectory.GetFileReference(fileName);
+            ShareFileClient imageFile = entryDirectory.GetFileClient(fileName);
             return imageFile;
         }
 
         public async Task DeleteAsync(Entry entry, Image image, ImageType type)
         {
-            CloudFile imageFile = await GetFileAsync(entry, image, type);
+            ShareFileClient imageFile = await GetFileAsync(entry, image, type);
             await imageFile.DeleteIfExistsAsync();
         }
 
         public async Task<Stream> FindAsync(Entry entry, Image image, ImageType type)
         {
-            CloudFile imageFile = await GetFileAsync(entry, image, type);
+            ShareFileClient imageFile = await GetFileAsync(entry, image, type);
             if (await imageFile.ExistsAsync())
-                return await imageFile.OpenReadAsync();
+            {
+                ShareFileDownloadInfo download = await imageFile.DownloadAsync();
+                return download.Content;
+            }
 
             return null;
         }
 
         public async Task SaveAsync(Entry entry, Image image, Stream content, ImageType type)
         {
-            CloudFile imageFile = await GetFileAsync(entry, image, type);
-            using (CloudFileStream imageStream = await imageFile.OpenWriteAsync(content.Length))
-            {
-                await content.CopyToAsync(imageStream);
-                await imageStream.CommitAsync();
-            }
+            ShareFileClient imageFile = await GetFileAsync(entry, image, type);
+            await imageFile.CreateAsync(content.Length);
+            
+            // Reset stream position if it supports seeking
+            if (content.CanSeek)
+                content.Position = 0;
+                
+            await imageFile.UploadAsync(content);
         }
     }
 }
