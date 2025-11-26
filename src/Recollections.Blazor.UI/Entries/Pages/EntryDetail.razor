@@ -4,11 +4,26 @@
 @if (Model != null)
 {
     <DocumentTitle Value="@Model.Title" />
+    <TemplateContent Name="MobileTitle">
+        <h2 class="title d-flex text-break mb-0">
+            <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
+            <DropdownButton CssClass="ms-auto" IsEnd="true">
+                <PermissionView Request="PermissionRequest.Owner">
+                    <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
+                </PermissionView>
+                <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                <PermissionView Request="PermissionRequest.Owner">
+                    <DropdownSeparator />
+                    <DropdownItem Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
+                </PermissionView>
+            </DropdownButton>
+        </h2>
+    </TemplateContent>
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div @ref="Container" class="entry-detail my-sm-3">
-                <h2 class="title d-flex text-break">
+                <h2 class="title d-none d-sm-flex text-break">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Owner">
