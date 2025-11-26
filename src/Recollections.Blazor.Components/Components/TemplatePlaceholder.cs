@@ -19,6 +19,12 @@ public class TemplatePlaceholder : ComponentBase, IDisposable
     [Parameter]
     public string Name { get; set; }
 
+    [Parameter]
+    public RenderFragment EmptyContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<IReadOnlyCollection<ITemplateContent>> ChildContent { get; set; }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -44,7 +50,19 @@ public class TemplatePlaceholder : ComponentBase, IDisposable
 
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        int i = 0;
+        if (content.Count == 0)
+        {
+            builder.AddContent(0, EmptyContent);
+            return;
+        }
+
+        if (ChildContent != null)
+        {
+            builder.AddContent(0, ChildContent(content));
+            return;
+        }
+
+        int i = 2;
         foreach (TemplateContent fragment in content)
         {
             builder.AddContent(i, fragment.ChildContent);

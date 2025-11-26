@@ -2,7 +2,7 @@
     <button class="btn btn-link py-0 px-2" data-bs-toggle="dropdown">
         <Icon Identifier="@Icon" />
     </button>
-    <div class="dropdown-menu">
+    <div class="dropdown-menu @(IsEnd ? "dropdown-menu-end" : "")">
         @if (Items != null)
         {
             foreach (var item in Items)
@@ -40,6 +40,9 @@
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsEnd { get; set; }
 
     public abstract record DropdownItem();
     public record ActionItem(string Icon, string Text, Action OnClick, string Title = null, string CssClass = null) : DropdownItem;

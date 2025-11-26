@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components;
 
-public class TemplateContent : ComponentBase, IDisposable
+public class TemplateContent : ComponentBase, ITemplateContent, IDisposable
 {
     [Inject]
     protected TemplateService Service { get; set; }
@@ -29,4 +29,9 @@ public class TemplateContent : ComponentBase, IDisposable
     {
         Service.RemoveContent(Name, this);
     }
+}
+
+public interface ITemplateContent
+{
+    RenderFragment ChildContent { get; }
 }
