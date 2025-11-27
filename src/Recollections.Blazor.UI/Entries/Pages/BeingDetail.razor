@@ -7,22 +7,24 @@
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
+            <ActionMenu>
+                <ItemGroup Text="@Model.Name">
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <ShareButton Owner="@Owner" BeingId="@Model.Id" Layout="ButtonLayout.Item" />
+                    </PermissionView>
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
+                    <PermissionView Request="PermissionRequest.Owner">
+                        @if (Model.Id != Model.UserId)
+                        {
+                            <Item Icon="trash-alt" Text="Delete Being" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Being" />
+                        }
+                    </PermissionView>
+                </ItemGroup>
+            </ActionMenu>
+
             <div class="entry-detail">
                 <h2 class="title d-flex">
                     <InlineTextEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
-                    <DropdownButton CssClass="ms-1">
-                        <PermissionView Request="PermissionRequest.Owner">
-                            <ShareButton Owner="@Owner" BeingId="@Model.Id" Layout="ButtonLayout.Item" />
-                        </PermissionView>
-                        <ShareLinkButton Layout="ButtonLayout.Item" />
-                        <PermissionView Request="PermissionRequest.Owner">
-                            @if (Model.Id != Model.UserId)
-                            {
-                                <ItemSeparator />
-                                <Item Icon="trash-alt" Text="Delete Being" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Being" />
-                            }
-                        </PermissionView>
-                    </DropdownButton>
                 </h2>
                 <h2 class="icon">
                     <InlineLink Value="@Model.Icon" PlaceHolder="user" OnClick="@(() => IconPicker.Show())">
