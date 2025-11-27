@@ -127,11 +127,14 @@ a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-z
     }
 }
 
-.dropdown-item .fa,
-.dropdown-item .far,
-.dropdown-item .fas {
-    width: $uni-icon-width;
-    text-align: center;
+.dropdown-item,
+.list-group-item {
+    .fa,
+    .far,
+    .fas {
+        width: $uni-icon-width;
+        text-align: center;
+    }
 }
 
 .btn-primary {

@@ -34,7 +34,7 @@
 
         return item => 
         {
-            var cssClass = $"list-group-item list-group-item-action";
+            var cssClass = $"list-group-item list-group-item-action border-0";
             if (item.Text.Contains("Delete"))
                 cssClass += " text-danger";
 
@@ -55,7 +55,7 @@
         Log.Debug("Getting item group template for EditButton.");
 
         return group => @<div class="list-group list-group-flush">
-            <h3 class="list-group-item sticky-top pt-3 mb-0">
+            <h3 class="list-group-item sticky-top text-secondary pt-3 mb-0">
                 @group.Text
             </h3>
             @group.ChildContent

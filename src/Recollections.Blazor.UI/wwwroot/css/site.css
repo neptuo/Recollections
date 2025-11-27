@@ -13540,7 +13540,10 @@ a:not(.btn, .nav-link, .dropdown-item, .leaflet-control-zoom-out, .leaflet-contr
 
 .dropdown-item .fa,
 .dropdown-item .far,
-.dropdown-item .fas {
+.dropdown-item .fas,
+.list-group-item .fa,
+.list-group-item .far,
+.list-group-item .fas {
   width: 24px;
   text-align: center;
 }
