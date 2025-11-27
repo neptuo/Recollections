@@ -13797,6 +13797,50 @@ input.input-number-noarrows[type=number] {
   display: none;
 }
 
+.btn-floating {
+  --self-width: 46px;
+  position: fixed;
+  bottom: 30px;
+  left: calc((100vw - var(--self-width)) / 2);
+  font-size: 1.25rem;
+  z-index: 1100;
+  border-radius: 50%;
+}
+@media (min-width: 576px) {
+  .btn-floating {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    bottom: unset;
+    left: unset;
+    z-index: unset;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .offcanvas-bottom-to-end {
+    right: 0;
+    left: 0;
+    height: var(--bs-offcanvas-height);
+    max-height: 100%;
+    border-top: var(--bs-offcanvas-border-width) solid var(--bs-offcanvas-border-color);
+    -webkit-transform: translateY(100%);
+        -ms-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+}
+@media (min-width: 576px) {
+  .offcanvas-bottom-to-end {
+    top: 0;
+    right: 0;
+    width: var(--bs-offcanvas-width);
+    border-left: var(--bs-offcanvas-border-width) solid var(--bs-offcanvas-border-color);
+    -webkit-transform: translateX(100%);
+        -ms-transform: translateX(100%);
+            transform: translateX(100%);
+  }
+}
+
 .main-navbar.block-icons {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;

@@ -39,6 +39,9 @@ public partial class Offcanvas : System.IDisposable
     [Parameter]
     public string BodyCssClass { get; set; }
 
+    [Parameter]
+    public string Direction { get; set; }
+
     public bool IsVisible { get; private set; }
 
     protected override void OnParametersSet()
@@ -47,7 +50,10 @@ public partial class Offcanvas : System.IDisposable
 
         Attributes ??= [];
 
-        var cssClass = "offcanvas offcanvas-bottom";
+        var cssClass = "offcanvas";
+        if (!string.IsNullOrEmpty(Direction))
+            cssClass += " offcanvas-" + Direction;
+
         if (Attributes.TryGetValue("class", out var providedCssClass))
             cssClass += " " + providedCssClass;
 
