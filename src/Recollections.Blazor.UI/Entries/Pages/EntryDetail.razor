@@ -7,36 +7,30 @@
     <TemplateContent Name="MobileTitle">
         <h2 class="title d-flex text-break mb-0">
             <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-            <PermissionContainer State="@Permissions">
-                <DropdownButton CssClass="ms-auto" IsEnd="true">
-                    <PermissionView Request="PermissionRequest.Owner">
-                        <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
-                    </PermissionView>
-                    <ShareLinkButton Layout="ButtonLayout.Item" />
-                    <PermissionView Request="PermissionRequest.Owner">
-                        <DropdownSeparator />
-                        <Item Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
-                    </PermissionView>
-                </DropdownButton>
-            </PermissionContainer>
         </h2>
     </TemplateContent>
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
+            <ActionMenu>
+                <ItemGroup Text="@Model.Title">
+                    @if (Gallery != null)
+                    {
+                        <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
+                    }
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
+                    </PermissionView>
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <Item Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
+                    </PermissionView>
+                </ItemGroup>
+            </ActionMenu>
+
             <div @ref="Container" class="entry-detail my-sm-3">
                 <h2 class="title d-none d-sm-flex text-break">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-                    <DropdownButton CssClass="ms-1">
-                        <PermissionView Request="PermissionRequest.Owner">
-                            <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
-                        </PermissionView>
-                        <ShareLinkButton Layout="ButtonLayout.Item" />
-                        <PermissionView Request="PermissionRequest.Owner">
-                            <ItemSeparator />
-                            <Item Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
-                        </PermissionView>
-                    </DropdownButton>
                 </h2>
                 <div class="datetime">
                     <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
