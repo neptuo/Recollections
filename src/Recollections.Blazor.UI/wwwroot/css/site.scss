@@ -86,9 +86,12 @@ footer.navbar {
     bottom: 55px;
 }
 
+.offcanvas-bottom {
+    bottom: 52px;
+}
+
 .offcanvas-bottom-menu {
     --bs-offcanvas-height: 320px;
-    bottom: 52px;
 
     .versions {
         font-size: .6rem;

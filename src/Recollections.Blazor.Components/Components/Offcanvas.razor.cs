@@ -25,6 +25,9 @@ public partial class Offcanvas : System.IDisposable
     public RenderFragment TitleContent { get; set; }
 
     [Parameter]
+    public bool IsHeader { get; set; } = true;
+
+    [Parameter]
     public RenderFragment HeaderContent { get; set; }
 
     [Parameter]
@@ -32,6 +35,9 @@ public partial class Offcanvas : System.IDisposable
 
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; }
+
+    [Parameter]
+    public string BodyCssClass { get; set; }
 
     public bool IsVisible { get; private set; }
 
@@ -46,6 +52,8 @@ public partial class Offcanvas : System.IDisposable
             cssClass += " " + providedCssClass;
 
         Attributes["class"] = cssClass;
+
+        BodyCssClass = string.IsNullOrEmpty(BodyCssClass) ? "offcanvas-body" : $"offcanvas-body {BodyCssClass}";
     }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)

@@ -15,14 +15,58 @@
     <Icon Identifier="pen" />
 </button>
 
-<Offcanvas @ref="Offcanvas" Title="Edit menu">
+<Offcanvas @ref="Offcanvas" style="--bs-offcanvas-height: 420px;" BodyCssClass="pt-0 pb-5" IsHeader="false">
     <ChildContent>
-        This is edit menu
+        <div class="list-group list-group-flush">
+            @{ var isFirstGroup = true; }
+            @foreach (var group in MenuGroups)
+            {
+                if (isFirstGroup == false)
+                {
+                    <div class="mt-3" />
+                }
+                <h3 class="list-group-item sticky-top pt-3 mb-0">
+                    @group.Text
+                </h3>
+                @foreach (var item in group.Items)
+                {
+                    <button type="button" class="list-group-item list-group-item-action @(item.Text.Contains("Delete") ? "text-danger" : "")">
+                        <Icon Identifier="@item.Icon" />
+                        @item.Text
+                    </button>
+                }
+                isFirstGroup = false;
+            }
+        </div>
     </ChildContent>
 </Offcanvas>
 
 @code {
     Offcanvas Offcanvas;
+
+    List<MenuItemGroup> MenuGroups = new()
+    {
+        new MenuItemGroup("My story", [
+            new MenuItem("Open gallery", "image"),
+            new MenuItem("Add Chapter", "book"),
+            new MenuItem("Add Story Entry", "plus"),
+            new MenuItem("Share with others", "share-alt"),
+            new MenuItem("Share a link", "share"),
+            new MenuItem("Delete Story", "trash-alt"),
+        ]),
+        new MenuItemGroup("Childhood", [
+            new MenuItem("Add Chapter Entry", "plus"),
+            new MenuItem("Delete Chapter", "trash-alt"),
+        ]),
+        new MenuItemGroup("Being adult", [
+            new MenuItem("Add Chapter Entry", "plus"),
+            new MenuItem("Delete Chapter", "trash-alt"),
+        ]),
+        new MenuItemGroup("Post covid life", [
+            new MenuItem("Add Chapter Entry", "plus"),
+            new MenuItem("Delete Chapter", "trash-alt"),
+        ]),
+    };
 
     void ToggleOffcanvas()
     {

@@ -13499,9 +13499,12 @@ footer.navbar a:hover {
   bottom: 55px;
 }
 
+.offcanvas-bottom {
+  bottom: 52px;
+}
+
 .offcanvas-bottom-menu {
   --bs-offcanvas-height: 320px;
-  bottom: 52px;
 }
 .offcanvas-bottom-menu .versions {
   font-size: 0.6rem;

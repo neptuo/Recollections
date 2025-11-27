@@ -73,9 +73,9 @@ public partial class HeadLayout : IDisposable
 
 public class MenuList
 {
-    public List<MenuItem> Bottom { get; } = new();
-    public List<MenuItem> Main { get; } = new();
-    public List<MenuItem> User { get; } = new();
+    public List<MenuItem> Bottom { get; } = [];
+    public List<MenuItem> Main { get; } = [];
+    public List<MenuItem> User { get; } = [];
 
     public MenuList(Navigator navigator, UserState userState, Action changePassword, Action changeTheme)
     {
@@ -101,14 +101,3 @@ public class MenuList
             group.Add(item);
     }
 }
-
-public record MenuItem(
-    string Text, 
-    string Icon, 
-    string Url = null, 
-    Type PageType = null, 
-    Action OnClick = null, 
-    NavLinkMatch Match = NavLinkMatch.Prefix, 
-    bool IsNewWindow = false,
-    string CssClass = ""
-);
