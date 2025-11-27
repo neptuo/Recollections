@@ -13817,8 +13817,13 @@ input.input-number-noarrows[type=number] {
   }
 }
 
+.btn-floating-offcanvas .list-group:not(:first-child) {
+  margin-top: 1rem;
+}
+
 @media (max-width: 575.98px) {
   .offcanvas-bottom-to-end {
+    bottom: 52px;
     right: 0;
     left: 0;
     height: var(--bs-offcanvas-height);

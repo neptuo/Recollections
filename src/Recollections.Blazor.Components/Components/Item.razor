@@ -1,0 +1,30 @@
+@renderFragment?.Invoke(this)
+
+@code {
+    [CascadingParameter]
+    public IItemContainer Container { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    private RenderFragment<Item> renderFragment;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        renderFragment = Container?.GetItemTemplate();
+    }
+}

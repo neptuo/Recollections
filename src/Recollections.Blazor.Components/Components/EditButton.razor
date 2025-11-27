@@ -1,44 +1,16 @@
 @using Neptuo.Logging;
+@implements IItemContainer
 @inject ILog<EditButton> Log
 
 <button class="btn btn-primary btn-floating" @onclick="@ToggleOffcanvas">
     <Icon Identifier="pen" />
 </button>
 
-<Offcanvas @ref="Offcanvas" class="offcanvas-bottom-to-end" style="--bs-offcanvas-height: 420px;" BodyCssClass="pt-0 pb-5" IsHeader="false">
+<Offcanvas @ref="Offcanvas" class="btn-floating-offcanvas offcanvas-bottom-to-end" style="--bs-offcanvas-height: 420px;" BodyCssClass="pt-0 pb-5" IsHeader="false">
     <ChildContent>
-        <div class="list-group list-group-flush">
-            @{ var isFirstGroup = true; }
-            @foreach (var group in MenuGroups)
-            {
-                @if (!string.IsNullOrEmpty(group.Text))
-                {
-                    if (isFirstGroup == false)
-                    {
-                        <div class="mt-3" />
-                    }
-                    <h3 class="list-group-item sticky-top pt-3 mb-0">
-                        @group.Text
-                    </h3>
-                }
-                
-                @foreach (var item in group.Items)
-                {
-                    var cssClass = $"list-group-item list-group-item-action";
-                    if (item.Text.Contains("Delete"))
-                        cssClass += " text-danger";
-
-                    if (!string.IsNullOrEmpty(item.CssClass))
-                        cssClass += $" {item.CssClass}";
-
-                    <button type="button" @onclick="@(() => { Offcanvas.Hide(); Log.Debug($"Click '{item.OnClick != null}'"); item.OnClick?.Invoke(); })" class="@cssClass">
-                        <Icon Identifier="@item.Icon" />
-                        @item.Text
-                    </button>
-                }
-                isFirstGroup = false;
-            }
-        </div>
+        <CascadingValue Value="@((IItemContainer)this)">
+            @ChildContent
+        </CascadingValue>
     </ChildContent>
 </Offcanvas>
 
@@ -46,7 +18,7 @@
     Offcanvas Offcanvas;
 
     [Parameter]
-    public List<MenuItemGroup> MenuGroups { get; set; } = [];
+    public RenderFragment ChildContent { get; set; }
 
     void ToggleOffcanvas()
     {
@@ -54,5 +26,39 @@
             Offcanvas.Hide();
         else
             Offcanvas.Show();
+    }
+
+    RenderFragment<Item> IItemContainer.GetItemTemplate()
+    {
+        Log.Debug("Getting item template for EditButton.");
+
+        return item => 
+        {
+            var cssClass = $"list-group-item list-group-item-action";
+            if (item.Text.Contains("Delete"))
+                cssClass += " text-danger";
+
+            if (!string.IsNullOrEmpty(item.CssClass))
+                cssClass += $" {item.CssClass}";
+
+            var onclick = () => { Offcanvas.Hide(); Log.Debug($"Click '{item.OnClick.HasDelegate}'"); return item.OnClick.InvokeAsync(); };
+
+            return @<button type="button" @onclick="@onclick" class="@cssClass" title="@item.Title">
+                <Icon Identifier="@item.Icon" />
+                @item.Text
+            </button>;
+        };
+    }
+
+    RenderFragment<ItemGroup> IItemContainer.GetItemGroupTemplate()
+    {
+        Log.Debug("Getting item group template for EditButton.");
+
+        return group => @<div class="list-group list-group-flush">
+            <h3 class="list-group-item sticky-top pt-3 mb-0">
+                @group.Text
+            </h3>
+            @group.ChildContent
+        </div>;
     }
 }
