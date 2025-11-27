@@ -10,9 +10,9 @@
             <PermissionContainer State="@Permissions">
                 <DropdownButton CssClass="ms-auto" IsEnd="true">
                     <PermissionView Request="PermissionRequest.Owner">
-                        <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
+                        <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
                     </PermissionView>
-                    <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
                     <PermissionView Request="PermissionRequest.Owner">
                         <DropdownSeparator />
                         <Item Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
@@ -29,9 +29,9 @@
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Owner">
-                            <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
+                            <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
                         </PermissionView>
-                        <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                        <ShareLinkButton Layout="ButtonLayout.Item" />
                         <PermissionView Request="PermissionRequest.Owner">
                             <ItemSeparator />
                             <Item Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />

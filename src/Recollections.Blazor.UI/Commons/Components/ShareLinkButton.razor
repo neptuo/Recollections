@@ -4,12 +4,9 @@
         <Icon Prefix="fas" Identifier="share" />
     </button>
 }
-else if (Layout == ButtonLayout.DropdownItem)
+else if (Layout == ButtonLayout.Item)
 {
-    <a class="dropdown-item" @onclick="@OnClick">
-        <Icon Prefix="fas" Identifier="share" />
-        Share a link
-    </a>
+    <Item Icon="share" Text="Share a link" OnClick="@OnClick" />
 }
 
 <TemplateContent Name="Dialogs">

@@ -1,34 +1,40 @@
 ﻿@page "/stories/{StoryId}"
 @inherits UserStateComponentBase
 
-
-
 @if (Model != null)
 {
     <DocumentTitle Value="@Model.Title" />
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
+            <ActionMenu>
+                <ItemGroup Text="@Model.Title">
+                    <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
+                    <PermissionView Request="PermissionRequest.Write">
+                        <Item Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
+                        <Item Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
+                    </PermissionView>
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <ShareButton Owner="@Owner" StoryId="@Model.Id" Layout="ButtonLayout.Item" />
+                    </PermissionView>
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <Item Icon="trash-alt" Text="Delete Story" OnClick="@(async () => await DeleteAsync())" CssClass="text-danger" Title="Delete Story" />
+                    </PermissionView>
+                </ItemGroup>
+
+                @foreach (var chapter in Model.Chapters)
+                {
+                    <ItemGroup Text="@chapter.Title">
+                        <Item Icon="plus" Text="Add Entry" OnClick="@(() => SelectEntry(chapter))" Title="Add Chapter Entry" />
+                        <Item Icon="trash-alt" Text="Delete Chapter" OnClick="@(async () => await DeleteChapterAsync(chapter))" CssClass="text-danger" Title="Delete Chapter" />
+                    </ItemGroup>
+                }
+            </ActionMenu>
+
             <div class="entry-detail my-sm-3">
                 <h2 class="d-flex title text-break">
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-                    <DropdownButton CssClass="ms-1">
-                        <PermissionView Request="PermissionRequest.Write">
-                            <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
-                            <ItemSeparator />
-                            <Item Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
-                            <Item Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
-                            <ItemSeparator />
-                        </PermissionView>
-                        <PermissionView Request="PermissionRequest.Owner">
-                            <ShareButton Owner="@Owner" StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
-                        </PermissionView>
-                        <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
-                        <PermissionView Request="PermissionRequest.Owner">
-                            <ItemSeparator />
-                            <Item Icon="trash-alt" Text="Delete Story" OnClick="@(async () => await DeleteAsync())" CssClass="text-danger" Title="Delete Story" />
-                        </PermissionView>
-                    </DropdownButton>
                 </h2>
                 <UserInformation Owner="@Owner" />
                 <div class="my-3">
@@ -44,13 +50,6 @@
                         <div class="chapter">
                             <h4 class="d-flex">
                                 <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" EditModeCssClass="flex-grow-1" />
-                                <PermissionView Request="PermissionRequest.Write">
-                                    <DropdownButton CssClass="ms-1">
-                                        <Item Icon="plus" Text="Add Entry" OnClick="() => SelectEntry(chapter)" Title="Add Chapter Entry" />
-                                        <ItemSeparator />
-                                        <Item Icon="trash-alt" Text="Delete" OnClick="@(async () => await DeleteChapterAsync(chapter))" CssClass="text-danger" Title="Delete Chapter" />
-                                    </DropdownButton> 
-                                </PermissionView>
                             </h4>
                             <div class="my-3">
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />

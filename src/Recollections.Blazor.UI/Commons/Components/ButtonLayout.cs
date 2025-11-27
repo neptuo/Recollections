@@ -9,5 +9,5 @@ namespace Neptuo.Recollections.Commons.Components;
 
 public enum ButtonLayout
 {
-    Button, DropdownItem
+    Button, Item
 }

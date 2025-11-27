@@ -11,7 +11,7 @@
                 <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
                 <DropdownButton CssClass="ms-1">
                     <Item Icon="cloud-download" Text="Download Original" OnClick="DownloadOriginalAsync" Title="Download Original Image" />
-                    <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
                     <PermissionView Request="PermissionRequest.Write">
                         <Item Icon="location-arrow" Text="Set Location from Original" OnClick="SetLocationOriginalAsync" Title="Set Location from Original Image" />
                         <ItemSeparator />
