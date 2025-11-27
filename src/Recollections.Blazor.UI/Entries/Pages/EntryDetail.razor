@@ -7,16 +7,18 @@
     <TemplateContent Name="MobileTitle">
         <h2 class="title d-flex text-break mb-0">
             <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-            <DropdownButton CssClass="ms-auto" IsEnd="true">
-                <PermissionView Request="PermissionRequest.Owner">
-                    <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
-                </PermissionView>
-                <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
-                <PermissionView Request="PermissionRequest.Owner">
-                    <DropdownSeparator />
-                    <DropdownItem Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
-                </PermissionView>
-            </DropdownButton>
+            <PermissionContainer State="@Permissions">
+                <DropdownButton CssClass="ms-auto" IsEnd="true">
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.DropdownItem" />
+                    </PermissionView>
+                    <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
+                    <PermissionView Request="PermissionRequest.Owner">
+                        <DropdownSeparator />
+                        <DropdownItem Icon="trash-alt" Text="Delete Entry" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Entry" />
+                    </PermissionView>
+                </DropdownButton>
+            </PermissionContainer>
         </h2>
     </TemplateContent>
 
