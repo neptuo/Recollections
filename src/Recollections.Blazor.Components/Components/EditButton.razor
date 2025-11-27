@@ -1,0 +1,34 @@
+<style>
+    .btn-floating {
+        --self-width: 46px;
+
+        position: fixed;
+        bottom: 30px;
+        left: calc((100vw - var(--self-width)) / 2);
+        font-size: 1.25rem;
+        z-index: 1100;
+        border-radius: 50%;
+    }
+</style>
+
+<button class="btn btn-primary btn-floating" @onclick="@ToggleOffcanvas">
+    <Icon Identifier="pen" />
+</button>
+
+<Offcanvas @ref="Offcanvas" Title="Edit menu">
+    <ChildContent>
+        This is edit menu
+    </ChildContent>
+</Offcanvas>
+
+@code {
+    Offcanvas Offcanvas;
+
+    void ToggleOffcanvas()
+    {
+        if (Offcanvas.IsVisible)
+            Offcanvas.Hide();
+        else
+            Offcanvas.Show();
+    }
+}

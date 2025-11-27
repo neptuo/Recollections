@@ -39,6 +39,8 @@ public partial class Offcanvas : System.IDisposable
     {
         base.OnParametersSet();
 
+        Attributes ??= [];
+
         var cssClass = "offcanvas offcanvas-bottom";
         if (Attributes.TryGetValue("class", out var providedCssClass))
             cssClass += " " + providedCssClass;
