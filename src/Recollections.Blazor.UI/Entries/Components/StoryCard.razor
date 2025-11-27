@@ -9,24 +9,24 @@
             @AfterTitleContent
         </div>
     </div>
-    <div class="card-body">
-        <div>
+    <div class="card-body px-0 py-1">
+        <div class="list-group list-group-flush bg-transparent">
             @if (Model.Chapters > 0)
             {
-                <div class="information @(OnChaptersClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnChaptersClick">
+                <div class="list-group-item border-0 bg-transparent @(OnChaptersClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnChaptersClick">
                     <Icon Identifier="book" />
                     @Model.Chapters chapters
                 </div>
             }
 
-            <div class="information">
+            <div class="list-group-item border-0 bg-transparent">
                 <Icon Prefix="fas" Identifier="comment-alt" />
                 @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
             </div>
 
             @if (Model.MinDate != null || Model.MaxDate != null)
             {
-                <div class="information">
+                <div class="list-group-item border-0 bg-transparent">
                     <Icon Identifier="calendar" />
                     <span class="ms-1">
                         @if (Model.MinDate != null)
@@ -52,7 +52,7 @@
 
             @if (UserState.UserId != Model.UserId)
             {
-                <div class="information">
+                <div class="list-group-item border-0 bg-transparent">
                     <Icon Identifier="user" />
                     @Model.UserName
                 </div>

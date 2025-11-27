@@ -14328,9 +14328,11 @@ input.input-number-noarrows[type=number] {
   margin: 0 auto;
 }
 
-.stories .card.selected {
-  background-color: rgba(250, 128, 114, 0.5);
+.stories .card.selected, .stories .card.selected-within {
   border-color: salmon;
+}
+.stories .card.selected .card-header {
+  background-color: rgba(250, 128, 114, 0.5);
 }
 .stories .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
@@ -14339,8 +14341,8 @@ input.input-number-noarrows[type=number] {
 .stories .card a:hover {
   text-decoration: none;
 }
-.stories .information {
-  color: var(--bs-secondary-color);
+.stories .card .list-group-item.selected {
+  background-color: rgba(250, 128, 114, 0.5);
 }
 
 .entry-detail .chapter {
@@ -14367,9 +14369,11 @@ input.input-number-noarrows[type=number] {
   margin-right: calc(var(--bs-card-spacer-x) * -1);
 }
 
-.beings .card.selected {
-  background-color: rgba(250, 128, 114, 0.5);
+.beings .card.selected, .beings .card.selected-within {
   border-color: salmon;
+}
+.beings .card.selected .card-header {
+  background-color: rgba(250, 128, 114, 0.5);
 }
 .beings .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
@@ -14377,6 +14381,9 @@ input.input-number-noarrows[type=number] {
 }
 .beings .card a:hover {
   text-decoration: none;
+}
+.beings .card .list-group-item.selected {
+  background-color: rgba(250, 128, 114, 0.5);
 }
 .beings .card {
   position: relative;
@@ -14419,9 +14426,11 @@ input.input-number-noarrows[type=number] {
   opacity: 0.5;
 }
 
-.search .card.selected {
-  background-color: rgba(250, 128, 114, 0.5);
+.search .card.selected, .search .card.selected-within {
   border-color: salmon;
+}
+.search .card.selected .card-header {
+  background-color: rgba(250, 128, 114, 0.5);
 }
 .search .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
@@ -14429,6 +14438,9 @@ input.input-number-noarrows[type=number] {
 }
 .search .card a:hover {
   text-decoration: none;
+}
+.search .card .list-group-item.selected {
+  background-color: rgba(250, 128, 114, 0.5);
 }
 .search .information {
   margin-right: 12px;
