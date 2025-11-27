@@ -7,4 +7,5 @@ public interface IItemContainer
 {
     RenderFragment<Item> GetItemTemplate();
     RenderFragment<ItemGroup> GetItemGroupTemplate();
+    RenderFragment<ItemSeparator> GetItemSeparatorTemplate();
 }

@@ -18,8 +18,8 @@
                         <PermissionView Request="PermissionRequest.Owner">
                             @if (Model.Id != Model.UserId)
                             {
-                                <DropdownSeparator />
-                                <DropdownItem Icon="trash-alt" Text="Delete Being" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Being" />
+                                <ItemSeparator />
+                                <Item Icon="trash-alt" Text="Delete Being" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Being" />
                             }
                         </PermissionView>
                     </DropdownButton>

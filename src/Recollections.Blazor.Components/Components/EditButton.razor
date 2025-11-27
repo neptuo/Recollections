@@ -61,4 +61,9 @@
             @group.ChildContent
         </div>;
     }
+
+    RenderFragment<ItemSeparator> IItemContainer.GetItemSeparatorTemplate()
+    {
+        return separator => @<hr />;
+    }
 }

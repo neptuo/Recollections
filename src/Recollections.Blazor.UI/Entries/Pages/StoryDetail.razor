@@ -14,19 +14,19 @@
                     <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
                     <DropdownButton CssClass="ms-1">
                         <PermissionView Request="PermissionRequest.Write">
-                            <DropdownItem Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
-                            <DropdownSeparator />
-                            <DropdownItem Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
-                            <DropdownItem Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
-                            <DropdownSeparator />
+                            <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
+                            <ItemSeparator />
+                            <Item Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
+                            <Item Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
+                            <ItemSeparator />
                         </PermissionView>
                         <PermissionView Request="PermissionRequest.Owner">
                             <ShareButton Owner="@Owner" StoryId="@Model.Id" Layout="ButtonLayout.DropdownItem" />
                         </PermissionView>
                         <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
                         <PermissionView Request="PermissionRequest.Owner">
-                            <DropdownSeparator />
-                            <DropdownItem Icon="trash-alt" Text="Delete Story" OnClick="@(async () => await DeleteAsync())" CssClass="text-danger" Title="Delete Story" />
+                            <ItemSeparator />
+                            <Item Icon="trash-alt" Text="Delete Story" OnClick="@(async () => await DeleteAsync())" CssClass="text-danger" Title="Delete Story" />
                         </PermissionView>
                     </DropdownButton>
                 </h2>
@@ -46,9 +46,9 @@
                                 <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" EditModeCssClass="flex-grow-1" />
                                 <PermissionView Request="PermissionRequest.Write">
                                     <DropdownButton CssClass="ms-1">
-                                        <DropdownItem Icon="plus" Text="Add Entry" OnClick="() => SelectEntry(chapter)" Title="Add Chapter Entry" />
-                                        <DropdownSeparator />
-                                        <DropdownItem Icon="trash-alt" Text="Delete" OnClick="@(async () => await DeleteChapterAsync(chapter))" CssClass="text-danger" Title="Delete Chapter" />
+                                        <Item Icon="plus" Text="Add Entry" OnClick="() => SelectEntry(chapter)" Title="Add Chapter Entry" />
+                                        <ItemSeparator />
+                                        <Item Icon="trash-alt" Text="Delete" OnClick="@(async () => await DeleteChapterAsync(chapter))" CssClass="text-danger" Title="Delete Chapter" />
                                     </DropdownButton> 
                                 </PermissionView>
                             </h4>

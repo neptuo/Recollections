@@ -1,30 +1,14 @@
+@implements IItemContainer
+
 <div class="dropdown @CssClass">
     <button class="btn btn-link py-0 px-2" data-bs-toggle="dropdown">
         <Icon Identifier="@Icon" />
     </button>
-    <div class="dropdown-menu @(IsEnd ? "dropdown-menu-end" : "")">
-        @if (Items != null)
-        {
-            foreach (var item in Items)
-            {
-                if (item is SeparatorItem)
-                {
-                    <hr class="dropdown-divider" />
-                }
-                else if (item is ActionItem action)
-                {
-                    <a class="dropdown-item @action.CssClass" @onclick="@action.OnClick" title="@action.Title">
-                        <Icon Identifier="@action.Icon" />
-                        @action.Text
-                    </a>
-                }
-            }
-        }
-        else
-        {
+    <ul class="dropdown-menu @(IsEnd ? "dropdown-menu-end" : "")">
+        <CascadingValue Value="@((IItemContainer)this)">
             @ChildContent
-        }
-    </div>
+        </CascadingValue>
+    </ul>
 </div>
 
 @code
@@ -36,18 +20,28 @@
     public string CssClass { get; set; }
 
     [Parameter]
-    public IReadOnlyCollection<DropdownItem> Items { get; set; }
-
-    [Parameter]
     public RenderFragment ChildContent { get; set; }
 
     [Parameter]
     public bool IsEnd { get; set; }
 
-    public abstract record DropdownItem();
-    public record ActionItem(string Icon, string Text, Action OnClick, string Title = null, string CssClass = null) : DropdownItem;
-    public record SeparatorItem() : DropdownItem
+    RenderFragment<Item> IItemContainer.GetItemTemplate()
     {
-        public static readonly SeparatorItem Instance = new SeparatorItem();
+        return item => @<li>
+            <a class="dropdown-item @item.CssClass" @onclick="@item.OnClick" title="@item.Title">
+                <Icon Identifier="@item.Icon" />
+                @item.Text
+            </a>
+        </li>;
+    }
+
+    RenderFragment<ItemGroup> IItemContainer.GetItemGroupTemplate()
+    {
+        return group => @<li><h6 class="dropdown-header">@group.Text</h6></li>;
+    }
+
+    RenderFragment<ItemSeparator> IItemContainer.GetItemSeparatorTemplate()
+    {
+        return separator => @<hr class="dropdown-divider" />;
     }
 }

@@ -1,0 +1,15 @@
+@renderFragment?.Invoke(this)
+
+@code {
+    [CascadingParameter]
+    public IItemContainer Container { get; set; }
+
+    private RenderFragment<ItemSeparator> renderFragment;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        renderFragment = Container?.GetItemSeparatorTemplate();
+    }
+}

@@ -10,12 +10,12 @@
             <h2 class="title d-flex text-break">
                 <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
                 <DropdownButton CssClass="ms-1">
-                    <DropdownItem Icon="cloud-download" Text="Download Original" OnClick="DownloadOriginalAsync" Title="Download Original Image" />
+                    <Item Icon="cloud-download" Text="Download Original" OnClick="DownloadOriginalAsync" Title="Download Original Image" />
                     <ShareLinkButton Layout="ButtonLayout.DropdownItem" />
                     <PermissionView Request="PermissionRequest.Write">
-                        <DropdownItem Icon="location-arrow" Text="Set Location from Original" OnClick="SetLocationOriginalAsync" Title="Set Location from Original Image" />
-                        <DropdownSeparator />
-                        <DropdownItem Icon="trash-alt" Text="Delete Image" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Image" />
+                        <Item Icon="location-arrow" Text="Set Location from Original" OnClick="SetLocationOriginalAsync" Title="Set Location from Original Image" />
+                        <ItemSeparator />
+                        <Item Icon="trash-alt" Text="Delete Image" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Image" />
                     </PermissionView>
                 </DropdownButton>
             </h2>
