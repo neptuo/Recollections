@@ -37,7 +37,12 @@
 
     RenderFragment<ItemGroup> IItemContainer.GetItemGroupTemplate()
     {
-        return group => @<li><h6 class="dropdown-header">@group.Text</h6></li>;
+        RenderFragment<ItemGroup> inner = group => @<li><h6 class="dropdown-header">@group.Text</h6></li>;
+        return group => builder =>
+        {
+            builder.AddContent(0, inner(group));
+            builder.AddContent(1, group.ChildContent);
+        };
     }
 
     RenderFragment<ItemSeparator> IItemContainer.GetItemSeparatorTemplate()
