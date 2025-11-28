@@ -6,3 +6,12 @@
         display: none;
     }
 }
+
+.file-progress-global {
+    top: 51px;
+    z-index: 1021;
+
+    @include media-breakpoint-up(md) {
+        top: 64px;
+    }
+}

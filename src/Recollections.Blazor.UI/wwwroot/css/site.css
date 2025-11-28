@@ -13802,6 +13802,16 @@ input.input-number-noarrows[type=number] {
   display: none;
 }
 
+.file-progress-global {
+  top: 51px;
+  z-index: 1021;
+}
+@media (min-width: 768px) {
+  .file-progress-global {
+    top: 64px;
+  }
+}
+
 .btn-floating {
   --self-width: 46px;
   position: fixed;
