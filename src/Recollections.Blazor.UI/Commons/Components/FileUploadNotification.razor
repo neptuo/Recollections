@@ -1,0 +1,71 @@
+<FileUploadProgressListener>
+    <ChildContent Context="files">
+        @if (files.Length > 0)
+        {
+            var currentCount = files.Count(p => p.Status == "current");
+            var currentAndFinishedCount = files.Count(p => p.Status == "current" || p.Status == "done" || p.Status == "error");
+            var currentPercentage = files.Where(p => p.Status == "current").Sum(p => p.Percentual) / currentCount;
+            <div class="container flex-nowrap sticky-top pb-2 bg-body file-progress-global" style="">
+                <div class="alert alert-secondary mb-0">
+                    <div class="d-flex align-items-center mb-1">
+                        <span>
+                            Uploading @currentAndFinishedCount / @files.Length
+                        </span>
+
+                        @if (files.Any(p => p.Status == "error"))
+                        {
+                            <Icon Identifier="exclamation-triangle" CssClass="ms-2 text-warning" />
+                        }
+
+                        <Icon
+                            OnClick="@(() => IsExpanded = !IsExpanded)"
+                            Identifier="@(IsExpanded ? "chevron-down" : "chevron-left")" 
+                            CssClass="ms-auto cursor-pointer"
+                        />
+                    </div>
+                    <div class="progress" style="height: 2px">
+                        <div class="progress-bar" style="width: @(currentPercentage)%"></div>
+                    </div>
+                    @if (IsExpanded)
+                    {
+                        <div class="list-group mt-3">
+                            @foreach (var file in files)
+                            {
+                                <div class="list-group-item d-flex align-items-center">
+                                    <span class="flex-grow-1 text-truncate">
+                                        @file.Name <span class="text-secondary">@Utils.FileSize(file.Size)</span>
+                                    </span>
+                                    <span>
+                                        @if (file.Status == "done")
+                                        {
+                                            <Icon Identifier="check" CssClass="text-success" />
+                                        }
+                                        else if (file.Status == "error")
+                                        {
+                                            <Icon Identifier="triangle-exclamation" CssClass="text-danger" />
+                                            <span class="d-none d-sm-inline">
+                                                @file.ErrorDescription
+                                            </span>
+                                        }
+                                        else if (file.Status == "current")
+                                        {
+                                            <span>@file.Percentual %</span>
+                                        }
+                                        else
+                                        {
+                                            <Icon Identifier="hourglass-start" CssClass="text-secondary" />
+                                        }
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </ChildContent>
+</FileUploadProgressListener>
+
+@code {
+    bool IsExpanded;
+}

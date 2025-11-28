@@ -1,0 +1,26 @@
+﻿@code
+{
+    public static RenderFragment FileSize(int? size)
+    {
+        return @<span class="text-nowrap">@GetFileSize(size)</span>;
+    }
+
+    private static string GetFileSize(long? bytes)
+    {
+        if (bytes == null)
+            return null;
+
+        const long KB = 1024;
+        const long MB = KB * 1024;
+        const long GB = MB * 1024;
+
+        if (bytes < KB)
+            return $"{bytes} B";
+        else if (bytes < MB)
+            return $"{bytes / KB} KB";
+        else if (bytes < GB)
+            return $"{bytes / MB} MB";
+        else
+            return $"{((double)bytes / GB):F1} GB";
+    }
+}

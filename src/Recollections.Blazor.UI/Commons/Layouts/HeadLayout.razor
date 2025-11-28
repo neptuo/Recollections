@@ -42,30 +42,7 @@
     </div>
 </nav>
 
-<FileUploadProgressListener>
-    <ChildContent Context="files">
-        @if (files.Length > 0)
-        {
-            var currentCount = files.Count(p => p.Status == "current");
-            var currentAndFinishedCount = files.Count(p => p.Status == "current" || p.Status == "done" || p.Status == "error");
-            var currentPercentage = files.Where(p => p.Status == "current").Sum(p => p.Percentual) / currentCount;
-            <div class="container flex-nowrap sticky-top pb-2 bg-body file-progress-global" style="">
-                <div class="alert alert-secondary mb-0">
-                    <div class="mb-1">
-                        Uploading @currentAndFinishedCount / @files.Length
-                        @if (files.Any(p => p.Status == "error"))
-                        {
-                            <Icon Identifier="exclamation-triangle" CssClass="ms-2 text-warning" />
-                        }
-                    </div>
-                    <div class="progress" style="height: 2px">
-                        <div class="progress-bar" style="width: @(currentPercentage)%"></div>
-                    </div>
-                </div>
-            </div>
-        }
-    </ChildContent>
-</FileUploadProgressListener>
+<FileUploadNotification />
 
 <ExceptionPanel @ref="ExceptionPanel" OnReadOnlyClick="OnReadOnlyClickAsync">
     <UnauthorizedContent>
