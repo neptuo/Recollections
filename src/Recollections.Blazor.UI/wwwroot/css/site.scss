@@ -137,6 +137,15 @@ a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-z
     }
 }
 
+.uniform {
+    &.fa,
+    &.far,
+    &.fas {
+        width: $uni-icon-width;
+        text-align: center;
+    }
+}
+
 .btn-primary {
     --bs-btn-color: #fff;
 }

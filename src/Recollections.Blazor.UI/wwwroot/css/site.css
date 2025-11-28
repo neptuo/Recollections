@@ -13548,6 +13548,11 @@ a:not(.btn, .nav-link, .dropdown-item, .leaflet-control-zoom-out, .leaflet-contr
   text-align: center;
 }
 
+.uniform.fa, .uniform.far, .uniform.fas {
+  width: 24px;
+  text-align: center;
+}
+
 .btn-primary {
   --bs-btn-color: #fff;
 }
@@ -14364,16 +14369,16 @@ input.input-number-noarrows[type=number] {
   margin-bottom: 1.5rem;
 }
 
-.story-picker .card-header .fa,
-.story-picker .card-header .fas {
+.story-picker .card-header .card-header-spread-icon.fa,
+.story-picker .card-header .card-header-spread-icon.fas {
   margin-top: calc(var(--bs-card-cap-padding-y) * -1);
   margin-bottom: calc(var(--bs-card-cap-padding-y) * -1);
   padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
   width: 52px;
   text-align: center;
 }
-.story-picker .card-header .fa:last-child,
-.story-picker .card-header .fas:last-child {
+.story-picker .card-header .card-header-spread-icon.fa:last-child,
+.story-picker .card-header .card-header-spread-icon.fas:last-child {
   margin-right: calc(var(--bs-card-cap-padding-x) * -1);
 }
 .story-picker hr {
@@ -14400,16 +14405,16 @@ input.input-number-noarrows[type=number] {
 .beings .card {
   position: relative;
 }
-.beings .card .card-header .fa,
-.beings .card .card-header .fas {
+.beings .card .card-header .card-header-spread-icon.fa,
+.beings .card .card-header .card-header-spread-icon.fas {
   margin-top: calc(var(--bs-card-cap-padding-y) * -1);
   margin-bottom: calc(var(--bs-card-cap-padding-y) * -1);
   padding: var(--bs-card-cap-padding-y) var(--bs-card-cap-padding-x);
   width: 52px;
   text-align: center;
 }
-.beings .card .card-header .fa:last-child,
-.beings .card .card-header .fas:last-child {
+.beings .card .card-header .card-header-spread-icon.fa:last-child,
+.beings .card .card-header .card-header-spread-icon.fas:last-child {
   margin-right: calc(var(--bs-card-cap-padding-x) * -1);
 }
 .beings .card .fa, .beings .card .fas {
@@ -14531,4 +14536,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

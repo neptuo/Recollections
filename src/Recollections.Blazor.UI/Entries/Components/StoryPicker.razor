@@ -21,9 +21,17 @@
                 <StoryCard
                     Model="@story"
                     OnTitleClick="@(async () => await SelectAsync(story, null))"
-                    OnChaptersClick="@(async () => await LoadChaptersAsync(story))"
                     CardCssClass="@($"no-hover flex-grow-1 {(SelectedStoryId == story.Id ? SelectedChapterId == null ? "selected" : "selected-within" : string.Empty)}")"
+                    HasBody="@state.IsExpanded"
                 >
+                    <BeforeTitleContent>
+                        <Icon
+                            Prefix="@(SelectedStoryId == story.Id && SelectedChapterId == null ? "fa" : "far")"
+                            Identifier="@(SelectedStoryId == story.Id && SelectedChapterId == null ? "square-check" : "square")"
+                            OnClick="@(async () => await SelectAsync(story, null))"
+                            CssClass="uniform me-1"
+                        />
+                    </BeforeTitleContent>
                     <AfterTitleContent>
                         @if (story.Chapters > 0)
                         {
@@ -38,16 +46,15 @@
                                 <Icon
                                     OnClick="@(async () => await LoadChaptersAsync(story))"
                                     Identifier="@(state.IsExpanded ? "chevron-down" : "chevron-left")" 
-                                    CssClass="fs-5 cursor-pointer chapter-toggle"
+                                    CssClass="fs-5 cursor-pointer chapter-toggle card-header-spread-icon"
                                 />
                             }
                         }
-                        <Icon Identifier="circle-info fs-5" OnClick="@(() => { Modal.Hide(); Navigator.OpenStoryDetail(story.Id); })" />
+                        <Icon Identifier="circle-info fs-5 card-header-spread-icon" OnClick="@(() => { Modal.Hide(); Navigator.OpenStoryDetail(story.Id); })" />
                     </AfterTitleContent>
-                    <EndBodyContent>
+                    <BodyContent>
                         @if (state.IsExpanded && state.Chapters != null)
                         {
-                            <hr class="m-2" />
                             <div class="list-group list-group-flush">
                                 @foreach (var chapter in state.Chapters)
                                 {
@@ -58,7 +65,7 @@
                                 }
                             </div>
                         }
-                    </EndBodyContent>
+                    </BodyContent>
                 </StoryCard>
             </ListView>
         </div>

@@ -1,65 +1,28 @@
 @using Neptuo.Recollections.Entries.Stories
 
 <div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
-    <div class="card-header">
+    <div class="card-header @(!HasBody ? "border-bottom-0" : string.Empty)">
         <div class="d-flex align-items-center">
+            @BeforeTitleContent
             <h5 class="flex-grow-1 py-2 mb-0 @(OnTitleClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnTitleClick">
                 @Model.Title
             </h5>
             @AfterTitleContent
         </div>
     </div>
-    <div class="card-body px-0 py-1">
-        <div class="list-group list-group-flush bg-transparent">
-            @if (Model.Chapters > 0)
+    @if (HasBody)
+    {
+        <div class="card-body p-0">
+            @if (BodyContent != null)
             {
-                <div class="list-group-item border-0 bg-transparent @(OnChaptersClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnChaptersClick">
-                    <Icon Identifier="book" />
-                    @Model.Chapters chapters
-                </div>
+                @BodyContent(DefaultBodyContent)
             }
-
-            <div class="list-group-item border-0 bg-transparent">
-                <Icon Prefix="fas" Identifier="comment-alt" />
-                @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
-            </div>
-
-            @if (Model.MinDate != null || Model.MaxDate != null)
+            else
             {
-                <div class="list-group-item border-0 bg-transparent">
-                    <Icon Identifier="calendar" />
-                    <span class="ms-1">
-                        @if (Model.MinDate != null)
-                        {
-                            @Model.MinDate.Value.ToString(UiOptions.DateFormat)
-                        }
-
-                        @if (Model.MinDate != Model.MaxDate)
-                        {
-                            if (Model.MinDate != null && Model.MaxDate != null)
-                            {
-                                @: -
-                            }
-
-                            if (Model.MaxDate != null)
-                            {
-                                @Model.MaxDate.Value.ToString(UiOptions.DateFormat)
-                            }
-                        }
-                    </span>
-                </div>
-            }
-
-            @if (UserState.UserId != Model.UserId)
-            {
-                <div class="list-group-item border-0 bg-transparent">
-                    <Icon Identifier="user" />
-                    @Model.UserName
-                </div>
+                @DefaultBodyContent
             }
         </div>
-        @EndBodyContent
-    </div>
+    }
 </div>
 
 @code
@@ -77,10 +40,13 @@
     public StoryListModel Model { get; set; }
 
     [Parameter]
+    public RenderFragment BeforeTitleContent { get; set; }
+    
+    [Parameter]
     public RenderFragment AfterTitleContent { get; set; }
 
     [Parameter]
-    public RenderFragment EndBodyContent { get; set; }
+    public RenderFragment<RenderFragment> BodyContent { get; set; }
 
     [Parameter]
     public EventCallback OnCardClick { get; set; }
@@ -89,11 +55,60 @@
     public EventCallback OnTitleClick { get; set; }
 
     [Parameter]
-    public EventCallback OnChaptersClick { get; set; }
+    public string CardCssClass { get; set; }
 
     [Parameter]
-    public string CardCssClass { get; set; }
+    public bool HasBody { get; set; } = true;
 
     [CascadingParameter]
     public UserState UserState { get; set; }
+
+    private RenderFragment DefaultBodyContent => 
+        @<div class="p-3">
+            @if (Model.Chapters > 0)
+            {
+                <div>
+                    <Icon Identifier="book" CssClass="uniform" />
+                    @Model.Chapters chapters
+                </div>
+            }
+
+            <div>
+                <Icon Prefix="fas" Identifier="comment-alt" CssClass="uniform" />
+                @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
+            </div>
+
+            @if (Model.MinDate != null || Model.MaxDate != null)
+            {
+                <div>
+                    <Icon Identifier="calendar" CssClass="uniform" />
+                    @(" ")
+                    @if (Model.MinDate != null)
+                    {
+                        @Model.MinDate.Value.ToString(UiOptions.DateFormat)
+                    }
+
+                    @if (Model.MinDate != Model.MaxDate)
+                    {
+                        if (Model.MinDate != null && Model.MaxDate != null)
+                        {
+                            @: -
+                        }
+
+                        if (Model.MaxDate != null)
+                        {
+                            @Model.MaxDate.Value.ToString(UiOptions.DateFormat)
+                        }
+                    }
+                </div>
+            }
+
+            @if (UserState.UserId != Model.UserId)
+            {
+                <div>
+                    <Icon Identifier="user" CssClass="uniform" />
+                    @Model.UserName
+                </div>
+            }
+        </div>;
 }
