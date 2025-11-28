@@ -13580,7 +13580,9 @@ a.bg-salmon {
   }
 }
 .modal .modal-overflow .modal-body {
-  max-height: calc(100vh - 158px - 1rem);
+  --bs-modal-header-height: 66px;
+  --bs-modal-footer-height: 71px;
+  max-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - var(--bs-modal-margin) * 2);
   overflow: auto;
 }
 
@@ -13806,7 +13808,7 @@ input.input-number-noarrows[type=number] {
   bottom: 30px;
   left: calc((100vw - var(--self-width)) / 2);
   font-size: 1.25rem;
-  z-index: 1100;
+  z-index: 1051;
   border-radius: 50%;
 }
 @media (min-width: 576px) {
@@ -14519,4 +14521,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */
