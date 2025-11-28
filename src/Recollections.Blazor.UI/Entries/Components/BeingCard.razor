@@ -1,62 +1,28 @@
 @using Neptuo.Recollections.Entries.Beings
+@inherits EntityCard<BeingListModel>
 
-<div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
-    <div class="card-header">
-        <div class="d-flex align-items-center">
-            <h5 class="flex-grow-1 py-2 mb-0">
-                @Model.Name
-                @if (UserState.UserId == Model.Id)
-                {
-                    <span class="ms-1">(me)</span>
-                }
-            </h5>
-            @AfterTitleContent
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="d-flex">
-            <div class="flex-grow-1">
-                <div class="information">
-                    <Icon Prefix="fas" Identifier="comment-alt" />
-                    @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
-                </div>
-
-                @if (UserState.UserId != Model.UserId)
-                {
-                    <div class="information">
-                        <Icon Identifier="user" />
-                        @Model.UserName
-                    </div>
-                }
-            </div>
-            <Icon Identifier="@Model.Icon" CssClass="fs-4" />
-        </div>
-    </div>
-</div>
+@Content
 
 @code
 {
-    [Inject]
-    protected Entries.Api Api { get; set; }
-
-    [Inject]
-    protected Navigator Navigator { get; set; }
-
-    [Inject]
-    protected UiOptions UiOptions { get; set; }
-
-    [Parameter]
-    public BeingListModel Model { get; set; }
-
-    [Parameter]
-    public RenderFragment AfterTitleContent { get; set; }
-
-    [Parameter]
-    public EventCallback OnCardClick { get; set; }
-
-    [Parameter]
-    public string CardCssClass { get; set; }
-
     [CascadingParameter]
     public UserState UserState { get; set; }
+
+    protected override string Title => $"{Model.Name}{(UserState.UserId == Model.Id ? " (me)" : string.Empty)}";
+
+    protected override RenderFragment DefaultBodyContent =>
+        @<div class="p-3">
+            <div class="information">
+                <Icon Prefix="fas" Identifier="comment-alt" CssClass="uniform" />
+                @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
+            </div>
+
+            @if (UserState.UserId != Model.UserId)
+            {
+                <div class="information">
+                    <Icon Identifier="user" CssClass="uniform" />
+                    @Model.UserName
+                </div>
+            }
+        </div>;
 }

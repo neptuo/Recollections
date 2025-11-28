@@ -1,7 +1,18 @@
-<Icon Prefix="far" Identifier="@(Checked ? "square-check" : "square")" />
+<Icon
+    Prefix="@(IsChecked ? "fa" : "far")"
+    Identifier="@(IsChecked ? "square-check" : "square")"
+    OnClick="@OnClick"
+    CssClass="@CssClass"
+/>
 
 @code
 {
     [Parameter]
-    public bool Checked { get; set; }
+    public bool IsChecked { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
 }

@@ -25,9 +25,8 @@
                     HasBody="@state.IsExpanded"
                 >
                     <BeforeTitleContent>
-                        <Icon
-                            Prefix="@(SelectedStoryId == story.Id && SelectedChapterId == null ? "fa" : "far")"
-                            Identifier="@(SelectedStoryId == story.Id && SelectedChapterId == null ? "square-check" : "square")"
+                        <CheckboxIcon
+                            IsChecked="@(SelectedStoryId == story.Id && SelectedChapterId == null)"
                             OnClick="@(async () => await SelectAsync(story, null))"
                             CssClass="uniform me-1"
                         />
@@ -59,7 +58,7 @@
                                 @foreach (var chapter in state.Chapters)
                                 {
                                     <a class="list-group-item list-group-action border-0 @(SelectedChapterId == chapter.Id ? "fw-bold selected" : "bg-transparent")" @onclick="(async () => await SelectAsync(story, chapter))" @onclick:stopPropagation="true">
-                                        <Icon Prefix="@(SelectedChapterId == chapter.Id ? "fa" : "far")" Identifier="@(SelectedChapterId == chapter.Id ? "square-check" : "square")" />
+                                        <CheckboxIcon IsChecked="@(SelectedChapterId == chapter.Id)" CssClass="uniform" />
                                         @chapter.Title
                                     </a>
                                 }

@@ -1,69 +1,15 @@
 @using Neptuo.Recollections.Entries.Stories
+@inherits EntityCard<StoryListModel>
 
-<div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
-    <div class="card-header @(!HasBody ? "border-bottom-0" : string.Empty)">
-        <div class="d-flex align-items-center">
-            @BeforeTitleContent
-            <h5 class="flex-grow-1 py-2 mb-0 @(OnTitleClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnTitleClick">
-                @Model.Title
-            </h5>
-            @AfterTitleContent
-        </div>
-    </div>
-    @if (HasBody)
-    {
-        <div class="card-body p-0">
-            @if (BodyContent != null)
-            {
-                @BodyContent(DefaultBodyContent)
-            }
-            else
-            {
-                @DefaultBodyContent
-            }
-        </div>
-    }
-</div>
+@Content
 
 @code
 {
-    [Inject]
-    protected Entries.Api Api { get; set; }
-
-    [Inject]
-    protected Navigator Navigator { get; set; }
-
-    [Inject]
-    protected UiOptions UiOptions { get; set; }
-
-    [Parameter]
-    public StoryListModel Model { get; set; }
-
-    [Parameter]
-    public RenderFragment BeforeTitleContent { get; set; }
-    
-    [Parameter]
-    public RenderFragment AfterTitleContent { get; set; }
-
-    [Parameter]
-    public RenderFragment<RenderFragment> BodyContent { get; set; }
-
-    [Parameter]
-    public EventCallback OnCardClick { get; set; }
-
-    [Parameter]
-    public EventCallback OnTitleClick { get; set; }
-
-    [Parameter]
-    public string CardCssClass { get; set; }
-
-    [Parameter]
-    public bool HasBody { get; set; } = true;
-
     [CascadingParameter]
     public UserState UserState { get; set; }
 
-    private RenderFragment DefaultBodyContent => 
+    protected override string Title => Model.Title;
+    protected override RenderFragment DefaultBodyContent => 
         @<div class="p-3">
             @if (Model.Chapters > 0)
             {

@@ -2,9 +2,21 @@
     <ChildContent>
         <div class="d-grid gap-3">
             <ListView Items="@Beings" IsLoading="@IsLoading" Context="being">
-                <BeingCard Model="being" OnCardClick="@(() => OnItemClick(being.Id))" CardCssClass="@($"no-hover flex-grow-1 {(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)}")">
+                <BeingCard
+                    Model="being"
+                    OnCardClick="@(() => OnItemClick(being.Id))"
+                    CardCssClass="@($"no-hover flex-grow-1 {(SelectedIds.Contains(being.Id) ? "selected" : String.Empty)}")"
+                    HasBody="false"
+                >
+                    <BeforeTitleContent>
+                        <CheckboxIcon
+                            IsChecked="@SelectedIds.Contains(being.Id)"
+                            OnClick="@(() => OnItemClick(being.Id))"
+                            CssClass="uniform me-1"
+                        />
+                    </BeforeTitleContent>
                     <AfterTitleContent>
-                        <Icon Identifier="circle-info fs-5" OnClick="@(() => { Modal.Hide(); Navigator.OpenBeingDetail(being.Id); })" />
+                        <Icon Identifier="circle-info fs-5 card-header-spread-icon" OnClick="@(() => { Modal.Hide(); Navigator.OpenBeingDetail(being.Id); })" />
                     </AfterTitleContent>
                 </BeingCard>
             </ListView>
