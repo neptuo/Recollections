@@ -6,7 +6,6 @@
     left: calc((100vw - var(--self-width)) / 2);
     font-size: 1.25rem;
     z-index: 1051;
-    border-radius: 50%;
 
     @include media-breakpoint-up(sm) {
         position: sticky;
