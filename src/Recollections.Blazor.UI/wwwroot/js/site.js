@@ -60,6 +60,10 @@
         },
         Dispose: function (container) {
             bootstrap.Offcanvas.getInstance(container).dispose();
+
+            // If the offcanvas was shown, the body styles are not reset on dispose.
+            document.body.style.paddingRight = null;
+            document.body.style.overflow = null;
         }
     },
     Tooltip: {
