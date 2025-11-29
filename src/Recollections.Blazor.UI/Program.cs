@@ -50,12 +50,16 @@ namespace Neptuo.Recollections
         {
             DefaultEventManager eventManager = new DefaultEventManager();
 
+            string apiBaseUrl = Environment.GetEnvironmentVariable("API_BASE_ADDRESS");
+            if (string.IsNullOrEmpty(apiBaseUrl))
+                throw Ensure.Exception.InvalidOperation("API_BASE_ADDRESS environment variable is not set.");
+
             services
                 .AddLogging()
                 .AddExceptions()
                 .AddComponents()
                 .AddUiOptions()
-                .AddHttpClientFactory(GetApiBaseUrl())
+                .AddHttpClientFactory($"{apiBaseUrl}api/")
                 .AddSingleton<IEventDispatcher>(eventManager)
                 .AddSingleton<IEventHandlerCollection>(eventManager)
                 .AddSingleton<Json>()
@@ -87,15 +91,6 @@ namespace Neptuo.Recollections
 
         private static void StartupServices(IServiceProvider services)
         {
-        }
-
-        private static string GetApiBaseUrl()
-        {
-#if DEBUG
-            return "http://localhost:33880/api/";
-#else
-            return "https://api.recollections.app/api/";
-#endif
         }
     }
 }
