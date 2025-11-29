@@ -4,6 +4,8 @@
     position: fixed;
     bottom: 30px;
     left: calc((100vw - var(--self-width)) / 2);
+    width: var(--self-width);
+    height: var(--self-width);
     font-size: 1.25rem;
     z-index: 1051;
 
@@ -42,7 +44,7 @@
             right: 0;
             left: 0;
             height: var(--#{$prefix}offcanvas-height);
-            max-height: 100%;
+            max-height: calc(100% - 52px);
             border-top: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
             transform: translateY(100%);
         }

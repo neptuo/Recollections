@@ -13820,6 +13820,8 @@ input.input-number-noarrows[type=number] {
   position: fixed;
   bottom: 30px;
   left: calc((100vw - var(--self-width)) / 2);
+  width: var(--self-width);
+  height: var(--self-width);
   font-size: 1.25rem;
   z-index: 1051;
 }
@@ -13857,7 +13859,7 @@ input.input-number-noarrows[type=number] {
     right: 0;
     left: 0;
     height: var(--bs-offcanvas-height);
-    max-height: 100%;
+    max-height: calc(100% - 52px);
     border-top: var(--bs-offcanvas-border-width) solid var(--bs-offcanvas-border-color);
     -webkit-transform: translateY(100%);
         -ms-transform: translateY(100%);
