@@ -54,8 +54,11 @@ namespace Neptuo.Recollections.Entries.Pages
             Permissions.IsOwner = UserState.UserId == Model.UserId;
         }
 
-        protected Task SaveAsync()
-            => Api.UpdateBeingAsync(Model);
+        protected async Task SaveAsync()
+        {
+            await Api.UpdateBeingAsync(Model);
+            StateHasChanged();
+        }
 
         protected Task SaveNameAsync(string title)
         {

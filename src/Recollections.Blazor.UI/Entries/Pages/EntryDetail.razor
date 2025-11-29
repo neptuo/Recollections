@@ -4,11 +4,6 @@
 @if (Model != null)
 {
     <DocumentTitle Value="@Model.Title" />
-    <TemplateContent Name="MobileTitle">
-        <h2 class="title d-flex text-break mb-0">
-            <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-        </h2>
-    </TemplateContent>
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
@@ -29,9 +24,7 @@
             </ActionMenu>
 
             <div @ref="Container" class="entry-detail my-sm-3">
-                <h2 class="title d-none d-sm-flex text-break">
-                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-                </h2>
+                <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <div class="datetime">
                     <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
                 </div>

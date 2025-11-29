@@ -33,9 +33,7 @@
             </ActionMenu>
 
             <div class="entry-detail my-sm-3">
-                <h2 class="d-flex title text-break">
-                    <InlineTextEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" EditModeCssClass="flex-grow-1" />
-                </h2>
+                <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <UserInformation Owner="@Owner" />
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />

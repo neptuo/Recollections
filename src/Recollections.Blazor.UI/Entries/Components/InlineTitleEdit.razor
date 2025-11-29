@@ -1,0 +1,21 @@
+<TemplateContent Name="MobileTitle">
+    @EditTemplate(true)
+</TemplateContent>
+
+@EditTemplate(false)
+
+@code {
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public Action<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public string PlaceHolder { get; set; }
+
+    protected RenderFragment EditTemplate(bool isMobileTitle) =>
+        @<h2 class="title text-break @(isMobileTitle ? "mb-0" : "d-none d-sm-flex")">
+            <InlineTextEdit Value="@Value" ValueChanged="@ValueChanged" Placeholder="@PlaceHolder" EditModeCssClass="flex-grow-1" />
+        </h2>;
+}

@@ -22,10 +22,8 @@
                 </ItemGroup>
             </ActionMenu>
 
-            <div class="entry-detail">
-                <h2 class="title d-flex">
-                    <InlineTextEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
-                </h2>
+            <div class="entry-detail my-sm-3">
+                <InlineTitleEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" />
                 <h2 class="icon">
                     <InlineLink Value="@Model.Icon" PlaceHolder="user" OnClick="@(() => IconPicker.Show())">
                         <ValueContent Context="identifier">

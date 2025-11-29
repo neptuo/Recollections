@@ -86,8 +86,11 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        protected Task SaveAsync()
-            => Api.UpdateStoryAsync(Model);
+        protected async Task SaveAsync()
+        {
+            await Api.UpdateStoryAsync(Model);
+            StateHasChanged();
+        }
 
         protected Task SaveTitleAsync(string title)
         {

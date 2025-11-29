@@ -18,9 +18,7 @@
         </ActionMenu>
 
         <div class="image-detail my-sm-3">
-            <h2 class="title d-flex text-break">
-                <InlineTextEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" EditModeCssClass="flex-grow-1" />
-            </h2>
+            <InlineTitleEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" />
             <div class="datetime">
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
             </div>

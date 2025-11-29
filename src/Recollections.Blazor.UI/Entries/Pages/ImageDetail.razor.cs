@@ -135,6 +135,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             await Api.UpdateImageAsync(EntryId, Model);
             UpdateOriginal();
+            StateHasChanged();
         }
 
         private void UpdateOriginal() => original = Model.Clone();
