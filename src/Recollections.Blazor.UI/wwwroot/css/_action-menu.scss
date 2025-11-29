@@ -9,12 +9,16 @@
 
     @include media-breakpoint-up(sm) {
         position: sticky;
-        top: 80px;
+        top: 70px;
         right: 10px;
         bottom: unset;
         left: unset;
-        z-index: 1;
+        z-index: 1001; // Map controls has z-index 1000, bootstrap offcanvas 1045
         float: right;
+    }
+    
+    @include media-breakpoint-up(md) {
+        top: 85px;
     }
 }
 

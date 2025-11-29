@@ -13405,7 +13405,7 @@ textarea.form-control-lg {
 
 [data-bs-theme=dark] .EasyMDEContainer .CodeMirror {
   color: var(--bs-body-color);
-  border-color: #333;
+  border-color: var(--bs-secondary-border-subtle);
   background-color: var(--bs-body-bg);
 }
 [data-bs-theme=dark] .EasyMDEContainer .cm-s-easymde .CodeMirror-cursor {
@@ -13418,13 +13418,13 @@ textarea.form-control-lg {
   background: var(--bs-body-bg);
 }
 [data-bs-theme=dark] .editor-toolbar {
-  border-top: 1px solid #333;
-  border-left: 1px solid #333;
-  border-right: 1px solid #333;
+  border-top: 1px solid var(--bs-secondary-border-subtle);
+  border-left: 1px solid var(--bs-secondary-border-subtle);
+  border-right: 1px solid var(--bs-secondary-border-subtle);
 }
 [data-bs-theme=dark] .editor-toolbar i.separator {
-  border-left: 1px solid #333;
-  border-right: 1px solid #333;
+  border-left: 1px solid var(--bs-secondary-border-subtle);
+  border-right: 1px solid var(--bs-secondary-border-subtle);
 }
 [data-bs-theme=dark] .editor-toolbar.fullscreen {
   background: var(--bs-body-bg);
@@ -13686,21 +13686,19 @@ a.bg-salmon {
   color: var(--bs-danger);
 }
 .inline-editor button.save:hover {
-  background: var(--bs-green);
   border: none !important;
 }
 .inline-editor button.cancel:hover {
-  background: var(--bs-danger);
   border: none !important;
 }
 .inline-editor .editor-toolbar:after {
   clear: both;
 }
 .inline-editor button:hover .oi-check, .inline-editor button:hover .fa-check {
-  color: white;
+  color: var(--bs-body-color);
 }
 .inline-editor button:hover .oi-x, .inline-editor button:hover .fa-times {
-  color: white;
+  color: var(--bs-body-color);
 }
 .inline-editor .form-control {
   font-size: inherit;
@@ -13828,12 +13826,17 @@ input.input-number-noarrows[type=number] {
 @media (min-width: 576px) {
   .btn-floating {
     position: sticky;
-    top: 80px;
+    top: 70px;
     right: 10px;
     bottom: unset;
     left: unset;
-    z-index: 1;
+    z-index: 1001;
     float: right;
+  }
+}
+@media (min-width: 768px) {
+  .btn-floating {
+    top: 85px;
   }
 }
 

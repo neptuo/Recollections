@@ -5,11 +5,11 @@
     {
         <form @onsubmit="@OnSaveValueAsync">
             <div class="input-group">
-                <input @ref="Input" type="text" class="form-control" @bind="Value" />
-                <button class="btn btn-outline-success btn-save" title="Save changes">
+                <input @ref="Input" type="text" class="form-control border-secondary-subtle" @bind="Value" style="box-shadow: unset !important;" />
+                <button class="btn border-secondary-subtle border-start-0 border-end-0 text-success btn-save" title="Save changes">
                     <Icon Identifier="check" />
                 </button>
-                <button class="btn btn-outline-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
+                <button class="btn border-secondary-subtle border-start-0 text-danger btn-cancel" @onclick="@OnResetAsync" title="Revert changes">
                     <Icon Identifier="times" />
                 </button>
             </div>

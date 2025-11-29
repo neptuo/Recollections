@@ -8,12 +8,10 @@
     }
 
     button.save:hover {
-        background: $ok-color;
         border: none !important;
     }
 
     button.cancel:hover {
-        background: $error-color;
         border: none !important;
     }
 
@@ -23,11 +21,11 @@
 
     button:hover {
         .oi-check, .fa-check {
-            color: white;
+            color: var(--bs-body-color);
         }
 
         .oi-x, .fa-times {
-            color: white;
+            color: var(--bs-body-color);
         }
     }
 

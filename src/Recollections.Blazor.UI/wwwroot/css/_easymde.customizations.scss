@@ -6,7 +6,7 @@
 [data-bs-theme=dark] {
     .EasyMDEContainer .CodeMirror {
         color: var(--bs-body-color);
-        border-color: #333;
+        border-color: var(--bs-secondary-border-subtle);
         background-color: var(--bs-body-bg);
     }
     .EasyMDEContainer .cm-s-easymde .CodeMirror-cursor {
@@ -22,13 +22,13 @@
     }
 
     .editor-toolbar {
-        border-top: 1px solid #333;
-        border-left: 1px solid #333;
-        border-right: 1px solid #333;
+        border-top: 1px solid var(--bs-secondary-border-subtle);
+        border-left: 1px solid var(--bs-secondary-border-subtle);
+        border-right: 1px solid var(--bs-secondary-border-subtle);
         
         i.separator {
-            border-left: 1px solid #333;
-            border-right: 1px solid #333;
+            border-left: 1px solid var(--bs-secondary-border-subtle);
+            border-right: 1px solid var(--bs-secondary-border-subtle);
         }
     }
 
