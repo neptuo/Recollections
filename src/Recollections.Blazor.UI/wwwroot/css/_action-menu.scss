@@ -23,8 +23,12 @@
 }
 
 .btn-floating-offcanvas {
-    --bs-offcanvas-height: 420px;
+    --bs-offcanvas-height: auto; // 420px
     --bs-offcanvas-width: 230px;
+
+    .offcanvas-body {
+        padding-bottom: 2rem !important;
+    }
 
     .list-group:not(:first-child) {
         margin-top: 1rem;

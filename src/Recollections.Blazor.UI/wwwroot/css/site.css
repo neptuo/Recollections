@@ -13841,8 +13841,11 @@ input.input-number-noarrows[type=number] {
 }
 
 .btn-floating-offcanvas {
-  --bs-offcanvas-height: 420px;
+  --bs-offcanvas-height: auto;
   --bs-offcanvas-width: 230px;
+}
+.btn-floating-offcanvas .offcanvas-body {
+  padding-bottom: 2rem !important;
 }
 .btn-floating-offcanvas .list-group:not(:first-child) {
   margin-top: 1rem;
