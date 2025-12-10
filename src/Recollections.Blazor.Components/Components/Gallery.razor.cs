@@ -34,7 +34,9 @@ namespace Neptuo.Recollections.Components
 
             if (indexToOpen != null)
             {
-                await Interop.OpenAsync(indexToOpen.Value);
+                if (Models.Count > indexToOpen.Value)
+                    await Interop.OpenAsync(indexToOpen.Value);
+
                 indexToOpen = null;
             }
         }
