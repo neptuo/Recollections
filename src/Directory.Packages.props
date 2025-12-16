@@ -9,7 +9,6 @@
 	<PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
 
 	<!-- Actual dependencies -->
-	<PackageVersion Include="Aspire.Hosting.AppHost" Version="$(FrameworkPackageVersion)" />
 	<PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
 	<PackageVersion Include="Blazored.SessionStorage" Version="2.4.0" />
 	<PackageVersion Include="CommonMark.NET" Version="0.15.1" />

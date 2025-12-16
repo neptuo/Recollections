@@ -1,0 +1,32 @@
+#:sdk Aspire.AppHost.Sdk@13.0.2
+#:project .\Recollections.Api\Recollections.Api.csproj
+#:project .\Recollections.Blazor.UI\Recollections.Blazor.UI.csproj
+
+using Microsoft.Extensions.Configuration;
+
+var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOptions 
+{
+    DashboardApplicationName = "Recollections AppHost",
+    Args = args,
+});
+
+var apiService = builder
+    .AddProject<Projects.Recollections_Api>("api");
+
+// var isWatch = builder.Configuration.GetValue<string>("DOTNET_WATCH") == "1";
+var isWatch = true;
+if (isWatch)
+{
+    builder
+        .AddExecutable("ui", "dotnet", Path.GetDirectoryName(new Projects.Recollections_Blazor_UI().ProjectPath)!, ["watch", "--non-interactive", "--verbose"])
+        .WithHttpEndpoint(targetPort: 33881, isProxied: false)
+        .WithReference(apiService);
+}
+else
+{
+    builder
+        .AddProject<Projects.Recollections_Blazor_UI>("ui")
+        .WithReference(apiService);
+}
+
+builder.Build().Run();
