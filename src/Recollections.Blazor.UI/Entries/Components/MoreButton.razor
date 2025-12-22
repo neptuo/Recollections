@@ -1,16 +1,14 @@
-﻿<div class="entry entry-empty" @onclick="@LoadAsync">
-    <div class="title">
-        @if (IsLoading)
-        {
-            @LoadingText
-        }
-        else if (!HasMore)
-        {
-            @NoMoreText
-        }
-        else
-        {
-            @Text
-        }
-    </div>
-</div>
+﻿<button @ref="@Button" class="btn btn-outline-primary" @onclick="@LoadAsync" disabled="@(IsLoading || !HasMore)">
+    @if (IsLoading)
+    {
+        @LoadingText
+    }
+    else if (!HasMore)
+    {
+        @NoMoreText
+    }
+    else
+    {
+        @Text
+    }
+</button>

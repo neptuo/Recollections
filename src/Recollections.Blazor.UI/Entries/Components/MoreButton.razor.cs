@@ -32,10 +32,15 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public string LoadingText { get; set; } = "Loading...";
 
+        protected ElementReference Button { get; set; }
+
         protected async Task LoadAsync()
         {
             if (HasMore && !IsLoading)
+            {
+                _ = ElementInterop.BlurAsync(Button);
                 await OnClick.InvokeAsync();
+            }
         }
     }
 }
