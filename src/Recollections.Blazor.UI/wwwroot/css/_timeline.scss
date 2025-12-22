@@ -20,12 +20,6 @@ $dot-diameter: 18px;
         background: var(--bs-secondary-bg);
     }
 
-    &:after {
-        content: "";
-        display: table;
-        clear: both;
-    }
-
     * {
         box-sizing: border-box;
     }
@@ -48,6 +42,8 @@ $dot-diameter: 18px;
     text-align: left;
     position: relative;
 
+    --dot-color: var(--bs-primary);
+
     .title {
         margin-bottom: .5em;
         float: left;
@@ -61,7 +57,7 @@ $dot-diameter: 18px;
             position: absolute;
             width: $dot-diameter;
             height: $dot-diameter;
-            border: $border-width solid salmon;
+            border: $border-width solid var(--dot-color);
             background-color: var(--bs-body-bg);
             border-radius: 100%;
             top: 15%;
@@ -98,9 +94,20 @@ $dot-diameter: 18px;
     }
 
     &:after {
-        content: '';
-        display: block;
+        content: "";
+        display: table;
         clear: both;
+    }
+    
+    &:not(.entry-new):last-child::before {
+        position: absolute;
+        top: 7px;
+        left: calc(15% - 10px);
+        width: 12px;
+        bottom: 0;
+        content: " ";
+        display: block;
+        background: var(--bs-body-bg);
     }
 }
 
@@ -149,6 +156,10 @@ $dot-diameter: 18px;
         .body {
             float: none;
             width: auto;
+        }
+    
+        &:not(.entry-new):last-child::before {
+            left: 4px;
         }
     }
 

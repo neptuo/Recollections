@@ -5,7 +5,7 @@
     }
 
     .timeline {
-        padding: 0;
+        padding: 0 1rem;
 
         &:before {
             left: 23px;
@@ -13,7 +13,7 @@
     }
 
     .entry {
-        padding: 1rem;
+        margin-top: 1rem;
 
         .title {
             display: block;

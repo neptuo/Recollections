@@ -28,7 +28,7 @@ namespace Neptuo.Recollections.Entries.Components
         public RenderFragment BeforeContent { get; set; }
 
         [Parameter]
-        public string NoMoreText { get; set; } = "Here I started...";
+        public string NoMoreText { get; set; }
 
         [Parameter]
         public bool AllowMore { get; set; } = true;

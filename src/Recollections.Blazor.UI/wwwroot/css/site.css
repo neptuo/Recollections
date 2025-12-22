@@ -14005,11 +14005,6 @@ input.input-number-noarrows[type=number] {
   width: 4px;
   background: var(--bs-secondary-bg);
 }
-.timeline:after {
-  content: "";
-  display: table;
-  clear: both;
-}
 .timeline * {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
@@ -14029,6 +14024,7 @@ input.input-number-noarrows[type=number] {
   clear: both;
   text-align: left;
   position: relative;
+  --dot-color: var(--bs-primary);
 }
 .entry .title {
   margin-bottom: 0.5em;
@@ -14043,7 +14039,7 @@ input.input-number-noarrows[type=number] {
   position: absolute;
   width: 18px;
   height: 18px;
-  border: 4px solid salmon;
+  border: 4px solid var(--dot-color);
   background-color: var(--bs-body-bg);
   border-radius: 100%;
   top: 15%;
@@ -14074,8 +14070,18 @@ input.input-number-noarrows[type=number] {
 }
 .entry:after {
   content: "";
-  display: block;
+  display: table;
   clear: both;
+}
+.entry:not(.entry-new):last-child::before {
+  position: absolute;
+  top: 7px;
+  left: calc(15% - 10px);
+  width: 12px;
+  bottom: 0;
+  content: " ";
+  display: block;
+  background: var(--bs-body-bg);
 }
 
 .entry-new .date-box {
@@ -14114,6 +14120,9 @@ input.input-number-noarrows[type=number] {
   float: none;
   width: auto;
 }
+.entry-picker .entry:not(.entry-new):last-child::before {
+  left: 4px;
+}
 .entry-picker .entry-new .date-box {
   width: 100%;
   float: none;
@@ -14149,6 +14158,9 @@ input.input-number-noarrows[type=number] {
 .entry-detail .entry .body {
   float: none;
   width: auto;
+}
+.entry-detail .entry:not(.entry-new):last-child::before {
+  left: 4px;
 }
 .entry-detail .entry-new .date-box {
   width: 100%;
@@ -14188,6 +14200,9 @@ input.input-number-noarrows[type=number] {
   .entry .body {
     float: none;
     width: auto;
+  }
+  .entry:not(.entry-new):last-child::before {
+    left: 4px;
   }
   .entry-new .date-box {
     width: 100%;
@@ -14297,13 +14312,13 @@ input.input-number-noarrows[type=number] {
   padding: 0;
 }
 .entry-picker .timeline {
-  padding: 0;
+  padding: 0 1rem;
 }
 .entry-picker .timeline:before {
   left: 23px;
 }
 .entry-picker .entry {
-  padding: 1rem;
+  margin-top: 1rem;
 }
 .entry-picker .entry .title {
   display: block;
