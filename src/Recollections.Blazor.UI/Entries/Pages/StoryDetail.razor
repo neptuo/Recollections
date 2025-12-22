@@ -47,7 +47,11 @@
                     {
                         <div class="chapter">
                             <h4>
-                                <InlineTextEdit Value="@chapter.Title" ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))" />
+                                <InlineTextEdit
+                                    @ref="LastChapterTitleEdit"
+                                    Value="@chapter.Title"
+                                    ValueChanged="@(async value => await SaveChapterTitleAsync(chapter, value))"
+                                />
                             </h4>
                             <div class="my-3">
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />

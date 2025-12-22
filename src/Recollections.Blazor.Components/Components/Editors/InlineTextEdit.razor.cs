@@ -27,6 +27,12 @@ namespace Neptuo.Recollections.Components.Editors
             isEditSwitched = true;
         }
 
+        public async Task EditAsync()
+        {
+            await OnEditAsync();
+            StateHasChanged();
+        }
+
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);

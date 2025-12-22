@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Exceptions.Handlers;
+using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Components.Editors;
 using Neptuo.Recollections.Entries.Components;
 using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
@@ -15,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class StoryDetail
+    public partial class StoryDetail(ILog<StoryDetail> log)
     {
         [Inject]
         protected Api Api { get; set; }
@@ -39,6 +41,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected PermissionContainerState Permissions { get; } = new();
         protected List<EntryImagesModel> Images { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
+        protected bool SelectLastChapterTitleEdit { get; set; }
+        protected InlineTextEdit LastChapterTitleEdit { get; set; }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
@@ -50,6 +54,18 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             if (previousStoryId != StoryId)
                 await LoadAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (SelectLastChapterTitleEdit)
+            {
+                log.Debug("Selecting last chapter title edit.");
+                SelectLastChapterTitleEdit = false;
+                await LastChapterTitleEdit.EditAsync();
+            }
         }
 
         protected async Task LoadAsync()
@@ -122,6 +138,7 @@ namespace Neptuo.Recollections.Entries.Pages
             };
             Model.Chapters.Add(chapter);
             Entries[chapter.Id] = new();
+            SelectLastChapterTitleEdit = true;
         }
 
         protected Task SaveChapterTitleAsync(ChapterModel chapter, string title)
