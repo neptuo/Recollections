@@ -13991,7 +13991,7 @@ input.input-number-noarrows[type=number] {
 
 .timeline {
   width: 100%;
-  padding: 1rem 0 0 6px;
+  padding: 0 0 0 6px;
   position: relative;
   font-family: "Source Sans Pro", sans-serif;
   font-weight: 300;
@@ -14015,8 +14015,14 @@ input.input-number-noarrows[type=number] {
           box-sizing: border-box;
 }
 .timeline .separator {
-  top: 67px;
+  --separator-top: 67px;
+  top: var(--separator-top);
   margin-left: calc(15% - 25px);
+}
+.timeline .separator:first-child {
+  top: 50px;
+  padding-top: calc(var(--separator-top) - 50px);
+  background: var(--bs-body-bg);
 }
 
 .entry {
@@ -14088,7 +14094,7 @@ input.input-number-noarrows[type=number] {
   left: 13px;
 }
 .entry-picker .timeline .separator {
-  top: 57px;
+  --separator-top: 57px;
   margin-left: -12px;
 }
 .entry-picker .entry .title {
@@ -14124,7 +14130,7 @@ input.input-number-noarrows[type=number] {
   left: 13px;
 }
 .entry-detail .timeline .separator {
-  top: 57px;
+  --separator-top: 57px;
   margin-left: -12px;
 }
 .entry-detail .entry .title {
@@ -14163,7 +14169,7 @@ input.input-number-noarrows[type=number] {
     left: 13px;
   }
   .timeline .separator {
-    top: 57px;
+    --separator-top: 57px;
     margin-left: -12px;
   }
   .entry .title {

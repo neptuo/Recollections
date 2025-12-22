@@ -7,7 +7,11 @@
     <div class="timeline">
         @if (ShowYearSeparators)
         {
-            @Separator("Now")
+            <div class="separator sticky-top mb-4 d-inline-block">
+                <div class="badge p-2 d-inline-block bg-secondary">
+                    Now
+                </div>
+            </div>
         }
 
         @BeforeContent
@@ -17,7 +21,9 @@
             if (ShowYearSeparators && entry.When.Year != lastYear)
             {
                 lastYear = entry.When.Year;
-                @Separator(entry.When.Year)
+                <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
+                    @lastYear
+                </div>
             }
 
             <div class="entry">
@@ -106,14 +112,4 @@
     <div class="entry-more">
         <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="@NoMoreText" />
     </div>
-}
-
-@code
-{
-    RenderFragment Separator<T>(T content)
-    {
-        return @<div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
-            @content
-        </div>;
-    }
 }
