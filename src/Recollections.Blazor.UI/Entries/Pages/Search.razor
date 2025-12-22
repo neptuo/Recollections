@@ -80,14 +80,12 @@
                         </div>
                     </div>
                 </div>
+
+                @if (Items.IndexOf(entry) == Items.Count - 3 && HasMore)
+                {
+                    <AutoloadNext Intersected="@LoadMoreAsync" />
+                }
             </ChildContent>
         </ListView>
-
-        @if (HasQuery && Items.Count > 0)
-        {
-            <div class="col-12 mb-4">
-                <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="@LoadMoreAsync" NoMoreText="There is nothing more to show..." />
-            </div>
-        }
     </div>
 </div>
