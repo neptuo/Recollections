@@ -2,6 +2,7 @@
 
 @if (BeforeContent != null || Entries.Count > 0)
 {
+    var index = 0;
     var lastYear = 0;
     <div class="timeline">
         @if (ShowYearSeparators)
@@ -90,6 +91,12 @@
                     </p>
                 </div>
             </div>
+
+            @if (index == Entries.Count - 3 && HasMore)
+            {
+                <AutoloadNext Intersected="LoadMoreAsync" />
+            }
+            index++;
         }
     </div>
 }
@@ -98,10 +105,6 @@
 {
     <div class="entry-more">
         <MoreButton IsLoading="@IsLoading" HasMore="@HasMore" OnClick="LoadMoreAsync" NoMoreText="@NoMoreText" />
-        @if (Entries.Count > 0 && HasMore && !IsLoading)
-        {
-            <AutoloadNext Intersected="LoadMoreAsync" />
-        }
     </div>
 }
 
