@@ -13910,7 +13910,7 @@ input.input-number-noarrows[type=number] {
     text-align: center;
   }
 }
-@media (min-width: 992px) {
+@media (min-width: 768px) {
   .main-navbar.block-icons ~ .mappage {
     top: 64px !important;
   }
@@ -14214,7 +14214,7 @@ input.input-number-noarrows[type=number] {
 }
 .mappage {
   position: absolute;
-  top: 56px;
+  top: 64px;
   left: 0;
   bottom: 0;
   right: 0;
@@ -14226,7 +14226,7 @@ input.input-number-noarrows[type=number] {
   height: 100%;
   border-radius: 0 !important;
 }
-@media (max-width: 991px) {
+@media (max-width: 767px) {
   .mappage {
     top: 48px;
   }

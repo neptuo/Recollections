@@ -1,6 +1,6 @@
 ﻿.mappage {
     position: absolute;
-    top: 56px;
+    top: 64px;
     left: 0;
     bottom: 0;
     right: 0;
@@ -14,7 +14,7 @@
         }
     }
 
-    @media (max-width:991px) {
+    @media (max-width:767px) {
         top: 48px;
     }
 }
