@@ -173,7 +173,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected string GetMapDescription(bool isVisible)
         {
-            const string addLocationText = "Add Location on Map";
+            const string addLocationText = "No Location on Map...";
             const string noLocationText = "No location...";
 
             if (isVisible)

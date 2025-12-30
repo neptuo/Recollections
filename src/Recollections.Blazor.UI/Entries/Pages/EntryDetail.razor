@@ -38,7 +38,7 @@
                 @if (UserState.IsAuthenticated)
                 {
                     <div class="gps">
-                        <MapToggle Text="@($"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
+                        <MapToggle Text="@(MarkerCount == 0 ? "No Locations on Map..." : $"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
                             <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" />
                         </MapToggle>
                     </div>
