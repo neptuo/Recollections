@@ -29,8 +29,11 @@
     [Parameter]
     public bool HasBody { get; set; } = true;
 
+    [Parameter]
+    public bool IsAutoFocus { get; set; }
+
     protected RenderFragment Content => 
-        @<div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick">
+        @<div class="card @(OnCardClick.HasDelegate ? "cursor-pointer" : string.Empty) @CardCssClass" @onclick="OnCardClick" data-autofocus="@IsAutoFocus">
             <div class="card-header @(!HasBody ? "border-bottom-0" : string.Empty)">
                 <div class="d-flex align-items-center">
                     @BeforeTitleContent

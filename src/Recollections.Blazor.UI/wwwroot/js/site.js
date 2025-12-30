@@ -19,11 +19,15 @@
                     }
 
                     const autofocus = $container.find('[data-autofocus]');
+                    let targetFocusElement;
                     if (autofocus.length > 0) {
-                        autofocus.first().trigger('focus');
+                        targetFocusElement = autofocus.first();
                     } else {
-                        $container.find("input").first().trigger('focus');
+                        targetFocusElement = $container.find("input").first();
                     }
+
+                    targetFocusElement[0].scrollIntoView(true);
+                    targetFocusElement.trigger('focus');
                 });
             }
 

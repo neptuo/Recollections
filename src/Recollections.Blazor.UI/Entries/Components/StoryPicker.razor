@@ -1,5 +1,11 @@
 ﻿@using Microsoft.Extensions.Logging.Abstractions
-<Modal @ref="Modal" Title="Select a Story or Chapter" CssClass="stories story-picker" IsOverflow="true" AutoFocus="false">
+<Modal 
+    @ref="Modal"
+    Title="Select a Story or Chapter"
+    CssClass="stories story-picker"
+    IsOverflow="true"
+    AutoFocus="@(SelectedStoryId != null || SelectedChapterId != null)"
+>
     <ChildContent>
         @if (!String.IsNullOrEmpty(ErrorMessage))
         {
@@ -23,6 +29,7 @@
                     OnTitleClick="@(async () => await SelectAsync(story, null))"
                     CardCssClass="@($"no-hover flex-grow-1 {(SelectedStoryId == story.Id ? SelectedChapterId == null ? "selected" : "selected-within" : string.Empty)}")"
                     HasBody="@state.IsExpanded"
+                    IsAutoFocus="@(SelectedStoryId == story.Id)"
                 >
                     <BeforeTitleContent>
                         <CheckboxIcon
