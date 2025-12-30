@@ -80,6 +80,12 @@ export function initialize(container, interop, markers, isZoomed, isEditable) {
         if (isEditable) {
             bindEvents(model, $container);
         }
+
+        model.map.on("moveend", () => {
+            const center = model.map.getCenter(); // { lat, lng }
+            const zoom = model.map.getZoom();
+            model.interop.invokeMethod("MapInterop.MoveEnd", center.lat, center.lng, zoom);
+        });
     }
 
     model = $container.data('map');
@@ -184,9 +190,9 @@ function moveMarker(model, id, latitude, longitude) {
     model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude);
 }
 
-export function centerAt(container, latitude, longitude) {
+export function centerAt(container, latitude, longitude, zoom) {
     const model = $(container).data('map');
-    model.map.setView([latitude, longitude], 17);
+    model.map.setView([latitude, longitude], zoom ?? 17);
 }
 
 export function redraw(container) {
