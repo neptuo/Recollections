@@ -33,8 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\index.html" CopyToOutputDirectory="PreserveNewest" />
     <Content Remove="**\*.svg" />
+    <Content Remove="**\*.scss" />
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
   </ItemGroup>
