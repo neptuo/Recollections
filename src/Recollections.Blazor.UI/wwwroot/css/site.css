@@ -13806,7 +13806,7 @@ input.input-number-noarrows[type=number] {
 }
 
 .file-progress-global {
-  top: 51px;
+  top: 50px;
   z-index: 1021;
 }
 @media (min-width: 768px) {
