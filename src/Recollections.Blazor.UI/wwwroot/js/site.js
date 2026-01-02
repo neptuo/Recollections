@@ -26,8 +26,11 @@
                         targetFocusElement = $container.find("input").first();
                     }
 
-                    targetFocusElement[0].scrollIntoView(true);
-                    targetFocusElement.trigger('focus');
+                    if (targetFocusElement.length > 0)
+                    {
+                        targetFocusElement[0].scrollIntoView(true);
+                        targetFocusElement.trigger('focus');
+                    }
                 });
             }
 
