@@ -35,6 +35,7 @@
   <ItemGroup>
     <Content Remove="**\*.svg" />
     <Content Remove="**\*.scss" />
+    <Content Remove="wwwroot\lib\leaflet\**\*.*" />
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
   </ItemGroup>
@@ -58,6 +59,9 @@
       <WebCompilerConfigPath>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', 'webcompilerconfiguration.json'))</WebCompilerConfigPath>
     </PropertyGroup>
     <Exec Command="dotnet webcompiler -r $(CssRootFolder) -c $(WebCompilerConfigPath)" />
+  </Target>
+  <Target Name="LibmanRestore">
+    <Exec Command="libman restore" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
 
   <!-- GitHubPages publish -->

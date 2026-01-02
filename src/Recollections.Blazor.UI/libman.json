@@ -37,7 +37,8 @@
       "library": "popper.js@2.9.2",
       "destination": "wwwroot/lib/popper",
       "files": [
-        "umd/*"
+        "umd/popper.min.js",
+        "umd/popper.min.js.map"
       ]
     },
     {
