@@ -24,6 +24,7 @@ async function handleShareTarget(e) {
         let fileObjects = [];
         for (let i = 0; i < files.length; i++) {
             fileObjects.push({
+                entryId: null,
                 name: files[i].name,
                 buffer: await files[i].arrayBuffer()
             });
