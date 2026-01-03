@@ -85,6 +85,12 @@ namespace Neptuo.Recollections.Components
             return await module.InvokeAsync<FileUploadToRetry[]>("getEntityStoredFiles", entityType, entityId);
         }
 
+        public async Task<FileUploadToRetry[]> GetUnassignedSharedFilesAsync()
+        {
+            await EnsureModuleAsync();
+            return await module.InvokeAsync<FileUploadToRetry[]>("getUnassignedSharedFiles");
+        }
+
         public async Task RetryEntityQueueAsync(string entityType, string entityId)
         {
             await EnsureModuleAsync();
@@ -120,6 +126,12 @@ namespace Neptuo.Recollections.Components
             {
                 await module.InvokeVoidAsync("setBearerToken", userId, bearerToken);
             }
+        }
+
+        public async Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("uploadUnassignedFilesTo", entityType, entityId, url);
         }
     }
 }
