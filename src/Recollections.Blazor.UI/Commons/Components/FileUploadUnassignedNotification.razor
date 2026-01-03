@@ -1,0 +1,82 @@
+@inject FileUploader FileUploader
+@implements IDisposable
+
+@if (UnassignedFiles.Length > 0)
+{
+    <div class="container flex-nowrap sticky-top pb-2 bg-body file-progress-global">
+        <div class="alert alert-secondary mb-0">
+            <div class="d-flex align-items-center">
+                @if (EntityType != null && EntityId != null)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" @onclick="@OnUploadClickAsync">
+                        Upload (@UnassignedFiles.Length) files here
+                    </button>
+                }
+                else
+                {
+                    <span>
+                        Select entry to upload (@UnassignedFiles.Length) files to...
+                    </span>
+                }
+
+                <Icon
+                    OnClick="@(() => IsExpanded = !IsExpanded)"
+                    Identifier="@(IsExpanded ? "chevron-down" : "chevron-left")" 
+                    CssClass="ms-auto cursor-pointer"
+                />
+            </div>
+            @if (IsExpanded)
+            {
+                <div class="list-group mt-3">
+                    @foreach (var file in UnassignedFiles)
+                    {
+                        <div class="list-group-item d-flex align-items-center">
+                            <span class="flex-grow-1 text-truncate">
+                                @file.Name <span class="text-secondary">@Utils.FileSize(file.Size)</span>
+                            </span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    bool IsExpanded = false;
+    FileUploadToRetry[] UnassignedFiles = [];
+    IDisposable currentUploadEntityRegistration;
+
+    string EntityType;
+    string EntityId;
+    string Url;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUploadEntityRegistration = FileUploader.AddCurrentEntityListener(OnCurrentUploadEntityChanged);
+        await base.OnInitializedAsync();
+
+        UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
+    }
+
+    public void Dispose()
+    {
+        currentUploadEntityRegistration?.Dispose();
+    }
+
+    private void OnCurrentUploadEntityChanged(string entityType, string entityId, string url)
+    {
+        EntityType = entityType;
+        EntityId = entityId;
+        Url = url;
+        StateHasChanged();
+    }
+
+    private async Task OnUploadClickAsync()
+    {
+        FileUploader.UploadUnassignedFilesToAsync(EntityType, EntityId, Url);
+        UnassignedFiles = [];
+        UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
+        StateHasChanged();
+    }
+}

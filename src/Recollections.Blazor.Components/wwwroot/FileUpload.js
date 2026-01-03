@@ -69,9 +69,16 @@ async function getStoredFilesByEntity(entityType, entityId) {
             const cursor = event.target.result;
             if (cursor) {
                 const fileData = cursor.value;
-                if (fileData.userId == userId && fileData.entityType === entityType && fileData.entityId === entityId) {
+
+                if (entityType == undefined && entityId == undefined) {
+                    // Files added through share target (unassigned)
                     results.push(fileData);
                 }
+                else if (fileData.userId == userId && fileData.entityType === entityType && fileData.entityId === entityId) {
+                    // Files added through entity upload form
+                    results.push(fileData);
+                }
+
                 cursor.continue();
             } else {
                 resolve(results);
@@ -313,6 +320,11 @@ export async function getEntityStoredFiles(entityType, entityId) {
     return storedFiles.filter(f => f != null).map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 
+export async function getUnassignedSharedFiles() {
+    const storedFiles = await getStoredFilesByEntity();
+    return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
+}
+
 export async function retryEntityQueue(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
@@ -329,6 +341,16 @@ export async function clearEntityQueue(entityType, entityId) {
 
 export function deleteFile(id) {
     return removeStoredFiles(Number.parseInt(id));
+}
+
+export async function uploadUnassignedFilesTo(entityType, entityId, url) {
+    const unassignedFiles = await getStoredFilesByEntity();
+    if (!unassignedFiles || unassignedFiles.length === 0) {
+        return;
+    }
+
+    const items = unassignedFiles.map(f => f.file);
+    queue.storeAndQueueFiles(items, url, entityType, entityId);
 }
 
 export function destroy() {
