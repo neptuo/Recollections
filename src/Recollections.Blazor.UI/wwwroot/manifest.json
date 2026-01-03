@@ -14,5 +14,22 @@
       "type":"image/png",
       "sizes":"512x512"
     }
-  ]
+  ],
+  "share_target": {
+    "action": "/",
+    "method":"POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [{
+        "name": "allfiles",
+        "accept": ["*/*"]
+      }]
+    }
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }
