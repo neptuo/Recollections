@@ -3,7 +3,7 @@
 // be reflected on the first load after each change).
 self.addEventListener('fetch', event => {
     if (event.request.method === "POST") {
-        return handleShareTarget();
+        return handleShareTarget(event);
     }
 });
 
@@ -16,9 +16,9 @@ function onMessage(event) {
 }
 
 async function handleShareTarget(e) {
-    const formData = await request.formData();
+    const formData = await e.request.formData();
     const files = formData.getAll("allfiles");
-    const url = request.url;
+    const url = e.request.url;
 
     if (files && files.length > 0) {
         let fileObjects = [];
@@ -31,6 +31,9 @@ async function handleShareTarget(e) {
         }
 
         // TODO: Pass to UI thread or store in DB
+        for (var i = 0; i < fileObjects.length; i++) {
+            console.log(fileObjects[i].name);
+        }
     }
 
     return Response.redirect(url, 302);
