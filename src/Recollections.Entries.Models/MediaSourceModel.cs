@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class ImageSourceModel : ICloneable<ImageSourceModel>, IEquatable<ImageSourceModel>
+    public class MediaSourceModel : ICloneable<MediaSourceModel>, IEquatable<MediaSourceModel>
     {
         public string Url { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public ImageSourceModel()
+        public MediaSourceModel()
         { }
 
-        public ImageSourceModel(string url, int width, int height)
+        public MediaSourceModel(string url, int width, int height)
         {
             Ensure.NotNull(url, "url");
             Ensure.PositiveOrZero(width, "width");
@@ -27,14 +27,14 @@ namespace Neptuo.Recollections.Entries
             Height = height;
         }
 
-        public ImageSourceModel Clone() => new ImageSourceModel()
+        public MediaSourceModel Clone() => new MediaSourceModel()
         {
             Url = Url,
             Width = Width,
             Height = Height
         };
 
-        public bool Equals(ImageSourceModel other) => other != null &&
+        public bool Equals(MediaSourceModel other) => other != null &&
             Url == other.Url &&
             Width == other.Width &&
             Height == other.Height;

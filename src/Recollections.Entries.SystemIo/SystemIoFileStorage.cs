@@ -29,6 +29,9 @@ namespace Neptuo.Recollections.Entries
         public ImagePath GetPath(Entry entry, Image entity)
             => new ImagePath(this, formatDefinition, entry, entity);
 
+        public VideoPath GetPath(Entry entry, Video entity)
+            => new VideoPath(this, formatDefinition, entry, entity);
+
         public string GetStoragePath(Entry entry)
         {
             string storagePath = pathResolver(configuration.GetPath(entry.UserId, entry.Id));
@@ -57,6 +60,32 @@ namespace Neptuo.Recollections.Entries
         public Task DeleteAsync(Entry entry, Image image, ImageType type)
         {
             ImagePath path = GetPath(entry, image);
+            string filePath = path.Get(type);
+            File.Delete(filePath);
+            return Task.CompletedTask;
+        }
+
+        public Task<Stream> FindAsync(Entry entry, Video video, VideoType type)
+        {
+            VideoPath path = GetPath(entry, video);
+            string filePath = path.Get(type);
+            if (!File.Exists(filePath))
+                return Task.FromResult<Stream>(null);
+
+            return Task.FromResult<Stream>(new FileStream(filePath, FileMode.Open, FileAccess.Read));
+        }
+
+        public async Task SaveAsync(Entry entry, Video video, Stream content, VideoType type)
+        {
+            VideoPath path = GetPath(entry, video);
+            string filePath = path.Get(type);
+            using (FileStream target = File.Create(filePath))
+                await content.CopyToAsync(target);
+        }
+
+        public Task DeleteAsync(Entry entry, Video video, VideoType type)
+        {
+            VideoPath path = GetPath(entry, video);
             string filePath = path.Get(type);
             File.Delete(filePath);
             return Task.CompletedTask;

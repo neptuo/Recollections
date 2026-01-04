@@ -198,9 +198,9 @@ namespace Neptuo.Recollections.Entries
             string basePath = $"api/entries/{entity.Entry.Id}/images/{entity.Id}";
 
             var previewSize = resizeService.GetResizedBounds(entity.OriginalWidth, entity.OriginalHeight, PreviewWidth);
-            model.Preview = new ImageSourceModel($"{basePath}/preview", previewSize.width, previewSize.height);
-            model.Thumbnail = new ImageSourceModel($"{basePath}/thumbnail", ThumbnailWidth, ThumbnailHeight);
-            model.Original = new ImageSourceModel($"{basePath}/original", entity.OriginalWidth, entity.OriginalHeight);
+            model.Preview = new MediaSourceModel($"{basePath}/preview", previewSize.width, previewSize.height);
+            model.Thumbnail = new MediaSourceModel($"{basePath}/thumbnail", ThumbnailWidth, ThumbnailHeight);
+            model.Original = new MediaSourceModel($"{basePath}/original", entity.OriginalWidth, entity.OriginalHeight);
         }
 
         public void MapEntitiesToModels(IEnumerable<Image> entities, ICollection<ImageModel> models, string userId)

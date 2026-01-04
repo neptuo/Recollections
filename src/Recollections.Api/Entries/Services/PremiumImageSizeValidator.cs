@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class PermiumImageSizeValidator : ImageValidator
+    public class PremiumImageSizeValidator : ImageValidator
     {
         private readonly IUserPremiumProvider premiumProvider;
         private readonly StorageOptions configuration;
 
-        public PermiumImageSizeValidator(IUserPremiumProvider premiumProvider, IOptions<StorageOptions> configuration)
+        public PremiumImageSizeValidator(IUserPremiumProvider premiumProvider, IOptions<StorageOptions> configuration)
             : base(configuration)
         {
             Ensure.NotNull(premiumProvider, "premiumProvider");

@@ -22,4 +22,8 @@ namespace Neptuo.Recollections.Entries
             return SupportedExtensions.Contains(extension);
         }
     }
+
+    public class VideoOptions : StorageOptions
+    {
+    }
 }
