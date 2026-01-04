@@ -64,17 +64,14 @@ async function getStoredFilesByEntity(entityType, entityId) {
         
         // Use cursor to filter by both entityType and entityId
         const request = store.openCursor();
+        const checkUserId = entityType != undefined && entityId != undefined;
         
         request.onsuccess = (event) => {
             const cursor = event.target.result;
             if (cursor) {
                 const fileData = cursor.value;
 
-                if (entityType == undefined && entityId == undefined) {
-                    // Files added through share target (unassigned)
-                    results.push(fileData);
-                }
-                else if (fileData.userId == userId && fileData.entityType === entityType && fileData.entityId === entityId) {
+                if ((!checkUserId || fileData.userId == userId) && fileData.entityType === entityType && fileData.entityId === entityId) {
                     // Files added through entity upload form
                     results.push(fileData);
                 }
@@ -351,6 +348,8 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
 
     const items = unassignedFiles.map(f => f.file);
     queue.storeAndQueueFiles(items, url, entityType, entityId);
+
+    await Promise.all(unassignedFiles.map(f => removeStoredFiles(f.id)));
 }
 
 export function destroy() {
