@@ -37,6 +37,10 @@ namespace Neptuo.Recollections.Entries
             ConfigureFreeLimits(services);
 
             services
+                .Configure<VideoOptions>(configuration.GetSection("Video"))
+                .AddTransient<IVideoValidator, VideoValidator>();
+
+            services
                 .AddHealthChecks()
                 .AddDbContextCheck<DataContext>("Entries.DataContext");
 
@@ -82,6 +86,7 @@ namespace Neptuo.Recollections.Entries
         {
             services
                 .AddTransient<ImageService>()
+                .AddTransient<VideoService>()
                 .AddTransient<ImageResizeService>()
                 .AddTransient<TimelineService>()
                 .AddTransient<IImageValidator, PermiumImageSizeValidator>()
