@@ -19,6 +19,11 @@ if (isWatch)
 {
     builder
         .AddExecutable("ui", "dotnet", Path.GetDirectoryName(new Projects.Recollections_Blazor_UI().ProjectPath)!, ["watch", "--non-interactive", "--verbose"])
+        .WithEnvironment(context =>
+        {
+            context.EnvironmentVariables["DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER"] = "1";
+            context.EnvironmentVariables["DOTNET_WATCH_RESTART_ON_RUDE_EDIT"] = "1";
+        })
         .WithHttpEndpoint(targetPort: 33881, isProxied: false)
         .WithReference(apiService);
 }
