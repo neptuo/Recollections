@@ -8,6 +8,7 @@ namespace Neptuo.Recollections.Entries
         public string UserId { get; set; }
 
         public MediaSourceModel Thumbnail { get; set; }
+        public MediaSourceModel Preview { get; set; }
         public MediaSourceModel Original { get; set; }
 
         public string ContentType { get; set; }

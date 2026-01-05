@@ -23,8 +23,8 @@ namespace Neptuo.Recollections.Entries
             string baseName = Path.GetFileNameWithoutExtension(image.FileName);
 
             Original = Path.Combine(storagePath, image.FileName);
-            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", formatDefinition.FileExtension));
             Preview = Path.Combine(storagePath, String.Concat(baseName, ".preview", formatDefinition.FileExtension));
+            Thumbnail = Path.Combine(storagePath, String.Concat(baseName, ".thumbnail", formatDefinition.FileExtension));
         }
 
         public string Get(ImageType type)

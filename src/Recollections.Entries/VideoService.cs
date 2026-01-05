@@ -10,11 +10,13 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using Path = System.IO.Path;
 using Stream = System.IO.Stream;
+using IsImage = SixLabors.ImageSharp.Image;
 
 namespace Neptuo.Recollections.Entries
 {
     public class VideoService
     {
+        private const int PreviewWidth = 1024;
         private const int ThumbnailWidth = 200;
         private const int ThumbnailHeight = 150;
 
@@ -63,24 +65,35 @@ namespace Neptuo.Recollections.Entries
             using (Stream source = file.OpenReadStream())
                 await fileStorage.SaveAsync(entry, entity, source, VideoType.Original);
 
-            // Extract thumbnail and store it as JPEG (same pipeline as images)
+            using var imageContent = await ExtractImageFromVideoAsync(entry, entity);
+            
+            ImageInfo imageInfo = IsImage.Identify(imageContent);
+            entity.OriginalWidth = imageInfo.Width;
+            entity.OriginalHeight = imageInfo.Height;
+
+            imageContent.Position = 0;
             using (var thumbnailContent = new MemoryStream())
             {
-                await ExtractThumbnailAsync(entry, entity, thumbnailContent);
+                resizeService.Thumbnail(imageContent, thumbnailContent, ThumbnailWidth, ThumbnailHeight);
                 thumbnailContent.Position = 0;
-                await fileStorage.SaveAsync(entry, entity, thumbnailContent, VideoType.Thumbnail);
 
-                thumbnailContent.Position = 0;
-                var (width, height) = resizeService.GetSize(thumbnailContent);
-                entity.OriginalWidth = width;
-                entity.OriginalHeight = height;
+                await fileStorage.SaveAsync(entry, entity, thumbnailContent, VideoType.Thumbnail);
+            }
+            
+            imageContent.Position = 0;
+            using (var previewContent = new MemoryStream())
+            {
+                resizeService.Resize(imageContent, previewContent, PreviewWidth);
+                previewContent.Position = 0;
+                
+                await fileStorage.SaveAsync(entry, entity, previewContent, VideoType.Preview);
             }
 
             await dataContext.SaveChangesAsync();
             return entity;
         }
 
-        private async Task ExtractThumbnailAsync(Entry entry, Video video, Stream outputJpeg)
+        private async Task<Stream> ExtractImageFromVideoAsync(Entry entry, Video video)
         {
             await using Stream original = await fileStorage.FindAsync(entry, video, VideoType.Original);
             if (original == null)
@@ -97,24 +110,15 @@ namespace Neptuo.Recollections.Entries
 
             try
             {
-                using var videoImage = SixLabors.ImageSharp.Image.Load(decoderOptions, original);
+                using var videoImage = IsImage.Load(decoderOptions, original);
                 if (videoImage.Frames.Count == 0)
                     throw new VideoUploadValidationException("Video contains no decodable frames.");
 
-                // using var firstFrame = videoImage.Frames.CloneFrame(0);
-                // using var firstFramePng = new MemoryStream();
-                // firstFrame.SaveAsPng(firstFramePng);
-                // firstFramePng.Position = 0;
-
-                using var outputStream = new MemoryStream();
+                var outputStream = new MemoryStream();
                 videoImage.Save(outputStream, formatDefinition.Codec);
                 outputStream.Position = 0;
                 
-                resizeService.Thumbnail(outputStream, outputJpeg, ThumbnailWidth, ThumbnailHeight);
-            }
-            catch (VideoUploadValidationException)
-            {
-                throw;
+                return outputStream;
             }
             catch (Exception ex)
             {
@@ -127,6 +131,7 @@ namespace Neptuo.Recollections.Entries
             dataContext.Videos.Remove(entity);
             await dataContext.SaveChangesAsync();
             await fileStorage.DeleteAsync(entry, entity, VideoType.Original);
+            await fileStorage.DeleteAsync(entry, entity, VideoType.Preview);
             await fileStorage.DeleteAsync(entry, entity, VideoType.Thumbnail);
         }
 
@@ -140,7 +145,10 @@ namespace Neptuo.Recollections.Entries
             model.ContentType = entity.ContentType;
 
             string basePath = $"api/entries/{entity.Entry.Id}/videos/{entity.Id}";
+
+            var previewSize = resizeService.GetResizedBounds(entity.OriginalWidth, entity.OriginalHeight, PreviewWidth);
             model.Original = new MediaSourceModel($"{basePath}/original", entity.OriginalWidth, entity.OriginalHeight);
+            model.Preview = new MediaSourceModel($"{basePath}/preview", previewSize.width, previewSize.height);
             model.Thumbnail = new MediaSourceModel($"{basePath}/thumbnail", ThumbnailWidth, ThumbnailHeight);
         }
 
