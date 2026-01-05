@@ -10,8 +10,7 @@ let isInitiazed = false;
 let autoPlayTimer = null;
 let stopCallback = () => { };
 let interop = null;
-let images = [];
-let isSlideChangeHooked = false;
+let items = [];
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -49,7 +48,7 @@ function resolveVideoMimeType(model) {
 }
 
 async function ensureVideoSrc(index) {
-    const model = images[index];
+    const model = items[index];
     if (!model || !isVideo(model)) {
         return;
     }
@@ -68,9 +67,9 @@ async function ensureVideoSrc(index) {
     }
 }
 
-export function initialize(intr, imgs) {
+export function initialize(intr, i) {
     interop = intr;
-    images = imgs;
+    items = i;
 
     if (!isInitiazed) {
         lightbox.on('uiRegister', function () {
@@ -141,23 +140,20 @@ export function initialize(intr, imgs) {
                 }
             });
 
-            if (!isSlideChangeHooked) {
-                isSlideChangeHooked = true;
-                lightbox.pswp.on('change', () => {
-                    ensureVideoSrc(lightbox.pswp.currIndex);
-                });
-            }
+            lightbox.pswp.on('change', () => {
+                ensureVideoSrc(lightbox.pswp.currIndex);
+            });
         });
 
         lightbox.on("numItems", (e) => {
             // Just for auto function.
-            lightbox.pswp.numItems = images.length;
+            lightbox.pswp.numItems = items.length;
 
-            e.numItems = images.length
+            e.numItems = items.length
         });
 
         lightbox.on("itemData", (e) => {
-            const model = images[e.index];
+            const model = items[e.index];
             const type = (model.type || 'image').toLowerCase();
 
             e.itemData = {
@@ -178,7 +174,7 @@ export function initialize(intr, imgs) {
                     const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index);
                     const arrayBuffer = await stream.arrayBuffer();
                     const blob = new Blob([arrayBuffer], {
-                        type: isVideo ? resolveVideoMimeType(model) : "image/png"
+                        type: model.contentType || (type === 'video' ? "video/mp4" : "image/png")
                     });
                     const url = URL.createObjectURL(blob);
                     model.src = url;
@@ -189,10 +185,10 @@ export function initialize(intr, imgs) {
             }
 
             if (type === 'video') {
-                const posterAttr = model.posterUrl ? ` poster="${model.posterUrl}"` : '';
                 // PhotoSwipe will render this HTML instead of treating it as an image.
                 // Src is injected asynchronously via ensureVideoSrc (from .NET stream interop).
-                e.itemData.html = `<video data-pswp-index="${e.index}" controls playsinline preload="metadata"${posterAttr} style="max-width:100%;max-height:100%;"></video>`;
+                const actualSize = (model.width && model.height) ? `width:${model.width}px;height:${model.height}px;` : '';
+                e.itemData.html = `<video data-pswp-index="${e.index}" controls playsinline preload style="min-width:200px;min-height:150px;max-width:100%;max-height:calc(100% - 100px);${actualSize};display:block;margin:40px auto;"></video>`;
 
                 // Ensure src gets set once the slide is in DOM.
                 setTimeout(() => ensureVideoSrc(e.index), 0);

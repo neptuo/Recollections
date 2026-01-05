@@ -214,7 +214,6 @@ namespace Neptuo.Recollections.Entries.Pages
                         Width = item.Video.Original.Width,
                         Height = item.Video.Original.Height,
                         ContentType = item.Video.ContentType,
-                        PosterUrl = Api.GetVideoUrl(item.Video.Thumbnail.Url)
                     });
                 }
             }

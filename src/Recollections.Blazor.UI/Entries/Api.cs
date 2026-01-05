@@ -90,9 +90,6 @@ namespace Neptuo.Recollections.Entries
         public Task<Stream> GetImageDataAsync(string url)
             => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
 
-        public string GetVideoUrl(string url)
-            => (settings.BaseUrl + url).Replace("api/api", "api");
-
         public Task UpdateImageAsync(string entryId, ImageModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/images/{model.Id}", model));
 
