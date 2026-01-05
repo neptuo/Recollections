@@ -4042,7 +4042,10 @@ class Opener {
 
     if (this.isOpening) {
       // unhide the placeholder
-      this._placeholder.style.opacity = 1;
+      if (this._placeholder) {
+        this._placeholder.style.opacity = 1;
+      }
+
       this._animateToOpenState();
     } else if (this.isClosing) {
       this._animateToClosedState();
