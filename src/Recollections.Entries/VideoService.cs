@@ -2,10 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Neptuo;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Xabe.FFmpeg;
 using Path = System.IO.Path;
 using Stream = System.IO.Stream;
 
@@ -77,69 +77,44 @@ namespace Neptuo.Recollections.Entries
 
         private async Task ExtractThumbnailAsync(Entry entry, Video video, Stream outputJpeg)
         {
-            // TODO: Explore better options than using external tool.
-
-            
-
-            // We rely on 'ffmpeg' being available on the server PATH.
-            // Output a single frame as PNG to stdout, then convert/resize to JPEG thumbnail.
-
             await using Stream original = await fileStorage.FindAsync(entry, video, VideoType.Original);
             if (original == null)
                 throw Ensure.Exception.InvalidOperation("Missing video content.");
 
-            using var pngFrame = new MemoryStream();
+            // Xabe.FFmpeg works with file paths, so we store the uploaded video temporarily.
+            // FFmpeg executables must be discoverable (on PATH or via FFmpeg.SetExecutablesPath).
+            string inputExtension = Path.GetExtension(video.FileName);
+            if (String.IsNullOrWhiteSpace(inputExtension))
+                inputExtension = ".mp4";
 
-            // ffmpeg -hide_banner -loglevel error -i pipe:0 -frames:v 1 -vf thumbnail,scale=-1:150 -f image2pipe -vcodec png pipe:1
-            var startInfo = new ProcessStartInfo
+            string tempInputPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{inputExtension}");
+            string tempSnapshotPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
+
+            try
             {
-                FileName = "ffmpeg",
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true,
-            };
+                await using (var tempInput = File.Create(tempInputPath))
+                    await original.CopyToAsync(tempInput);
 
-            startInfo.ArgumentList.Add("-hide_banner");
-            startInfo.ArgumentList.Add("-loglevel");
-            startInfo.ArgumentList.Add("error");
-            startInfo.ArgumentList.Add("-i");
-            startInfo.ArgumentList.Add("pipe:0");
-            startInfo.ArgumentList.Add("-frames:v");
-            startInfo.ArgumentList.Add("1");
-            startInfo.ArgumentList.Add("-vf");
-            startInfo.ArgumentList.Add($"thumbnail,scale=-1:{ThumbnailHeight}");
-            startInfo.ArgumentList.Add("-f");
-            startInfo.ArgumentList.Add("image2pipe");
-            startInfo.ArgumentList.Add("-vcodec");
-            startInfo.ArgumentList.Add("png");
-            startInfo.ArgumentList.Add("pipe:1");
+                // Snapshot returns image in format based on output extension (PNG here).
+                IConversion conversion = await FFmpeg.Conversions.FromSnippet.Snapshot(tempInputPath, tempSnapshotPath, TimeSpan.FromSeconds(0));
 
-            using var process = Process.Start(startInfo);
-            if (process == null)
-                throw Ensure.Exception.InvalidOperation("Unable to start ffmpeg process.");
+                try
+                {
+                    await conversion.Start();
+                }
+                catch (Exception ex)
+                {
+                    throw new VideoUploadValidationException($"ffmpeg failed", ex);
+                }
 
-            var copyInputTask = Task.Run(async () =>
+                await using var snapshotStream = File.OpenRead(tempSnapshotPath);
+                resizeService.Thumbnail(snapshotStream, outputJpeg, ThumbnailWidth, ThumbnailHeight);
+            }
+            finally
             {
-                await original.CopyToAsync(process.StandardInput.BaseStream);
-                process.StandardInput.Close();
-            });
-
-            var copyOutputTask = process.StandardOutput.BaseStream.CopyToAsync(pngFrame);
-            var stderrTask = process.StandardError.ReadToEndAsync();
-
-            await Task.WhenAll(copyInputTask, copyOutputTask);
-            await process.WaitForExitAsync();
-
-            string stderr = await stderrTask;
-            if (process.ExitCode != 0)
-                throw new VideoUploadValidationException($"ffmpeg failed: {stderr}");
-
-            pngFrame.Position = 0;
-
-            // Convert to JPEG thumbnail with exact bounds
-            resizeService.Thumbnail(pngFrame, outputJpeg, ThumbnailWidth, ThumbnailHeight);
+                try { if (File.Exists(tempInputPath)) File.Delete(tempInputPath); } catch { }
+                try { if (File.Exists(tempSnapshotPath)) File.Delete(tempSnapshotPath); } catch { }
+            }
         }
 
         public async Task DeleteAsync(Entry entry, Video entity)
