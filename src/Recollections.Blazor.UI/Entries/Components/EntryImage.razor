@@ -42,9 +42,13 @@
         return @<div class="@GetPlaceHolderContainerCssClass()">
             @if (IsLoadingNotFound || PlaceHolder != null)
             {
+                var icon = GetPlaceHolderIcon();
                 <div class="d-flex justify-content-center align-items-center">
                     <span class="status text-center @PlaceHolderCssClass">
-                        <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
+                        @if (icon != null)
+                        {
+                            <Icon Prefix="fas" Identifier="@icon" CssClass="d-block fs-2" />
+                        }
 
                         @GetPlaceHolder()
                     </span>
@@ -53,11 +57,18 @@
         </div>;
     }
 
-    string GetPlaceHolder() => IsLoadingNotFound ? "Not found" : PlaceHolder;
+    string GetPlaceHolder() => IsLoadingNotFound 
+        ? (Image == null && Video != null 
+            ? "" 
+            : "Not found"
+        )
+        : PlaceHolder;
 
     string GetPlaceHolderIcon() 
     {
-        if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
+        if ((PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
+            return null;
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
             return "triangle-exclamation";
         else if (PlaceHolderState == EntryImagePlaceHolderState.Pending)
             return "hourglass-start";
@@ -80,7 +91,9 @@
         if (isAlert)
             result.Append(" alert m-0");
 
-        if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
+        if ((PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
+            result.Append(" alert-secondary");
+        else if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
             result.Append(" alert-danger");
         else if (PlaceHolderState == EntryImagePlaceHolderState.Success)
             result.Append(" alert-success");
