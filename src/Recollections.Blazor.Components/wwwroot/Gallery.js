@@ -11,6 +11,7 @@ let autoPlayTimer = null;
 let stopCallback = () => { };
 let interop = null;
 let images = [];
+let isSlideChangeHooked = false;
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -36,6 +37,35 @@ function stop(el) {
     el.innerHTML = playIcon;
 
     stopCallback();
+}
+
+function isVideo(model) {
+    const type = (model.type || 'image').toLowerCase();
+    return type === 'video';
+}
+
+function resolveVideoMimeType(model) {
+    return model.contentType || 'video/mp4';
+}
+
+async function ensureVideoSrc(index) {
+    const model = images[index];
+    if (!model || !isVideo(model)) {
+        return;
+    }
+
+    if (!model.src) {
+        await model.provider;
+    }
+
+    // Find the active slide's video element and set src.
+    // const selector = `.pswp__slide--active video[data-pswp-index="${index}"]`;
+    const selector = `video[data-pswp-index="${index}"]`;
+    const videoEl = document.querySelector(selector);
+    if (videoEl && videoEl.src !== model.src) {
+        videoEl.src = model.src;
+        videoEl.load();
+    }
 }
 
 export function initialize(intr, imgs) {
@@ -110,6 +140,13 @@ export function initialize(intr, imgs) {
                     });
                 }
             });
+
+            if (!isSlideChangeHooked) {
+                isSlideChangeHooked = true;
+                lightbox.pswp.on('change', () => {
+                    ensureVideoSrc(lightbox.pswp.currIndex);
+                });
+            }
         });
 
         lightbox.on("numItems", (e) => {
@@ -120,32 +157,46 @@ export function initialize(intr, imgs) {
         });
 
         lightbox.on("itemData", (e) => {
+            const model = images[e.index];
+            const type = (model.type || 'image').toLowerCase();
+
             e.itemData = {
-                w: images[e.index].width,
-                h: images[e.index].height,
-                alt: images[e.index].title,
-            }
+                w: model.width,
+                h: model.height,
+                alt: model.title,
+            };
 
             // Src is only used when swiping images in gallery.
             // On every gallery open, all images are refetched (fortunately disk cache is used).
             // It is caused by the reseting of images array on every gallery component render.
-            if (images[e.index].src) {
-                e.itemData.src = images[e.index].src;
-            } else if (images[e.index].provider) {
-                e.itemData.provider = images[e.index].provider;
+            if (model.src) {
+                e.itemData.src = model.src;
+            } else if (model.provider) {
+                e.itemData.provider = model.provider;
             } else {
-                e.itemData.provider = images[e.index].provider = new Promise(async resolve => {
+                e.itemData.provider = model.provider = new Promise(async resolve => {
                     const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index);
                     const arrayBuffer = await stream.arrayBuffer();
                     const blob = new Blob([arrayBuffer], {
-                        type: "image/png"
+                        type: isVideo ? resolveVideoMimeType(model) : "image/png"
                     });
                     const url = URL.createObjectURL(blob);
-                    images[e.index].src = url;
+                    model.src = url;
 
                     console.log(`Loading image at index '${e.index}'`);
                     resolve(url);
                 });
+            }
+
+            if (type === 'video') {
+                const posterAttr = model.posterUrl ? ` poster="${model.posterUrl}"` : '';
+                // PhotoSwipe will render this HTML instead of treating it as an image.
+                // Src is injected asynchronously via ensureVideoSrc (from .NET stream interop).
+                e.itemData.html = `<video data-pswp-index="${e.index}" controls playsinline preload="metadata"${posterAttr} style="max-width:100%;max-height:100%;"></video>`;
+
+                // Ensure src gets set once the slide is in DOM.
+                setTimeout(() => ensureVideoSrc(e.index), 0);
+                return;
             }
         });
 

@@ -46,22 +46,37 @@
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                @if (Images.Count > 0 || UploadProgress?.Count > 0)
+                @if (Media?.Count > 0 || UploadProgress?.Count > 0)
                 {
                     <div class="images my-3">
-                        @if (Images != null)
+                        @if (Media != null)
                         {
-                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="(async i => { await Gallery.CloseAsync(); Navigator.OpenImageDetail(EntryId, Images[i].Id); })" />
+                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="@(async i => { await Gallery.CloseAsync(); var item = Media[i]; if (item?.Type == "image" && item.Image != null) { Navigator.OpenImageDetail(EntryId, item.Image.Id); } })" />
 
-                            @foreach (var image in Images)
+                            @foreach (var item in Media)
                             {
-                                <EntryImage @key="image.Id" Image="@image" OnClick="(() => Gallery.Open(Images.IndexOf(image)))">
-                                    <ThumbnailContent>
-                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenImageDetail(EntryId, image.Id); })" @onclick:stopPropagation="true">
-                                            <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
-                                        </button>
-                                    </ThumbnailContent>
-                                </EntryImage>
+                                @if (item?.Type == "image" && item.Image != null)
+                                {
+                                    var image = item.Image;
+
+                                    <EntryImage @key="image.Id" Image="@image" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
+                                        <ThumbnailContent>
+                                            <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenImageDetail(EntryId, image.Id); })" @onclick:stopPropagation="true">
+                                                <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
+                                            </button>
+                                        </ThumbnailContent>
+                                    </EntryImage>
+                                }
+                                else if (item?.Type == "video" && item.Video != null)
+                                {
+                                    var video = item.Video;
+
+                                    <div class="image justify-content-center">
+                                        <a href="#" class="position-relative w-100" @onclick="(() => Gallery.Open(Media.IndexOf(item)))" @onclick:stopPropagation @onclick:preventDefault>
+                                            <img class="rounded ratio ratio-4x3" src="@video.Thumbnail.Url" />
+                                        </a>
+                                    </div>
+                                }
                             }
                         }
 
@@ -71,7 +86,17 @@
                             {
                                 @if (upload.IsDone && upload.Tag != null)
                                 {
-                                    <EntryImage Image="@(upload.Tag as ImageModel)" />
+                                    var uploadMedia = upload.Tag as MediaModel;
+                                    if (uploadMedia?.Type == "image" && uploadMedia.Image != null)
+                                    {
+                                        <EntryImage Image="@uploadMedia.Image" />
+                                    }
+                                    else if (uploadMedia?.Type == "video" && uploadMedia.Video != null)
+                                    {
+                                        <div class="image justify-content-center">
+                                            <img class="rounded ratio ratio-4x3" src="@uploadMedia.Video.Thumbnail.Url" />
+                                        </div>
+                                    }
                                 }
                                 else
                                 {
@@ -91,7 +116,7 @@
                         <FileUpload 
                             EntityType="entry"
                             EntityId="@EntryId"
-                            Url="@Api.ImageUploadUrl(Model.Id)"
+                            Url="@Api.MediaUploadUrl(Model.Id)"
                             DragAndDropContainer="Container"
                         />
                     </PermissionView>

@@ -52,6 +52,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private EntryModel original;
         protected EntryModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
+        protected List<MediaModel> Media { get; set; }
         protected List<ImageModel> Images { get; set; }
         protected EntryStoryModel Story { get; set; }
         protected List<EntryBeingModel> Beings { get; } = new List<EntryBeingModel>();
@@ -150,7 +151,11 @@ namespace Neptuo.Recollections.Entries.Pages
             if (Images != null)
                 imagesCount = Images.Count;
 
-            Images = await Api.GetImagesAsync(EntryId);
+            Media = await Api.GetMediaAsync(EntryId);
+            Images = Media
+                .Where(m => StringComparer.OrdinalIgnoreCase.Equals(m.Type, "image") && m.Image != null)
+                .Select(m => m.Image)
+                .ToList();
 
             if (Log.IsDebugEnabled())
             {
@@ -188,29 +193,55 @@ namespace Neptuo.Recollections.Entries.Pages
             }
 
             GalleryItems.Clear();
-            foreach (var image in Images)
+            foreach (var item in Media)
             {
-                GalleryItems.Add(new GalleryModel()
+                if (StringComparer.OrdinalIgnoreCase.Equals(item.Type, "image") && item.Image != null)
                 {
-                    Title = image.Name,
-                    Width = image.Preview.Width,
-                    Height = image.Preview.Height
-                });
+                    GalleryItems.Add(new GalleryModel()
+                    {
+                        Type = "image",
+                        Title = item.Image.Name,
+                        Width = item.Image.Preview.Width,
+                        Height = item.Image.Preview.Height
+                    });
+                }
+                else if (StringComparer.OrdinalIgnoreCase.Equals(item.Type, "video") && item.Video != null)
+                {
+                    GalleryItems.Add(new GalleryModel()
+                    {
+                        Type = "video",
+                        Title = item.Video.Name,
+                        Width = item.Video.Original.Width,
+                        Height = item.Video.Original.Height,
+                        ContentType = item.Video.ContentType,
+                        PosterUrl = Api.GetVideoUrl(item.Video.Thumbnail.Url)
+                    });
+                }
             }
         }
 
         protected async Task<Stream> OnGetImageDataAsync(int index)
         {
-            if (index > Images.Count)
+            if (index >= Media.Count)
                 return null;
 
-            var image = Images[index];
-            Log.Debug($"Get image for gallery at '{index}' (count '{Images.Count}'), URL is '{image.Preview.Url}'.");
+            var item = Media[index];
+            if (StringComparer.OrdinalIgnoreCase.Equals(item.Type, "image") && item.Image != null)
+            {
+                var image = item.Image;
+                Log.Debug($"Get image for gallery at '{index}' (count '{Media.Count}'), URL is '{image.Preview.Url}'.");
 
-            var stream = await Api.GetImageDataAsync(image.Preview.Url);
-            Log.Debug($"Got image data for gallery at '{index}'");
+                var stream = await Api.GetImageDataAsync(image.Preview.Url);
+                Log.Debug($"Got image data for gallery at '{index}'");
 
-            return stream;
+                return stream;
+            }
+
+            // Videos are rendered from URLs directly in Gallery.js.
+            if (StringComparer.OrdinalIgnoreCase.Equals(item.Type, "video") && item.Video != null)
+                return await Api.GetImageDataAsync(item.Video.Original.Url);
+
+            return null;
         }
 
         protected async Task SaveTitleAsync(string value)
@@ -305,12 +336,13 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 foreach (var progress in progresses)
                 {
-                    ImageModel image = null;
                     if (progress.Status == "done" && progress.ResponseText != null)
                     {
-                        image = progress.Tag as ImageModel;
-                        if (image == null)
-                            image = Json.Deserialize<ImageModel>(progress.ResponseText);
+                        var media = progress.Tag as MediaModel;
+                        if (media == null)
+                            media = Json.Deserialize<MediaModel>(progress.ResponseText);
+
+                        progress.Tag = media;
                     }
 
                     UploadProgress.Add(progress);

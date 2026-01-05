@@ -39,7 +39,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Dictionary<string, List<TimelineEntryModel>> Entries { get; set; } = new();
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new();
-        protected List<EntryImagesModel> Images { get; set; }
+        protected List<EntryMediaModel> Media { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
         protected bool SelectLastChapterTitleEdit { get; set; }
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
@@ -86,18 +86,36 @@ namespace Neptuo.Recollections.Entries.Pages
             for (int i = 0; i < Model.Chapters.Count; i++)
                 Entries[Model.Chapters[i].Id] = entries[i + 1].Entries;
 
-            Images = await Api.GetStoryImagesAsync(StoryId);
+            Media = await Api.GetStoryMediaAsync(StoryId);
             GalleryItems.Clear();
-            foreach (var entry in Images)
+            foreach (var entry in Media)
             {
-                foreach (var image in entry.Images)
+                foreach (var item in entry.Media)
                 {
-                    GalleryItems.Add(new GalleryModel()
+                    if (item.Type == "image" && item.Image != null)
                     {
-                        Title = image.Name,
-                        Width = image.Preview.Width,
-                        Height = image.Preview.Height
-                    });
+                        var image = item.Image;
+                        GalleryItems.Add(new GalleryModel()
+                        {
+                            Type = "image",
+                            Title = image.Name,
+                            Width = image.Preview.Width,
+                            Height = image.Preview.Height
+                        });
+                    }
+                    else if (item.Type == "video" && item.Video != null)
+                    {
+                        var video = item.Video;
+                        GalleryItems.Add(new GalleryModel()
+                        {
+                            Type = "video",
+                            Title = video.Name,
+                            Width = video.Thumbnail.Width,
+                            Height = video.Thumbnail.Height,
+                            ContentType = video.ContentType,
+                            PosterUrl = video.Thumbnail.Url
+                        });
+                    }
                 }
             }
         }
@@ -159,16 +177,16 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
-        private bool TryFindImage(int index, out string entryId, out ImageModel image)
+        private bool TryFindMedia(int index, out string entryId, out MediaModel media)
         {
             int i = 0;
-            foreach (var entry in Images)
+            foreach (var entry in Media)
             {
-                foreach (var item in entry.Images)
+                foreach (var item in entry.Media)
                 {
                     if (index == i)
                     {
-                        image = item;
+                        media = item;
                         entryId = entry.EntryId;
                         return true;
                     }
@@ -178,26 +196,32 @@ namespace Neptuo.Recollections.Entries.Pages
             }
 
             entryId = null;
-            image = null;
+            media = null;
             return false;
         }
 
         protected async Task<Stream> OnGetImageDataAsync(int index)
         {
-            if (!TryFindImage(index, out _, out var image))
+            if (!TryFindMedia(index, out _, out var item))
                 return null;
 
-            var stream = await Api.GetImageDataAsync(image.Preview.Url);
+            if (item.Type != "image" || item.Image == null)
+                return null;
+
+            var stream = await Api.GetImageDataAsync(item.Image.Preview.Url);
             return stream;
         }
 
         protected async Task OpenImageDetailAsync(int index)
         {
-            if (!TryFindImage(index, out var entryId, out var image))
+            if (!TryFindMedia(index, out var entryId, out var item))
+                return;
+
+            if (item.Type != "image" || item.Image == null)
                 return;
 
             await Gallery.CloseAsync();
-            Navigator.OpenImageDetail(entryId, image.Id);
+            Navigator.OpenImageDetail(entryId, item.Image.Id);
         }
 
         protected async Task OnBeforeInternalNavigation(LocationChangingContext context)
