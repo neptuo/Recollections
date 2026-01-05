@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Xabe.FFmpeg;
+using HeyRed.ImageSharp.AVCodecFormats;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using Path = System.IO.Path;
 using Stream = System.IO.Stream;
 
@@ -20,17 +22,20 @@ namespace Neptuo.Recollections.Entries
         private readonly IFileStorage fileStorage;
         private readonly ImageResizeService resizeService;
         private readonly IVideoValidator validator;
+        private readonly ImageFormatDefinition formatDefinition;
 
-        public VideoService(DataContext dataContext, IFileStorage fileStorage, ImageResizeService resizeService, IVideoValidator validator)
+        public VideoService(DataContext dataContext, IFileStorage fileStorage, ImageResizeService resizeService, IVideoValidator validator, ImageFormatDefinition formatDefinition)
         {
             Ensure.NotNull(dataContext, "dataContext");
             Ensure.NotNull(fileStorage, "fileStorage");
             Ensure.NotNull(resizeService, "resizeService");
             Ensure.NotNull(validator, "validator");
+            Ensure.NotNull(formatDefinition, "formatDefinition");
             this.dataContext = dataContext;
             this.fileStorage = fileStorage;
             this.resizeService = resizeService;
             this.validator = validator;
+            this.formatDefinition = formatDefinition;
         }
 
         public async Task<Video> CreateAsync(Entry entry, IFileInput file)
@@ -81,39 +86,39 @@ namespace Neptuo.Recollections.Entries
             if (original == null)
                 throw Ensure.Exception.InvalidOperation("Missing video content.");
 
-            // Xabe.FFmpeg works with file paths, so we store the uploaded video temporarily.
-            // FFmpeg executables must be discoverable (on PATH or via FFmpeg.SetExecutablesPath).
-            string inputExtension = Path.GetExtension(video.FileName);
-            if (String.IsNullOrWhiteSpace(inputExtension))
-                inputExtension = ".mp4";
-
-            string tempInputPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}{inputExtension}");
-            string tempSnapshotPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
+            // Decode a small number of frames from the video and use the first decoded frame.
+            // Requires ImageSharp.AVCodecFormats (+ native package) to be available at runtime.
+            var configuration = new Configuration().WithAVDecoders();
+            var decoderOptions = new DecoderOptions
+            {
+                Configuration = configuration,
+                MaxFrames = 1,
+            };
 
             try
             {
-                await using (var tempInput = File.Create(tempInputPath))
-                    await original.CopyToAsync(tempInput);
+                using var videoImage = SixLabors.ImageSharp.Image.Load(decoderOptions, original);
+                if (videoImage.Frames.Count == 0)
+                    throw new VideoUploadValidationException("Video contains no decodable frames.");
 
-                // Snapshot returns image in format based on output extension (PNG here).
-                IConversion conversion = await FFmpeg.Conversions.FromSnippet.Snapshot(tempInputPath, tempSnapshotPath, TimeSpan.FromSeconds(0));
+                // using var firstFrame = videoImage.Frames.CloneFrame(0);
+                // using var firstFramePng = new MemoryStream();
+                // firstFrame.SaveAsPng(firstFramePng);
+                // firstFramePng.Position = 0;
 
-                try
-                {
-                    await conversion.Start();
-                }
-                catch (Exception ex)
-                {
-                    throw new VideoUploadValidationException($"ffmpeg failed", ex);
-                }
-
-                await using var snapshotStream = File.OpenRead(tempSnapshotPath);
-                resizeService.Thumbnail(snapshotStream, outputJpeg, ThumbnailWidth, ThumbnailHeight);
+                using var outputStream = new MemoryStream();
+                videoImage.Save(outputStream, formatDefinition.Codec);
+                outputStream.Position = 0;
+                
+                resizeService.Thumbnail(outputStream, outputJpeg, ThumbnailWidth, ThumbnailHeight);
             }
-            finally
+            catch (VideoUploadValidationException)
             {
-                try { if (File.Exists(tempInputPath)) File.Delete(tempInputPath); } catch { }
-                try { if (File.Exists(tempSnapshotPath)) File.Delete(tempSnapshotPath); } catch { }
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new VideoUploadValidationException("Unable to extract thumbnail from video.", ex);
             }
         }
 
