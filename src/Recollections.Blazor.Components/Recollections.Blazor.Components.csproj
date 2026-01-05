@@ -5,6 +5,10 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <StaticWebAssetsFingerprintContent>false</StaticWebAssetsFingerprintContent>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CommonMark.NET" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />

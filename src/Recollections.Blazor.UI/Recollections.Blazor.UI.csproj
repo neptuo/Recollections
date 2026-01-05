@@ -7,12 +7,13 @@
 	  <InvariantGlobalization>true</InvariantGlobalization>
     <PublishDomain>recollections.app</PublishDomain>
     <ApiBaseAddress>https://api.recollections.app/</ApiBaseAddress>
+    <ApiBaseAddress Condition="'$(Configuration)' == 'Debug'">http://localhost:33880/</ApiBaseAddress>
   </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <WasmFingerprintAssets>false</WasmFingerprintAssets>
-    <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
     <StaticWebAssetsFingerprintContent>false</StaticWebAssetsFingerprintContent>
-    <ApiBaseAddress>http://localhost:33880/</ApiBaseAddress>
+    <BlazorFingerprintBlazorJs>false</BlazorFingerprintBlazorJs>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <StaticWebAssetFingerprintPattern Include="JavaScript" Pattern="*.js" Expression="#[.{fingerprint}]!" />
@@ -42,6 +43,7 @@
   <ItemGroup>
     <Content Remove="**\*.svg" />
     <Content Remove="**\*.scss" />
+    <Watch Include="wwwroot\css\**\*.scss" />
     <Content Remove="wwwroot\lib\leaflet\**\*.*" />
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
