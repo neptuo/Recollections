@@ -71,11 +71,19 @@
                                 {
                                     var video = item.Video;
 
-                                    <div class="image justify-content-center">
+                                    <EntryImage @key="video.Id" Video="@video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
+                                        <ThumbnailContent>
+                                            @* <button class="btn btn-outline-primary border-0 p-0" @onclick:stopPropagation="true">
+                                                <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
+                                            </button> *@
+                                            <Icon Identifier="play" Prefix="fas" CssClass="position-absolute top-50 start-50 translate-middle z-3 fs-1" />
+                                        </ThumbnailContent>
+                                    </EntryImage>
+                                    @* <div class="image justify-content-center">
                                         <a href="#" class="position-relative w-100" @onclick="(() => Gallery.Open(Media.IndexOf(item)))" @onclick:stopPropagation @onclick:preventDefault>
                                             <img class="rounded ratio ratio-4x3" src="@video.Thumbnail.Url" />
                                         </a>
-                                    </div>
+                                    </div> *@
                                 }
                             }
                         }

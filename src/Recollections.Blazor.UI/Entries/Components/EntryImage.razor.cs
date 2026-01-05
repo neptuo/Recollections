@@ -48,6 +48,9 @@ namespace Neptuo.Recollections.Entries.Components
         public ImageModel Image { get; set; }
 
         [Parameter]
+        public VideoModel Video { get; set; }
+
+        [Parameter]
         public ImageType ImageType { get; set; } = ImageType.Thumbnail;
 
         [Parameter]
@@ -92,6 +95,8 @@ namespace Neptuo.Recollections.Entries.Components
             string imageUrl = null;
             if (Image != null)
                 imageUrl = FindImageUrl();
+            else if (Video != null)
+                imageUrl = Video.Thumbnail?.Url;
 
             if (imageUrl != null)
             {
