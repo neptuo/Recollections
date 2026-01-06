@@ -199,7 +199,7 @@ namespace Neptuo.Recollections.Entries.Pages
             return false;
         }
 
-        protected async Task<Stream> OnGetImageDataAsync(int index)
+        protected async Task<Stream> OnGetImageDataAsync(int index, string type)
         {
             if (!TryFindMedia(index, out _, out var item))
                 return null;

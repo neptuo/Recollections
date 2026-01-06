@@ -219,7 +219,7 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        protected async Task<Stream> OnGetImageDataAsync(int index)
+        protected async Task<Stream> OnGetImageDataAsync(int index, string type)
         {
             if (index >= Media.Count)
                 return null;
@@ -238,7 +238,12 @@ namespace Neptuo.Recollections.Entries.Pages
 
             // Videos are rendered from URLs directly in Gallery.js.
             if (StringComparer.OrdinalIgnoreCase.Equals(item.Type, "video") && item.Video != null)
-                return await Api.GetImageDataAsync(item.Video.Original.Url);
+            {
+                if (type == "original")
+                    return await Api.GetImageDataAsync(item.Video.Original.Url);
+                else
+                    return await Api.GetImageDataAsync(item.Video.Preview.Url);
+            }
 
             return null;
         }

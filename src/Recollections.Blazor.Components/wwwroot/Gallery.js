@@ -43,30 +43,6 @@ function isVideo(model) {
     return type === 'video';
 }
 
-function resolveVideoMimeType(model) {
-    return model.contentType || 'video/mp4';
-}
-
-async function ensureVideoSrc(index) {
-    const model = items[index];
-    if (!model || !isVideo(model)) {
-        return;
-    }
-
-    if (!model.src) {
-        await model.provider;
-    }
-
-    // Find the active slide's video element and set src.
-    // const selector = `.pswp__slide--active video[data-pswp-index="${index}"]`;
-    const selector = `video[data-pswp-index="${index}"]`;
-    const videoEl = document.querySelector(selector);
-    if (videoEl && videoEl.src !== model.src) {
-        videoEl.src = model.src;
-        videoEl.load();
-    }
-}
-
 export function initialize(intr, i) {
     interop = intr;
     items = i;
@@ -78,10 +54,20 @@ export function initialize(intr, i) {
                 order: 9,
                 isButton: true,
                 html: playIcon,
-                onClick: (event, el) => {
+                onInit: (el, pswp) => {
                     lightbox.pswp.on('close', () => {
                         stop(el);
                     });
+                    
+                    lightbox.pswp.on('change', () => {
+                        const index = lightbox.pswp.currIndex;
+                        const model = items[index];
+                        if (isVideo(model)) {
+                            stop(el);
+                        }
+                    });
+                },
+                onClick: (event, el) => {
 
                     if (autoPlayTimer == null) {
                         play(el);
@@ -109,7 +95,15 @@ export function initialize(intr, i) {
                 html: 'Caption text',
                 onInit: (el, pswp) => {
                     lightbox.pswp.on('change', () => {
-                        el.innerHTML = lightbox.pswp.currSlide.data.alt || '';
+                        const index = lightbox.pswp.currIndex;
+                        const model = items[index];
+
+                        let title = lightbox.pswp.currSlide.data.alt || '';
+                        if (isVideo(model)) {
+                            title += ' (click to play video)';
+                        }
+                        el.innerHTML = title;
+                        el.style.display = '';
                     });
                 }
             });
@@ -141,7 +135,52 @@ export function initialize(intr, i) {
             });
 
             lightbox.pswp.on('change', () => {
-                ensureVideoSrc(lightbox.pswp.currIndex);
+                const index = lightbox.pswp.currIndex;
+                const model = items[index];
+                if (isVideo(model)) {
+                    lightbox.pswp.currSlide.image.classList.add('pswp__video');
+                } else {
+                    lightbox.pswp.currSlide.image.classList.remove('pswp__video');
+                }
+            });
+
+            lightbox.pswp.on('pointerUp', async e => {
+                const index = lightbox.pswp.currIndex;
+                const model = items[index];
+                if (!isVideo(model) || e.originalEvent.target != lightbox.pswp.currSlide.image) {
+                    return;
+                }
+
+                e.preventDefault();
+                if (lightbox.pswp.currSlide.image.tagName.toLowerCase() === 'video') {
+                    return;
+                }
+
+                const titleEl = lightbox.pswp.scrollWrap.parentElement.querySelector(".pswp__title");
+                const originalTitle = lightbox.pswp.currSlide.data.alt || '';
+
+                titleEl.innerHTML = `${originalTitle} (loading video...)`;
+                
+                const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
+                const arrayBuffer = await stream.arrayBuffer();
+                const blob = new Blob([arrayBuffer], {
+                    type: model.contentType || "video/mp4"
+                });
+                const url = URL.createObjectURL(blob);
+
+                const imageEl = lightbox.pswp.currSlide.image;
+                const videoEl = document.createElement('video');
+                videoEl.src = url;
+                videoEl.controls = true;
+                videoEl.playsInline = true;
+                videoEl.autoplay = true;
+                videoEl.className = imageEl.className;
+                videoEl.style.width = imageEl.style.width;
+                videoEl.style.height = imageEl.style.height;
+
+                imageEl.parentNode.replaceChild(videoEl, imageEl);
+                lightbox.pswp.currSlide.image = videoEl;
+                titleEl.style.display = 'none';
             });
         });
 
@@ -171,10 +210,11 @@ export function initialize(intr, i) {
                 e.itemData.provider = model.provider;
             } else {
                 e.itemData.provider = model.provider = new Promise(async resolve => {
-                    const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index);
+                    const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index, "");
                     const arrayBuffer = await stream.arrayBuffer();
                     const blob = new Blob([arrayBuffer], {
-                        type: model.contentType || (type === 'video' ? "video/mp4" : "image/png")
+                        // type: model.contentType || (type === 'video' ? "video/mp4" : "image/png")
+                        type: "image/png"
                     });
                     const url = URL.createObjectURL(blob);
                     model.src = url;
@@ -184,16 +224,16 @@ export function initialize(intr, i) {
                 });
             }
 
-            if (type === 'video') {
-                // PhotoSwipe will render this HTML instead of treating it as an image.
-                // Src is injected asynchronously via ensureVideoSrc (from .NET stream interop).
-                const actualSize = (model.width && model.height) ? `width:${model.width}px;height:${model.height}px;` : '';
-                e.itemData.html = `<video data-pswp-index="${e.index}" controls playsinline preload style="min-width:200px;min-height:150px;max-width:100%;max-height:calc(100% - 100px);${actualSize};display:block;margin:40px auto;"></video>`;
+            // if (type === 'video') {
+            //     // PhotoSwipe will render this HTML instead of treating it as an image.
+            //     // Src is injected asynchronously via ensureVideoSrc (from .NET stream interop).
+            //     const actualSize = (model.width && model.height) ? `width:${model.width}px;height:${model.height}px;` : '';
+            //     e.itemData.html = `<video data-pswp-index="${e.index}" controls playsinline preload style="min-width:200px;min-height:150px;max-width:100%;max-height:calc(100% - 100px);display:block;margin:40px auto;"></video>`;
 
-                // Ensure src gets set once the slide is in DOM.
-                setTimeout(() => ensureVideoSrc(e.index), 0);
-                return;
-            }
+            //     // Ensure src gets set once the slide is in DOM.
+            //     setTimeout(() => ensureVideoSrc(e.index), 0);
+            //     return;
+            // }
         });
 
         lightbox.init();

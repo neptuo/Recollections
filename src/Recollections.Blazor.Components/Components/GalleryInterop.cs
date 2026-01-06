@@ -41,12 +41,12 @@ namespace Neptuo.Recollections.Components
             => await module.InvokeAsync<bool>("isOpen");
 
         [JSInvokable]
-        public async Task<DotNetStreamReference> GetImageDataAsync(int index)
+        public async Task<DotNetStreamReference> GetImageDataAsync(int index, string type)
         {
             if (component.DataGetter == null)
                 return null;
 
-            var stream = await component.DataGetter(index);
+            var stream = await component.DataGetter(index, type);
             return new DotNetStreamReference(stream);
         }
 

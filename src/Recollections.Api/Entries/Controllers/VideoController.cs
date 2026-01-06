@@ -34,6 +34,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         public Task<IActionResult> Thumbnail(string entryId, string videoId)
             => GetFileContent(entryId, videoId, VideoType.Thumbnail, enableRangeProcessing: false, inline: true);
 
+        [HttpGet("{videoId}/preview")]
+        public Task<IActionResult> Preview(string entryId, string videoId)
+            => GetFileContent(entryId, videoId, VideoType.Preview, enableRangeProcessing: false, inline: true);
+
         [HttpGet("{videoId}/original")]
         public Task<IActionResult> Original(string entryId, string videoId)
             => GetFileContent(entryId, videoId, VideoType.Original, enableRangeProcessing: true, inline: true);
@@ -57,7 +61,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 Response.Headers[HeaderNames.ETag] = videoId;
 
-                if (type == VideoType.Thumbnail)
+                if (type == VideoType.Thumbnail || type == VideoType.Preview)
                 {
                     Response.Headers[HeaderNames.CacheControl] = CacheHeaderValue;
                     return File(content, "image/jpeg");
