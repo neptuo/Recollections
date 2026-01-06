@@ -11,6 +11,8 @@ using SixLabors.ImageSharp.Formats;
 using Path = System.IO.Path;
 using Stream = System.IO.Stream;
 using IsImage = SixLabors.ImageSharp.Image;
+using SixLabors.ImageSharp.Metadata;
+using System.Globalization;
 
 namespace Neptuo.Recollections.Entries
 {
@@ -65,13 +67,17 @@ namespace Neptuo.Recollections.Entries
             using (Stream source = file.OpenReadStream())
                 await fileStorage.SaveAsync(entry, entity, source, VideoType.Original);
 
-            using var imageContent = await ExtractImageFromVideoAsync(entry, entity);
-            
-            ImageInfo imageInfo = IsImage.Identify(imageContent);
-            entity.OriginalWidth = imageInfo.Width;
-            entity.OriginalHeight = imageInfo.Height;
+            using var imageContent = new MemoryStream();
+            using (var videoImage = await ExtractImageFromVideoAsync(entry, entity))
+            {
+                videoImage.Save(imageContent, formatDefinition.Codec);
+                imageContent.Position = 0;
 
-            imageContent.Position = 0;
+                entity.OriginalWidth = videoImage.Width;
+                entity.OriginalHeight = videoImage.Height;
+                SetProperties(entity, videoImage.Metadata);
+            }
+
             using (var thumbnailContent = new MemoryStream())
             {
                 resizeService.Thumbnail(imageContent, thumbnailContent, ThumbnailWidth, ThumbnailHeight);
@@ -93,7 +99,40 @@ namespace Neptuo.Recollections.Entries
             return entity;
         }
 
-        private async Task<Stream> ExtractImageFromVideoAsync(Entry entry, Video video)
+        private void SetProperties(Video entity, ImageMetadata imageMetadata, bool isWhenIncluded = true)
+        {
+            if (imageMetadata.DecodedImageFormat is IImageFormat<AVMetadata> avFormat && imageMetadata.TryGetFormatMetadata(avFormat, out var metadata))
+            {
+                entity.Duration = metadata.Duration.TotalSeconds;
+
+                if (isWhenIncluded && metadata.ContainerMetadata.TryGetValue("creation_time", out var creationTimeRaw) && DateTime.TryParse(creationTimeRaw.ToString(), out var creationTime))
+                {
+                    entity.When = creationTime;
+                }
+
+                if (metadata.ContainerMetadata.TryGetValue("location", out var locationRaw))
+                {
+                    locationRaw = locationRaw.Trim('/');
+                    var parts = locationRaw.Split('+', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length >= 2)
+                    {
+                        if (double.TryParse(parts[0], CultureInfo.InvariantCulture, out var latitude) && double.TryParse(parts[1], CultureInfo.InvariantCulture, out var longitude))
+                        {
+                            entity.Location.Latitude = latitude;
+                            entity.Location.Longitude = longitude;
+                        }
+
+                        if (parts.Length >= 3)
+                        {
+                            if (double.TryParse(parts[2], CultureInfo.InvariantCulture, out var altitude))
+                                entity.Location.Altitude = altitude;
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task<IsImage> ExtractImageFromVideoAsync(Entry entry, Video video)
         {
             await using Stream original = await fileStorage.FindAsync(entry, video, VideoType.Original);
             if (original == null)
@@ -110,17 +149,13 @@ namespace Neptuo.Recollections.Entries
 
             try
             {
-                using var videoImage = IsImage.Load(decoderOptions, original);
+                var videoImage = IsImage.Load(decoderOptions, original);
                 if (videoImage.Frames.Count == 0)
                     throw new VideoUploadValidationException("Video contains no decodable frames.");
 
-                var outputStream = new MemoryStream();
-                videoImage.Save(outputStream, formatDefinition.Codec);
-                outputStream.Position = 0;
-                
-                return outputStream;
+                return videoImage;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not VideoUploadValidationException)
             {
                 throw new VideoUploadValidationException("Unable to extract thumbnail from video.", ex);
             }
@@ -143,6 +178,11 @@ namespace Neptuo.Recollections.Entries
             model.Description = entity.Description;
             model.When = entity.When;
             model.ContentType = entity.ContentType;
+
+            model.Duration = entity.Duration;
+            model.Location.Latitude = entity.Location.Latitude;
+            model.Location.Longitude = entity.Location.Longitude;
+            model.Location.Altitude = entity.Location.Altitude;
 
             string basePath = $"api/entries/{entity.Entry.Id}/videos/{entity.Id}";
 

@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Entries
         public string Description { get; set; }
         public DateTime When { get; set; }
 
-        public LocationModel Location { get; set; } = new LocationModel();
+        public LocationModel Location { get; set; } = new();
 
         public ImageModel Clone() => new ImageModel()
         {

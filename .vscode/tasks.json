@@ -20,6 +20,21 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "Api build",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "./src/Recollections.Api"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "Blazor watch",
             "command": "dotnet",
             "type": "process",
