@@ -26,23 +26,23 @@ namespace Neptuo.Recollections.Entries.Controllers
         private static readonly StringValues CacheHeaderValue = new StringValues(new[] { "private", $"max-age={CacheSeconds}" });
 
         private readonly ImageService service;
-        private readonly DataContext dataContext;
+        private readonly DataContext db;
         private readonly IFileStorage fileProvider;
         private readonly ShareStatusService shareStatus;
         private readonly IUserNameProvider userNames;
         private readonly FreeLimitsChecker freeLimits;
 
-        public ImageController(ImageService service, DataContext dataContext, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
-            : base(dataContext, shareStatus)
+        public ImageController(ImageService service, DataContext db, IFileStorage fileProvider, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
+            : base(db, shareStatus)
         {
             Ensure.NotNull(service, "service");
-            Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(db, "db");
             Ensure.NotNull(fileProvider, "fileProvider");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(freeLimits, "freeLimits");
             this.service = service;
-            this.dataContext = dataContext;
+            this.db = db;
             this.fileProvider = fileProvider;
             this.shareStatus = shareStatus;
             this.userNames = userNames;
@@ -52,7 +52,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpGet]
         public Task<IActionResult> List(string entryId) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
-            List<Image> entities = await dataContext.Images
+            List<Image> entities = await db.Images
                 .Where(i => i.Entry.Id == entryId)
                 .OrderBy(i => i.When)
                 .ToListAsync();
@@ -70,7 +70,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Task<IActionResult> Detail(string entryId, string imageId) => RunEntryAsync(entryId, Permission.Read, async (entry, permission) =>
         {
-            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            Image entity = await db.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)
                 return NotFound();
 
@@ -101,7 +101,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
         private Task<IActionResult> GetFileContent(string entryId, string imageId, ImageType type) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
-            Image entity = await dataContext.Images.FindAsync(imageId);
+            Image entity = await db.Images.FindAsync(imageId);
             if (entity == null)
                 return NotFound();
 
@@ -169,23 +169,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPut("{imageId}")]
         public Task<IActionResult> Update(string entryId, string imageId, ImageModel model) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
-            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            Image entity = await db.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)
                 return NotFound();
 
             service.MapModelToEntity(model, entity);
-
-            dataContext.Entry(entity).State = EntityState.Modified;
-            dataContext.Entry(entity.Location).State = EntityState.Modified;
-            await dataContext.SaveChangesAsync();
-
+            await db.SaveChangesAsync();
             return NoContent();
         });
 
         [HttpDelete("{imageId}")]
         public Task<IActionResult> Delete(string entryId, string imageId) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
-            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            Image entity = await db.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)
                 return NotFound();
 
@@ -197,7 +193,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPost("{imageId}/set-location-from-original")]
         public Task<IActionResult> SetLocationFromOriginal(string entryId, string imageId) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
-            Image entity = await dataContext.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
+            Image entity = await db.Images.FirstOrDefaultAsync(i => i.Entry.Id == entryId && i.Id == imageId);
             if (entity == null)
                 return NotFound();
 

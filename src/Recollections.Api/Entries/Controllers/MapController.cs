@@ -51,7 +51,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             List<MapEntryModel> toRemove = new List<MapEntryModel>();
             foreach (var item in results)
             {
-                if (HasLocationValue(item))
+                if (HasNotLocationValue(item))
                 {
                     var location = await dataContext.Images
                         .Where(i => i.Entry.Id == item.Id && i.Location.Latitude != null && i.Location.Longitude != null)
@@ -66,7 +66,22 @@ namespace Neptuo.Recollections.Entries.Controllers
                     item.Location = location;
                 }
 
-                if (HasLocationValue(item))
+                if (HasNotLocationValue(item))
+                {
+                    var location = await dataContext.Videos
+                        .Where(v => v.Entry.Id == item.Id && v.Location.Latitude != null && v.Location.Longitude != null)
+                        .Select(v => new LocationModel()
+                        {
+                            Latitude = v.Location.Latitude,
+                            Longitude = v.Location.Longitude,
+                            Altitude = v.Location.Altitude
+                        })
+                        .FirstOrDefaultAsync();
+
+                    item.Location = location;
+                }
+
+                if (HasNotLocationValue(item))
                     toRemove.Add(item);
             }
 
@@ -76,7 +91,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             return Ok(results);
         }
 
-        private bool HasLocationValue(MapEntryModel item) => item.Location == null || !item.Location.HasValue();
+        private bool HasNotLocationValue(MapEntryModel item) => item.Location == null || !item.Location.HasValue();
 
         [HttpGet]
         public async Task<IActionResult> GeoLocate([FromQuery(Name = "q")] string query)

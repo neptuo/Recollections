@@ -21,7 +21,7 @@ namespace Neptuo.Recollections.Entries
         public int OriginalHeight { get; set; }
         public double? Duration { get; set; }
 
-        public ImageLocation Location { get; set; } = new();
+        public MediaLocation Location { get; set; }
 
         public string FileName { get; set; }
         public string ContentType { get; set; }

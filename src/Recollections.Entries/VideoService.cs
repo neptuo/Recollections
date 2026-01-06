@@ -118,14 +118,17 @@ namespace Neptuo.Recollections.Entries
                     {
                         if (double.TryParse(parts[0], CultureInfo.InvariantCulture, out var latitude) && double.TryParse(parts[1], CultureInfo.InvariantCulture, out var longitude))
                         {
+                            if (entity.Location == null)
+                                entity.Location = new();
+
                             entity.Location.Latitude = latitude;
                             entity.Location.Longitude = longitude;
-                        }
 
-                        if (parts.Length >= 3)
-                        {
-                            if (double.TryParse(parts[2], CultureInfo.InvariantCulture, out var altitude))
-                                entity.Location.Altitude = altitude;
+                            if (parts.Length >= 3)
+                            {
+                                if (double.TryParse(parts[2], CultureInfo.InvariantCulture, out var altitude))
+                                    entity.Location.Altitude = altitude;
+                            }
                         }
                     }
                 }
@@ -180,9 +183,12 @@ namespace Neptuo.Recollections.Entries
             model.ContentType = entity.ContentType;
 
             model.Duration = entity.Duration;
-            model.Location.Latitude = entity.Location.Latitude;
-            model.Location.Longitude = entity.Location.Longitude;
-            model.Location.Altitude = entity.Location.Altitude;
+            if (entity.Location != null)
+            {
+                model.Location.Latitude = entity.Location.Latitude;
+                model.Location.Longitude = entity.Location.Longitude;
+                model.Location.Altitude = entity.Location.Altitude;
+            }
 
             string basePath = $"api/entries/{entity.Entry.Id}/videos/{entity.Id}";
 
@@ -200,6 +206,32 @@ namespace Neptuo.Recollections.Entries
                 MapEntityToModel(entity, model, userId);
                 models.Add(model);
             }
+        }
+
+        public void MapModelToEntity(VideoModel model, Video entity)
+        {
+            entity.Name = model.Name;
+            entity.Description = model.Description;
+            entity.When = model.When;
+
+            if (entity.Location == null)
+                entity.Location = new();
+
+            entity.Location.Latitude = model.Location.Latitude;
+            entity.Location.Longitude = model.Location.Longitude;
+            entity.Location.Altitude = model.Location.Altitude;
+        }
+
+        public async Task SetLocationFromOriginalAsync(Entry entry, Video video)
+        {
+            var videoContent = await fileStorage.FindAsync(entry, video, VideoType.Original);
+            if (videoContent == null)
+                return;
+
+            using var videoImage = await ExtractImageFromVideoAsync(entry, video);
+            SetProperties(video, videoImage.Metadata, isWhenIncluded: false);
+
+            await dataContext.SaveChangesAsync();
         }
     }
 }

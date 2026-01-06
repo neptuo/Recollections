@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Neptuo.Recollections.Migrations;
 
 #nullable disable
 
 namespace Neptuo.Recollections.Entries.Migrations
 {
     /// <inheritdoc />
-    public partial class VideoLocationDuration : Migration
+    public partial class VideoLocationDuration : MigrationWithSchema<DataContext>
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -13,31 +14,25 @@ namespace Neptuo.Recollections.Entries.Migrations
             migrationBuilder.AddColumn<double>(
                 name: "Duration",
                 table: "Videos",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "Location_Altitude",
                 table: "Videos",
-                type: "REAL",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Location_ImageId",
-                table: "Videos",
-                type: "TEXT",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "Location_Latitude",
                 table: "Videos",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "Location_Longitude",
                 table: "Videos",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
         }
 
@@ -46,23 +41,23 @@ namespace Neptuo.Recollections.Entries.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Duration",
-                table: "Videos");
+                table: "Videos",
+                schema: Schema.Name);
 
             migrationBuilder.DropColumn(
                 name: "Location_Altitude",
-                table: "Videos");
-
-            migrationBuilder.DropColumn(
-                name: "Location_ImageId",
-                table: "Videos");
+                table: "Videos",
+                schema: Schema.Name);
 
             migrationBuilder.DropColumn(
                 name: "Location_Latitude",
-                table: "Videos");
+                table: "Videos",
+                schema: Schema.Name);
 
             migrationBuilder.DropColumn(
                 name: "Location_Longitude",
-                table: "Videos");
+                table: "Videos",
+                schema: Schema.Name);
         }
     }
 }

@@ -173,8 +173,14 @@ namespace Neptuo.Recollections
         public string UrlImageDetail(string entryId, string imageId)
             => $"/entries/{entryId}/images/{imageId}";
 
+        public string UrlVideoDetail(string entryId, string videoId)
+            => $"/entries/{entryId}/videos/{videoId}";
+
         public void OpenImageDetail(string entryId, string imageId)
             => uri.NavigateTo(UrlImageDetail(entryId, imageId));
+
+        public void OpenVideoDetail(string entryId, string videoId)
+            => uri.NavigateTo(UrlVideoDetail(entryId, videoId));
 
         public string UrlBeings()
             => "/beings";

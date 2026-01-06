@@ -84,6 +84,9 @@ namespace Neptuo.Recollections.Entries
         {
             using (ImagePropertyReader propertyReader = new ImagePropertyReader(imageContent))
             {
+                if (entity.Location == null)
+                    entity.Location = new();
+
                 entity.Location.Longitude = propertyReader.FindLongitude();
                 entity.Location.Latitude = propertyReader.FindLatitude();
                 entity.Location.Altitude = propertyReader.FindAltitude();
@@ -191,9 +194,12 @@ namespace Neptuo.Recollections.Entries
             model.Description = entity.Description;
             model.When = entity.When;
 
-            model.Location.Latitude = entity.Location.Latitude;
-            model.Location.Longitude = entity.Location.Longitude;
-            model.Location.Altitude = entity.Location.Altitude;
+            if (entity.Location != null)
+            {
+                model.Location.Latitude = entity.Location.Latitude;
+                model.Location.Longitude = entity.Location.Longitude;
+                model.Location.Altitude = entity.Location.Altitude;
+            }
 
             string basePath = $"api/entries/{entity.Entry.Id}/images/{entity.Id}";
 
@@ -220,11 +226,12 @@ namespace Neptuo.Recollections.Entries
             entity.Description = model.Description;
             entity.When = model.When;
 
+            if (entity.Location == null)
+                entity.Location = new();
+
             entity.Location.Latitude = model.Location.Latitude;
             entity.Location.Longitude = model.Location.Longitude;
             entity.Location.Altitude = model.Location.Altitude;
-
-            entity.Location.ImageId = entity.Id;
         }
     }
 }

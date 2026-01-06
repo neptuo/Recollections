@@ -185,5 +185,20 @@ namespace Neptuo.Recollections.Entries
 
         public Task<Stream> GetTileAsync(string type, int x, int y, int z)
             => faultHandler.Wrap(http.GetStreamAsync($"maptiles/{type}/256/{z}/{x}/{y}"));
+
+        public Task<AuthorizedModel<VideoModel>> GetVideoAsync(string entryId, string videoId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<VideoModel>>($"entries/{entryId}/videos/{videoId}"));
+
+        public Task UpdateVideoAsync(string entryId, VideoModel model)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/videos/{model.Id}", model));
+
+        public Task DeleteVideoAsync(string entryId, string videoId)
+            => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}/videos/{videoId}"));
+
+        public Task SetVideoLocationFromOriginalAsync(string entryId, string videoId)
+            => faultHandler.Wrap(http.PostAsync($"entries/{entryId}/videos/{videoId}/set-location-from-original", new StringContent(String.Empty)));
+
+        public Task<Stream> GetVideoDataAsync(string url)
+            => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
     }
 }
