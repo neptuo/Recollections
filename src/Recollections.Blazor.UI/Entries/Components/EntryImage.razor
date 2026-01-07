@@ -5,7 +5,7 @@
     @if (OnClick.HasDelegate)
     {
         <a href="@GetLinkUrl()" class="position-relative w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
-            @if (ImageType == Models.ImageType.Thumbnail) 
+            @if (Type == MediaType.Thumbnail) 
             {
                 @ThumbnailContent
             }
@@ -36,7 +36,7 @@
     {
         if (Content != null)
         {
-            return @<img @ref="@Element" class="rounded @(ImageType == Models.ImageType.Thumbnail ? "ratio ratio-4x3" : "")" />;
+            return @<img @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" />;
         }
 
         return @<div class="@GetPlaceHolderContainerCssClass()">
@@ -85,7 +85,7 @@
     string GetPlaceHolderContainerCssClass()
     {
         var result = new StringBuilder();
-        result.Append($"img rounded {(ImageType == Models.ImageType.Thumbnail ? "ratio ratio-4x3" : "")}");
+        result.Append($"img rounded {(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")}");
 
         bool isAlert = IsLoadingNotFound || PlaceHolderCssClass != null;
         if (isAlert)

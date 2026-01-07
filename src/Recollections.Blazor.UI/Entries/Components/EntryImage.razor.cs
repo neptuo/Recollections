@@ -51,7 +51,7 @@ namespace Neptuo.Recollections.Entries.Components
         public VideoModel Video { get; set; }
 
         [Parameter]
-        public ImageType ImageType { get; set; } = ImageType.Thumbnail;
+        public MediaType Type { get; set; } = MediaType.Thumbnail;
 
         [Parameter]
         public string PlaceHolder { get; set; }
@@ -94,9 +94,9 @@ namespace Neptuo.Recollections.Entries.Components
 
             string imageUrl = null;
             if (Image != null)
-                imageUrl = FindImageUrl();
+                imageUrl = FindImageUrl(Image);
             else if (Video != null)
-                imageUrl = Video.Thumbnail?.Url;
+                imageUrl = FindImageUrl(Video);
 
             if (imageUrl != null)
             {
@@ -143,18 +143,18 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
-        private string FindImageUrl()
+        private string FindImageUrl(IMediaUrlList media)
         {
-            switch (ImageType)
+            switch (Type)
             {
-                case ImageType.Original:
-                    return Image.Original?.Url;
-                case ImageType.Preview:
-                    return Image.Preview?.Url;
-                case ImageType.Thumbnail:
-                    return Image.Thumbnail?.Url;
+                case MediaType.Original:
+                    return media.Original?.Url;
+                case MediaType.Preview:
+                    return media.Preview?.Url;
+                case MediaType.Thumbnail:
+                    return media.Thumbnail?.Url;
                 default:
-                    throw Ensure.Exception.NotSupported(ImageType);
+                    throw Ensure.Exception.NotSupported(Type);
             }
         }
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class ImageModel : ICloneable<ImageModel>, IEquatable<ImageModel>
+    public class ImageModel : ICloneable<ImageModel>, IEquatable<ImageModel>, IMediaUrlList
     {
         public string Id { get; set; }
         public string UserId { get; set; }

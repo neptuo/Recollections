@@ -2,7 +2,7 @@ using System;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class VideoModel : ICloneable<VideoModel>, IEquatable<VideoModel>
+    public class VideoModel : ICloneable<VideoModel>, IEquatable<VideoModel>, IMediaUrlList
     {
         public string Id { get; set; }
         public string UserId { get; set; }
