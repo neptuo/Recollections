@@ -19,13 +19,13 @@
 
         <div class="image-detail my-sm-3">
             <InlineTitleEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" />
-            <div class="datetime">
-                <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
-            </div>
             @if (EntryId != null)
             {
                 <InlineLink Icon="comment" Value="@EntryModel.Title" OnClick="@(() => Navigator.OpenEntryDetail(EntryId))" />
             }
+            <div class="datetime">
+                <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
+            </div>
             <UserInformation Owner="@Owner" />
             @if (UserState.IsAuthenticated)
             {
