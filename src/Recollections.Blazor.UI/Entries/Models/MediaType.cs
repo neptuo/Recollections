@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Models
 {
-    public enum ImageType
+    public enum MediaType
     {
         Original,
         Preview,

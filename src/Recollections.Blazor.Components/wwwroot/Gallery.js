@@ -10,7 +10,7 @@ let isInitiazed = false;
 let autoPlayTimer = null;
 let stopCallback = () => { };
 let interop = null;
-let images = [];
+let items = [];
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -38,9 +38,14 @@ function stop(el) {
     stopCallback();
 }
 
-export function initialize(intr, imgs) {
+function isVideo(model) {
+    const type = (model.type || 'image').toLowerCase();
+    return type === 'video';
+}
+
+export function initialize(intr, i) {
     interop = intr;
-    images = imgs;
+    items = i;
 
     if (!isInitiazed) {
         lightbox.on('uiRegister', function () {
@@ -49,10 +54,20 @@ export function initialize(intr, imgs) {
                 order: 9,
                 isButton: true,
                 html: playIcon,
-                onClick: (event, el) => {
+                onInit: (el, pswp) => {
                     lightbox.pswp.on('close', () => {
                         stop(el);
                     });
+                    
+                    lightbox.pswp.on('change', () => {
+                        const index = lightbox.pswp.currIndex;
+                        const model = items[index];
+                        if (isVideo(model)) {
+                            stop(el);
+                        }
+                    });
+                },
+                onClick: (event, el) => {
 
                     if (autoPlayTimer == null) {
                         play(el);
@@ -80,7 +95,15 @@ export function initialize(intr, imgs) {
                 html: 'Caption text',
                 onInit: (el, pswp) => {
                     lightbox.pswp.on('change', () => {
-                        el.innerHTML = lightbox.pswp.currSlide.data.alt || '';
+                        const index = lightbox.pswp.currIndex;
+                        const model = items[index];
+
+                        let title = lightbox.pswp.currSlide.data.alt || '';
+                        if (isVideo(model)) {
+                            title += ' (click to play video)';
+                        }
+                        el.innerHTML = title;
+                        el.style.display = '';
                     });
                 }
             });
@@ -110,38 +133,90 @@ export function initialize(intr, imgs) {
                     });
                 }
             });
+
+            lightbox.pswp.on('change', () => {
+                const index = lightbox.pswp.currIndex;
+                const model = items[index];
+                if (isVideo(model)) {
+                    lightbox.pswp.currSlide.image.classList.add('pswp__video');
+                } else {
+                    lightbox.pswp.currSlide.image.classList.remove('pswp__video');
+                }
+            });
+
+            lightbox.pswp.on('pointerUp', async e => {
+                const index = lightbox.pswp.currIndex;
+                const model = items[index];
+                if (!isVideo(model) || e.originalEvent.target != lightbox.pswp.currSlide.image) {
+                    return;
+                }
+
+                e.preventDefault();
+                if (lightbox.pswp.currSlide.image.tagName.toLowerCase() === 'video') {
+                    return;
+                }
+
+                const titleEl = lightbox.pswp.scrollWrap.parentElement.querySelector(".pswp__title");
+                const originalTitle = lightbox.pswp.currSlide.data.alt || '';
+
+                titleEl.innerHTML = `${originalTitle} (loading video...)`;
+                
+                const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
+                const arrayBuffer = await stream.arrayBuffer();
+                const blob = new Blob([arrayBuffer], {
+                    type: model.contentType || "video/mp4"
+                });
+                const url = URL.createObjectURL(blob);
+
+                const imageEl = lightbox.pswp.currSlide.image;
+                const videoEl = document.createElement('video');
+                videoEl.src = url;
+                videoEl.controls = true;
+                videoEl.playsInline = true;
+                videoEl.autoplay = true;
+                videoEl.className = imageEl.className;
+                videoEl.style.width = imageEl.style.width;
+                videoEl.style.height = imageEl.style.height;
+
+                imageEl.parentNode.replaceChild(videoEl, imageEl);
+                lightbox.pswp.currSlide.image = videoEl;
+                titleEl.style.display = 'none';
+            });
         });
 
         lightbox.on("numItems", (e) => {
             // Just for auto function.
-            lightbox.pswp.numItems = images.length;
+            lightbox.pswp.numItems = items.length;
 
-            e.numItems = images.length
+            e.numItems = items.length
         });
 
         lightbox.on("itemData", (e) => {
+            const model = items[e.index];
+            const type = (model.type || 'image').toLowerCase();
+
             e.itemData = {
-                w: images[e.index].width,
-                h: images[e.index].height,
-                alt: images[e.index].title,
-            }
+                w: model.width,
+                h: model.height,
+                alt: model.title,
+            };
 
             // Src is only used when swiping images in gallery.
             // On every gallery open, all images are refetched (fortunately disk cache is used).
             // It is caused by the reseting of images array on every gallery component render.
-            if (images[e.index].src) {
-                e.itemData.src = images[e.index].src;
-            } else if (images[e.index].provider) {
-                e.itemData.provider = images[e.index].provider;
+            if (model.src) {
+                e.itemData.src = model.src;
+            } else if (model.provider) {
+                e.itemData.provider = model.provider;
             } else {
-                e.itemData.provider = images[e.index].provider = new Promise(async resolve => {
-                    const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index);
+                e.itemData.provider = model.provider = new Promise(async resolve => {
+                    const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index, "");
                     const arrayBuffer = await stream.arrayBuffer();
                     const blob = new Blob([arrayBuffer], {
                         type: "image/png"
                     });
                     const url = URL.createObjectURL(blob);
-                    images[e.index].src = url;
+                    model.src = url;
 
                     console.log(`Loading image at index '${e.index}'`);
                     resolve(url);

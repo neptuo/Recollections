@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class ImageDetail
+    public partial class VideoDetail
     {
         [Inject]
         protected Navigator Navigator { get; set; }
@@ -28,18 +28,18 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Downloader Downloader { get; set; }
 
         [Inject]
-        protected ILog<ImageDetail> Log { get; set; }
+        protected ILog<VideoDetail> Log { get; set; }
 
         [Parameter]
         public string EntryId { get; set; }
 
-        private string previousImageId;
+        private string previousVideoId;
 
         [Parameter]
-        public string ImageId { get; set; }
+        public string VideoId { get; set; }
 
-        private ImageModel original;
-        protected ImageModel Model { get; set; }
+        private VideoModel original;
+        protected VideoModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected EntryModel EntryModel { get; set; }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
@@ -49,20 +49,20 @@ namespace Neptuo.Recollections.Entries.Pages
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
-            previousImageId = ImageId;
+            previousVideoId = VideoId;
             return base.SetParametersAsync(parameters);
         }
 
         protected async override Task OnParametersSetAsync()
         {
-            if (previousImageId != ImageId)
+            if (previousVideoId != VideoId)
                 await LoadAsync();
         }
 
         private async Task LoadAsync()
         {
             Permission userPermission;
-            (Model, Owner, userPermission) = await Api.GetImageAsync(EntryId, ImageId);
+            (Model, Owner, userPermission) = await Api.GetVideoAsync(EntryId, VideoId);
 
             UpdateOriginal();
 
@@ -133,7 +133,7 @@ namespace Neptuo.Recollections.Entries.Pages
             if (original.Equals(Model))
                 return;
 
-            await Api.UpdateImageAsync(EntryId, Model);
+            await Api.UpdateVideoAsync(EntryId, Model);
             UpdateOriginal();
             StateHasChanged();
         }
@@ -142,16 +142,16 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task DeleteAsync()
         {
-            if (await Navigator.AskAsync($"Do you really want to delete this image?"))
+            if (await Navigator.AskAsync($"Do you really want to delete this video?"))
             {
-                await Api.DeleteImageAsync(EntryId, ImageId);
+                await Api.DeleteVideoAsync(EntryId, VideoId);
                 Navigator.OpenEntryDetail(EntryId);
             }
         }
 
         protected async Task SetLocationOriginalAsync()
         {
-            await Api.SetImageLocationFromOriginalAsync(EntryId, ImageId);
+            await Api.SetVideoLocationFromOriginalAsync(EntryId, VideoId);
             await LoadAsync();
         }
 
@@ -159,7 +159,7 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             var stream = await Api.GetMediaDataAsync(Model.Original.Url);
             Log.Debug($"Original stream downloaded.");
-            await Downloader.FromStreamAsync(Model.Name, stream, "image/png");
+            await Downloader.FromStreamAsync(Model.Name, stream, Model.ContentType);
             Log.Debug($"JS interop completed.");
         }
 

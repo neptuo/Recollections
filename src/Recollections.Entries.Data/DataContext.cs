@@ -18,6 +18,8 @@ namespace Neptuo.Recollections.Entries
 
         public DbSet<Image> Images { get; set; }
 
+        public DbSet<Video> Videos { get; set; }
+
         public DbSet<Story> Stories { get; set; }
         public DbSet<StoryShare> StoryShares { get; set; }
 

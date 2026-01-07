@@ -23,7 +23,7 @@ namespace Neptuo.Recollections.Entries
         public int OriginalWidth { get; set; }
         public int OriginalHeight { get; set; }
 
-        public ImageLocation Location { get; set; } = new ImageLocation();
+        public MediaLocation Location { get; set; }
 
         public string FileName { get; set; }
     }

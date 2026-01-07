@@ -75,3 +75,10 @@
     position: absolute;
     bottom: 0px;
 }
+
+img.pswp__video {
+    cursor: pointer !important;
+}
+video.pswp__video {
+    cursor: auto !important;
+}

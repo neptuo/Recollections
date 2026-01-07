@@ -46,22 +46,36 @@
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                @if (Images.Count > 0 || UploadProgress?.Count > 0)
+                @if (Media?.Count > 0 || UploadProgress?.Count > 0)
                 {
                     <div class="images my-3">
-                        @if (Images != null)
+                        @if (Media != null)
                         {
-                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="(async i => { await Gallery.CloseAsync(); Navigator.OpenImageDetail(EntryId, Images[i].Id); })" />
+                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="@OnGalleryOpenInfoAsync" />
 
-                            @foreach (var image in Images)
+                            @foreach (var item in Media)
                             {
-                                <EntryImage @key="image.Id" Image="@image" OnClick="(() => Gallery.Open(Images.IndexOf(image)))">
+                                string key = null;
+                                Action onClick = null;
+                                
+                                if (item.Image != null)
+                                {
+                                    key = item.Image.Id;
+                                    onClick = () => { Navigator.OpenImageDetail(EntryId, item.Image.Id); };
+                                }
+                                else if (item.Video != null)
+                                {
+                                    key = item.Video.Id;
+                                    onClick = () => { Navigator.OpenVideoDetail(EntryId, item.Video.Id); };
+                                }
+                                
+                                <EntryMedia @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
                                     <ThumbnailContent>
-                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenImageDetail(EntryId, image.Id); })" @onclick:stopPropagation="true">
+                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="@onClick" @onclick:stopPropagation="true">
                                             <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
                                         </button>
                                     </ThumbnailContent>
-                                </EntryImage>
+                                </EntryMedia>
                             }
                         }
 
@@ -71,11 +85,15 @@
                             {
                                 @if (upload.IsDone && upload.Tag != null)
                                 {
-                                    <EntryImage Image="@(upload.Tag as ImageModel)" />
+                                    var uploadMedia = upload.Tag as MediaModel;
+                                    if (uploadMedia.Image != null || uploadMedia.Video != null)
+                                    {
+                                        <EntryMedia Image="@uploadMedia.Image" Video="@uploadMedia.Video" />
+                                    }
                                 }
                                 else
                                 {
-                                    <EntryImage
+                                    <EntryMedia
                                         PlaceHolder="@upload.StatusDescription"
                                         PlaceHolderCssClass="@(upload.IsCurrent ? (upload.Percentual == 0 ? "loading-circle" : $"text-primary") : "")"
                                         PlaceHolderState="@GetImagePlaceHolderState(upload)"
@@ -91,7 +109,7 @@
                         <FileUpload 
                             EntityType="entry"
                             EntityId="@EntryId"
-                            Url="@Api.ImageUploadUrl(Model.Id)"
+                            Url="@Api.MediaUploadUrl(Model.Id)"
                             DragAndDropContainer="Container"
                         />
                     </PermissionView>

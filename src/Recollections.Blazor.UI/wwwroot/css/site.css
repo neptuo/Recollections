@@ -14308,6 +14308,14 @@ input.input-number-noarrows[type=number] {
   bottom: 0px;
 }
 
+img.pswp__video {
+  cursor: pointer !important;
+}
+
+video.pswp__video {
+  cursor: auto !important;
+}
+
 .entry-picker .modal-body {
   padding: 0;
 }
@@ -14356,7 +14364,7 @@ input.input-number-noarrows[type=number] {
       -ms-flex-align: center;
           align-items: center;
 }
-.image-detail .image img, .image-detail .image .img {
+.image-detail .image img, .image-detail .image video, .image-detail .image .img {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -14564,4 +14572,4 @@ input.input-number-noarrows[type=number] {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */

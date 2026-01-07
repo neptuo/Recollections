@@ -14,5 +14,9 @@ namespace Neptuo.Recollections.Entries
         Task<Stream> FindAsync(Entry entry, Image image, ImageType type);
         Task SaveAsync(Entry entry, Image image, Stream content, ImageType type);
         Task DeleteAsync(Entry entry, Image image, ImageType type);
+
+        Task<Stream> FindAsync(Entry entry, Video video, VideoType type);
+        Task SaveAsync(Entry entry, Video video, Stream content, VideoType type);
+        Task DeleteAsync(Entry entry, Video video, VideoType type);
     }
 }

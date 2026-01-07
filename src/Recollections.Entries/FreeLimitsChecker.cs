@@ -58,6 +58,9 @@ namespace Neptuo.Recollections.Entries
         public Task<bool> CanCreateImageAsync(string userId, string entryId)
             => CountCheckAsync(userId, db.Images.Where(i => i.Entry.Id == entryId), options.ImageInEntryCount);
 
+        public Task<bool> CanCreateVideoAsync(string userId, string entryId)
+            => CountCheckAsync(userId, db.Videos.Where(v => v.Entry.Id == entryId), options.VideoInEntryCount);
+
         public Task<bool> CanSetGpsAsync(string userId, int gpsCount)
             => CountCheckAsync(userId, gpsCount, options.GpsInEntryCount);
 

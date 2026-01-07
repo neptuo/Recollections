@@ -81,10 +81,13 @@ namespace Neptuo.Recollections.Entries
         public Task<List<ImageModel>> GetImagesAsync(string entryId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<ImageModel>>($"entries/{entryId}/images"));
 
+        public Task<List<MediaModel>> GetMediaAsync(string entryId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<MediaModel>>($"entries/{entryId}/media"));
+
         public Task<AuthorizedModel<ImageModel>> GetImageAsync(string entryId, string imageId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ImageModel>>($"entries/{entryId}/images/{imageId}"));
 
-        public Task<Stream> GetImageDataAsync(string url)
+        public Task<Stream> GetMediaDataAsync(string url)
             => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
 
         public Task UpdateImageAsync(string entryId, ImageModel model)
@@ -98,6 +101,8 @@ namespace Neptuo.Recollections.Entries
 
         public string ImageUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/images";
 
+        public string MediaUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/media";
+
         public Task<List<StoryListModel>> GetStoryListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryListModel>>("stories"));
 
@@ -106,6 +111,9 @@ namespace Neptuo.Recollections.Entries
 
         public Task<List<EntryImagesModel>> GetStoryImagesAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryImagesModel>>($"stories/{storyId}/images"));
+
+        public Task<List<EntryMediaModel>> GetStoryMediaAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryMediaModel>>($"stories/{storyId}/media"));
 
         public Task<AuthorizedModel<StoryModel>> GetStoryAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<StoryModel>>($"stories/{storyId}"));
@@ -177,5 +185,17 @@ namespace Neptuo.Recollections.Entries
 
         public Task<Stream> GetTileAsync(string type, int x, int y, int z)
             => faultHandler.Wrap(http.GetStreamAsync($"maptiles/{type}/256/{z}/{x}/{y}"));
+
+        public Task<AuthorizedModel<VideoModel>> GetVideoAsync(string entryId, string videoId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<VideoModel>>($"entries/{entryId}/videos/{videoId}"));
+
+        public Task UpdateVideoAsync(string entryId, VideoModel model)
+            => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/videos/{model.Id}", model));
+
+        public Task DeleteVideoAsync(string entryId, string videoId)
+            => faultHandler.Wrap(http.DeleteAsync($"entries/{entryId}/videos/{videoId}"));
+
+        public Task SetVideoLocationFromOriginalAsync(string entryId, string videoId)
+            => faultHandler.Wrap(http.PostAsync($"entries/{entryId}/videos/{videoId}/set-location-from-original", new StringContent(String.Empty)));
     }
 }

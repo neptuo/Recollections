@@ -22,7 +22,7 @@ namespace Neptuo.Recollections.Components
         public List<GalleryModel> Models { get; set; }
 
         [Parameter]
-        public Func<int, Task<Stream>> DataGetter { get; set; }
+        public Func<int, string, Task<Stream>> DataGetter { get; set; }
 
         [Parameter]
         public EventCallback<int> OnOpenInfo { get; set; }

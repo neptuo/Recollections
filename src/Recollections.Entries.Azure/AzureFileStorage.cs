@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
+using Azure;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -101,6 +102,59 @@ namespace Neptuo.Recollections.Entries
                 content.Position = 0;
                 
             await imageFile.UploadAsync(content);
+        }
+
+        private const string DerivedImageExtension = ".jpg";
+
+        private static string GetVideoFileName(Video video, VideoType type)
+        {
+            string baseName = Path.GetFileNameWithoutExtension(video.FileName);
+
+            switch (type)
+            {
+                case VideoType.Original:
+                    return video.FileName;
+                case VideoType.Thumbnail:
+                    return string.Concat(baseName, ".thumbnail", DerivedImageExtension);
+                default:
+                    throw Ensure.Exception.NotSupported(type);
+            }
+        }
+
+        private async Task<ShareFileClient> GetFileAsync(Entry entry, Video video, VideoType type)
+        {
+            ShareDirectoryClient entryDirectory = await GetDirectoryAsync(entry);
+            string fileName = GetVideoFileName(video, type);
+            return entryDirectory.GetFileClient(fileName);
+        }
+
+        public async Task DeleteAsync(Entry entry, Video video, VideoType type)
+        {
+            ShareFileClient file = await GetFileAsync(entry, video, type);
+            await file.DeleteIfExistsAsync();
+        }
+
+        public async Task<Stream> FindAsync(Entry entry, Video video, VideoType type)
+        {
+            ShareFileClient file = await GetFileAsync(entry, video, type);
+            if (await file.ExistsAsync())
+            {
+                ShareFileDownloadInfo download = await file.DownloadAsync();
+                return download.Content;
+            }
+
+            return null;
+        }
+
+        public async Task SaveAsync(Entry entry, Video video, Stream content, VideoType type)
+        {
+            ShareFileClient file = await GetFileAsync(entry, video, type);
+            await file.CreateAsync(content.Length);
+
+            if (content.CanSeek)
+                content.Position = 0;
+
+            await file.UploadAsync(content);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Neptuo.Logging;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class EntryImage
+    public partial class EntryMedia
     {
         private bool hasSourceChanged;
         private string url;
@@ -32,7 +33,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected ImageInterop ImageInterop { get; set; }
 
         [Inject]
-        protected ILog<EntryImage> Log { get; set; }
+        protected ILog<EntryMedia> Log { get; set; }
 
         [Inject]
         protected ExceptionPanelSuppression ExceptionPanelSuppression { get; set; }
@@ -48,7 +49,10 @@ namespace Neptuo.Recollections.Entries.Components
         public ImageModel Image { get; set; }
 
         [Parameter]
-        public ImageType ImageType { get; set; } = ImageType.Thumbnail;
+        public VideoModel Video { get; set; }
+
+        [Parameter]
+        public MediaType Type { get; set; } = MediaType.Thumbnail;
 
         [Parameter]
         public string PlaceHolder { get; set; }
@@ -57,7 +61,7 @@ namespace Neptuo.Recollections.Entries.Components
         public string PlaceHolderCssClass { get; set; }
 
         [Parameter]
-        public EntryImagePlaceHolderState PlaceHolderState { get; set; }
+        public EntryMediaPlaceHolderState PlaceHolderState { get; set; }
 
         [Parameter]
         public RenderFragment ThumbnailContent { get; set; }
@@ -65,7 +69,13 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public EventCallback OnClick { get; set; }
 
+        [Parameter]
+        public bool ClickToPlay { get; set; }
+
         protected ElementReference Element { get; set; }
+        
+        protected bool IsVideoLoading = false;
+        protected bool IsVideoContent = false;
 
         protected string GetLinkUrl()
         {
@@ -89,36 +99,43 @@ namespace Neptuo.Recollections.Entries.Components
         {
             await base.OnParametersSetAsync();
 
-            string imageUrl = null;
-            if (Image != null)
-                imageUrl = FindImageUrl();
-
-            if (imageUrl != null)
+            if (!IsVideoContent)
             {
-                if (previousUrl != imageUrl)
+                string mediaUrl = null;
+                if (Image != null)
+                    mediaUrl = FindImageUrl(Image);
+                else if (Video != null)
+                    mediaUrl = FindImageUrl(Video);
+
+                if (mediaUrl != null)
                 {
-                    IsLoadingNotFound = false;
-                    previousUrl = imageUrl;
-                    url = imageUrl;
-                    hasSourceChanged = true;
-                    _ = LoadImageDataAsync(imageUrl).ContinueWith(_ => StateHasChanged());
-                }
+                    if (previousUrl != mediaUrl)
+                    {
+                        IsLoadingNotFound = false;
+                        previousUrl = mediaUrl;
+                        url = mediaUrl;
+                        hasSourceChanged = true;
+                        _ = LoadMediaDataAsync(mediaUrl).ContinueWith(_ => StateHasChanged());
+                    }
 
-                return;
-            }
-            else
-            {
-                Content = null;
+                    return;
+                }
+                else
+                {
+                    Content = null;
+                }
             }
         }
 
-        private async Task LoadImageDataAsync(string imageUrl)
+        private async Task LoadMediaDataAsync(string mediaUrl)
         {
             using (ExceptionPanelSuppression.Enter<HttpRequestException>(e => e.StatusCode == HttpStatusCode.NotFound))
             {
                 try
                 {
-                    Content = await Api.GetImageDataAsync(imageUrl);
+                    Log.Debug("Downloading media from {0}", mediaUrl);
+                    Content = await Api.GetMediaDataAsync(mediaUrl);
+                    Log.Debug("Media downloaded successfully");
                 }
                 catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
                 {
@@ -134,23 +151,38 @@ namespace Neptuo.Recollections.Entries.Components
             if (Content != null && hasSourceChanged)
             {
                 hasSourceChanged = false;
-                await ImageInterop.SetAsync(Element, Content);
+                await ImageInterop.SetAsync(Element, Content, IsVideoContent ? Video?.ContentType : null);
             }
         }
 
-        private string FindImageUrl()
+        private string FindImageUrl(IMediaUrlList media, MediaType? type = null)
         {
-            switch (ImageType)
+            switch (type ?? Type)
             {
-                case ImageType.Original:
-                    return Image.Original?.Url;
-                case ImageType.Preview:
-                    return Image.Preview?.Url;
-                case ImageType.Thumbnail:
-                    return Image.Thumbnail?.Url;
+                case MediaType.Original:
+                    return media.Original?.Url;
+                case MediaType.Preview:
+                    return media.Preview?.Url;
+                case MediaType.Thumbnail:
+                    return media.Thumbnail?.Url;
                 default:
-                    throw Ensure.Exception.NotSupported(ImageType);
+                    throw Ensure.Exception.NotSupported(Type);
             }
+        }
+
+        private void DownloadVideo()
+        {
+            if (Video == null || IsVideoLoading)
+                return;
+
+            IsVideoLoading = true;
+            LoadMediaDataAsync(FindImageUrl(Video, MediaType.Original)).ContinueWith(_ =>
+            {
+                IsVideoLoading = false;
+                IsVideoContent = true;
+                hasSourceChanged = true;
+                StateHasChanged();
+            });
         }
     }
 }

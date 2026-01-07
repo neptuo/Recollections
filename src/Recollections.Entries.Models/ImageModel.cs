@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class ImageModel : ICloneable<ImageModel>, IEquatable<ImageModel>
+    public class ImageModel : ICloneable<ImageModel>, IEquatable<ImageModel>, IMediaUrlList
     {
         public string Id { get; set; }
         public string UserId { get; set; }
 
-        public ImageSourceModel Thumbnail { get; set; }
-        public ImageSourceModel Preview { get; set; }
-        public ImageSourceModel Original { get; set; }
+        public MediaSourceModel Thumbnail { get; set; }
+        public MediaSourceModel Preview { get; set; }
+        public MediaSourceModel Original { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime When { get; set; }
 
-        public LocationModel Location { get; set; } = new LocationModel();
+        public LocationModel Location { get; set; } = new();
 
         public ImageModel Clone() => new ImageModel()
         {

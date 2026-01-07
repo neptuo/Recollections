@@ -1,0 +1,102 @@
+﻿@using System.Text
+
+<div class="image justify-content-center @(!IsLoadingNotFound && Content == null && PlaceHolder == null ? "placeholder-glow" : "")">
+    @if (OnClick.HasDelegate)
+    {
+        <a href="@GetLinkUrl()" class="position-relative w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
+            @if (Type == MediaType.Thumbnail) 
+            {
+                @ThumbnailContent
+            }
+
+            @RenderImage()
+        </a>
+    }
+    else
+    {
+        @RenderImage()
+    }
+</div>
+
+@code
+{
+    RenderFragment RenderImage() 
+    {
+        if (Content != null)
+        {
+            if (IsVideoContent)
+                return @<video @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" controls playsinline preload autoplay />;
+
+            Action onClick = null;
+            if (ClickToPlay && Video != null)
+                onClick = DownloadVideo;
+
+            return @<img @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" @onclick="@onClick" />;
+        }
+
+        return @<div class="@GetPlaceHolderContainerCssClass()">
+            @if (IsLoadingNotFound || PlaceHolder != null)
+            {
+                <div class="d-flex justify-content-center align-items-center">
+                    <span class="status text-center @PlaceHolderCssClass">
+                        @if (Image != null)
+                        {
+                            <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
+                        }
+                        else if (Video != null)
+                        {
+                            <Icon Identifier="play" Prefix="fas" CssClass="position-absolute top-50 start-50 translate-middle z-3 fs-1" />
+                        }
+
+                        @GetPlaceHolder()
+                    </span>
+                </div>
+            }
+        </div>;
+    }
+
+    string GetPlaceHolder()
+        => IsLoadingNotFound ? "Not found" : PlaceHolder;
+
+    string GetPlaceHolderIcon() 
+    {
+        if (PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound)
+            return "triangle-exclamation";
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Pending)
+            return "hourglass-start";
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Progress)
+            return "hourglass-half";
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Finished)
+            return "hourglass-end";
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Success)
+            return "check";
+
+        return null;
+    }
+
+    StringBuilder PlaceHolderContainerCssClassBuilder = new();
+
+    string GetPlaceHolderContainerCssClass()
+    {
+        var result = PlaceHolderContainerCssClassBuilder.Clear();
+        result.Append($"img rounded {(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")}");
+
+        bool isAlert = IsLoadingNotFound || PlaceHolderCssClass != null;
+        if (isAlert)
+            result.Append(" alert m-0");
+
+        if ((PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
+            result.Append(" alert-secondary");
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound)
+            result.Append(" alert-danger");
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Success)
+            result.Append(" alert-success");
+        else if (PlaceHolderCssClass == null)
+            result.Append(" placeholder");
+        else if (isAlert)
+            result.Append(" alert-secondary");
+
+        return result.ToString();
+    }
+}
+

@@ -11,13 +11,13 @@ namespace Neptuo.Recollections.Components
 {
     public class ImageInterop(IJSRuntime jsRuntime)
     {
-        private ValueTask SetInternalAsync(object element, Stream stream)
-            => jsRuntime.InvokeVoidAsync("ImageSource.Set", element, new DotNetStreamReference(stream));
+        private ValueTask SetInternalAsync(object element, Stream stream, string contentType = null)
+            => jsRuntime.InvokeVoidAsync("ImageSource.Set", element, new DotNetStreamReference(stream), contentType);
 
-        public ValueTask SetAsync(ElementReference element, Stream stream)
-            => SetInternalAsync(element, stream);
+        public ValueTask SetAsync(ElementReference element, Stream stream, string contentType = null)
+            => SetInternalAsync(element, stream, contentType);
 
-        public ValueTask SetAsync(IJSObjectReference element, Stream stream)
-            => SetInternalAsync(element, stream);
+        public ValueTask SetAsync(IJSObjectReference element, Stream stream, string contentType = null)
+            => SetInternalAsync(element, stream, contentType);
     }
 }

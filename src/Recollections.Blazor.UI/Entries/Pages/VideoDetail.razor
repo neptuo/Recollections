@@ -1,4 +1,4 @@
-﻿@page "/entries/{EntryId}/images/{ImageId}"
+﻿@page "/entries/{EntryId}/videos/{VideoId}"
 @inherits UserStateComponentBase
 
 @if (Model != null)
@@ -8,17 +8,17 @@
     <PermissionContainer State="@Permissions">
         <ActionMenu>
             <ItemGroup Text="@Model.Name">
-                <Item Icon="cloud-download" Text="Download Original" OnClick="DownloadOriginalAsync" Title="Download Original Image" />
+                <Item Icon="cloud-download" Text="Download Original" OnClick="DownloadOriginalAsync" Title="Download Original Video" />
                 <ShareLinkButton Layout="ButtonLayout.Item" />
                 <PermissionView Request="PermissionRequest.Write">
-                    <Item Icon="location-arrow" Text="Set Location from Original" OnClick="SetLocationOriginalAsync" Title="Set Location from Original Image" />
-                    <Item Icon="trash-alt" Text="Delete Image" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Image" />
+                    <Item Icon="location-arrow" Text="Set Location from Original" OnClick="SetLocationOriginalAsync" Title="Set Location from Original Video" />
+                    <Item Icon="trash-alt" Text="Delete Video" OnClick="DeleteAsync" CssClass="text-danger" Title="Delete Video" />
                 </PermissionView>
             </ItemGroup>
         </ActionMenu>
 
         <div class="image-detail my-sm-3">
-            <InlineTitleEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" />
+            <InlineTitleEdit Value="@Model.Name" PlaceHolder="Unnamed video..." ValueChanged="@(async value => await SaveNameAsync(value))" />
             @if (EntryId != null)
             {
                 <InlineLink Icon="comment" Value="@EntryModel.Title" OnClick="@(() => Navigator.OpenEntryDetail(EntryId))" />
@@ -26,6 +26,12 @@
             <div class="datetime">
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
             </div>
+            @if (Model.Duration != null)
+            {
+                <div class="duration">
+                    <InlineLink Value="@TimeSpan.FromSeconds(Model.Duration.Value).ToString(@"hh\:mm\:ss")" Icon="stopwatch" />
+                </div>
+            }
             <UserInformation Owner="@Owner" />
             @if (UserState.IsAuthenticated)
             {
@@ -38,7 +44,7 @@
             <div class="my-3">
                 <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
             </div>
-            <EntryMedia EntryId="@EntryId" Image="@Model" Type="@MediaType.Preview" />
+            <EntryMedia EntryId="@EntryId" Video="@Model" Type="@MediaType.Preview" ClickToPlay="true" />
         </div>
 
         <LocationEdit @ref="LocationEdit" Save="@(async location => await SaveLocationAsync(location))" Delete="@OnClearLocationAsync" />

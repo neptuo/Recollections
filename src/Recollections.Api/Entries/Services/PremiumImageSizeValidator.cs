@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
-    public class PermiumImageSizeValidator : ImageValidator
+    public class PremiumImageSizeValidator : ImageValidator
     {
         private readonly IUserPremiumProvider premiumProvider;
         private readonly StorageOptions configuration;
 
-        public PermiumImageSizeValidator(IUserPremiumProvider premiumProvider, IOptions<StorageOptions> configuration)
+        public PremiumImageSizeValidator(IUserPremiumProvider premiumProvider, IOptions<StorageOptions> configuration)
             : base(configuration)
         {
             Ensure.NotNull(premiumProvider, "premiumProvider");
@@ -25,11 +25,11 @@ namespace Neptuo.Recollections.Entries
 
         protected override async Task<bool> IsValidSizeAsync(string userId, long fileLength)
         {
-            if (configuration.PremiumMaxLength != null)
+            if (configuration.Images.PremiumMaxLength != null)
             {
                 bool hasPremium = await premiumProvider.HasPremiumAsync(userId);
                 if (hasPremium)
-                    return fileLength <= configuration.PremiumMaxLength.Value;
+                    return fileLength <= configuration.Images.PremiumMaxLength.Value;
             }
 
             return await base.IsValidSizeAsync(userId, fileLength);
