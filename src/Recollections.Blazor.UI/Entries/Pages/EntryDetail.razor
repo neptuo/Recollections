@@ -55,31 +55,27 @@
 
                             @foreach (var item in Media)
                             {
-                                @if (item?.Type == "image" && item.Image != null)
+                                string key = null;
+                                Action onClick = null;
+                                
+                                if (item.Image != null)
                                 {
-                                    var image = item.Image;
-
-                                    <EntryImage @key="image.Id" Image="@image" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
-                                        <ThumbnailContent>
-                                            <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenImageDetail(EntryId, image.Id); })" @onclick:stopPropagation="true">
-                                                <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
-                                            </button>
-                                        </ThumbnailContent>
-                                    </EntryImage>
+                                    key = item.Image.Id;
+                                    onClick = () => { Navigator.OpenImageDetail(EntryId, item.Image.Id); };
                                 }
-                                else if (item?.Type == "video" && item.Video != null)
+                                else if (item.Video != null)
                                 {
-                                    var video = item.Video;
-
-                                    <EntryImage @key="video.Id" Video="@video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
-                                        <ThumbnailContent>
-                                            <button class="btn btn-outline-primary border-0 p-0" @onclick="(async () => { Navigator.OpenVideoDetail(EntryId, video.Id); })" @onclick:stopPropagation="true">
-                                                <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
-                                            </button>
-                                            <Icon Identifier="play" Prefix="fas" CssClass="position-absolute top-50 start-50 translate-middle z-3 fs-1" />
-                                        </ThumbnailContent>
-                                    </EntryImage>
+                                    key = item.Video.Id;
+                                    onClick = () => { Navigator.OpenVideoDetail(EntryId, item.Video.Id); };
                                 }
+                                
+                                <EntryImage @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
+                                    <ThumbnailContent>
+                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="@onClick" @onclick:stopPropagation="true">
+                                            <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
+                                        </button>
+                                    </ThumbnailContent>
+                                </EntryImage>
                             }
                         }
 
