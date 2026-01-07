@@ -30,9 +30,12 @@
                 <div class="list-group mt-3">
                     @foreach (var file in UnassignedFiles)
                     {
-                        <div class="list-group-item d-flex align-items-center">
+                        <div class="list-group-item list-group-item-action d-flex align-items-center">
                             <span class="flex-grow-1 text-truncate">
                                 @file.Name <span class="text-secondary">@Utils.FileSize(file.Size)</span>
+                            </span>
+                            <span>
+                                <Icon Identifier="trash-alt" OnClick="@(() => DeleteStoredFileAsync(file))" CssClass="text-danger" />
                             </span>
                         </div>
                     }
@@ -74,8 +77,15 @@
 
     private async Task OnUploadClickAsync()
     {
-        FileUploader.UploadUnassignedFilesToAsync(EntityType, EntityId, Url);
         UnassignedFiles = [];
+        await FileUploader.UploadUnassignedFilesToAsync(EntityType, EntityId, Url);
+        UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
+        StateHasChanged();
+    }
+
+    async Task DeleteStoredFileAsync(FileUploadToRetry file)
+    {
+        await FileUploader.DeleteFileAsync(file.Id);
         UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
         StateHasChanged();
     }
