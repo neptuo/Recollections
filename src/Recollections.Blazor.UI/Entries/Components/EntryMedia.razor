@@ -25,7 +25,7 @@
         if (Content != null)
         {
             if (IsVideoContent)
-                return @<video @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" controls playsinline preload />;
+                return @<video @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" controls playsinline preload autoplay />;
 
             Action onClick = null;
             if (ClickToPlay && Video != null)

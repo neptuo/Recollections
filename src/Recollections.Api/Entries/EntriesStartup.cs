@@ -31,14 +31,10 @@ namespace Neptuo.Recollections.Entries
 
         public void ConfigureServices(IServiceCollection services, IHostEnvironment environment, IReverseProxyBuilder yarp)
         {
-            ConfigureImages(services);
+            ConfigureMedia(services);
             ConfigureDatabase(services);
             ConfigureStorage(services);
             ConfigureFreeLimits(services);
-
-            services
-                .Configure<VideoOptions>(configuration.GetSection("Video"))
-                .AddTransient<IVideoValidator, VideoValidator>();
 
             services
                 .AddHealthChecks()
@@ -82,7 +78,7 @@ namespace Neptuo.Recollections.Entries
             services.AddTransient<FreeLimitsChecker>();
         }
 
-        private static void ConfigureImages(IServiceCollection services)
+        private static void ConfigureMedia(IServiceCollection services)
         {
             services
                 .AddTransient<ImageService>()
@@ -90,6 +86,7 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageResizeService>()
                 .AddTransient<TimelineService>()
                 .AddTransient<IImageValidator, PremiumImageSizeValidator>()
+                .AddTransient<IVideoValidator, VideoValidator>()
                 .AddSingleton(ImageFormatDefinition.Jpeg);
         }
 
@@ -100,7 +97,9 @@ namespace Neptuo.Recollections.Entries
 
         private void ConfigureStorage(IServiceCollection services)
         {
-            services.Configure<StorageOptions>(configuration.GetSection("Storage"));
+            services
+                .Configure<StorageOptions>(configuration.GetSection("Storage"))
+                .Configure<VideoOptions>(configuration.GetSection("Video"));
 
             var fileSystem = configuration.GetSection("Storage").GetSection("FileSystem");
             if (fileSystem.GetValue("Server", StorageFileSystem.Local) == StorageFileSystem.Azure)
