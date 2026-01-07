@@ -35,14 +35,14 @@
 {
     <MonthView Year="@Year.Value" Month="@Month.Value" Context="day">
         <div>
-            <span class="badge bg-light text-dark">
+            <span class="badge">
                 @day
             </span>
         </div>
 
         @foreach (var model in Models.Where(e => e.When.Day == day))
         {
-            <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon">
+            <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon px-1">
                 @model.Title
             </a>
         }

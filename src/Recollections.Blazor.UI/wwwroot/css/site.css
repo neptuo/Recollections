@@ -14519,7 +14519,7 @@ video.pswp__video {
 .calendar .calendar-cell {
   width: 14.2857142857%;
   padding: 0.25rem;
-  border: 0px solid #dee2e6;
+  border: 0px solid var(--bs-secondary-border-subtle);
   border-left-width: 1px;
   border-bottom-width: 1px;
 }
