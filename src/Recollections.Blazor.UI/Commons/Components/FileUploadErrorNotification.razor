@@ -1,0 +1,87 @@
+@using Neptuo.Logging
+@inherits UserStateComponentBase
+@implements IDisposable
+@inject FileUploader FileUploader
+@inject ILog<FileUploadUnfinishedNotification> Log
+@inject IFreeLimitsNotifier FreeLimitsNotifier
+
+<Modal @ref="@UploadError" Title="Upload Error" IsClosable="false">
+    <ChildContent>
+        @{
+            var message = $"Some uploads ({UploadErrors.Count}) finished with errors.";
+        }
+        <Alert Mode="AlertMode.Warning" Message="@message" />
+
+        <div class="list-group mt-3">
+            @foreach (var error in UploadErrors)
+            {
+                <div class="list-group-item list-group-item-action d-flex align-items-center">
+                    <span class="flex-grow-1 text-truncate">
+                        @error.Name
+                        <br />
+                        <small class="text-warning">
+                            @error.ErrorDescription (@error.StatusCode)
+                        </small>
+                    </span>
+                    <span>
+                        <Icon Identifier="trash-alt" OnClick="@(() => DeleteUploadErrorAsync(error))" CssClass="text-danger" />
+                    </span>
+                </div>
+            }
+        </div>
+
+    </ChildContent>
+    <Buttons>
+        <button class="btn btn-primary btn-sm-expand" @onclick="@(() => { UploadError.Hide(); return FileUploader.RetryStoredFilesAsync(UploadErrors.Select(e => e.Id)); })">Retry</button>
+        <button class="btn btn-secondary" @onclick="@(() => { UploadError.Hide(); return FileUploader.ClearStoredFilesAsync(UploadErrors.Select(e => e.Id)); })">
+            <Icon Identifier="trash-alt" CssClass="me-1" />
+            Remove all
+        </button>
+    </Buttons>
+</Modal>
+
+@code {
+    IDisposable uploadListener;
+    Modal UploadError;
+    List<FileUploadProgress> UploadErrors = [];
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        uploadListener = FileUploader.AddProgressListener(OnUploadProgress);
+    }
+
+    public void Dispose()
+        => uploadListener?.Dispose();
+
+    void OnUploadProgress(IReadOnlyCollection<FileUploadProgress> progresses)
+    {
+        Log.Debug($"OnUploadProgressAsync '{progresses.Count}' files");
+
+        if (progresses.All(p => p.Status == "done" || p.Status == "error"))
+        {
+            UploadErrors.Clear();
+            UploadErrors.AddRange(progresses.Where(p => p.Status == "error"));
+            if (UploadErrors.Count > 0)
+            {
+                if (UploadErrors.All(e => e.StatusCode == 402))
+                    FreeLimitsNotifier.Show();
+                else
+                    UploadError.Show();
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    async Task DeleteUploadErrorAsync(FileUploadProgress progress)
+    {
+        await FileUploader.DeleteFileAsync(progress.Id);
+        UploadErrors.Remove(progress);
+
+        if (UploadErrors.Count == 0)
+            UploadError.Hide();
+
+        StateHasChanged();
+    }
+}

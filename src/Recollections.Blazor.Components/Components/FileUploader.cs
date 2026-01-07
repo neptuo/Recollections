@@ -7,23 +7,27 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components;
 
-public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
+public class FileUploader
 {
-    private bool isInitialized;
+    private readonly FileUploadInterop interop;
+    private readonly ILog<FileUploader> log;
+    
     private FileUploadProgress[] lastProgresses;
     private List<Action<FileUploadProgress[]>> progressNotifications = [];
     private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotificationsPerEntity = [];
     private List<Action<string, string, string>> currentEntityListeners = [];
 
+    public FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
+    {
+        this.interop = interop;
+        this.log = log;
+        
+        log.Debug("Initialize");
+        interop.Initialize(this);
+    }
+
     public async Task<IAsyncDisposable> BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
     {
-        if (!isInitialized)
-        {
-            log.Debug("Initialize");
-            interop.Initialize(this);
-            isInitialized = true;
-        }
-
         log.Debug("BindFormAsync");
         await interop.BindFormAsync(
             entityType,

@@ -5,39 +5,3 @@
         @Text
     </button>
 </form>
-
-
-<Modal @ref="@UploadError" Title="Upload Error" IsClosable="false">
-    <ChildContent>
-        @{
-            var message = $"Some uploads ({UploadErrors.Count}) finished with errors.";
-        }
-        <Alert Mode="AlertMode.Warning" Message="@message" />
-
-        <div class="list-group mt-3">
-            @foreach (var error in UploadErrors)
-            {
-                <div class="list-group-item list-group-item-action d-flex align-items-center">
-                    <span class="flex-grow-1 text-truncate">
-                        @error.Name
-                        <br />
-                        <small class="text-warning">
-                            @error.ErrorDescription (@error.StatusCode)
-                        </small>
-                    </span>
-                    <span>
-                        <Icon Identifier="trash-alt" OnClick="@(() => DeleteUploadErrorAsync(error))" CssClass="text-danger" />
-                    </span>
-                </div>
-            }
-        </div>
-
-    </ChildContent>
-    <Buttons>
-        <button class="btn btn-primary btn-sm-expand" @onclick="@(() => { UploadError.Hide(); return FileUploader.RetryStoredFilesAsync(UploadErrors.Select(e => e.Id)); })">Retry</button>
-        <button class="btn btn-secondary" @onclick="@(() => { UploadError.Hide(); return FileUploader.ClearStoredFilesAsync(UploadErrors.Select(e => e.Id)); })">
-            <Icon Identifier="trash-alt" CssClass="me-1" />
-            Remove all
-        </button>
-    </Buttons>
-</Modal>
