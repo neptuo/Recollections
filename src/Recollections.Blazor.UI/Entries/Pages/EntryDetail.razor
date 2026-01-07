@@ -51,7 +51,7 @@
                     <div class="images my-3">
                         @if (Media != null)
                         {
-                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetImageDataAsync" OnOpenInfo="@OnGalleryOpenInfoAsync" />
+                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="@OnGalleryOpenInfoAsync" />
 
                             @foreach (var item in Media)
                             {

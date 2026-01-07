@@ -36,11 +36,11 @@ namespace Neptuo.Recollections.Entries.Pages
         protected EntryPicker EntryPicker { get; set; }
         protected Gallery Gallery { get; set; }
         protected StoryModel Model { get; set; }
-        protected Dictionary<string, List<TimelineEntryModel>> Entries { get; set; } = new();
+        protected Dictionary<string, List<TimelineEntryModel>> Entries { get; set; } = [];
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new();
-        protected List<EntryMediaModel> Media { get; set; }
-        protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
+        protected List<EntryMediaModel> Media { get; set; } = [];
+        protected List<GalleryModel> GalleryItems { get; } = [];
         protected bool SelectLastChapterTitleEdit { get; set; }
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
 
@@ -86,33 +86,37 @@ namespace Neptuo.Recollections.Entries.Pages
             for (int i = 0; i < Model.Chapters.Count; i++)
                 Entries[Model.Chapters[i].Id] = entries[i + 1].Entries;
 
+            await LoadMediaAsync();
+        }
+
+        protected async Task LoadMediaAsync()
+        {
+            Media.Clear();
             Media = await Api.GetStoryMediaAsync(StoryId);
             GalleryItems.Clear();
             foreach (var entry in Media)
             {
                 foreach (var item in entry.Media)
                 {
-                    if (item.Type == "image" && item.Image != null)
+                    if (item.Image != null)
                     {
-                        var image = item.Image;
                         GalleryItems.Add(new GalleryModel()
                         {
                             Type = "image",
-                            Title = image.Name,
-                            Width = image.Preview.Width,
-                            Height = image.Preview.Height
+                            Title = item.Image.Name,
+                            Width = item.Image.Preview.Width,
+                            Height = item.Image.Preview.Height
                         });
                     }
-                    else if (item.Type == "video" && item.Video != null)
+                    else if (item.Video != null)
                     {
-                        var video = item.Video;
                         GalleryItems.Add(new GalleryModel()
                         {
                             Type = "video",
-                            Title = video.Name,
-                            Width = video.Thumbnail.Width,
-                            Height = video.Thumbnail.Height,
-                            ContentType = video.ContentType,
+                            Title = item.Video.Name,
+                            Width = item.Video.Preview.Width,
+                            Height = item.Video.Preview.Height,
+                            ContentType = item.Video.ContentType,
                         });
                     }
                 }
@@ -199,28 +203,37 @@ namespace Neptuo.Recollections.Entries.Pages
             return false;
         }
 
-        protected async Task<Stream> OnGetImageDataAsync(int index, string type)
+        protected Task<Stream> OnGetMediaDataAsync(int index, string type)
         {
-            if (!TryFindMedia(index, out _, out var item))
-                return null;
+            if (TryFindMedia(index, out _, out var item))
+            {
+                if (item.Image != null)
+                {
+                    return Api.GetMediaDataAsync(item.Image.Preview.Url);
+                }
+                else if (item.Video != null)
+                {
+                    if (type == "original")
+                        return Api.GetMediaDataAsync(item.Video.Original.Url);
+                    else
+                        return Api.GetMediaDataAsync(item.Video.Preview.Url);
+                }
+            }
 
-            if (item.Type != "image" || item.Image == null)
-                return null;
-
-            var stream = await Api.GetMediaDataAsync(item.Image.Preview.Url);
-            return stream;
+            return Task.FromResult<Stream>(null);
         }
 
-        protected async Task OpenImageDetailAsync(int index)
+        protected async Task OnGalleryOpenInfoAsync(int index)
         {
             if (!TryFindMedia(index, out var entryId, out var item))
                 return;
 
-            if (item.Type != "image" || item.Image == null)
-                return;
-
             await Gallery.CloseAsync();
-            Navigator.OpenImageDetail(entryId, item.Image.Id);
+            
+            if (item.Image != null)
+                Navigator.OpenImageDetail(entryId, item.Image.Id);
+            else if (item.Video != null)
+                Navigator.OpenVideoDetail(entryId, item.Video.Id);
         }
 
         protected async Task OnBeforeInternalNavigation(LocationChangingContext context)
@@ -266,6 +279,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 ExceptionHandler.Handle(new Exception("Missing required co-owner permission to select the entry"));
             }
 
+            await LoadMediaAsync();
             StateHasChanged();
         }
     }
