@@ -14,7 +14,7 @@ namespace Neptuo.Recollections.Components
     {
         private IAsyncDisposable formBinding;
 
-        public const string DefaultText = "Upload Images";
+        public const string DefaultText = "Upload Media";
 
         [Inject]
         protected FileUploader FileUploader { get; set; }
