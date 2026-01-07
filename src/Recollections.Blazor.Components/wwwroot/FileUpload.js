@@ -362,3 +362,15 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
 export function destroy() {
 
 }
+
+export async function handleShareTarget(e) {
+    const formData = await e.request.formData();
+    const files = formData.getAll("allfiles");
+    const url = e.request.url;
+
+    if (files && files.length > 0) {
+        await storeFiles(files, null, null, null);
+    }
+
+    return Response.redirect(url, 302);
+}
