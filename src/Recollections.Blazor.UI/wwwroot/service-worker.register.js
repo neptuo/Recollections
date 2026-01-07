@@ -35,7 +35,7 @@ window.addEventListener('beforeinstallprompt', function (e) {
 });
 
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+    navigator.serviceWorker.register('service-worker.js', { type: 'module' }).then(function (registration) {
         if (registration.waiting !== null) {
             if (navigator.serviceWorker.controller) {
                 Pwa.updateable();

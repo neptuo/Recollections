@@ -372,5 +372,6 @@ export async function handleShareTarget(e) {
         await storeFiles(files, null, null, null);
     }
 
-    return Response.redirect(url, 302);
+    // return Response.redirect(url, 302);
+    return new Request(url, { method: 'GET' });
 }

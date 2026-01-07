@@ -1,10 +1,12 @@
-﻿// In development, always fetch from the network and do not enable offline support.
+﻿import * as FileUpload from './_content/Recollections.Blazor.Components/FileUpload.js';
+
+// In development, always fetch from the network and do not enable offline support.
 // This is because caching would make development more difficult (changes would not
 // be reflected on the first load after each change).
 self.addEventListener('fetch', async event => {
     if (event.request.method === "POST") {
-        var fileUpload = await import('./_content/Recollections.Blazor.Components/FileUpload.js');
-        return fileUpload.handleShareTarget(event);
+        // TODO: Trigger it only for share target URL (= /)
+        return FileUpload.handleShareTarget(event);
     }
 });
 
