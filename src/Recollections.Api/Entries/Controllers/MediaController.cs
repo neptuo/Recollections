@@ -74,6 +74,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPost]
+        [RequestSizeLimit(200_000_000)]
         public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
             string userId = HttpContext.User.FindUserId();
