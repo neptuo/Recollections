@@ -38,7 +38,7 @@
             <div class="my-3">
                 <InlineMarkdownEdit Value="@Model.Description" PlaceHolder="No description..." ValueChanged="@(async value => await SaveDescriptionAsync(value))" />
             </div>
-            <EntryImage EntryId="@EntryId" Image="@Model" Type="@MediaType.Preview" />
+            <EntryMedia EntryId="@EntryId" Image="@Model" Type="@MediaType.Preview" />
         </div>
 
         <LocationEdit @ref="LocationEdit" Save="@(async location => await SaveLocationAsync(location))" Delete="@OnClearLocationAsync" />

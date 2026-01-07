@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class EntryImage
+    public partial class EntryMedia
     {
         private bool hasSourceChanged;
         private string url;
@@ -32,7 +32,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected ImageInterop ImageInterop { get; set; }
 
         [Inject]
-        protected ILog<EntryImage> Log { get; set; }
+        protected ILog<EntryMedia> Log { get; set; }
 
         [Inject]
         protected ExceptionPanelSuppression ExceptionPanelSuppression { get; set; }
@@ -60,7 +60,7 @@ namespace Neptuo.Recollections.Entries.Components
         public string PlaceHolderCssClass { get; set; }
 
         [Parameter]
-        public EntryImagePlaceHolderState PlaceHolderState { get; set; }
+        public EntryMediaPlaceHolderState PlaceHolderState { get; set; }
 
         [Parameter]
         public RenderFragment ThumbnailContent { get; set; }

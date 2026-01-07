@@ -453,24 +453,24 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadBeingsAsync();
         }
 
-        private EntryImagePlaceHolderState GetImagePlaceHolderState(FileUploadProgress progress)
+        private EntryMediaPlaceHolderState GetImagePlaceHolderState(FileUploadProgress progress)
         {
             if (progress.IsError)
-                return EntryImagePlaceHolderState.Error;
+                return EntryMediaPlaceHolderState.Error;
 
             if (progress.IsPending)
-                return EntryImagePlaceHolderState.Pending;
+                return EntryMediaPlaceHolderState.Pending;
 
             if (progress.IsCurrent && progress.Percentual > 0 && progress.Percentual < 100)
-                return EntryImagePlaceHolderState.Progress;
+                return EntryMediaPlaceHolderState.Progress;
 
             if (progress.IsCurrent && progress.Percentual == 100)
-                return EntryImagePlaceHolderState.Finished;
+                return EntryMediaPlaceHolderState.Finished;
 
             if (progress.IsDone)
-                return EntryImagePlaceHolderState.Success;
+                return EntryMediaPlaceHolderState.Success;
 
-            return EntryImagePlaceHolderState.None;
+            return EntryMediaPlaceHolderState.None;
         }
         
         private async Task OnGalleryOpenInfoAsync(int index)

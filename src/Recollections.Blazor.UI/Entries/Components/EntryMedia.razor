@@ -70,17 +70,17 @@
 
     string GetPlaceHolderIcon() 
     {
-        if ((PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
+        if ((PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
             return null;
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound)
             return "triangle-exclamation";
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Pending)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Pending)
             return "hourglass-start";
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Progress)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Progress)
             return "hourglass-half";
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Finished)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Finished)
             return "hourglass-end";
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Success)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Success)
             return "check";
 
         return null;
@@ -95,11 +95,11 @@
         if (isAlert)
             result.Append(" alert m-0");
 
-        if ((PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
+        if ((PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
             result.Append(" alert-secondary");
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Error || IsLoadingNotFound)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound)
             result.Append(" alert-danger");
-        else if (PlaceHolderState == EntryImagePlaceHolderState.Success)
+        else if (PlaceHolderState == EntryMediaPlaceHolderState.Success)
             result.Append(" alert-success");
         else if (PlaceHolderCssClass == null)
             result.Append(" placeholder");

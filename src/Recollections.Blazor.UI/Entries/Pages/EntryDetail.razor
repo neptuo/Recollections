@@ -69,13 +69,13 @@
                                     onClick = () => { Navigator.OpenVideoDetail(EntryId, item.Video.Id); };
                                 }
                                 
-                                <EntryImage @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
+                                <EntryMedia @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
                                     <ThumbnailContent>
                                         <button class="btn btn-outline-primary border-0 p-0" @onclick="@onClick" @onclick:stopPropagation="true">
                                             <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
                                         </button>
                                     </ThumbnailContent>
-                                </EntryImage>
+                                </EntryMedia>
                             }
                         }
 
@@ -86,20 +86,14 @@
                                 @if (upload.IsDone && upload.Tag != null)
                                 {
                                     var uploadMedia = upload.Tag as MediaModel;
-                                    if (uploadMedia?.Type == "image" && uploadMedia.Image != null)
+                                    if (uploadMedia.Image != null || uploadMedia.Video != null)
                                     {
-                                        <EntryImage Image="@uploadMedia.Image" />
-                                    }
-                                    else if (uploadMedia?.Type == "video" && uploadMedia.Video != null)
-                                    {
-                                        <div class="image justify-content-center">
-                                            <img class="rounded ratio ratio-4x3" src="@uploadMedia.Video.Thumbnail.Url" />
-                                        </div>
+                                        <EntryMedia Image="@uploadMedia.Image" Video="@uploadMedia.Video" />
                                     }
                                 }
                                 else
                                 {
-                                    <EntryImage
+                                    <EntryMedia
                                         PlaceHolder="@upload.StatusDescription"
                                         PlaceHolderCssClass="@(upload.IsCurrent ? (upload.Percentual == 0 ? "loading-circle" : $"text-primary") : "")"
                                         PlaceHolderState="@GetImagePlaceHolderState(upload)"

@@ -1,6 +1,6 @@
 namespace Neptuo.Recollections.Entries.Components;
 
-public enum EntryImagePlaceHolderState
+public enum EntryMediaPlaceHolderState
 {
     None,
     Pending,
