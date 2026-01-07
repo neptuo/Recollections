@@ -20,21 +20,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly VideoService videoService;
         private readonly IUserNameProvider userNames;
         private readonly FreeLimitsChecker freeLimits;
-        private readonly VideoOptions videoOptions;
+        private readonly StorageOptions storageOptions;
 
-        public MediaController(DataContext db, ImageService imageService, VideoService videoService, IOptions<VideoOptions> videoOptions, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
+        public MediaController(DataContext db, ImageService imageService, VideoService videoService, IOptions<StorageOptions> storageOptions, ShareStatusService shareStatus, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(imageService, "imageService");
             Ensure.NotNull(videoService, "videoService");
-            Ensure.NotNull(videoOptions, "videoOptions");
+            Ensure.NotNull(storageOptions, "storageOptions");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(freeLimits, "freeLimits");
             this.db = db;
             this.imageService = imageService;
             this.videoService = videoService;
-            this.videoOptions = videoOptions.Value;
+            this.storageOptions = storageOptions.Value;
             this.userNames = userNames;
             this.freeLimits = freeLimits;
         }
@@ -83,8 +83,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             // decide by extension
             string extension = System.IO.Path.GetExtension(file.FileName)?.ToLowerInvariant();
-            bool isVideo = extension != null && videoOptions.IsSupportedExtension(extension);
-
+            bool isVideo = extension != null && storageOptions.Videos.IsSupportedExtension(extension);
             if (isVideo)
             {
                 if (!await freeLimits.CanCreateVideoAsync(userId, entryId))

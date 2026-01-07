@@ -25,11 +25,11 @@ namespace Neptuo.Recollections.Entries
 
         protected override async Task<bool> IsValidSizeAsync(string userId, long fileLength)
         {
-            if (configuration.PremiumMaxLength != null)
+            if (configuration.Images.PremiumMaxLength != null)
             {
                 bool hasPremium = await premiumProvider.HasPremiumAsync(userId);
                 if (hasPremium)
-                    return fileLength <= configuration.PremiumMaxLength.Value;
+                    return fileLength <= configuration.Images.PremiumMaxLength.Value;
             }
 
             return await base.IsValidSizeAsync(userId, fileLength);

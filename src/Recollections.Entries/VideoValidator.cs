@@ -6,9 +6,9 @@ namespace Neptuo.Recollections.Entries
 {
     public class VideoValidator : IVideoValidator
     {
-        private readonly VideoOptions configuration;
+        private readonly StorageOptions configuration;
 
-        public VideoValidator(IOptions<VideoOptions> configuration)
+        public VideoValidator(IOptions<StorageOptions> configuration)
         {
             Ensure.NotNull(configuration, "configuration");
             this.configuration = configuration.Value;
@@ -16,11 +16,11 @@ namespace Neptuo.Recollections.Entries
 
         public Task ValidateAsync(string userId, IFileInput file)
         {
-            if (file.Length > configuration.MaxLength)
+            if (file.Length > configuration.Videos.MaxLength)
                 throw new VideoMaxLengthExceededException();
 
             string extension = Path.GetExtension(file.FileName)?.ToLowerInvariant();
-            if (extension == null || !configuration.IsSupportedExtension(extension))
+            if (extension == null || !configuration.Videos.IsSupportedExtension(extension))
                 throw new VideoNotSupportedExtensionException();
 
             return Task.CompletedTask;

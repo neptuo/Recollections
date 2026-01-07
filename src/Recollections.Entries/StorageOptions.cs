@@ -9,6 +9,12 @@ namespace Neptuo.Recollections.Entries
 {
     public class StorageOptions
     {
+        public MediaOptions Images { get; set; }
+        public MediaOptions Videos { get; set; }
+    }
+
+    public class MediaOptions
+    {
         public int MaxLength { get; set; }
         public int? PremiumMaxLength { get; set; }
 
@@ -21,9 +27,5 @@ namespace Neptuo.Recollections.Entries
 
             return SupportedExtensions.Contains(extension);
         }
-    }
-
-    public class VideoOptions : StorageOptions
-    {
     }
 }

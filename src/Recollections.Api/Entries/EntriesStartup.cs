@@ -98,8 +98,7 @@ namespace Neptuo.Recollections.Entries
         private void ConfigureStorage(IServiceCollection services)
         {
             services
-                .Configure<StorageOptions>(configuration.GetSection("Storage"))
-                .Configure<VideoOptions>(configuration.GetSection("Video"));
+                .Configure<StorageOptions>(configuration.GetSection("Storage"));
 
             var fileSystem = configuration.GetSection("Storage").GetSection("FileSystem");
             if (fileSystem.GetValue("Server", StorageFileSystem.Local) == StorageFileSystem.Azure)

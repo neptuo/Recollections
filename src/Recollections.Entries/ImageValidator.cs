@@ -29,7 +29,7 @@ namespace Neptuo.Recollections.Entries
         }
 
         protected virtual Task<bool> IsValidSizeAsync(string userId, long fileLength)
-            => Task.FromResult(fileLength <= configuration.MaxLength);
+            => Task.FromResult(fileLength <= configuration.Images.MaxLength);
 
         protected virtual Task<bool> IsValidExtensionAsync(string userId, string extension)
         {
@@ -37,7 +37,7 @@ namespace Neptuo.Recollections.Entries
                 return Task.FromResult(false);
 
             extension = extension.ToLowerInvariant();
-            if (!configuration.IsSupportedExtension(extension))
+            if (!configuration.Images.IsSupportedExtension(extension))
                 return Task.FromResult(false);
 
             return Task.FromResult(true);
