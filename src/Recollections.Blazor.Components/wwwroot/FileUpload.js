@@ -305,12 +305,12 @@ export async function getEntityStoredFiles(entityType, entityId) {
         if (p.entityType !== entityType || p.entityId !== entityId)
             return;
 
-        const index = storedFiles.findIndex(f => f.file.name === p.name);
+        const index = storedFiles.findIndex(f => f?.file.name === p.name);
         if (index >= 0) {
-            storedFiles.removeAt(index);
+            delete storedFiles[index];
         }
     });
-    return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
+    return storedFiles.filter(f => f != null).map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 
 export async function retryEntityQueue(entityType, entityId) {
