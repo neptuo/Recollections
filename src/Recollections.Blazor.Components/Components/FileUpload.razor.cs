@@ -22,10 +22,6 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected ILog<FileUpload> Log { get; set; }
 
-        [Inject]
-        protected IFreeLimitsNotifier FreeLimitsNotifier { get; set; }
-
-        private IDisposable previousUploadListener;
         private string previousEntityType;
         private string previousEntityId;
 
@@ -56,17 +52,6 @@ namespace Neptuo.Recollections.Components
             return base.SetParametersAsync(parameters);
         }
 
-        protected override async Task OnParametersSetAsync()
-        {
-            await base.OnParametersSetAsync();
-
-            if (previousEntityType != EntityType || previousEntityId != EntityId)
-            {
-                previousUploadListener?.Dispose();
-                previousUploadListener = FileUploader.AddProgressListener(EntityType, EntityId, OnUploadProgress);
-            }
-        }
-
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("OnAfterRenderAsync");
@@ -81,37 +66,6 @@ namespace Neptuo.Recollections.Components
         {
             if (formBinding != null)
                 await formBinding.DisposeAsync();
-        }
-
-        protected void OnUploadProgress(IReadOnlyCollection<FileUploadProgress> progresses)
-        {
-            Log.Debug($"OnUploadProgressAsync '{progresses.Count}' files");
-
-            if (progresses.All(p => p.Status == "done" || p.Status == "error"))
-            {
-                UploadErrors.Clear();
-                UploadErrors.AddRange(progresses.Where(p => p.Status == "error"));
-                if (UploadErrors.Count > 0)
-                {
-                    if (UploadErrors.All(e => e.StatusCode == 402))
-                        FreeLimitsNotifier.Show();
-                    else
-                        UploadError.Show();
-                }
-            }
-
-            StateHasChanged();
-        }
-
-        protected async Task DeleteUploadErrorAsync(FileUploadProgress progress)
-        {
-            await FileUploader.DeleteFileAsync(progress.Id);
-            UploadErrors.Remove(progress);
-
-            if (UploadErrors.Count == 0)
-                UploadError.Hide();
-
-            StateHasChanged();
         }
     }
 }
