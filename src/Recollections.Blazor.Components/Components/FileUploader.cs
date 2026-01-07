@@ -115,38 +115,24 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
         });
     }
 
-    public Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync(string entityType, string entityId)
-    {
-        return interop.GetStoredFilesToRetryAsync(entityType, entityId);
-    }
+    public Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync()
+        => interop.GetStoredFilesToRetryAsync();
 
     public Task<FileUploadToRetry[]> GetUnassignedSharedFilesAsync()
-    {
-        return interop.GetUnassignedSharedFilesAsync();
-    }
+        => interop.GetUnassignedSharedFilesAsync();
 
-    public Task RetryEntityQueueAsync(string entityType, string entityId)
-    {
-        return interop.RetryEntityQueueAsync(entityType, entityId);
-    }
+    public Task RetryStoredFilesAsync(IEnumerable<string> ids)
+        => interop.RetryStoredFilesAsync(ids);
 
-    public Task ClearEntityQueueAsync(string entityType, string entityId)
-    {
-        return interop.ClearEntityQueueAsync(entityType, entityId);
-    }
+    public Task ClearStoredFilesAsync(IEnumerable<string> ids)
+        => interop.ClearStoredFilesAsync(ids);
 
-    public Task DeleteFileAsync(string fileId)
-    {
-        return interop.DeleteFileAsync(fileId);
-    }
+    public Task DeleteFileAsync(string id)
+        => interop.DeleteFileAsync(id);
 
     public Task SetBearerTokenAsync(string userId, string bearerToken)
-    {
-        return interop.SetBearerTokenAsync(userId, bearerToken);
-    }
+        => interop.SetBearerTokenAsync(userId, bearerToken);
 
     public Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
-    {
-        return interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
-    }
+        => interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
 }

@@ -55,7 +55,7 @@ async function storeFiles(files, actionUrl, entityType, entityId) {
     return Promise.all(promises);
 }
 
-async function getStoredFilesByEntity(entityType, entityId) {
+async function getStoredFilesByFlag(assigned) {
     const db = await initializeDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
@@ -64,16 +64,20 @@ async function getStoredFilesByEntity(entityType, entityId) {
         
         // Use cursor to filter by both entityType and entityId
         const request = store.openCursor();
-        const checkUserId = entityType != undefined && entityId != undefined;
         
         request.onsuccess = (event) => {
             const cursor = event.target.result;
             if (cursor) {
                 const fileData = cursor.value;
 
-                if ((!checkUserId || fileData.userId == userId) && fileData.entityType === entityType && fileData.entityId === entityId) {
-                    // Files added through entity upload form
-                    results.push(fileData);
+                if (assigned) {
+                    if (fileData.userId == userId && fileData.entityType != null && fileData.entityId != null) {
+                        results.push(fileData);
+                    }
+                } else {
+                    if (fileData.entityType == null && fileData.entityId == null) {
+                        results.push(fileData);
+                    }
                 }
 
                 cursor.continue();
@@ -86,7 +90,7 @@ async function getStoredFilesByEntity(entityType, entityId) {
     });
 }
 
-async function removeStoredFiles(id) {
+async function removeStoredFile(id) {
     const db = await initializeDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
@@ -160,7 +164,7 @@ class EntityUploadQueue {
                 (response) => {
                     // Remove successfully uploaded file from IndexedDB
                     if (storedFile.id) {
-                        removeStoredFiles(storedFile.id);
+                        removeStoredFile(storedFile.id);
                     }
 
                     this.uploadStep(response);
@@ -303,12 +307,9 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
     }
 }
 
-export async function getEntityStoredFiles(entityType, entityId) {
-    const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+export async function getStoredFiles() {
+    const storedFiles = await getStoredFilesByFlag(true);
     queue.progress.forEach(p => {
-        if (p.entityType !== entityType || p.entityId !== entityId)
-            return;
-
         const index = storedFiles.findIndex(f => f?.file.name === p.name);
         if (index >= 0) {
             delete storedFiles[index];
@@ -318,30 +319,36 @@ export async function getEntityStoredFiles(entityType, entityId) {
 }
 
 export async function getUnassignedSharedFiles() {
-    const storedFiles = await getStoredFilesByEntity();
+    const storedFiles = await getStoredFilesByFlag(false);
     return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 
-export async function retryEntityQueue(entityType, entityId) {
-    const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+export async function retryStoredFiles(ids) {
+    let storedFiles = await getStoredFilesByFlag(true);
+    if (ids && ids.length > 0) {
+        storedFiles = storedFiles.filter(f => ids.includes(`${f.id}`));
+    }
     if (storedFiles.length > 0) {
         queue.addStoredFilesToQueue(storedFiles);
     }
 }
 
-export async function clearEntityQueue(entityType, entityId) {
-    const storedFiles = await getStoredFilesByEntity(entityType, entityId);
+export async function clearStoredFiles(ids) {
+    let storedFiles = await getStoredFilesByFlag(true);
+    if (ids && ids.length > 0) {
+        storedFiles = storedFiles.filter(f => ids.includes(`${f.id}`));
+    }
     if (storedFiles.length > 0) {
-        await Promise.all(storedFiles.map(f => removeStoredFiles(f.id)));
+        await Promise.all(storedFiles.map(f => removeStoredFile(f.id)));
     }
 }
 
 export function deleteFile(id) {
-    return removeStoredFiles(Number.parseInt(id));
+    return removeStoredFile(Number.parseInt(id));
 }
 
 export async function uploadUnassignedFilesTo(entityType, entityId, url) {
-    const unassignedFiles = await getStoredFilesByEntity();
+    const unassignedFiles = await getStoredFilesByFlag(false);
     if (!unassignedFiles || unassignedFiles.length === 0) {
         return;
     }
@@ -349,7 +356,7 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
     const items = unassignedFiles.map(f => f.file);
     queue.storeAndQueueFiles(items, url, entityType, entityId);
 
-    await Promise.all(unassignedFiles.map(f => removeStoredFiles(f.id)));
+    await Promise.all(unassignedFiles.map(f => removeStoredFile(f.id)));
 }
 
 export function destroy() {

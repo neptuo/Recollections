@@ -15,7 +15,6 @@ namespace Neptuo.Recollections.Components
     {
         private readonly IJSRuntime js;
         private IJSObjectReference module;
-        private bool isInitialized = false;
         private readonly ILog<FileUploadInterop> log;
         private FileUploader uploader;
 
@@ -33,19 +32,9 @@ namespace Neptuo.Recollections.Components
         private async Task EnsureModuleAsync()
         {
             if (module == null)
-                module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
-        }
-
-        public void Initialize(FileUploader uploader)
-            => this.uploader = uploader;
-
-        public async Task BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
-        {
-            await EnsureModuleAsync();
-            
-            if (!isInitialized)
             {
-                isInitialized = true;
+                module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/FileUpload.js");
+            
                 await module.InvokeVoidAsync(
                     "initialize",
                     DotNetObjectReference.Create(this)
@@ -54,6 +43,14 @@ namespace Neptuo.Recollections.Components
                 if (!string.IsNullOrEmpty(bearerToken))
                     await SetBearerTokenAsync(userId, bearerToken);
             }
+        }
+
+        public void Initialize(FileUploader uploader)
+            => this.uploader = uploader;
+
+        public async Task BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
+        {
+            await EnsureModuleAsync();
 
             await module.InvokeVoidAsync(
                 "bindForm",
@@ -79,10 +76,10 @@ namespace Neptuo.Recollections.Components
             uploader.OnProgress(index, total, loaded);
         }
 
-        public async Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync(string entityType, string entityId)
+        public async Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync()
         {
             await EnsureModuleAsync();
-            return await module.InvokeAsync<FileUploadToRetry[]>("getEntityStoredFiles", entityType, entityId);
+            return await module.InvokeAsync<FileUploadToRetry[]>("getStoredFiles");
         }
 
         public async Task<FileUploadToRetry[]> GetUnassignedSharedFilesAsync()
@@ -91,16 +88,16 @@ namespace Neptuo.Recollections.Components
             return await module.InvokeAsync<FileUploadToRetry[]>("getUnassignedSharedFiles");
         }
 
-        public async Task RetryEntityQueueAsync(string entityType, string entityId)
+        public async Task RetryStoredFilesAsync(IEnumerable<string> ids)
         {
             await EnsureModuleAsync();
-            await module.InvokeVoidAsync("retryEntityQueue", entityType, entityId);
+            await module.InvokeVoidAsync("retryStoredFiles", ids);
         }
 
-        public async Task ClearEntityQueueAsync(string entityType, string entityId)
+        public async Task ClearStoredFilesAsync(IEnumerable<string> ids)
         {
             await EnsureModuleAsync();
-            await module.InvokeVoidAsync("clearEntityQueue", entityType, entityId);
+            await module.InvokeVoidAsync("clearStoredFiles", ids);
         }
 
         public async Task DeleteFileAsync(string fileId)
