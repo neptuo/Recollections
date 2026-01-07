@@ -64,14 +64,18 @@ async function getStoredFilesByEntity(entityType, entityId) {
         
         // Use cursor to filter by both entityType and entityId
         const request = store.openCursor();
+        const checkUserId = entityType != undefined && entityId != undefined;
         
         request.onsuccess = (event) => {
             const cursor = event.target.result;
             if (cursor) {
                 const fileData = cursor.value;
-                if (fileData.userId == userId && fileData.entityType === entityType && fileData.entityId === entityId) {
+
+                if ((!checkUserId || fileData.userId == userId) && fileData.entityType === entityType && fileData.entityId === entityId) {
+                    // Files added through entity upload form
                     results.push(fileData);
                 }
+
                 cursor.continue();
             } else {
                 resolve(results);
@@ -313,6 +317,11 @@ export async function getEntityStoredFiles(entityType, entityId) {
     return storedFiles.filter(f => f != null).map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
 }
 
+export async function getUnassignedSharedFiles() {
+    const storedFiles = await getStoredFilesByEntity();
+    return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
+}
+
 export async function retryEntityQueue(entityType, entityId) {
     const storedFiles = await getStoredFilesByEntity(entityType, entityId);
     if (storedFiles.length > 0) {
@@ -329,6 +338,18 @@ export async function clearEntityQueue(entityType, entityId) {
 
 export function deleteFile(id) {
     return removeStoredFiles(Number.parseInt(id));
+}
+
+export async function uploadUnassignedFilesTo(entityType, entityId, url) {
+    const unassignedFiles = await getStoredFilesByEntity();
+    if (!unassignedFiles || unassignedFiles.length === 0) {
+        return;
+    }
+
+    const items = unassignedFiles.map(f => f.file);
+    queue.storeAndQueueFiles(items, url, entityType, entityId);
+
+    await Promise.all(unassignedFiles.map(f => removeStoredFiles(f.id)));
 }
 
 export function destroy() {

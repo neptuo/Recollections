@@ -13,6 +13,7 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     private FileUploadProgress[] lastProgresses;
     private List<Action<FileUploadProgress[]>> progressNotifications = [];
     private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotificationsPerEntity = [];
+    private List<Action<string, string, string>> currentEntityListeners = [];
 
     public async Task<IAsyncDisposable> BindFormAsync(string entityType, string entityId, string url, ElementReference formElement, ElementReference dragAndDropContainer)
     {
@@ -32,8 +33,14 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
             dragAndDropContainer
         );
 
+        currentEntityListeners.ForEach(l => l(entityType, entityId, url));
+
         // TODO: Create disposable to unbind the form.
-        return new AsyncDisposableAction(() => Task.CompletedTask);
+        return new AsyncDisposableAction(() => 
+        {
+            currentEntityListeners.ForEach(l => l(null, null, null));
+            return Task.CompletedTask;
+        });
     }
 
     private void RaiseProgressNotification(FileUploadProgress[] progresses)
@@ -97,9 +104,25 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
         });
     }
 
+    public IDisposable AddCurrentEntityListener(Action<string, string, string> listener)
+    {
+        currentEntityListeners.Add(listener);
+        log.Debug($"AddCurrentEntityListener contains '{currentEntityListeners.Count}' listeners");
+        return new DisposableAction(() =>
+        {
+            currentEntityListeners.Remove(listener);
+            log.Debug($"RemoveCurrentEntityListener remaining '{currentEntityListeners.Count}' listeners");
+        });
+    }
+
     public Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync(string entityType, string entityId)
     {
         return interop.GetStoredFilesToRetryAsync(entityType, entityId);
+    }
+
+    public Task<FileUploadToRetry[]> GetUnassignedSharedFilesAsync()
+    {
+        return interop.GetUnassignedSharedFilesAsync();
     }
 
     public Task RetryEntityQueueAsync(string entityType, string entityId)
@@ -120,5 +143,10 @@ public class FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     public Task SetBearerTokenAsync(string userId, string bearerToken)
     {
         return interop.SetBearerTokenAsync(userId, bearerToken);
+    }
+
+    public Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
+    {
+        return interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
     }
 }

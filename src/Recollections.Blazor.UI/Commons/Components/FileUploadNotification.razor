@@ -5,7 +5,7 @@
             var currentCount = files.Count(p => p.Status == "current");
             var currentAndFinishedCount = files.Count(p => p.Status == "current" || p.Status == "done" || p.Status == "error");
             var currentPercentage = files.Where(p => p.Status == "current").Sum(p => p.Percentual) / currentCount;
-            <div class="container flex-nowrap sticky-top pb-2 bg-body file-progress-global" style="">
+            <div class="container flex-nowrap sticky-top pb-2 bg-body file-progress-global">
                 <div class="alert alert-secondary mb-0">
                     <div class="d-flex align-items-center mb-1">
                         <span>
