@@ -213,7 +213,6 @@ export function initialize(intr, i) {
                     const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index, "");
                     const arrayBuffer = await stream.arrayBuffer();
                     const blob = new Blob([arrayBuffer], {
-                        // type: model.contentType || (type === 'video' ? "video/mp4" : "image/png")
                         type: "image/png"
                     });
                     const url = URL.createObjectURL(blob);
@@ -223,17 +222,6 @@ export function initialize(intr, i) {
                     resolve(url);
                 });
             }
-
-            // if (type === 'video') {
-            //     // PhotoSwipe will render this HTML instead of treating it as an image.
-            //     // Src is injected asynchronously via ensureVideoSrc (from .NET stream interop).
-            //     const actualSize = (model.width && model.height) ? `width:${model.width}px;height:${model.height}px;` : '';
-            //     e.itemData.html = `<video data-pswp-index="${e.index}" controls playsinline preload style="min-width:200px;min-height:150px;max-width:100%;max-height:calc(100% - 100px);display:block;margin:40px auto;"></video>`;
-
-            //     // Ensure src gets set once the slide is in DOM.
-            //     setTimeout(() => ensureVideoSrc(e.index), 0);
-            //     return;
-            // }
         });
 
         lightbox.init();

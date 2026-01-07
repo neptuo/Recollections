@@ -207,7 +207,7 @@ namespace Neptuo.Recollections.Entries.Pages
             if (item.Type != "image" || item.Image == null)
                 return null;
 
-            var stream = await Api.GetImageDataAsync(item.Image.Preview.Url);
+            var stream = await Api.GetMediaDataAsync(item.Image.Preview.Url);
             return stream;
         }
 

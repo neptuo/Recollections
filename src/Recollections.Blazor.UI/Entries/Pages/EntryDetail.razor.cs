@@ -237,7 +237,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 var image = item.Image;
                 Log.Debug($"Get image for gallery at '{index}' (count '{Media.Count}'), URL is '{image.Preview.Url}'.");
 
-                var stream = await Api.GetImageDataAsync(image.Preview.Url);
+                var stream = await Api.GetMediaDataAsync(image.Preview.Url);
                 Log.Debug($"Got image data for gallery at '{index}'");
 
                 return stream;
@@ -245,9 +245,9 @@ namespace Neptuo.Recollections.Entries.Pages
             else if (item.Video != null)
             {
                 if (type == "original")
-                    return await Api.GetVideoDataAsync(item.Video.Original.Url);
+                    return await Api.GetMediaDataAsync(item.Video.Original.Url);
                 else
-                    return await Api.GetVideoDataAsync(item.Video.Preview.Url);
+                    return await Api.GetMediaDataAsync(item.Video.Preview.Url);
             }
 
             return null;

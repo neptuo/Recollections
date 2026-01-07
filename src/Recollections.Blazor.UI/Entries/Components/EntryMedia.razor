@@ -1,7 +1,6 @@
-﻿@using Neptuo.Logging
-@using System.Text
+﻿@using System.Text
 
-<div class="@GetContainerCssClass()">
+<div class="image justify-content-center @(!IsLoadingNotFound && Content == null && PlaceHolder == null ? "placeholder-glow" : "")">
     @if (OnClick.HasDelegate)
     {
         <a href="@GetLinkUrl()" class="position-relative w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
@@ -21,33 +20,28 @@
 
 @code
 {
-    string GetContainerCssClass()
-    {
-        var result = new StringBuilder();
-        result.Append("image justify-content-center");
-
-        if (!IsLoadingNotFound && Content == null && PlaceHolder == null)
-            result.Append(" placeholder-glow");
-
-        return result.ToString();
-    }
-
     RenderFragment RenderImage() 
     {
         if (Content != null)
         {
-            return @<img @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" />;
+            if (IsVideoContent)
+                return @<video @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" controls playsinline preload />;
+
+            Action onClick = null;
+            if (ClickToPlay && Video != null)
+                onClick = DownloadVideo;
+
+            return @<img @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" @onclick="@onClick" />;
         }
 
         return @<div class="@GetPlaceHolderContainerCssClass()">
             @if (IsLoadingNotFound || PlaceHolder != null)
             {
-                var icon = GetPlaceHolderIcon();
                 <div class="d-flex justify-content-center align-items-center">
                     <span class="status text-center @PlaceHolderCssClass">
-                        @if (icon != null)
+                        @if (Image != null)
                         {
-                            <Icon Prefix="fas" Identifier="@icon" CssClass="d-block fs-2" />
+                            <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
                         }
                         else if (Video != null)
                         {
@@ -61,18 +55,12 @@
         </div>;
     }
 
-    string GetPlaceHolder() => IsLoadingNotFound 
-        ? (Image == null && Video != null 
-            ? "" 
-            : "Not found"
-        )
-        : PlaceHolder;
+    string GetPlaceHolder()
+        => IsLoadingNotFound ? "Not found" : PlaceHolder;
 
     string GetPlaceHolderIcon() 
     {
-        if ((PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound) && Image == null && Video != null)
-            return null;
-        else if (PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound)
+        if (PlaceHolderState == EntryMediaPlaceHolderState.Error || IsLoadingNotFound)
             return "triangle-exclamation";
         else if (PlaceHolderState == EntryMediaPlaceHolderState.Pending)
             return "hourglass-start";
@@ -86,9 +74,11 @@
         return null;
     }
 
+    StringBuilder PlaceHolderContainerCssClassBuilder = new();
+
     string GetPlaceHolderContainerCssClass()
     {
-        var result = new StringBuilder();
+        var result = PlaceHolderContainerCssClassBuilder.Clear();
         result.Append($"img rounded {(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")}");
 
         bool isAlert = IsLoadingNotFound || PlaceHolderCssClass != null;

@@ -87,7 +87,7 @@ namespace Neptuo.Recollections.Entries
         public Task<AuthorizedModel<ImageModel>> GetImageAsync(string entryId, string imageId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ImageModel>>($"entries/{entryId}/images/{imageId}"));
 
-        public Task<Stream> GetImageDataAsync(string url)
+        public Task<Stream> GetMediaDataAsync(string url)
             => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
 
         public Task UpdateImageAsync(string entryId, ImageModel model)
@@ -197,8 +197,5 @@ namespace Neptuo.Recollections.Entries
 
         public Task SetVideoLocationFromOriginalAsync(string entryId, string videoId)
             => faultHandler.Wrap(http.PostAsync($"entries/{entryId}/videos/{videoId}/set-location-from-original", new StringContent(String.Empty)));
-
-        public Task<Stream> GetVideoDataAsync(string url)
-            => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
     }
 }
