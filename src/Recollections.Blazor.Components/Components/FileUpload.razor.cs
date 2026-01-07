@@ -49,9 +49,6 @@ namespace Neptuo.Recollections.Components
         protected Modal UploadError { get; set; }
         protected List<FileUploadProgress> UploadErrors { get; } = [];
 
-        protected Modal UploadRetry { get; set; }
-        protected List<FileUploadToRetry> UploadRetries { get; } = [];
-
         public override Task SetParametersAsync(ParameterView parameters)
         {
             previousEntityType = EntityType;
@@ -65,10 +62,6 @@ namespace Neptuo.Recollections.Components
 
             if (previousEntityType != EntityType || previousEntityId != EntityId)
             {
-                var storedFiles = await FileUploader.GetStoredFilesToRetryAsync(EntityType, EntityId);
-                if (storedFiles.Length > 0)
-                    OnStoredFilesDetected(storedFiles);
-
                 previousUploadListener?.Dispose();
                 previousUploadListener = FileUploader.AddProgressListener(EntityType, EntityId, OnUploadProgress);
             }
@@ -88,14 +81,6 @@ namespace Neptuo.Recollections.Components
         {
             if (formBinding != null)
                 await formBinding.DisposeAsync();
-        }
-
-        protected void OnStoredFilesDetected(IReadOnlyCollection<FileUploadToRetry> retries)
-        {
-            Log.Debug($"OnStoredFilesDetected '{retries.Count}' files");
-            UploadRetries.Clear();
-            UploadRetries.AddRange(retries);
-            UploadRetry.Show();
         }
 
         protected void OnUploadProgress(IReadOnlyCollection<FileUploadProgress> progresses)
@@ -126,17 +111,6 @@ namespace Neptuo.Recollections.Components
             if (UploadErrors.Count == 0)
                 UploadError.Hide();
 
-            StateHasChanged();
-        }
-        
-        protected async Task DeleteUploadToRetryAsync(FileUploadToRetry retry)
-        {
-            await FileUploader.DeleteFileAsync(retry.Id);
-            UploadRetries.Remove(retry);
-
-            if (UploadRetries.Count == 0)
-                UploadRetry.Hide();
-                
             StateHasChanged();
         }
     }

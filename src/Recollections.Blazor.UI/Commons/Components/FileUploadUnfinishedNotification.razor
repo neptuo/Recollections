@@ -1,0 +1,65 @@
+@using Neptuo.Logging
+@inherits UserStateComponentBase
+@inject FileUploader FileUploader
+@inject ILog<FileUploadUnfinishedNotification> Log
+
+<Modal @ref="@UploadRetry" Title="Unfinished files from last time" IsClosable="false">
+    <ChildContent>
+        <Alert Mode="AlertMode.Warning" Message="@($"Some uploads ({UploadRetries.Count}) did not finish last time.")" />
+
+        <div class="list-group mt-3">
+            @foreach (var retry in UploadRetries)
+            {
+                var item = retry;
+
+                <div class="list-group-item list-group-item-action d-flex align-items-center">
+                    <span class="flex-grow-1 text-truncate">
+                        @retry.Name
+                    </span>
+                    <span>
+                        <Icon Identifier="trash-alt" OnClick="@(() => DeleteStoredFileAsync(item))" CssClass="text-danger" />
+                    </span>
+                </div>
+            }
+        </div>
+
+    </ChildContent>
+    <Buttons>
+        <button class="btn btn-primary btn-sm-expand" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.RetryStoredFilesAsync(UploadRetries.Select(r => r.Id)); })">Retry</button>
+        <button class="btn btn-secondary" @onclick="@(() => { UploadRetry.Hide(); return FileUploader.ClearStoredFilesAsync(UploadRetries.Select(r => r.Id)); })">
+            <Icon Identifier="trash-alt" CssClass="me-1" />
+            Remove all
+        </button>
+    </Buttons>
+</Modal>
+
+@code{
+    Modal UploadRetry;
+    List<FileUploadToRetry> UploadRetries = [];
+    
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var storedFiles = await FileUploader.GetStoredFilesToRetryAsync();
+        Log.Debug($"OnStoredFilesDetected '{storedFiles.Length}' files");
+
+        if (storedFiles.Length > 0)
+        {
+            UploadRetries.Clear();
+            UploadRetries.AddRange(storedFiles);
+            UploadRetry.Show();
+        }
+    }
+
+    async Task DeleteStoredFileAsync(FileUploadToRetry retry)
+    {
+        await FileUploader.DeleteFileAsync(retry.Id);
+        UploadRetries.Remove(retry);
+
+        if (UploadRetries.Count == 0)
+            UploadRetry.Hide();
+            
+        StateHasChanged();
+    }
+}

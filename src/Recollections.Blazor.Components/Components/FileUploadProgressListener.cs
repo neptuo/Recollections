@@ -20,7 +20,7 @@ public class FileUploadProgressListener(FileUploader fileUploader, ILog<FileUplo
         listenerRegistration = fileUploader.AddProgressListener(OnProgress);
 
         // Uncomment to simulate file upload progress
-        Mock();
+        // Mock();
     }
 
     private void Mock() => OnProgress([
