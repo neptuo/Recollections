@@ -188,8 +188,6 @@ $dot-diameter: 18px;
     @include narrow;
 
     .timeline {
-        padding-top: 16px;
-
         .entry:last-child .body {
             margin-bottom: 0;
         }

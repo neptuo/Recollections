@@ -13747,6 +13747,9 @@ a.bg-salmon {
 .inline-editor-viewmode.inline-editable:hover .far::before {
   content: "\f304";
 }
+.inline-editor-viewmode p:last-child {
+  margin-bottom: 0;
+}
 
 h2 .inline-editor-viewmode .fa, .h2 .inline-editor-viewmode .fa {
   top: 16px;
@@ -14174,9 +14177,6 @@ input.input-number-noarrows[type=number] {
 }
 .entry-detail .entry-more {
   margin-left: 0;
-}
-.entry-detail .timeline {
-  padding-top: 16px;
 }
 .entry-detail .timeline .entry:last-child .body {
   margin-bottom: 0;
