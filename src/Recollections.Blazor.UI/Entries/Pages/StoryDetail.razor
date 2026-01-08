@@ -35,6 +35,11 @@
             <div class="entry-detail my-sm-3">
                 <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <UserInformation Owner="@Owner" />
+                <div class="gps">
+                    <MapToggle Text="@(Markers.Count == 0 ? "No Locations on Map..." : $"Show Locations on Map ({Markers.Count})")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                    </MapToggle>
+                </div>
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>

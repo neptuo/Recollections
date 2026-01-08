@@ -115,6 +115,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<EntryMediaModel>> GetStoryMediaAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryMediaModel>>($"stories/{storyId}/media"));
 
+        public Task<List<MapEntryModel>> GetStoryMapAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>($"stories/{storyId}/map"));
+
         public Task<AuthorizedModel<StoryModel>> GetStoryAsync(string storyId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<StoryModel>>($"stories/{storyId}"));
 

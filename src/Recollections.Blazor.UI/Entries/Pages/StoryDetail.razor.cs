@@ -45,6 +45,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
         protected Modal GalleryPreviewModal { get; set; }
         protected bool LoadGalleryPreviews { get; set; }
+        
+        protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
+        protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
@@ -88,6 +91,7 @@ namespace Neptuo.Recollections.Entries.Pages
             for (int i = 0; i < Model.Chapters.Count; i++)
                 Entries[Model.Chapters[i].Id] = entries[i + 1].Entries;
 
+            await LoadMapAsync();
             await LoadMediaAsync();
         }
 
@@ -123,6 +127,28 @@ namespace Neptuo.Recollections.Entries.Pages
                     }
                 }
             }
+        }
+
+        private async Task LoadMapAsync()
+        {
+            MapEntries = await Api.GetStoryMapAsync(StoryId);
+            Markers.Clear();
+            foreach (var entry in MapEntries)
+            {
+                Markers.Add(new MapMarkerModel()
+                {
+                    Latitude = entry.Location.Latitude,
+                    Longitude = entry.Location.Longitude,
+                    Altitude = entry.Location.Altitude,
+                    Title = entry.Title
+                });
+            }
+        }
+
+        protected void OnMarkerSelected(int index)
+        {
+            var entry = MapEntries[index];
+            Navigator.OpenEntryDetail(entry.Id);
         }
 
         protected async Task SaveAsync()
