@@ -1,6 +1,6 @@
 ﻿@inherits UserStateComponentBase
 
-<Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker">
+<Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker" IsOverflow="true">
     <ChildContent>
         <div class="timeline">
             <ListView Items="@Entries" EmptyMessage="You don't have any entry..." Context="entry">
