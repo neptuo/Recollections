@@ -40,6 +40,9 @@ namespace Neptuo.Recollections.Entries.Components
         public bool ShowYearSeparators { get; set; } = false;
 
         [Parameter]
+        public bool Collapsible { get; set; } = false;
+
+        [Parameter]
         public List<TimelineEntryModel> Data { get; set; }
 
         [Parameter]
@@ -51,6 +54,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; private set; } = true;
+        protected bool IsCollapsed { get; set; } = false;
 
         protected async override Task OnInitializedAsync()
         {

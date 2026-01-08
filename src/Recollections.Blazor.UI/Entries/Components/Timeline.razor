@@ -16,93 +16,104 @@
 
         @BeforeContent
 
-        @foreach (var entry in Entries)
+        @if (Collapsible && Entries.Count > 0)
         {
-            if (ShowYearSeparators && entry.When.Year != lastYear)
+            <div class="separator @(!IsCollapsed ? "mb-4" : "") badge p-2 d-inline-block bg-secondary position-relative top-0 z-1 cursor-pointer" @onclick="@(e => IsCollapsed = !IsCollapsed)">
+                <Icon Identifier="comment-alt" CssClass="me-1" />
+                @Entries.Count
+            </div>
+        }
+
+        @if (!IsCollapsed)
+        {
+            @foreach (var entry in Entries)
             {
-                lastYear = entry.When.Year;
-                <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
-                    @lastYear
-                </div>
-            }
+                if (ShowYearSeparators && entry.When.Year != lastYear)
+                {
+                    lastYear = entry.When.Year;
+                    <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
+                        @lastYear
+                    </div>
+                }
 
-            <div class="entry">
-                <div class="title">
-                    <h3>@entry.When.ToString(ShowYearSeparators ? UiOptions.ShortDateFormat : UiOptions.DateFormat)</h3>
-                </div>
-                <div class="body">
-                    <h2>
-                        <a href="@Navigator.UrlEntryDetail(entry.Id)">
-                            @entry.Title
-                        </a>
-                    </h2>
-                    <p>
-                        @if (ShowStoryInfo && (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle)))
-                        {
-                            <span class="information">
-                                <Icon Identifier="book" />
-
-                                @entry.StoryTitle
-                                @if (!String.IsNullOrEmpty(entry.ChapterTitle))
-                                {
-                                    <span>
-                                        - @entry.ChapterTitle
-                                    </span>
-                                }
-                            </span>
-                        }
-
-                        @if (entry.TextWordCount > 0)
-                        {
-                            <span class="information">
-                                <Icon Identifier="quote-right" />
-                                @entry.TextWordCount words
-                            </span>
-                        }
-
-                        @if (entry.GpsCount > 0)
-                        {
-                            <span class="information">
-                                <Icon Prefix="fas" Identifier="location-arrow" />
-                                @entry.GpsCount
-                            </span>
-                        }
-
-                        @if (entry.ImageCount > 0)
-                        {
-                            <span class="information">
-                                <Icon Identifier="image" />
-                                @entry.ImageCount
-                            </span>
-                        }
-
-                        @if (entry.Beings != null)
-                        {
-                            foreach (var being in entry.Beings)
+                <div class="entry">
+                    <div class="title">
+                        <h3>@entry.When.ToString(ShowYearSeparators ? UiOptions.ShortDateFormat : UiOptions.DateFormat)</h3>
+                    </div>
+                    <div class="body">
+                        <h2>
+                            <a href="@Navigator.UrlEntryDetail(entry.Id)">
+                                @entry.Title
+                            </a>
+                        </h2>
+                        <p>
+                            @if (ShowStoryInfo && (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle)))
                             {
                                 <span class="information">
-                                    <BeingIcon Identifier="@being.Icon" />
-                                    @being.Name
+                                    <Icon Identifier="book" />
+
+                                    @entry.StoryTitle
+                                    @if (!String.IsNullOrEmpty(entry.ChapterTitle))
+                                    {
+                                        <span>
+                                            - @entry.ChapterTitle
+                                        </span>
+                                    }
                                 </span>
                             }
-                        }
 
-                        @if (UserState.UserId != entry.UserId)
-                        {
-                            <span class="information">
-                                <Icon Identifier="user" />
-                                @entry.UserName
-                            </span>
-                        }
-                    </p>
+                            @if (entry.TextWordCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="quote-right" />
+                                    @entry.TextWordCount words
+                                </span>
+                            }
+
+                            @if (entry.GpsCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Prefix="fas" Identifier="location-arrow" />
+                                    @entry.GpsCount
+                                </span>
+                            }
+
+                            @if (entry.ImageCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="image" />
+                                    @entry.ImageCount
+                                </span>
+                            }
+
+                            @if (entry.Beings != null)
+                            {
+                                foreach (var being in entry.Beings)
+                                {
+                                    <span class="information">
+                                        <BeingIcon Identifier="@being.Icon" />
+                                        @being.Name
+                                    </span>
+                                }
+                            }
+
+                            @if (UserState.UserId != entry.UserId)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="user" />
+                                    @entry.UserName
+                                </span>
+                            }
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            @if (index == Entries.Count - 3 && HasMore)
-            {
-                <AutoloadNext Intersected="LoadMoreAsync" />
+                @if (index == Entries.Count - 3 && HasMore)
+                {
+                    <AutoloadNext Intersected="LoadMoreAsync" />
+                }
+                index++;
             }
-            index++;
         }
     </div>
 }
