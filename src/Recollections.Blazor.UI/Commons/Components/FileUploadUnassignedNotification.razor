@@ -1,5 +1,7 @@
 @inject FileUploader FileUploader
+@inject ShareTargetInterop ShareTargetInterop
 @implements IDisposable
+@implements ShareTargetInterop.IComponent
 
 @if (UnassignedFiles.Length > 0)
 {
@@ -57,6 +59,7 @@
     protected override async Task OnInitializedAsync()
     {
         currentUploadEntityRegistration = FileUploader.AddCurrentEntityListener(OnCurrentUploadEntityChanged);
+        ShareTargetInterop.Initialize(this);
         await base.OnInitializedAsync();
 
         UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
@@ -65,6 +68,13 @@
     public void Dispose()
     {
         currentUploadEntityRegistration?.Dispose();
+        ShareTargetInterop?.Remove(this);
+    }
+
+    public async void FilesReceived(int receivedCount)
+    {
+        UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
+        StateHasChanged();
     }
 
     private void OnCurrentUploadEntityChanged(string entityType, string entityId, string url)
@@ -85,7 +95,7 @@
 
     async Task DeleteStoredFileAsync(FileUploadToRetry file)
     {
-        await FileUploader.DeleteFileAsync(file.Id);
+        await FileUploader.RemoveStoredFileAsync(file.Id);
         UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
         StateHasChanged();
     }

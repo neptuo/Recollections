@@ -54,7 +54,7 @@
 
     async Task DeleteStoredFileAsync(FileUploadToRetry retry)
     {
-        await FileUploader.DeleteFileAsync(retry.Id);
+        await FileUploader.RemoveStoredFileAsync(retry.Id);
         UploadRetries.Remove(retry);
 
         if (UploadRetries.Count == 0)
