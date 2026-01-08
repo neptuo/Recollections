@@ -45,6 +45,26 @@
             }
         },
         {
+            "label": "Blazor build",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "./src/Recollections.Blazor.UI"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$msCompile",
+            "options": {
+                "statusbar": {
+                    "label": "blazor:build"
+                }
+            }
+        },
+        {
             "label": "Blazor watch",
             "command": "dotnet",
             "type": "process",
