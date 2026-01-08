@@ -42,13 +42,12 @@
                         @if (Image != null)
                         {
                             <Icon Prefix="fas" Identifier="@GetPlaceHolderIcon()" CssClass="d-block fs-2" />
+                            @GetPlaceHolder()
                         }
                         else if (Video != null)
                         {
                             <Icon Identifier="play" Prefix="fas" CssClass="position-absolute top-50 start-50 translate-middle z-3 fs-1" />
                         }
-
-                        @GetPlaceHolder()
                     </span>
                 </div>
             }
