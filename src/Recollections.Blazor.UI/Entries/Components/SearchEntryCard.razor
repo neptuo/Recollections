@@ -1,0 +1,60 @@
+@inherits EntityCard<SearchEntryModel>
+
+@Content
+
+@code
+{
+    [CascadingParameter]
+    public UserState UserState { get; set; }
+
+    protected override string Title => $"{Model.Title}";
+
+    protected override RenderFragment DefaultBodyContent =>
+        @<div class="p-3">
+            <div class="information">
+                <Icon Identifier="calendar-alt" />
+                @Model.When.ToString(UiOptions.DateFormat)
+            </div>
+
+            @if (!String.IsNullOrEmpty(Model.StoryTitle) || !String.IsNullOrEmpty(Model.ChapterTitle))
+            {
+                <div class="information">
+                    <Icon Identifier="book" />
+
+                    @Model.StoryTitle
+                    @if (!String.IsNullOrEmpty(Model.ChapterTitle))
+                    {
+                        <span>
+                            - @Model.ChapterTitle
+                        </span>
+                    }
+                </div>
+            }
+
+            <div>
+                @if (Model.GpsCount > 0)
+                {
+                    <span class="information">
+                        <Icon Prefix="fas" Identifier="location-arrow" />
+                        @Model.GpsCount
+                    </span>
+                }
+
+                @if (Model.ImageCount > 0)
+                {
+                    <span class="information">
+                        <Icon Identifier="image" />
+                        @Model.ImageCount
+                    </span>
+                }
+
+                @if (UserState.UserId != Model.UserId)
+                {
+                    <span class="information">
+                        <Icon Identifier="user" />
+                        @Model.UserName
+                    </span>
+                }
+            </div>
+        </div>;
+}

@@ -26,59 +26,8 @@
                 </div>
             </EmptyContent>
             <ChildContent>
-                <div class="col-12 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a class="stretched-link" href="@Navigator.UrlEntryDetail(entry.Id)">@entry.Title</a>
-                            </h5>
-                            <div>
-                                <span class="information">
-                                    <Icon Identifier="calendar-alt" />
-                                    @entry.When.ToString(UiOptions.DateFormat)
-                                </span>
-
-                                @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
-                                {
-                                    <span class="information">
-                                        <Icon Identifier="book" />
-
-                                        @entry.StoryTitle
-                                        @if (!String.IsNullOrEmpty(entry.ChapterTitle))
-                                        {
-                                            <span>
-                                                - @entry.ChapterTitle
-                                            </span>
-                                        }
-                                    </span>
-                                }
-
-                                @if (entry.GpsCount > 0)
-                                {
-                                    <span class="information">
-                                        <Icon Prefix="fas" Identifier="location-arrow" />
-                                        @entry.GpsCount
-                                    </span>
-                                }
-
-                                @if (entry.ImageCount > 0)
-                                {
-                                    <span class="information">
-                                        <Icon Identifier="image" />
-                                        @entry.ImageCount
-                                    </span>
-                                }
-
-                                @if (UserState.UserId != entry.UserId)
-                                {
-                                    <span class="information">
-                                        <Icon Identifier="user" />
-                                        @entry.UserName
-                                    </span>
-                                }
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-sm-12 mb-4">
+                    <SearchEntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
                 </div>
 
                 @if (Items.IndexOf(entry) == Items.Count - 3 && HasMore)
