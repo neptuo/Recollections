@@ -21,7 +21,7 @@
             <InlineTitleEdit Value="@Model.Name" PlaceHolder="Unnamed image..." ValueChanged="@(async value => await SaveNameAsync(value))" />
             @if (EntryId != null)
             {
-                <InlineLink Icon="comment" Value="@EntryModel.Title" OnClick="@(() => Navigator.OpenEntryDetail(EntryId))" />
+                <InlineLink Icon="comment-alt" Value="@EntryModel.Title" OnClick="@(() => Navigator.OpenEntryDetail(EntryId))" />
             }
             <div class="datetime">
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
