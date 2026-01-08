@@ -43,6 +43,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<GalleryModel> GalleryItems { get; } = [];
         protected bool SelectLastChapterTitleEdit { get; set; }
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
+        protected Modal GalleryPreviewModal { get; set; }
+        protected bool LoadGalleryPreviews { get; set; }
 
         public override Task SetParametersAsync(ParameterView parameters)
         {

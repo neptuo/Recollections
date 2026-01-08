@@ -99,6 +99,9 @@ namespace Neptuo.Recollections.Components
                 case ModalSize.Large:
                     DialogCssClass += " modal-lg";
                     break;
+                case ModalSize.Fullscreen:
+                    DialogCssClass += " modal-fullscreen";
+                    break;
                 default:
                     throw Ensure.Exception.NotSupported(Size.ToString());
             }

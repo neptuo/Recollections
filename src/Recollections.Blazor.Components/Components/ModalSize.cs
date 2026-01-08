@@ -11,6 +11,7 @@ namespace Neptuo.Recollections.Components
     {
         Small,
         Normal,
-        Large
+        Large,
+        Fullscreen
     }
 }

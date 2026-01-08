@@ -176,11 +176,19 @@ a.bg-salmon {
     }
 }
 
-.modal .modal-overflow .modal-body {
+.modal .modal-overflow {
     --bs-modal-header-height: 66px;
     --bs-modal-footer-height: 71px;
-    max-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - (var(--bs-modal-margin) * 2));
-    overflow: auto;
+    --bs-modal-overflow-margin: var(--bs-modal-margin);
+    
+    &.modal-fullscreen {
+        --bs-modal-overflow-margin: -1px;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - (var(--bs-modal-overflow-margin) * 2));
+        overflow: auto;
+    }
 }
 
 @media (min-width: 576px) {
