@@ -57,7 +57,7 @@
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
                             <div class="entries">
-                                <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" />
+                                <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" Collapsible="true" />
                             </div>
                         </div>
                     }
