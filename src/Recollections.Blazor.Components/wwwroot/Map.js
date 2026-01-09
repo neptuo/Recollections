@@ -107,7 +107,7 @@ export function initialize(container, interop, isEditable) {
     // }
 }
 
-export function updateMarkers(container, markers, isZoomed, isEditable) {
+export function updateMarkers(container, markers, isEditable) {
     const $container = $(container);
     const model = $container.data('map');
     const points = setMarkers(model, markers, isEditable);

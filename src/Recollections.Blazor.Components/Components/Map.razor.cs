@@ -89,6 +89,8 @@ namespace Neptuo.Recollections.Components
 
             if (selected != null)
             {
+                Log.Debug($"Centering at selected location: {selected.Latitude}, {selected.Longitude}");
+                
                 await Interop.CenterAtAsync(selected.Latitude, selected.Longitude);
                 selected = null;
             }

@@ -19,7 +19,23 @@ namespace Neptuo.Recollections.Components
         private Map editor;
         private DotNetObjectReference<MapInterop> self;
 
-        private int markersHashCode;
+        private int previousMarkersHashCode;
+        private int previousMapPositionHashCode;
+
+        private int ComputeMarkersHashCode()
+        {
+            var hashCode = new HashCode();
+
+            hashCode.Add(editor.Markers ?? []);
+            if (editor.Markers != null)
+            {
+                hashCode.Add(editor.Markers.Count);
+                foreach (var marker in editor.Markers)
+                    hashCode.Add(marker);
+            }
+
+            return hashCode.ToHashCode();
+        }
 
         public async Task InitializeAsync(Map editor)
         {
@@ -33,7 +49,6 @@ namespace Neptuo.Recollections.Components
                 if (self == null)
                     self = DotNetObjectReference.Create(this);
 
-                // TODO: Initialize once.
                 await module.InvokeVoidAsync(
                     "initialize",
                     editor.Container,
@@ -45,28 +60,42 @@ namespace Neptuo.Recollections.Components
             MapPosition position = null;
             if (!string.IsNullOrEmpty(navigationManager.HistoryEntryState))
             {
-                log.Debug($"Restoring map position from history state '{navigationManager.HistoryEntryState}'");
+                log.Debug($"Reading map position from history state '{navigationManager.HistoryEntryState}'");
                 position = JsonSerializer.Deserialize<MapPosition>(navigationManager.HistoryEntryState);
             }
 
-            // TODO: Pass markers only when changed.
-            await module.InvokeVoidAsync(
-                "updateMarkers", 
-                editor.Container, 
-                editor.Markers,
-                editor.IsZoomed || position != null,
-                editor.IsEditable
-            );
+            int markersHashCode = ComputeMarkersHashCode();
+            var hasMarkersChanged = previousMarkersHashCode != markersHashCode;
+            if (hasMarkersChanged)
+            {
+                log.Debug("Markers changed, updating map markers.");
+                previousMarkersHashCode = markersHashCode;
+
+                await module.InvokeVoidAsync(
+                    "updateMarkers", 
+                    editor.Container, 
+                    editor.Markers,
+                    editor.IsEditable
+                );
+            }
 
             if (position != null)
             {
-                log.Debug($"Centering map at lat={position.Latitude}, lon={position.Longitude}, zoom={position.Zoom}");
-                await CenterAtAsync(position.Latitude, position.Longitude, position.Zoom);
+                int mapPositionHashCode = position.GetHashCode();
+                if (previousMapPositionHashCode != mapPositionHashCode)
+                {
+                    previousMapPositionHashCode = mapPositionHashCode;
+                    log.Debug($"Position changed, centering map at lat={position.Latitude}, lon={position.Longitude}, zoom={position.Zoom}");
+                    await CenterAtAsync(position.Latitude, position.Longitude, position.Zoom);
+                }
             }
             else
             {
-                // TODO: Update position only when changed.
-                await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
+                if (hasMarkersChanged)
+                {
+                    log.Debug("Centering map at markers.");
+                    await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
+                }
             }
         }
 
@@ -80,7 +109,11 @@ namespace Neptuo.Recollections.Components
         [JSInvokable("MapInterop.MoveEnd")]
         public void MoveEnd(double latitude, double longitude, int zoom)
         {
-            var userState = JsonSerializer.Serialize(new MapPosition(latitude, longitude, zoom));
+            // We don't need another round through OnAfterRenderAsync
+            var position = new MapPosition(latitude, longitude, zoom);
+            previousMapPositionHashCode = position.GetHashCode();
+
+            var userState = JsonSerializer.Serialize(position);
             if (navigationManager.HistoryEntryState == userState)
             {
                 log.Debug("Map position unchanged in history state.");
