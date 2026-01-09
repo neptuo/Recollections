@@ -5,7 +5,8 @@ async function storeFiles(files, actionUrl, entityType, entityId, userId) {
     const promises = Array.from(files).map(file => {
         return new Promise(async resolve => {
             let id = self.crypto.randomUUID();
-            await mediaCache.put(id, new Response(file, { 
+            const request = new Request(id);
+            const result = await mediaCache.put(request, new Response(file, { 
                 headers: { 
                     'X-Entity-Type': entityType || '',
                     'X-Entity-Id': entityId || '',
@@ -19,7 +20,7 @@ async function storeFiles(files, actionUrl, entityType, entityId, userId) {
                 }
             }));
             resolve({
-                id: id,
+                id: request.url,
                 file: file,
                 actionUrl: actionUrl,
                 userId: userId,
