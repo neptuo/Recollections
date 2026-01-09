@@ -22,11 +22,11 @@ namespace Neptuo.Recollections.Components
         {
             this.editor = editor;
 
-            module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
-
-            await module.InvokeVoidAsync(
-                "ensureApi"
-            );
+            if (module == null)
+            {
+                module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
+                await module.InvokeVoidAsync("ensureApi");
+            }
 
             MapPosition position = null;
             if (!string.IsNullOrEmpty(navigationManager.HistoryEntryState))
