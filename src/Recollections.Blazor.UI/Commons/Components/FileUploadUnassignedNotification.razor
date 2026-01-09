@@ -1,7 +1,5 @@
 @inject FileUploader FileUploader
-@inject ShareTargetInterop ShareTargetInterop
 @implements IDisposable
-@implements ShareTargetInterop.IComponent
 
 @if (UnassignedFiles.Length > 0)
 {
@@ -16,13 +14,13 @@
                 }
                 else
                 {
-                    <span>
+                    <span @onclick="@Toggle" class="cursor-pointer">
                         Select entry to upload (@UnassignedFiles.Length) files to...
                     </span>
                 }
 
                 <Icon
-                    OnClick="@(() => IsExpanded = !IsExpanded)"
+                    OnClick="@Toggle"
                     Identifier="@(IsExpanded ? "chevron-down" : "chevron-left")" 
                     CssClass="ms-auto cursor-pointer"
                 />
@@ -59,7 +57,6 @@
     protected override async Task OnInitializedAsync()
     {
         currentUploadEntityRegistration = FileUploader.AddCurrentEntityListener(OnCurrentUploadEntityChanged);
-        ShareTargetInterop.Initialize(this);
         await base.OnInitializedAsync();
 
         UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
@@ -68,14 +65,10 @@
     public void Dispose()
     {
         currentUploadEntityRegistration?.Dispose();
-        ShareTargetInterop?.Remove(this);
     }
 
-    public async void FilesReceived(int receivedCount)
-    {
-        UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
-        StateHasChanged();
-    }
+    private void Toggle()
+        => IsExpanded = !IsExpanded;
 
     private void OnCurrentUploadEntityChanged(string entityType, string entityId, string url)
     {
