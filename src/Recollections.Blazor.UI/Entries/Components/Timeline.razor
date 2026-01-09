@@ -16,11 +16,12 @@
 
         @BeforeContent
 
-        @if (Collapsible && Entries.Count > 0)
+        @if (Collapsible && Entries.Count > 5)
         {
-            <div class="separator @(!IsCollapsed ? "mb-4" : "") badge p-2 d-inline-block bg-secondary position-relative top-0 z-1 cursor-pointer" @onclick="@(e => IsCollapsed = !IsCollapsed)">
+            <div class="separator @(!IsCollapsed ? "mb-4" : "") badge p-2 d-inline-block bg-body-secondary position-relative top-0 z-1 cursor-pointer" style="margin-left: -6px;" @onclick="@(e => IsCollapsed = !IsCollapsed)">
                 <Icon Identifier="comment-alt" CssClass="me-1" />
                 @Entries.Count
+@(Entries.Count > 1 ? "entries" : "entry")
             </div>
         }
 
