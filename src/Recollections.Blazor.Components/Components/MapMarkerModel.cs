@@ -17,21 +17,17 @@ namespace Neptuo.Recollections.Components
         public string Title { get; set; }
         public string DropColor { get; set; }
 
-        public override bool Equals(object? obj)
-            => base.Equals(obj as MapMarkerModel);
+        public override bool Equals(object obj)
+            => Equals(obj as MapMarkerModel);
 
         public bool Equals(MapMarkerModel other)
-        {
-            if (other == null)
-                return false;
-
-            return Longitude == other.Longitude
+            => other != null
+                && Longitude == other.Longitude
                 && Latitude == other.Latitude
                 && Altitude == other.Altitude
                 && IsEditable == other.IsEditable
                 && Title == other.Title
                 && DropColor == other.DropColor;
-        }
 
         public override int GetHashCode()
             => HashCode.Combine(
