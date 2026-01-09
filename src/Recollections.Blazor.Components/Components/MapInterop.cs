@@ -37,6 +37,34 @@ namespace Neptuo.Recollections.Components
             return hashCode.ToHashCode();
         }
 
+        public bool ShouldRender()
+        {
+            // Duplicated logic from InitializeAsync.
+            
+            if (module == null)
+                return true;
+
+            var markersHashCode = ComputeMarkersHashCode();
+            var hasMarkersChanged = previousMarkersHashCode != markersHashCode;
+            if (hasMarkersChanged)
+                return true;
+            
+            MapPosition position = FindMapPositionFromHistoryEntry();
+            if (position != null)
+            {
+                var mapPositionHashCode = position.GetHashCode();
+                if (previousMapPositionHashCode != mapPositionHashCode)
+                    return true;
+            }
+            else
+            {
+                if (hasMarkersChanged)
+                    return true;
+            }
+
+            return false;
+        }
+
         public async Task InitializeAsync(Map editor)
         {
             this.editor = editor;
@@ -57,14 +85,9 @@ namespace Neptuo.Recollections.Components
                 );
             }
 
-            MapPosition position = null;
-            if (!string.IsNullOrEmpty(navigationManager.HistoryEntryState))
-            {
-                log.Debug($"Reading map position from history state '{navigationManager.HistoryEntryState}'");
-                position = JsonSerializer.Deserialize<MapPosition>(navigationManager.HistoryEntryState);
-            }
+            MapPosition position = FindMapPositionFromHistoryEntry();
 
-            int markersHashCode = ComputeMarkersHashCode();
+            var markersHashCode = ComputeMarkersHashCode();
             var hasMarkersChanged = previousMarkersHashCode != markersHashCode;
             if (hasMarkersChanged)
             {
@@ -81,7 +104,7 @@ namespace Neptuo.Recollections.Components
 
             if (position != null)
             {
-                int mapPositionHashCode = position.GetHashCode();
+                var mapPositionHashCode = position.GetHashCode();
                 if (previousMapPositionHashCode != mapPositionHashCode)
                 {
                     previousMapPositionHashCode = mapPositionHashCode;
@@ -97,6 +120,18 @@ namespace Neptuo.Recollections.Components
                     await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
                 }
             }
+        }
+
+        private MapPosition FindMapPositionFromHistoryEntry()
+        {
+            MapPosition position = null;
+            if (!string.IsNullOrEmpty(navigationManager.HistoryEntryState))
+            {
+                log.Debug($"Reading map position from history state '{navigationManager.HistoryEntryState}'");
+                position = JsonSerializer.Deserialize<MapPosition>(navigationManager.HistoryEntryState);
+            }
+
+            return position;
         }
 
         [JSInvokable("MapInterop.MarkerMoved")]
