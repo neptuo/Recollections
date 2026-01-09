@@ -14,13 +14,13 @@
                 }
                 else
                 {
-                    <span>
+                    <span @onclick="@Toggle" class="cursor-pointer">
                         Select entry to upload (@UnassignedFiles.Length) files to...
                     </span>
                 }
 
                 <Icon
-                    OnClick="@(() => IsExpanded = !IsExpanded)"
+                    OnClick="@Toggle"
                     Identifier="@(IsExpanded ? "chevron-down" : "chevron-left")" 
                     CssClass="ms-auto cursor-pointer"
                 />
@@ -66,6 +66,9 @@
     {
         currentUploadEntityRegistration?.Dispose();
     }
+
+    private void Toggle()
+        => IsExpanded = !IsExpanded;
 
     private void OnCurrentUploadEntityChanged(string entityType, string entityId, string url)
     {
