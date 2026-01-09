@@ -17,7 +17,7 @@ export async function ensureApi() {
     Leaflet = window.L;
 }
 
-export function initialize(container, interop, markers, isZoomed, isEditable) {
+export function initialize(container, interop, isEditable) {
     let model = null;
 
     const $container = $(container);
@@ -88,22 +88,46 @@ export function initialize(container, interop, markers, isZoomed, isEditable) {
         });
     }
 
-    model = $container.data('map');
+    // model = $container.data('map');
+    // const points = setMarkers(model, markers, isEditable);
+
+    // model.isAdding = false;
+    // model.isEmptyPoint = points.length == 0 && !model.isAdditive;
+
+    // $container.find('.map').css("cursor", "");
+    // if (model.isEmptyPoint || points.length == 0) {
+    //     $container.find('.map').css("cursor", "crosshair");
+    //     if (!isZoomed) {
+    //         model.map.setView([0, 0], 1);
+    //     }
+    // } else {
+    //     if (!isZoomed) {
+    //         model.map.fitBounds(points, { maxZoom: 14 });
+    //     }
+    // }
+}
+
+export function updateMarkers(container, markers, isZoomed, isEditable) {
+    const $container = $(container);
+    const model = $container.data('map');
     const points = setMarkers(model, markers, isEditable);
 
     model.isAdding = false;
     model.isEmptyPoint = points.length == 0 && !model.isAdditive;
 
     $container.find('.map').css("cursor", "");
-    if (model.isEmptyPoint || points.length == 0) {
+    if (model.isEmptyPoint) {
         $container.find('.map').css("cursor", "crosshair");
-        if (!isZoomed) {
-            model.map.setView([0, 0], 1);
-        }
+    }
+}
+
+export function centerAtMarkers(container) {
+    const $container = $(container);
+    const model = $container.data('map');
+    if (model.points.length == 0) {
+        model.map.setView([0, 0], 1);
     } else {
-        if (!isZoomed) {
-            model.map.fitBounds(points, { maxZoom: 14 });
-        }
+        model.map.fitBounds(model.points, { maxZoom: 14 });
     }
 }
 
@@ -183,6 +207,7 @@ function setMarkers(model, markers, isEditable) {
         model.markers.push(marker);
     }
 
+    model.points = points;
     return points;
 }
 

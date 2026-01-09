@@ -17,6 +17,9 @@ namespace Neptuo.Recollections.Components
     {
         private IJSObjectReference module;
         private Map editor;
+        private DotNetObjectReference<MapInterop> self;
+
+        private int markersHashCode;
 
         public async Task InitializeAsync(Map editor)
         {
@@ -26,6 +29,17 @@ namespace Neptuo.Recollections.Components
             {
                 module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
                 await module.InvokeVoidAsync("ensureApi");
+
+                if (self == null)
+                    self = DotNetObjectReference.Create(this);
+
+                // TODO: Initialize once.
+                await module.InvokeVoidAsync(
+                    "initialize",
+                    editor.Container,
+                    self,
+                    editor.IsEditable
+                );
             }
 
             MapPosition position = null;
@@ -35,10 +49,10 @@ namespace Neptuo.Recollections.Components
                 position = JsonSerializer.Deserialize<MapPosition>(navigationManager.HistoryEntryState);
             }
 
+            // TODO: Pass markers only when changed.
             await module.InvokeVoidAsync(
-                "initialize",
-                editor.Container,
-                DotNetObjectReference.Create(this),
+                "updateMarkers", 
+                editor.Container, 
                 editor.Markers,
                 editor.IsZoomed || position != null,
                 editor.IsEditable
@@ -48,6 +62,11 @@ namespace Neptuo.Recollections.Components
             {
                 log.Debug($"Centering map at lat={position.Latitude}, lon={position.Longitude}, zoom={position.Zoom}");
                 await CenterAtAsync(position.Latitude, position.Longitude, position.Zoom);
+            }
+            else
+            {
+                // TODO: Update position only when changed.
+                await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
             }
         }
 
