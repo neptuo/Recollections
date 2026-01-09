@@ -11,7 +11,13 @@ function onFetch(event) {
             const formData = await event.request.formData();
             const files = formData.getAll("allfiles");
             await storeFiles(files, null, null, null, null);
-            return Response.redirect('/', 303);
+
+            const allClients = await clients.matchAll();
+            if (allClients && allClients.length > 0) {
+                return Response.redirect(allClients[0].url, 303);
+            } else {
+                return Response.redirect('/', 303);
+            }
         })());
     }
 }
