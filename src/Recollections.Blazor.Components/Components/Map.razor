@@ -39,7 +39,7 @@
                         <input @ref="SearchInput" @bind="SearchQuery" type="text" class="form-control" placeholder="Street, city, country ..." />
                     </div>
                     <div class="col-auto">
-                        <button class="btn btn-primary" @onclick="@(async () => await SearchLocationAsync())">Search</button>
+                        <button class="btn btn-primary" @onclick="@(() => SearchLocationAsync())">Search</button>
                     </div>
                 </div>
 
@@ -47,7 +47,7 @@
                 {
                     <hr />
                     <p>
-                        <a @onclick="@(async () => await SearchResultSelectedAsync(searchResult))">
+                        <a @onclick="@(() => SearchResultSelectedAsync(searchResult))">
                             <strong>@searchResult.Label</strong>
                         </a>
                         <br />
