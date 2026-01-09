@@ -85,7 +85,7 @@
 
     async Task DeleteStoredFileAsync(FileUploadToRetry file)
     {
-        await FileUploader.DeleteFileAsync(file.Id);
+        await FileUploader.RemoveStoredFileAsync(file.Id);
         UnassignedFiles = await FileUploader.GetUnassignedSharedFilesAsync();
         StateHasChanged();
     }

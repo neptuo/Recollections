@@ -76,7 +76,7 @@
 
     async Task DeleteUploadErrorAsync(FileUploadProgress progress)
     {
-        await FileUploader.DeleteFileAsync(progress.Id);
+        await FileUploader.RemoveStoredFileAsync(progress.Id);
         UploadErrors.Remove(progress);
 
         if (UploadErrors.Count == 0)

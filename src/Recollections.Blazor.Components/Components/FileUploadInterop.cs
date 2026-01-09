@@ -100,10 +100,10 @@ namespace Neptuo.Recollections.Components
             await module.InvokeVoidAsync("clearStoredFiles", ids);
         }
 
-        public async Task DeleteFileAsync(string fileId)
+        public async Task RemoveStoredFileAsync(string fileId)
         {
             await EnsureModuleAsync();
-            await module.InvokeVoidAsync("deleteFile", fileId);
+            await module.InvokeVoidAsync("removeStoredFile", fileId);
         }
 
         public async Task DestroyAsync()

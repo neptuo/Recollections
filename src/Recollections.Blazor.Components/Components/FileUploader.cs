@@ -131,8 +131,8 @@ public class FileUploader
     public Task ClearStoredFilesAsync(IEnumerable<string> ids)
         => interop.ClearStoredFilesAsync(ids);
 
-    public Task DeleteFileAsync(string id)
-        => interop.DeleteFileAsync(id);
+    public Task RemoveStoredFileAsync(string id)
+        => interop.RemoveStoredFileAsync(id);
 
     public Task SetBearerTokenAsync(string userId, string bearerToken)
         => interop.SetBearerTokenAsync(userId, bearerToken);

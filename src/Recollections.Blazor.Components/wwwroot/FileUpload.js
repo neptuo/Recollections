@@ -1,105 +1,81 @@
-﻿// IndexedDB operations
-const DB_NAME = 'FileUploadDB';
-const DB_VERSION = 1;
-const STORE_NAME = 'pendingUploads';
-
-function initializeDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                store.createIndex('timestamp', 'timestamp', { unique: false });
-                store.createIndex('userId', 'userId', { unique: false });
-                store.createIndex('entityType', 'entityType', { unique: false });
-                store.createIndex('entityId', 'entityId', { unique: false });
-            }
-        };
-    });
-}
-
-async function storeFiles(files, actionUrl, entityType, entityId) {
-    const db = await initializeDB();
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
+﻿// Sync with FileUpload.js
+async function storeFiles(files, actionUrl, entityType, entityId, userId) {
+    const mediaCache = await caches.open('media');
     
     const promises = Array.from(files).map(file => {
         return new Promise(async resolve => {
-            const storedFile = {
+            let id = self.crypto.randomUUID();
+            await mediaCache.put(id, new Response(file, { 
+                headers: { 
+                    'X-Entity-Type': entityType || '',
+                    'X-Entity-Id': entityId || '',
+                    'X-User-Id': userId || '',
+                    'X-Action-Url': actionUrl || '',
+
+                    'X-File-Name': file.name,
+                    'X-Last-Modified': file.lastModified,
+                    'Content-Size': file.size,
+                    'Content-Type': file.type,
+                }
+            }));
+            resolve({
+                id: id,
                 file: file,
                 actionUrl: actionUrl,
                 userId: userId,
                 entityType: entityType,
                 entityId: entityId,
-                timestamp: Date.now()
-            };
-
-            const request = store.add(storedFile);
-            request.onsuccess = () => {
-                storedFile.id = request.result;
-                resolve(storedFile);
-            };
-            request.onerror = () => {
-                console.error('Failed to store file in IndexedDB:', request.error);
-                storedFile.id = null;
-                resolve(storedFile);
-            };
+            });
         });
     });
-    
+
     return Promise.all(promises);
 }
 
 async function getStoredFilesByFlag(assigned) {
-    const db = await initializeDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
-        const results = [];
-        
-        // Use cursor to filter by both entityType and entityId
-        const request = store.openCursor();
-        
-        request.onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-                const fileData = cursor.value;
-
-                if (assigned) {
-                    if (fileData.userId == userId && fileData.entityType != null && fileData.entityId != null) {
-                        results.push(fileData);
-                    }
-                } else {
-                    if (fileData.entityType == null && fileData.entityId == null) {
-                        results.push(fileData);
-                    }
-                }
-
-                cursor.continue();
-            } else {
-                resolve(results);
+    const mediaCache = await caches.open('media');
+    const storedFiles = [];
+    const requests = await mediaCache.keys();
+    for (const request of requests) {
+        const response = await mediaCache.match(request);
+        const entityType = response.headers.get('X-Entity-Type');
+        const entityId = response.headers.get('X-Entity-Id');
+        const actionUrl = response.headers.get('X-Action-Url');
+        const uId = response.headers.get('X-User-Id');
+        let isPassed = false;
+        if (assigned) {
+            if (entityType != null && entityId != null && uId == userId) {
+                isPassed = true;
             }
-        };
-        
-        request.onerror = () => reject(request.error);
-    });
+        } else {
+            if (entityType == '' && entityId == '' && uId == '') {
+                isPassed = true;
+            }
+        }
+
+        if (isPassed) {
+            const file = await response.blob();
+            file.name = response.headers.get('X-File-Name');
+            file.lastModified = Number.parseInt(response.headers.get('X-Last-Modified'));
+            
+            const storedFile = {
+                id: request.url,
+                file: file,
+                actionUrl: actionUrl,
+                userId: userId,
+                entityType: entityType,
+                entityId: entityId,
+            };
+            storedFiles.push(storedFile);
+        }
+    }
+
+    return storedFiles;
 }
 
-async function removeStoredFile(id) {
-    const db = await initializeDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.delete(id);
-        
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-    });
+export async function removeStoredFile(id) {
+    const mediaCache = await caches.open('media');
+    mediaCache.delete(id);
 }
 
 class EntityUploadQueue {
@@ -218,7 +194,7 @@ class EntityUploadQueue {
     }
 
     async storeAndQueueFiles(items, actionUrl, entityType, entityId) {
-        const storedItems = await storeFiles(items, actionUrl, entityType, entityId);
+        const storedItems = await storeFiles(items, actionUrl, entityType, entityId, userId);
         this.addStoredFilesToQueue(storedItems);
     }
 
@@ -343,10 +319,6 @@ export async function clearStoredFiles(ids) {
     }
 }
 
-export function deleteFile(id) {
-    return removeStoredFile(Number.parseInt(id));
-}
-
 export async function uploadUnassignedFilesTo(entityType, entityId, url) {
     const unassignedFiles = await getStoredFilesByFlag(false);
     if (!unassignedFiles || unassignedFiles.length === 0) {
@@ -361,16 +333,4 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
 
 export function destroy() {
 
-}
-
-export async function handleShareTarget(e) {
-    const formData = await e.request.formData();
-    const files = formData.getAll("allfiles");
-    const url = e.request.url;
-
-    if (files && files.length > 0) {
-        await storeFiles(files, null, null, null);
-    }
-
-    return Response.redirect(url, 302);
 }
