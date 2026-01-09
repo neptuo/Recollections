@@ -82,7 +82,7 @@
                                     {
                                         int currentIndex = mediaIndex;
                                         mediaIndex++;
-                                        <EntryMedia Image="@item.Image" Video="@item.Video" OnClick="@(() => Gallery.Open(currentIndex))" />
+                                        <EntryMedia Image="@item.Image" Video="@item.Video" OnClick="@(() => Gallery.OpenAsync(currentIndex))" />
                                     }
                                 }
                             </div>

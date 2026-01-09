@@ -11,7 +11,7 @@
                 <ItemGroup Text="@Model.Title">
                     @if (Gallery != null)
                     {
-                        <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.Open(0))" />
+                        <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.OpenAsync(0))" />
                     }
                     <PermissionView Request="PermissionRequest.Owner">
                         <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
@@ -69,7 +69,7 @@
                                     onClick = () => { Navigator.OpenVideoDetail(EntryId, item.Video.Id); };
                                 }
                                 
-                                <EntryMedia @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.Open(Media.IndexOf(item)))">
+                                <EntryMedia @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.OpenAsync(Media.IndexOf(item)))">
                                     <ThumbnailContent>
                                         <button class="btn btn-outline-primary border-0 p-0" @onclick="@onClick" @onclick:stopPropagation="true">
                                             <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
