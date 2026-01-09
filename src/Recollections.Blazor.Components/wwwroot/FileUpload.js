@@ -1,4 +1,4 @@
-﻿// Sync with FileUpload.js
+﻿// Sync with share-target.js (1:1)
 async function storeFiles(files, actionUrl, entityType, entityId, userId) {
     const mediaCache = await caches.open('media');
     
@@ -6,7 +6,7 @@ async function storeFiles(files, actionUrl, entityType, entityId, userId) {
         return new Promise(async resolve => {
             let id = self.crypto.randomUUID();
             const request = new Request(id);
-            const result = await mediaCache.put(request, new Response(file, { 
+            await mediaCache.put(request, new Response(file, { 
                 headers: { 
                     'X-Entity-Type': entityType || '',
                     'X-Entity-Id': entityId || '',
