@@ -2,6 +2,7 @@
 // offline support. See https://aka.ms/blazor-offline-considerations
 
 self.importScripts('./service-worker-assets.js');
+self.importScripts('./share-target.js');
 
 const cacheNamePrefix = 'offline-cache-';
 const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`;
@@ -41,6 +42,11 @@ async function onActivate(event) {
 }
 
 async function onFetch(event) {
+    const response = shareTargetHandler(event);
+    if (response) {
+        return response;
+    }
+
     let cachedResponse = null;
     if (event.request.method === 'GET') {
         // For all navigation requests, try to serve index.html from cache
