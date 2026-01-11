@@ -48,6 +48,14 @@
                     </span>
                 }
 
+                @if (Model.VideoCount > 0)
+                {
+                    <span class="information">
+                        <Icon Identifier="film" />
+                        @Model.VideoCount
+                    </span>
+                }
+
                 @if (UserState.UserId != Model.UserId)
                 {
                     <span class="information">

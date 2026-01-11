@@ -19,5 +19,6 @@ public record EntryListModel
     List<EntryBeingModel> Beings,
 
     int ImageCount,
+    int VideoCount,
     int GpsCount
 );

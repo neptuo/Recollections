@@ -87,6 +87,14 @@
                                 </span>
                             }
 
+                            @if (entry.VideoCount > 0)
+                            {
+                                <span class="information">
+                                    <Icon Identifier="film" />
+                                    @entry.VideoCount
+                                </span>
+                            }
+
                             @if (entry.Beings != null)
                             {
                                 foreach (var being in entry.Beings)

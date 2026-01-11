@@ -41,6 +41,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                 ChapterTitle = e.Chapter.Title,
                 Beings = new List<EntryBeingModel>(),
                 ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id),
+                VideoCount = dataContext.Videos.Count(v => v.Entry.Id == e.Id),
                 GpsCount = e.Locations.Count,
                 BeingCount = e.Beings.Count(),
                 Text = e.Text
@@ -80,6 +81,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             ChapterTitle: e.ChapterTitle,
             Beings: e.Beings,
             ImageCount: e.ImageCount,
+            VideoCount: e.VideoCount,
             GpsCount: e.GpsCount
         )).ToList(), result.Count == pageSize);
     }
