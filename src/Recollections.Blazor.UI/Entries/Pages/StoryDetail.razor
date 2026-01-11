@@ -40,9 +40,19 @@
                         <Neptuo.Recollections.Components.Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
                     </MapToggle>
                 </div>
-                <div>
-                    <InlineLink Icon="image" Value="@($"{GalleryItems.Count} {(GalleryItems.Count > 1 ? "images and videos" : (GalleryItems[0].Type == "video" ? "video" : "image"))}")" OnClick="@(() => { LoadGalleryPreviews = true; GalleryPreviewModal.Show(); })"  />
-                </div>
+                @{
+                    string value = GalleryItems.Count switch
+                    {
+                        0 => null,
+                        1 when GalleryItems[0].Type == "video" => "1 video",
+                        1 => "1 image",
+                        _ => $"{GalleryItems.Count} images and videos"
+                    };
+                    string placeholder = GalleryItems.Count == 0 ? "No images or videos..." : null;
+                    <div>
+                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => { LoadGalleryPreviews = true; GalleryPreviewModal.Show(); })" IsClickable="@(GalleryItems.Count > 0)"  />
+                    </div>
+                }
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
