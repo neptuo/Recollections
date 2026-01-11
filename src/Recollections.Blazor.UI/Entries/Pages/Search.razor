@@ -27,7 +27,7 @@
             </EmptyContent>
             <ChildContent>
                 <div class="col-sm-12 mb-4">
-                    <SearchEntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
+                    <EntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
                 </div>
 
                 @if (Items.IndexOf(entry) == Items.Count - 3 && HasMore)

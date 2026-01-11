@@ -43,15 +43,15 @@ namespace Neptuo.Recollections.Entries.Components
         public bool Collapsible { get; set; } = false;
 
         [Parameter]
-        public List<TimelineEntryModel> Data { get; set; }
+        public List<EntryListModel> Data { get; set; }
 
         [Parameter]
-        public Func<int, Task<TimelineListResponse>> DataGetter { get; set; }
+        public Func<int, Task<PageableList<EntryListModel>>> DataGetter { get; set; }
 
         private int offset;
         private Task loadAsyncFromParametersSet;
 
-        protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
+        protected List<EntryListModel> Entries { get; } = [];
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; private set; } = true;
         protected bool IsCollapsed { get; set; } = false;
@@ -96,13 +96,13 @@ namespace Neptuo.Recollections.Entries.Components
             {
                 IsLoading = true;
 
-                TimelineListResponse response = await DataGetter(offset);
+                PageableList<EntryListModel> response = await DataGetter(offset);
 
-                Entries.AddRange(response.Entries);
+                Entries.AddRange(response.Models);
                 HasMore = response.HasMore;
                 offset = Entries.Count;
 
-                Log.Debug($"Loaded '{response.Entries.Count}' ('{(HasMore ? "has more" : "end of stream")}'), total so far '{Entries.Count}'");
+                Log.Debug($"Loaded '{response.Models.Count}' ('{(HasMore ? "has more" : "end of stream")}'), total so far '{Entries.Count}'");
             }
             finally
             {

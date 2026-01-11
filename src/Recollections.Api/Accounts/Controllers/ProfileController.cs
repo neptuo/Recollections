@@ -20,17 +20,17 @@ namespace Neptuo.Recollections.Accounts.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly ShareStatusService shareStatus;
-        private readonly TimelineService timeline;
+        private readonly EntryListMapper entryMapper;
 
-        public ProfileController(UserManager<User> userManager, EntriesDataContext entriesDb, ShareStatusService shareStatus, TimelineService timeline)
+        public ProfileController(UserManager<User> userManager, EntriesDataContext entriesDb, ShareStatusService shareStatus, EntryListMapper entryMapper)
             : base(entriesDb, shareStatus)
         {
             Ensure.NotNull(userManager, "userManager");
             Ensure.NotNull(shareStatus, "shareStatus");
-            Ensure.NotNull(timeline, "timeline");
+            Ensure.NotNull(entryMapper, "entryMapper");
             this.userManager = userManager;
             this.shareStatus = shareStatus;
-            this.timeline = timeline;
+            this.entryMapper = entryMapper;
         }
 
         [HttpGet("{id}")]
@@ -59,10 +59,17 @@ namespace Neptuo.Recollections.Accounts.Controllers
             var userId = User.FindUserId();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries.Where(e => e.UserId == id).OrderByDescending(e => e.When), [userId, ShareStatusService.PublicUserId], connectedUsers);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(
+                dataContext, 
+                dataContext.Entries
+                    .Where(e => e.UserId == id)
+                    .OrderByDescending(e => e.When), 
+                [userId, ShareStatusService.PublicUserId], 
+                connectedUsers
+            );
 
-            var (models, hasMore) = await timeline.GetAsync(query, id, connectedUsers, offset);
-            return Ok(new TimelineListResponse(models, hasMore));
+            var (models, hasMore) = await entryMapper.MapAsync(query, id, connectedUsers, offset);
+            return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
 
         private void MapEntityToModel(User entity, ProfileModel model)

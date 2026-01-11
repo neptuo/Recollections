@@ -84,7 +84,7 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageService>()
                 .AddTransient<VideoService>()
                 .AddTransient<ImageResizeService>()
-                .AddTransient<TimelineService>()
+                .AddTransient<EntryListMapper>()
                 .AddTransient<MapService>()
                 .AddTransient<IImageValidator, PremiumImageSizeValidator>()
                 .AddTransient<IVideoValidator, VideoValidator>()

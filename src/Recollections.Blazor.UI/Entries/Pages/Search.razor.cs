@@ -34,7 +34,7 @@ namespace Neptuo.Recollections.Entries.Pages
         /// </summary>
         protected string SearchText { get; set; }
 
-        protected List<SearchEntryModel> Items { get; } = new List<SearchEntryModel>(10);
+        protected List<EntryListModel> Items { get; } = [];
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; set; }
         protected bool HasQuery => !String.IsNullOrEmpty(Query);
@@ -101,11 +101,11 @@ namespace Neptuo.Recollections.Entries.Pages
                 IsLoading = true;
 
                 var response = await Api.SearchAsync(Query, offset);
-                Items.AddRange(response.Entries);
+                Items.AddRange(response.Models);
                 HasMore = response.HasMore;
                 offset = Items.Count;
 
-                Log.Debug($"Found '{response.Entries.Count}' items with '{response.HasMore}'.");
+                Log.Debug($"Found '{response.Models.Count}' items with '{response.HasMore}'.");
             }
             finally
             {

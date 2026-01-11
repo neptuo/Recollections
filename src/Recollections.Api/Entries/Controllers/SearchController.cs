@@ -22,15 +22,18 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
         private readonly IConnectionProvider connections;
+        private readonly EntryListMapper entryMapper;
 
-        public SearchController(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus, IConnectionProvider connections)
+        public SearchController(DataContext dataContext, EntryListMapper entryMapper, IUserNameProvider userNames, ShareStatusService shareStatus, IConnectionProvider connections)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(entryMapper, "entryMapper");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(connections, "connections");
             this.dataContext = dataContext;
+            this.entryMapper = entryMapper;
             this.userNames = userNames;
             this.shareStatus = shareStatus;
             this.connections = connections;
@@ -50,31 +53,15 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            List<SearchEntryModel> result = await shareStatus
+            var dbQuery = shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .OrderByDescending(e => e.When)
                 .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"))
                 .Skip(offset)
-                .Take(PageSize)
-                .Select(e => new SearchEntryModel()
-                {
-                    Id = e.Id,
-                    UserId = e.UserId,
-                    Title = e.Title,
-                    When = e.When,
-                    Text = e.Text,
-                    StoryTitle = e.Story.Title ?? e.Chapter.Story.Title,
-                    ChapterTitle = e.Chapter.Title,
-                    GpsCount = e.Locations.Count,
-                    ImageCount = dataContext.Images.Count(i => i.Entry.Id == e.Id)
-                })
-                .ToListAsync();
-
-            var userNames = await this.userNames.GetUserNamesAsync(result.Select(e => e.UserId).ToArray());
-            for (int i = 0; i < result.Count; i++)
-                result[i].UserName = userNames[i];
-
-            return Ok(new SearchResponse(result, result.Count == PageSize));
+                .Take(PageSize);
+            
+            var (models, hasMore) = await entryMapper.MapAsync(dbQuery, userId, connectedUsers, PageSize);
+            return Ok(new PageableList<EntryListModel>(models, hasMore));
         }
     }
 }

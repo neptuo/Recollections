@@ -54,12 +54,12 @@ namespace Neptuo.Recollections.Entries
             return false;
         }
 
-        public Task<TimelineListResponse> GetTimelineListAsync(int? offset)
-            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+        public Task<PageableList<EntryListModel>> GetTimelineListAsync(int? offset)
+            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
-        public Task<TimelineListResponse> GetTimelineListAsync(string userId, int? offset)
-            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"profiles/{userId}/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
-
+        public Task<PageableList<EntryListModel>> GetTimelineListAsync(string userId, int? offset)
+            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"profiles/{userId}/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+        
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
@@ -136,12 +136,12 @@ namespace Neptuo.Recollections.Entries
         public Task<bool> UpdateEntryStoryAsync(string entryId, EntryStoryUpdateModel model)
             => faultHandler.Wrap(SaveAsync($"entries/{entryId}/story", model));
 
-        public Task<TimelineListResponse> GetStoryTimelineAsync(string storyId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"stories/{storyId}/timeline"));
+        public Task<PageableList<EntryListModel>> GetStoryTimelineAsync(string storyId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"stories/{storyId}/timeline"));
 
-        public Task<TimelineListResponse> GetStoryChapterTimelineAsync(string storyId, string chapterId)
-            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"stories/{storyId}/chapters/{chapterId}/timeline"));
-
+        public Task<PageableList<EntryListModel>> GetStoryChapterTimelineAsync(string storyId, string chapterId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"stories/{storyId}/chapters/{chapterId}/timeline"));
+        
         public Task<List<BeingListModel>> GetBeingListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<BeingListModel>>("beings"));
 
@@ -163,10 +163,10 @@ namespace Neptuo.Recollections.Entries
         public Task UpdateEntryBeingsAsync(string entryId, List<string> beingIds)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/beings", beingIds));
 
-        public Task<TimelineListResponse> GetBeingTimelineAsync(string beingId, int? offset)
-            => faultHandler.Wrap(http.GetFromJsonAsync<TimelineListResponse>($"beings/{beingId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+        public Task<PageableList<EntryListModel>> GetBeingTimelineAsync(string beingId, int? offset)
+            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"beings/{beingId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
-        public Task<SearchResponse> SearchAsync(string query, int offset = 0)
+        public Task<PageableList<EntryListModel>> SearchAsync(string query, int offset = 0)
         {
             string url = "search";
             url = QueryHelpers.AddQueryString(url, "q", query);
@@ -174,7 +174,7 @@ namespace Neptuo.Recollections.Entries
             if (offset > 0)
                 url = QueryHelpers.AddQueryString(url, "offset", offset.ToString());
 
-            return faultHandler.Wrap(http.GetFromJsonAsync<SearchResponse>(url));
+            return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
         }
 
         public Task<List<CalendarEntryModel>> GetYearEntryListAsync(int year)

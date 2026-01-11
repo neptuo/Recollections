@@ -19,19 +19,19 @@ namespace Neptuo.Recollections.Entries.Controllers
     {
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
-        private readonly TimelineService timeline;
+        private readonly EntryListMapper entryMapper;
         private readonly IConnectionProvider connections;
 
-        public TimelineController(DataContext db, ShareStatusService shareStatus, TimelineService timeline, IConnectionProvider connections)
+        public TimelineController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, IConnectionProvider connections)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
-            Ensure.NotNull(timeline, "timeline");
+            Ensure.NotNull(entryMapper, "entryMapper");
             Ensure.NotNull(connections, "connectionProvider");
             this.db = db;
             this.shareStatus = shareStatus;
-            this.timeline = timeline;
+            this.entryMapper = entryMapper;
             this.connections = connections;
         }
 
@@ -43,10 +43,15 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.OrderByDescending(e => e.When), userId, connectedUsers);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(
+                db, 
+                db.Entries.OrderByDescending(e => e.When), 
+                userId, 
+                connectedUsers
+            );
 
-            var (models, hasMore) = await timeline.GetAsync(query, userId, connectedUsers, offset);
-            return Ok(new TimelineListResponse(models, hasMore));
+            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset);
+            return Ok(new PageableList<EntryListModel>(models, hasMore));
         }
     }
 }

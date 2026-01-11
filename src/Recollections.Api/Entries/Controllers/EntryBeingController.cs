@@ -45,11 +45,12 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             var models = entry.Beings
                 .OrderBy(b => b.Name)
-                .Select(b => new EntryBeingModel()
-                {
-                    Id = b.Id,
-                    Name = b.Name
-                });
+                .Select(b => new EntryBeingModel
+                (
+                    Id: b.Id,
+                    Name: b.Name,
+                    Icon: b.Icon
+                ));
 
             return Task.FromResult<IActionResult>(Ok(models));
         });

@@ -19,7 +19,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected UiOptions UiOptions { get; set; }
 
         [Parameter]
-        public Action<TimelineEntryModel> Selected { get; set; }
+        public Action<EntryListModel> Selected { get; set; }
 
         protected Modal Modal { get; set; }
 
@@ -27,14 +27,14 @@ namespace Neptuo.Recollections.Entries.Components
         private bool isFirstShow = true;
 
         protected bool IsLoading { get; set; }
-        protected List<TimelineEntryModel> Entries { get; } = new List<TimelineEntryModel>();
+        protected List<EntryListModel> Entries { get; } = new List<EntryListModel>();
         protected bool HasMore { get; private set; }
 
         private async Task LoadAsync()
         {
             IsLoading = true;
-            TimelineListResponse response = await Api.GetTimelineListAsync(offset);
-            Entries.AddRange(response.Entries);
+            var response = await Api.GetTimelineListAsync(offset);
+            Entries.AddRange(response.Models);
             HasMore = response.HasMore;
             offset = Entries.Count;
             IsLoading = false;

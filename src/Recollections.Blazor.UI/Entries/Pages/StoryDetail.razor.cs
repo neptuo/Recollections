@@ -36,7 +36,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected EntryPicker EntryPicker { get; set; }
         protected Gallery Gallery { get; set; }
         protected StoryModel Model { get; set; }
-        protected Dictionary<string, List<TimelineEntryModel>> Entries { get; set; } = [];
+        protected Dictionary<string, List<EntryListModel>> Entries { get; set; } = [];
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new();
         protected List<EntryMediaModel> Media { get; set; } = [];
@@ -81,15 +81,15 @@ namespace Neptuo.Recollections.Entries.Pages
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
 
-            var entriesTasks = new Task<TimelineListResponse>[Model.Chapters.Count + 1];
+            var entriesTasks = new Task<PageableList<EntryListModel>>[Model.Chapters.Count + 1];
             entriesTasks[0] = Api.GetStoryTimelineAsync(Model.Id);
             for (int i = 0; i < Model.Chapters.Count; i++)
                 entriesTasks[i + 1] = Api.GetStoryChapterTimelineAsync(Model.Id, Model.Chapters[i].Id);
 
             var entries = await Task.WhenAll(entriesTasks);
-            Entries[Model.Id] = entries[0].Entries;
+            Entries[Model.Id] = entries[0].Models;
             for (int i = 0; i < Model.Chapters.Count; i++)
-                Entries[Model.Chapters[i].Id] = entries[i + 1].Entries;
+                Entries[Model.Chapters[i].Id] = entries[i + 1].Models;
 
             await LoadMapAsync();
             await LoadMediaAsync();
@@ -281,7 +281,7 @@ namespace Neptuo.Recollections.Entries.Pages
             EntryPicker.Show();
         }
 
-        protected async void EntrySelected(TimelineEntryModel entry)
+        protected async void EntrySelected(EntryListModel entry)
         {
             var model = new EntryStoryUpdateModel(Model.Id);
 
@@ -293,14 +293,14 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 string previousId = Entries.Where(s => s.Value.Any(e => e.Id == entry.Id)).Select(s => s.Key).FirstOrDefault();
                 if (previousId == Model.Id)
-                    Entries[Model.Id] = (await Api.GetStoryTimelineAsync(Model.Id)).Entries;
+                    Entries[Model.Id] = (await Api.GetStoryTimelineAsync(Model.Id)).Models;
                 else if (previousId != null)
-                    Entries[previousId] = (await Api.GetStoryChapterTimelineAsync(Model.Id, previousId)).Entries;
+                    Entries[previousId] = (await Api.GetStoryChapterTimelineAsync(Model.Id, previousId)).Models;
 
                 if (model.ChapterId != null)
-                    Entries[model.ChapterId] = (await Api.GetStoryChapterTimelineAsync(Model.Id, model.ChapterId)).Entries;
+                    Entries[model.ChapterId] = (await Api.GetStoryChapterTimelineAsync(Model.Id, model.ChapterId)).Models;
                 else
-                    Entries[Model.Id] = (await Api.GetStoryTimelineAsync(Model.Id)).Entries;
+                    Entries[Model.Id] = (await Api.GetStoryTimelineAsync(Model.Id)).Models;
             }
             else
             {
