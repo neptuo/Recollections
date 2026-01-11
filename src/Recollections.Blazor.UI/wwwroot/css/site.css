@@ -14527,23 +14527,38 @@ video.pswp__video {
   margin-right: 12px;
 }
 
-.calendar .card.selected, .calendar .card.selected-within, .yearlendar .card.selected, .yearlendar .card.selected-within {
+.yearlendar .card.selected, .yearlendar .card.selected-within {
   border-color: salmon;
 }
-.calendar .card.selected .card-header, .yearlendar .card.selected .card-header {
+.yearlendar .card.selected .card-header {
   background-color: rgba(250, 128, 114, 0.5);
 }
-.calendar .card:hover:not(.no-hover), .yearlendar .card:hover:not(.no-hover) {
+.yearlendar .card:hover:not(.no-hover) {
   background-color: rgba(250, 128, 114, 0.25);
   border-color: salmon;
 }
-.calendar .card a:hover, .yearlendar .card a:hover {
+.yearlendar .card a:hover {
   text-decoration: none;
 }
-.calendar .card .list-group-item.selected, .yearlendar .card .list-group-item.selected {
+.yearlendar .card .list-group-item.selected {
   background-color: rgba(250, 128, 114, 0.5);
 }
 
+.calendar .badge {
+  margin-bottom: 0.125rem;
+}
+.calendar .bg-salmon {
+  display: block;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.calendar a.bg-salmon {
+  text-decoration: none;
+}
+.calendar a.bg-salmon:hover {
+  color: white;
+}
 .calendar .calendar-header,
 .calendar .calendar-cell {
   width: 14.2857142857%;
