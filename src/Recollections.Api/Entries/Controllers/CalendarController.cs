@@ -19,25 +19,28 @@ namespace Neptuo.Recollections.Entries.Controllers
     public class CalendarController : ControllerBase
     {
         private readonly DataContext dataContext;
+        private readonly EntryListMapper entryMapper;
         private readonly ShareStatusService shareStatus;
         private readonly IUserPremiumProvider premiumProvider;
         private readonly IConnectionProvider connections;
 
-        public CalendarController(DataContext dataContext, ShareStatusService shareStatus, IUserPremiumProvider premiumProvider, IConnectionProvider connections)
+        public CalendarController(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus, IUserPremiumProvider premiumProvider, IConnectionProvider connections)
             : base(dataContext, shareStatus)
         {
             Ensure.NotNull(dataContext, "dataContext");
+            Ensure.NotNull(entryMapper, "entryMapper");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(premiumProvider, "premiumProvider");
             Ensure.NotNull(connections, "connections");
             this.dataContext = dataContext;
+            this.entryMapper = entryMapper;
             this.shareStatus = shareStatus;
             this.premiumProvider = premiumProvider;
             this.connections = connections;
         }
 
         [HttpGet("{year}")]
-        [ProducesDefaultResponseType(typeof(List<CalendarEntryModel>))]
+        [ProducesDefaultResponseType(typeof(List<EntryListModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
@@ -53,28 +56,21 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            var result = await shareStatus
+            var query = shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .Where(e => e.When.Year == year)
-                .OrderByDescending(e => e.When)
-                .Select(e => new CalendarEntryModel()
-                {
-                    Id = e.Id,
-                    Title = e.Title,
-                    When = e.When
-                })
-                .AsNoTracking()
-                .ToListAsync();
+                .OrderByDescending(e => e.When);
 
-            return Ok(result);
+            var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
+            return Ok(models);
         }
 
         [HttpGet("{year}/{month}")]
-        [ProducesDefaultResponseType(typeof(List<CalendarEntryModel>))]
+        [ProducesDefaultResponseType(typeof(List<EntryListModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<CalendarEntryModel>>> GetMonthList(int year, int month)
+        public async Task<ActionResult<List<EntryListModel>>> GetMonthList(int year, int month)
         {
             string userId = HttpContext.User.FindUserId();
             if (string.IsNullOrEmpty(userId))
@@ -82,20 +78,13 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            var result = await shareStatus
+            var query = shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .Where(e => e.When.Year == year && e.When.Month == month)
-                .OrderByDescending(e => e.When)
-                .Select(e => new CalendarEntryModel()
-                {
-                    Id = e.Id,
-                    Title = e.Title,
-                    When = e.When
-                })
-                .AsNoTracking()
-                .ToListAsync();
-
-            return result;
+                .OrderByDescending(e => e.When);
+                
+            var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
+            return Ok(models);
         }
     }
 }

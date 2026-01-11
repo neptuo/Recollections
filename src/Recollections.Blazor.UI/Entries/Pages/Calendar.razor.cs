@@ -38,7 +38,7 @@ namespace Neptuo.Recollections.Entries.Pages
             ? $"{DateTimeFormatInfo.CurrentInfo.MonthNames[Month.Value - 1]} {Year}"
             : Year.ToString();
 
-        protected List<CalendarEntryModel> Models { get; } = new List<CalendarEntryModel>();
+        protected List<EntryListModel> Models { get; } = [];
 
         public override async Task SetParametersAsync(ParameterView parameters)
         {

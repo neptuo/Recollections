@@ -3,7 +3,6 @@
 @page "/calendar/{Year:int}/{Month:int}"
 @inherits UserStateAuthenticatedComponentBase
 
-
 <DocumentTitle Value="@Title" />
 <TemplateContent Name="MobileTitle">Calendar</TemplateContent>
 
@@ -64,11 +63,7 @@ else if (IsYearView)
 
                 @foreach (var model in Models.Where(e => e.When.Month == month))
                 {
-                    <div>
-                        <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon">
-                            @model.Title
-                        </a>
-                    </div>
+                    <EntryCard Model="model" OnCardClick="@(() => Navigator.UrlEntryDetail(model.Id))" CardCssClass="mb-4" />
                 }
             </div>
         }

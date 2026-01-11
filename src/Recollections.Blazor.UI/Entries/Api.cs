@@ -177,12 +177,12 @@ namespace Neptuo.Recollections.Entries
             return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
         }
 
-        public Task<List<CalendarEntryModel>> GetYearEntryListAsync(int year)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<CalendarEntryModel>>($"calendar/{year}"));
+        public Task<List<EntryListModel>> GetYearEntryListAsync(int year)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"calendar/{year}"));
 
-        public Task<List<CalendarEntryModel>> GetMonthEntryListAsync(int year, int month)
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<CalendarEntryModel>>($"calendar/{year}/{month}"));
-
+        public Task<List<EntryListModel>> GetMonthEntryListAsync(int year, int month)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"calendar/{year}/{month}"));
+            
         public Task<VersionModel> GetVersionAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<VersionModel>($"entries/version"));
 

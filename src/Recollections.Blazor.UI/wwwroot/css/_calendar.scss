@@ -1,22 +1,5 @@
 ﻿.calendar, .yearlendar {
-    .badge {
-        margin-bottom: .125rem;
-    }
-
-    .bg-salmon {
-        display: block;
-        text-align: left;
-        text-overflow: ellipsis;
-        overflow: hidden;
-    }
-
-    a.bg-salmon {
-        text-decoration: none;
-
-        &:hover {
-            color: white;
-        }
-    }
+    @import "_salmon-card.scss";
 }
 
 .calendar {
