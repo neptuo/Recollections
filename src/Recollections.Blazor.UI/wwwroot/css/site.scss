@@ -199,14 +199,18 @@ a.bg-salmon {
     --bs-modal-header-height: 66px;
     --bs-modal-footer-height: 71px;
     --bs-modal-overflow-margin: var(--bs-modal-margin);
+    --bs-modal-overflow-body-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - (var(--bs-modal-overflow-margin) * 2));
+
+    .modal-body {
+        max-height: var(--bs-modal-overflow-body-height);
+        overflow: auto;
+    }
     
     &.modal-fullscreen {
         --bs-modal-overflow-margin: -1px;
-    }
-
-    .modal-body {
-        max-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - (var(--bs-modal-overflow-margin) * 2));
-        overflow: auto;
+        .modal-body {
+            height: var(--bs-modal-overflow-body-height);
+        }
     }
 }
 

@@ -9,7 +9,7 @@
         <PermissionContainer State="@Permissions">
             <ActionMenu>
                 <ItemGroup Text="@Model.Title">
-                    <Item Icon="image" Text="Open gallery" OnClick="@(() => { LoadGalleryPreviews = true; GalleryPreviewModal.Show(); })" />
+                    <Item Icon="image" Text="Open gallery" OnClick="@(() => GalleryPreviewModal.Show())" />
                     <PermissionView Request="PermissionRequest.Write">
                         <Item Icon="book" Text="Add Chapter" OnClick="AddChapter" Title="Add Chapter" />
                         <Item Icon="plus" Text="Add Story Entry" OnClick="() => SelectEntry(null)" Title="Add Story Entry" />
@@ -50,7 +50,7 @@
                     };
                     string placeholder = GalleryItems.Count == 0 ? "No images or videos..." : null;
                     <div>
-                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => { LoadGalleryPreviews = true; GalleryPreviewModal.Show(); })" IsClickable="@(GalleryItems.Count > 0)"  />
+                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => GalleryPreviewModal.Show())" IsClickable="@(GalleryItems.Count > 0)"  />
                     </div>
                 }
                 <div class="my-3">
@@ -82,26 +82,7 @@
                 </div>
 
                 <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="OnGalleryOpenInfoAsync" />
-                
-                <Modal @ref="GalleryPreviewModal" Size="@ModalSize.Fullscreen" Title="@($"{Model.Title} Gallery")" IsOverflow="true">
-                    <ChildContent>
-                        @if (LoadGalleryPreviews)
-                        {
-                            <div class="images">
-                                @{ int mediaIndex = 0; }
-                                @foreach (var entry in Media)
-                                {
-                                    foreach (var item in entry.Media)
-                                    {
-                                        int currentIndex = mediaIndex;
-                                        mediaIndex++;
-                                        <EntryMedia Image="@item.Image" Video="@item.Video" OnClick="@(() => Gallery.OpenAsync(currentIndex))" />
-                                    }
-                                }
-                            </div>
-                        }
-                    </ChildContent>
-                </Modal>
+                <GalleryPreviewModal @ref="GalleryPreviewModal" Title="@Model.Title" Media="@AllMedia" OnMediaClick="@(index => Gallery.OpenAsync(index))" />
             </div>
         </PermissionContainer>
     </CascadingValue>

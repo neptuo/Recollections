@@ -1,0 +1,83 @@
+<Modal @ref="Modal" Size="@ModalSize.Fullscreen" Title="@($"{Title} Gallery")" IsOverflow="true">
+    <ChildContent>
+        @if (RenderPreviews)
+        {
+            int mediaIndex = 0;
+            <div class="images">
+                @foreach (var item in Media)
+                {
+                    int currentIndex = mediaIndex;
+                    mediaIndex++;
+                    if (mediaIndex == (CurrentLimit - 4)) 
+                    {
+                        <AutoloadNext Intersected="@OnLoadNext" />
+                    }
+
+                    if (mediaIndex >= CurrentLimit)
+                        break;
+
+                    <EntryMedia Image="@item.Image" Video="@item.Video" OnClick="@(() => OnMediaClick.InvokeAsync(currentIndex))" />
+                }
+            </div>
+        }
+    </ChildContent>
+</Modal>
+
+@code {
+    Modal Modal;
+    bool RenderPreviews;
+    int CurrentLimit = 10;
+    int previousParametersHashCode;
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public List<MediaModel> Media { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnMediaClick { get; set; }
+
+    private int ComputeParametersHashCode()
+    {
+        var hashCode = new HashCode();
+
+        hashCode.Add(Media ?? []);
+        if (Media != null)
+        {
+            hashCode.Add(Media.Count);
+            foreach (var model in Media)
+                hashCode.Add(model);
+        }
+
+        return hashCode.ToHashCode();
+    }
+
+    private void OnLoadNext()
+    {
+        CurrentLimit += 10;
+        if (CurrentLimit <= Media.Count)
+            StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        int currentParametersHashCode = ComputeParametersHashCode();
+        if (previousParametersHashCode != currentParametersHashCode)
+        {
+            CurrentLimit = 10;
+            RenderPreviews = false;
+        }
+
+        previousParametersHashCode = currentParametersHashCode;
+    }
+
+    public void Show() 
+    {
+        Modal.Show();
+        RenderPreviews = true;
+        StateHasChanged();
+    }
+
+    public void Hide() => Modal.Hide();
+}

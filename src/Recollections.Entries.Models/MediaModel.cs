@@ -1,3 +1,5 @@
+using System;
+
 namespace Neptuo.Recollections.Entries
 {
     public class MediaModel
@@ -6,5 +8,8 @@ namespace Neptuo.Recollections.Entries
 
         public ImageModel Image { get; set; }
         public VideoModel Video { get; set; }
+
+        public override int GetHashCode()
+            => HashCode.Combine(Type, Image, Video);
     }
 }

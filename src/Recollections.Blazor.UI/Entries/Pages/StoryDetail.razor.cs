@@ -40,11 +40,11 @@ namespace Neptuo.Recollections.Entries.Pages
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new();
         protected List<EntryMediaModel> Media { get; set; } = [];
+        protected List<MediaModel> AllMedia { get; set; } = [];
         protected List<GalleryModel> GalleryItems { get; } = [];
         protected bool SelectLastChapterTitleEdit { get; set; }
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
-        protected Modal GalleryPreviewModal { get; set; }
-        protected bool LoadGalleryPreviews { get; set; }
+        protected GalleryPreviewModal GalleryPreviewModal { get; set; }
         
         protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
@@ -100,10 +100,12 @@ namespace Neptuo.Recollections.Entries.Pages
             Media.Clear();
             Media = await Api.GetStoryMediaAsync(StoryId);
             GalleryItems.Clear();
+            AllMedia.Clear();
             foreach (var entry in Media)
             {
                 foreach (var item in entry.Media)
                 {
+                    AllMedia.Add(item);
                     if (item.Image != null)
                     {
                         GalleryItems.Add(new GalleryModel()
