@@ -1,4 +1,4 @@
-<div @ref="Element" @attributes="Attributes" tabindex="-1">
+<div @ref="Element" @attributes="Attributes" class="@cssClass" tabindex="-1">
     @if (IsHeader)
     {
         <div class="offcanvas-header">
@@ -10,7 +10,11 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
     }
-    <div class="@BodyCssClass">
-        @ChildContent
+    <div class="@bodyCssClass">
+        @if (!IsBodyRenderedLazily || hasBodyRendered || IsVisible)
+        {
+            hasBodyRendered = true;
+            @ChildContent
+        }
     </div>
 </div>
