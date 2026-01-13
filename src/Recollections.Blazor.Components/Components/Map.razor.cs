@@ -12,20 +12,8 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
 {
-    public partial class Map : ComponentBase, IDisposable
+    public partial class Map(MapInterop Interop, ImageInterop ImageInterop, ILog<Map> Log, IMapService Service) : ComponentBase, IDisposable
     {
-        [Inject]
-        protected MapInterop Interop { get; set; }
-
-        [Inject]
-        protected ImageInterop ImageInterop { get; set; }
-
-        [Inject]
-        protected ILog<Map> Log { get; set; }
-
-        [Inject]
-        internal IMapService Service { get; set; }
-
         [Parameter]
         public IList<MapMarkerModel> Markers { get; set; }
 
@@ -50,7 +38,8 @@ namespace Neptuo.Recollections.Components
         protected Modal SearchModal { get; set; }
         protected ElementReference SearchInput { get; set; }
         protected string SearchQuery { get; set; }
-        protected List<MapSearchModel> SearchResults { get; } = new List<MapSearchModel>();
+        protected List<MapSearchModel> SearchResults { get; } = [];
+        protected bool HasSearchResultsChanged { get; set;}
         protected Modal TileTypeModal { get; set; }
         protected string TileType { get; set; }
 
@@ -72,8 +61,6 @@ namespace Neptuo.Recollections.Components
             IsInitialized = true;
         }
 
-        private MapSearchModel selected;
-
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("OnAfterRenderAsync");
@@ -86,19 +73,12 @@ namespace Neptuo.Recollections.Components
 
             if (Markers.Count > 0)
                 IsZoomed = true;
-
-            if (selected != null)
-            {
-                Log.Debug($"Centering at selected location: {selected.Latitude}, {selected.Longitude}");
-
-                await Interop.CenterAtAsync(selected.Latitude, selected.Longitude);
-                selected = null;
-            }
         }
 
         protected override bool ShouldRender()
         {
-            var result = Interop.ShouldRender();
+            var result = Interop.ShouldRender() || HasSearchResultsChanged;
+            HasSearchResultsChanged = false;
             Log.Debug($"ShouldRender: {result}");
             return result;
         }
@@ -138,6 +118,8 @@ namespace Neptuo.Recollections.Components
 
         protected async Task SearchLocationAsync()
         {
+            bool hadSearchResults = SearchResults.Count > 0;
+
             SearchModal.Show();
             SearchResults.Clear();
             if (!String.IsNullOrEmpty(SearchQuery))
@@ -146,17 +128,18 @@ namespace Neptuo.Recollections.Components
                 SearchResults.AddRange(results);
 
                 Log.Debug($"Search, results: {SearchResults.Count}.");
-
-                StateHasChanged();
             }
+            
+            HasSearchResultsChanged = hadSearchResults || SearchResults.Count > 0;
+            StateHasChanged();
         }
 
-        protected ValueTask SearchResultSelectedAsync(MapSearchModel selected)
+        protected async Task SearchResultSelectedAsync(MapSearchModel selected)
         {
-            this.selected = selected;
             SearchModal.Hide();
-
-            return ValueTask.CompletedTask;
+            
+            Log.Debug($"Centering at selected location: {selected.Latitude}, {selected.Longitude}");
+            await Interop.CenterAtAsync(selected.Latitude, selected.Longitude);
         }
 
         internal async Task LoadTileAsync(JSObjectReference img, int x, int y, int z)
