@@ -39,18 +39,20 @@
 }
 
 .offcanvas-bottom-to-end {
+    // For smaller screens, show offcanvas at the bottom
     @include media-breakpoint-down(sm) {
         & {
-            bottom: 52px; // Duplicated for .offcanvas-bottom
+            bottom: var(--blz-bottom-bar-height);
             right: 0;
             left: 0;
             height: var(--#{$prefix}offcanvas-height);
-            max-height: calc(100% - 52px);
+            max-height: calc(100% - var(--blz-bottom-bar-height));
             border-top: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
             transform: translateY(100%);
         }
     }
 
+    // For larger screens, show offcanvas on the right side
     @include media-breakpoint-up(sm) {
         & {
             top: 0;

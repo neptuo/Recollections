@@ -13844,11 +13844,11 @@ input.input-number-noarrows[type=number] {
 
 @media (max-width: 575.98px) {
   .offcanvas-bottom-to-end {
-    bottom: 52px;
+    bottom: var(--blz-bottom-bar-height);
     right: 0;
     left: 0;
     height: var(--bs-offcanvas-height);
-    max-height: calc(100% - 52px);
+    max-height: calc(100% - var(--blz-bottom-bar-height));
     border-top: var(--bs-offcanvas-border-width) solid var(--bs-offcanvas-border-color);
     -webkit-transform: translateY(100%);
         -ms-transform: translateY(100%);
