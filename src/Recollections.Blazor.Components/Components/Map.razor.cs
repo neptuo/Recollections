@@ -30,10 +30,10 @@ namespace Neptuo.Recollections.Components
         public IList<MapMarkerModel> Markers { get; set; }
 
         [Parameter]
-        public Action MarkersChanged { get; set; }
+        public EventCallback MarkersChanged { get; set; }
 
         [Parameter]
-        public Action<int> MarkerSelected { get; set; }
+        public EventCallback<int> MarkerSelected { get; set; }
 
         [Parameter]
         public EventCallback OnClearLocation { get; set; }
@@ -108,7 +108,7 @@ namespace Neptuo.Recollections.Components
             Log.Debug("Dispose");
         }
 
-        internal void MoveMarker(int? index, double latitude, double longitude)
+        internal async void MoveMarker(int? index, double latitude, double longitude)
         {
             if (!IsEditable)
                 return;
@@ -132,7 +132,7 @@ namespace Neptuo.Recollections.Components
             {
                 marker.Latitude = latitude;
                 marker.Longitude = longitude;
-                MarkersChanged?.Invoke();
+                await MarkersChanged.InvokeAsync();
             }
         }
 

@@ -170,30 +170,5 @@ namespace Neptuo.Recollections.Entries.Pages
             Markers[0].Altitude = null;
             return SaveLocationAsync();
         }
-
-        protected string GetMapDescription(bool isVisible)
-        {
-            const string addLocationText = "No Location on Map...";
-            const string noLocationText = "No location...";
-
-            if (isVisible)
-            {
-                if (Model.Location.HasValue())
-                    return Model.Location.ToRoundedString();
-                else if (Permissions.IsEditable)
-                    return addLocationText;
-                else
-                    return noLocationText;
-            }
-            else
-            {
-                if (Model.Location.HasValue())
-                    return "Show Location on Map";
-                else if (Permissions.IsEditable)
-                    return addLocationText;
-                else
-                    return noLocationText;
-            }
-        }
     }
 }

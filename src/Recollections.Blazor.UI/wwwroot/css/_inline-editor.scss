@@ -127,8 +127,6 @@ h4 {
     position: relative;
 
     .map {
-        height: 500px;
-
         img {
             cursor: pointer;
         }
@@ -149,6 +147,16 @@ h4 {
 
         .card-body {
             padding: 4px;
+        }
+    }
+}
+
+.offcanvas {
+    .map-container {
+        height: 100%;
+
+        .map {
+            height: 100%;
         }
     }
 }

@@ -38,8 +38,8 @@
                 @if (UserState.IsAuthenticated)
                 {
                     <div class="gps">
-                        <MapToggle Text="@(MarkerCount == 0 ? "No Locations on Map..." : $"Show Locations on Map ({MarkerCount})")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
-                            <Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" />
+                        <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(MarkerCount == 0 ? "No locations..." : $" {MarkerCount} locations")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
+                            <Map Markers="@Markers" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" />
                         </MapToggle>
                     </div>
                 }

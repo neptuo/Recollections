@@ -36,8 +36,8 @@
                 <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
-                    <MapToggle Text="@(Markers.Count == 0 ? "No Locations on Map..." : $"Show Locations on Map ({Markers.Count})")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
-                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                    <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
                     </MapToggle>
                 </div>
                 @{

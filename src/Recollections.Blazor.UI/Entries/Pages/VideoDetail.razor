@@ -36,8 +36,8 @@
             @if (UserState.IsAuthenticated)
             {
                 <div class="gps">
-                    <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
-                        <Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
+                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(!Model.Location.HasValue() ? "No location..." : Model.Location.ToRoundedString())" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
+                        <Map Markers="@Markers" MarkersChanged="@(() => SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
                     </MapToggle>
                 </div>
             }

@@ -1,6 +1,14 @@
-﻿<InlineLink IconPrefix="fas" Icon="location-arrow" Value="@Value" PlaceHolder="@PlaceHolder" OnClick="@OnToggle" IsClickable="@IsEnabled" />
+﻿<InlineLink
+    IconPrefix="fas"
+    Icon="location-arrow"
+    Value="@(!IsPlaceHolder ? Text : null)"
+    PlaceHolder="@(IsPlaceHolder ? Text : null)"
+    OnClick="@(() => Modal.Show())"
+    IsClickable="@IsEnabled"
+/>
 
-@if (IsVisible)
-{
-    @ChildContent
-}
+<Offcanvas @ref="Modal" Title="@DialogTitle" Direction="start" BodyCssClass="p-0" IsBodyRenderedLazily="true" style="--bs-offcanvas-width: 100%;">
+    <ChildContent>
+        @ChildContent
+    </ChildContent>
+</Offcanvas>

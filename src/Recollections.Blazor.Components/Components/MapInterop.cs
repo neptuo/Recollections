@@ -139,7 +139,7 @@ namespace Neptuo.Recollections.Components
             => editor.MoveMarker(index, latitude, longitude);
 
         [JSInvokable("MapInterop.MarkerSelected")]
-        public void MarkerSelected(int index) => editor.MarkerSelected?.Invoke(index);
+        public async void MarkerSelected(int index) => await editor.MarkerSelected.InvokeAsync(index);
 
         [JSInvokable("MapInterop.MoveEnd")]
         public void MoveEnd(double latitude, double longitude, int zoom)

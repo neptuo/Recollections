@@ -13800,9 +13800,6 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 .map-container {
   position: relative;
 }
-.map-container .map {
-  height: 500px;
-}
 .map-container .map img {
   cursor: pointer;
 }
@@ -13818,6 +13815,13 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 }
 .map-container .card .card-body {
   padding: 4px;
+}
+
+.offcanvas .map-container {
+  height: 100%;
+}
+.offcanvas .map-container .map {
+  height: 100%;
 }
 
 input.input-number-noarrows {
@@ -14256,7 +14260,6 @@ input.input-number-noarrows[type=number] {
 }
 .mappage .map-container .map {
   height: 100%;
-  border-radius: 0 !important;
 }
 @media (max-width: 767px) {
   .mappage {
