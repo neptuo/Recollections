@@ -2,7 +2,7 @@
     position: absolute;
     top: var(--blz-top-bar-height);
     left: 0;
-    bottom: 0;
+    bottom: var(--blz-bottom-bar-height);
     right: 0;
 }
 
