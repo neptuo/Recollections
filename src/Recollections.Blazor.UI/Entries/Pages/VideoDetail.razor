@@ -37,7 +37,7 @@
             {
                 <div class="gps">
                     <MapToggle ToggleChanged="@GetMapDescription" IsPlaceHolder="@(!Model.Location.HasValue())" IsEnabled="@(Model.Location.HasValue() || Permissions.IsEditable)">
-                        <Neptuo.Recollections.Components.Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
+                        <Map Markers="@Markers" MarkersChanged="@(async () => await SaveLocationAsync())" MarkerSelected="OnLocationSelected" OnClearLocation="@OnClearLocationAsync" />
                     </MapToggle>
                 </div>
             }
