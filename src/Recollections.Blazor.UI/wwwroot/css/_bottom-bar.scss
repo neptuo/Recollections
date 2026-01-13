@@ -1,0 +1,27 @@
+:root {
+    --blz-bottom-bar-height: 53px;
+
+    @include media-breakpoint-up(sm) {
+        --blz-bottom-bar-height: 0;
+    }
+}
+
+.bottom-bar {
+    z-index: 1050;
+    background: var(--bs-body-bg);
+    border-top: 1px solid var(--bs-border-color-translucent);
+
+    .items-6, .items-5, .items-4, .items-3 {
+        span.text {
+            display: none;
+        }
+    }
+}
+
+.offcanvas-bottom-menu {
+    --bs-offcanvas-height: 320px;
+
+    .versions {
+        font-size: .6rem;
+    }
+}

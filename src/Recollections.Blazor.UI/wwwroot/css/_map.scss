@@ -1,0 +1,39 @@
+﻿.mappage {
+    position: absolute;
+    top: var(--blz-top-bar-height);
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.map-container, .map {
+    height: 100%;
+}
+
+.map-container {
+    position: relative;
+
+    .map {
+        img {
+            cursor: pointer;
+        }
+    }
+
+    .map-controls {
+        position: absolute;
+        top: 10px;
+        z-index: 401;
+        left: 10px;
+    }
+
+    .card {
+        .card-header,
+        .card-footer {
+            display: none;
+        }
+
+        .card-body {
+            padding: 4px;
+        }
+    }
+}

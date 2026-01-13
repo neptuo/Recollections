@@ -4,17 +4,14 @@
 
 .calendar {
     .badge {
-        margin-bottom: .125rem;
-    }
-
-    .bg-salmon {
         display: block;
+        margin-bottom: $spacer * .125;
         text-align: left;
         text-overflow: ellipsis;
         overflow: hidden;
     }
 
-    a.bg-salmon {
+    a.badge {
         text-decoration: none;
 
         &:hover {

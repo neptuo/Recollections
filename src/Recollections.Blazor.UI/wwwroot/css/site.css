@@ -13445,28 +13445,6 @@ textarea.form-control-lg {
   background: #52585F;
 }
 
-#blazor-error-ui {
-  color-scheme: light only;
-  background: lightyellow;
-  bottom: 0;
-  -webkit-box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-          box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  display: none;
-  left: 0;
-  padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-  position: fixed;
-  width: 100%;
-  z-index: 1000;
-}
-#blazor-error-ui .dismiss {
-  cursor: pointer;
-  position: absolute;
-  right: 0.75rem;
-  top: 0.5rem;
-}
-
 a:not([href]):not([tabindex]) {
   color: inherit;
   text-decoration: none;
@@ -13480,7 +13458,7 @@ body {
   position: relative;
   min-width: 370px;
   min-height: 100vh;
-  padding-bottom: 56px;
+  padding-bottom: calc(var(--blz-bottom-bar-height) + 2rem);
 }
 
 footer.navbar {
@@ -13504,6 +13482,15 @@ footer.navbar a:hover {
   background: var(--bs-body-bg);
 }
 
+:root {
+  --blz-bottom-bar-height: 53px;
+}
+@media (min-width: 576px) {
+  :root {
+    --blz-bottom-bar-height: 0;
+  }
+}
+
 .bottom-bar {
   z-index: 1050;
   background: var(--bs-body-bg);
@@ -13513,27 +13500,24 @@ footer.navbar a:hover {
   display: none;
 }
 
-.toast {
-  z-index: 1060;
-}
-
-.bottom-55 {
-  bottom: 55px;
-}
-
-.offcanvas-bottom {
-  bottom: 52px;
-}
-
-.offcanvas-start {
-  margin-bottom: 54px;
-}
-
 .offcanvas-bottom-menu {
   --bs-offcanvas-height: 320px;
 }
 .offcanvas-bottom-menu .versions {
   font-size: 0.6rem;
+}
+
+.toast {
+  z-index: 1060;
+  bottom: 55px;
+}
+
+.offcanvas-bottom {
+  bottom: var(--blz-bottom-bar-height);
+}
+
+.offcanvas-start {
+  margin-bottom: var(--blz-bottom-bar-height);
 }
 
 blockquote {
@@ -13542,10 +13526,6 @@ blockquote {
 
 .clear {
   clear: both;
-}
-
-.body-offset {
-  margin-top: 24px;
 }
 
 .hidden, .inline-editor .hidden {
@@ -13589,12 +13569,6 @@ a:not(.btn, .nav-link, .dropdown-item, .leaflet-control-zoom-out, .leaflet-contr
   --bs-btn-active-color: #fff;
 }
 
-.bg-salmon,
-a.bg-salmon {
-  color: white;
-  background-color: salmon;
-}
-
 .aspect-1 {
   aspect-ratio: 1;
 }
@@ -13603,35 +13577,33 @@ a.bg-salmon {
   cursor: pointer !important;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .modal .btn-sm-expand {
     -webkit-box-flex: 1 !important;
         -ms-flex: 1 1 auto !important;
             flex: 1 1 auto !important;
   }
 }
-.modal .modal-overflow {
+.modal {
   --bs-modal-header-height: 66px;
   --bs-modal-footer-height: 71px;
+}
+
+.modal-overflow {
   --bs-modal-overflow-margin: var(--bs-modal-margin);
   --bs-modal-overflow-body-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - (var(--bs-modal-overflow-margin) * 2));
 }
-.modal .modal-overflow .modal-body {
+.modal-overflow .modal-body {
   max-height: var(--bs-modal-overflow-body-height);
   overflow: auto;
 }
-.modal .modal-overflow.modal-fullscreen {
+.modal-overflow.modal-fullscreen {
   --bs-modal-overflow-margin: -1px;
 }
-.modal .modal-overflow.modal-fullscreen .modal-body {
+.modal-overflow.modal-fullscreen .modal-body {
   height: var(--bs-modal-overflow-body-height);
 }
 
-@media (min-width: 576px) {
-  .modal .modal-overflow .modal-body {
-    max-height: calc(100vh - 142px - 2.5rem);
-  }
-}
 .loading-bar {
   display: inline-block;
   position: relative;
@@ -13801,33 +13773,6 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
   margin-top: -60px;
 }
 
-.map-container {
-  position: relative;
-}
-.map-container .map img {
-  cursor: pointer;
-}
-.map-container .map-controls {
-  position: absolute;
-  top: 10px;
-  z-index: 401;
-  left: 10px;
-}
-.map-container .card .card-header,
-.map-container .card .card-footer {
-  display: none;
-}
-.map-container .card .card-body {
-  padding: 4px;
-}
-
-.offcanvas .map-container {
-  height: 100%;
-}
-.offcanvas .map-container .map {
-  height: 100%;
-}
-
 input.input-number-noarrows {
   /* Chrome, Safari, Edge, Opera */
   /* Firefox */
@@ -13922,6 +13867,15 @@ input.input-number-noarrows[type=number] {
   }
 }
 
+:root {
+  --blz-top-bar-height: 50.28px;
+}
+@media (min-width: 768px) {
+  :root {
+    --blz-top-bar-height: 64px;
+  }
+}
+
 .main-navbar.block-icons {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
@@ -13931,7 +13885,7 @@ input.input-number-noarrows[type=number] {
   padding-right: 1.1rem;
   padding-left: 1.1rem;
 }
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .main-navbar.block-icons .nav-link {
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
@@ -13943,7 +13897,7 @@ input.input-number-noarrows[type=number] {
     padding-left: 1.5rem;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 767.98px) {
   .main-navbar.block-icons .nav-link .fa, .main-navbar.block-icons .nav-link .fas, .main-navbar.block-icons .nav-link .far {
     font-size: 1.3rem;
   }
@@ -13952,11 +13906,6 @@ input.input-number-noarrows[type=number] {
   .main-navbar.block-icons .nav-link .fa, .main-navbar.block-icons .nav-link .fas, .main-navbar.block-icons .nav-link .far {
     display: block;
     text-align: center;
-  }
-}
-@media (min-width: 768px) {
-  .main-navbar.block-icons ~ .mappage {
-    top: 64px !important;
   }
 }
 
@@ -14255,21 +14204,34 @@ input.input-number-noarrows[type=number] {
 }
 .mappage {
   position: absolute;
-  top: 64px;
+  top: var(--blz-top-bar-height);
   left: 0;
   bottom: 0;
   right: 0;
 }
-.mappage .map-container {
+
+.map-container, .map {
   height: 100%;
 }
-.mappage .map-container .map {
-  height: 100%;
+
+.map-container {
+  position: relative;
 }
-@media (max-width: 767px) {
-  .mappage {
-    top: 48px;
-  }
+.map-container .map img {
+  cursor: pointer;
+}
+.map-container .map-controls {
+  position: absolute;
+  top: 10px;
+  z-index: 401;
+  left: 10px;
+}
+.map-container .card .card-header,
+.map-container .card .card-footer {
+  display: none;
+}
+.map-container .card .card-body {
+  padding: 4px;
 }
 
 .entry-detail .images {
@@ -14557,18 +14519,16 @@ video.pswp__video {
 }
 
 .calendar .badge {
-  margin-bottom: 0.125rem;
-}
-.calendar .bg-salmon {
   display: block;
+  margin-bottom: 0.125rem;
   text-align: left;
   text-overflow: ellipsis;
   overflow: hidden;
 }
-.calendar a.bg-salmon {
+.calendar a.badge {
   text-decoration: none;
 }
-.calendar a.bg-salmon:hover {
+.calendar a.badge:hover {
   color: white;
 }
 .calendar .calendar-header,

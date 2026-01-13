@@ -24,27 +24,6 @@ $theme-colors: map-merge($theme-colors, ( "primary": $primary ));
     background: #52585F;
 }
 
-#blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    
-    .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
-}
-
 a:not([href]):not([tabindex]) {
     color: inherit;
     text-decoration: none;
@@ -58,7 +37,7 @@ body {
     position: relative;
     min-width: 370px;
     min-height: 100vh;
-    padding-bottom: 56px;
+    padding-bottom: calc(var(--blz-bottom-bar-height) + 2rem);
 }
 
 footer.navbar {
@@ -66,7 +45,7 @@ footer.navbar {
     bottom: 0;
     width: 100%;
     border-top: 1px solid rgba(0,0,0,.1);
-    padding-top: 0.5rem;
+    padding-top: $spacer * 0.5;
 
     .navbar-text {
         color: $placeholder-color !important;
@@ -85,40 +64,19 @@ footer.navbar {
     background: var(--bs-body-bg);
 }
 
-.bottom-bar {
-    z-index: 1050;
-    background: var(--bs-body-bg);
-    border-top: 1px solid var(--bs-border-color-translucent);
-
-    .items-6, .items-5, .items-4, .items-3 {
-        span.text {
-            display: none;
-        }
-    }
-}
+@import "_bottom-bar.scss";
 
 .toast {
     z-index: 1060;
-}
-
-.bottom-55 {
     bottom: 55px;
 }
 
 .offcanvas-bottom {
-    bottom: 52px; // Duplicated for .offcanvas-bottom-to-end
+    bottom: var(--blz-bottom-bar-height); // Duplicated for .offcanvas-bottom-to-end
 }
 
 .offcanvas-start {
-    margin-bottom: 54px; // To avoid bottom bar
-}
-
-.offcanvas-bottom-menu {
-    --bs-offcanvas-height: 320px;
-
-    .versions {
-        font-size: .6rem;
-    }
+    margin-bottom: var(--blz-bottom-bar-height); // To avoid bottom bar
 }
 
 blockquote {
@@ -127,10 +85,6 @@ blockquote {
 
 .clear {
     clear: both;
-}
-
-.body-offset {
-    margin-top: 24px;
 }
 
 .hidden, .inline-editor .hidden {
@@ -179,12 +133,6 @@ a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-z
     --bs-btn-active-color: #fff;
 }
 
-.bg-salmon,
-a.bg-salmon {
-    color: white;
-    background-color: salmon;
-}
-
 .aspect-1 {
     aspect-ratio: 1;
 }
@@ -193,85 +141,18 @@ a.bg-salmon {
     cursor: pointer !important;
 }
 
-@media (max-width: 767px) {
+@include media-breakpoint-down(md) {
     .modal .btn-sm-expand {
         flex: 1 1 auto !important; // flex-fill
     }
 }
 
-.modal .modal-overflow {
-    --bs-modal-header-height: 66px;
-    --bs-modal-footer-height: 71px;
-    --bs-modal-overflow-margin: var(--bs-modal-margin);
-    --bs-modal-overflow-body-height: calc(100vh - (var(--bs-modal-header-height) + 1px) - (var(--bs-modal-footer-height) + 1px) - (var(--bs-modal-overflow-margin) * 2));
-
-    .modal-body {
-        max-height: var(--bs-modal-overflow-body-height);
-        overflow: auto;
-    }
-    
-    &.modal-fullscreen {
-        --bs-modal-overflow-margin: -1px;
-        .modal-body {
-            height: var(--bs-modal-overflow-body-height);
-        }
-    }
-}
-
-@media (min-width: 576px) {
-    .modal .modal-overflow .modal-body {
-        max-height: calc(100vh - 142px - 2.5rem);
-    }
-}
-
+@import "_modal.scss";
 @import "_loading.scss";
 @import "_inline-editor.scss";
 @import "_file-upload.scss";
 @import "_action-menu.scss";
-
-.main-navbar {
-    &.block-icons {
-        padding-top: .25rem;
-        padding-bottom: .25rem;
-
-        .nav-link {
-            text-align: center;
-            padding-right: 1.1rem;
-            padding-left: 1.1rem;
-
-            @media (max-width: 767px) {
-                padding-top: .3rem;
-                padding-bottom: .3rem;
-            }
-
-            @media (min-width:1200px) {
-                padding-right: 1.5rem;
-                padding-left: 1.5rem;
-            }
-
-            .fa, .fas, .far {
-                @media (max-width: 767px) {
-                    font-size: 1.3rem;
-                }
-
-                @media (min-width: 768px) {
-                    display: block;
-                    text-align: center;
-                }
-            }
-        }
-
-        @media (min-width:768px) {
-            & ~ .mappage {
-                top: 64px !important;
-            }
-        }
-    }
-}
-
-.user-navbar {
-    flex-direction: row;
-}
+@import "_top-bar.scss";
 
 .actions {
     .right-actions {
@@ -301,7 +182,7 @@ a.bg-salmon {
 @import "_exception-panel.scss";
 @import "_accounts.scss";
 @import "_timeline.scss";
-@import "_mappage.scss";
+@import "_map.scss";
 @import "_entry-detail.scss";
 @import "_entry-picker.scss";
 @import "_image-detail.scss";

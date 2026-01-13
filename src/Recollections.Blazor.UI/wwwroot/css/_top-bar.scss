@@ -1,0 +1,45 @@
+:root {
+    --blz-top-bar-height: 50.28px;
+
+    @include media-breakpoint-up(md) {
+        --blz-top-bar-height: 64px;
+    }
+}
+
+.main-navbar {
+    &.block-icons {
+        padding-top: .25rem;
+        padding-bottom: .25rem;
+
+        .nav-link {
+            text-align: center;
+            padding-right: 1.1rem;
+            padding-left: 1.1rem;
+
+            @include media-breakpoint-down(md) {
+                padding-top: .3rem;
+                padding-bottom: .3rem;
+            }
+
+            @include media-breakpoint-up(xl) {
+                padding-right: 1.5rem;
+                padding-left: 1.5rem;
+            }
+
+            .fa, .fas, .far {
+                @include media-breakpoint-down(md) {
+                    font-size: 1.3rem;
+                }
+
+                @include media-breakpoint-up(md) {
+                    display: block;
+                    text-align: center;
+                }
+            }
+        }
+    }
+}
+
+.user-navbar {
+    flex-direction: row;
+}

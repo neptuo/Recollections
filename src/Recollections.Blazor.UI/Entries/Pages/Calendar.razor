@@ -42,7 +42,7 @@
 
         @foreach (var model in Models.Where(e => e.When.Day == day))
         {
-            <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-salmon px-1">
+            <a href="@Navigator.UrlEntryDetail(model.Id)" class="badge bg-primary text-white px-1">
                 @model.Title
             </a>
         }
