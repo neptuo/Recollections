@@ -27,6 +27,7 @@
 .btn-floating-offcanvas {
     --bs-offcanvas-height: auto; // 420px
     --bs-offcanvas-width: 230px;
+    --bs-offcanvas-zindex: 1046; // To overlap other offcanvas (1045)
 
     .offcanvas-body {
         padding-bottom: 2rem !important;

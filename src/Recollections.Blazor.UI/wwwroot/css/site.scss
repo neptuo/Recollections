@@ -109,6 +109,10 @@ footer.navbar {
     bottom: 52px; // Duplicated for .offcanvas-bottom-to-end
 }
 
+.offcanvas-start {
+    margin-bottom: 54px; // To avoid bottom bar
+}
+
 .offcanvas-bottom-menu {
     --bs-offcanvas-height: 320px;
 

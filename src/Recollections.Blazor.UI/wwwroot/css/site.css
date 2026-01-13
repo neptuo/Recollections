@@ -13525,6 +13525,10 @@ footer.navbar a:hover {
   bottom: 52px;
 }
 
+.offcanvas-start {
+  margin-bottom: 54px;
+}
+
 .offcanvas-bottom-menu {
   --bs-offcanvas-height: 320px;
 }
@@ -13884,6 +13888,7 @@ input.input-number-noarrows[type=number] {
 .btn-floating-offcanvas {
   --bs-offcanvas-height: auto;
   --bs-offcanvas-width: 230px;
+  --bs-offcanvas-zindex: 1046;
 }
 .btn-floating-offcanvas .offcanvas-body {
   padding-bottom: 2rem !important;
