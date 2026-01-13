@@ -43,7 +43,6 @@
   <ItemGroup>
     <Content Remove="**\*.svg" />
     <Content Remove="**\*.scss" />
-    <Watch Include="wwwroot\css\**\*.scss" />
     <Content Remove="wwwroot\lib\leaflet\**\*.*" />
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
@@ -62,7 +61,7 @@
       <ScssFiles Include="wwwroot\css\**\*.scss" />
     </ItemGroup>
   </Target>
-  <Target Name="CompileScss" DependsOnTargets="PrepareScss" BeforeTargets="ResolveProjectStaticWebAssets" Inputs="@(ScssFiles)" Outputs="wwwroot\css\site.css">
+  <Target Name="CompileScss" DependsOnTargets="PrepareScss" Inputs="@(ScssFiles)" Outputs="wwwroot\css\site.css">
     <PropertyGroup>
       <CssRootFolder>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'wwwroot', 'css'))</CssRootFolder>
       <WebCompilerConfigPath>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', 'webcompilerconfiguration.json'))</WebCompilerConfigPath>
