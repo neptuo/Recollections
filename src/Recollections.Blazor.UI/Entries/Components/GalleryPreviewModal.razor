@@ -22,7 +22,6 @@
 
 @code {
     Offcanvas Modal;
-    bool RenderPreviews;
     int CurrentLimit = 10;
     int previousParametersHashCode;
 
@@ -61,10 +60,7 @@
     {
         int currentParametersHashCode = ComputeParametersHashCode();
         if (previousParametersHashCode != currentParametersHashCode)
-        {
             CurrentLimit = 10;
-            RenderPreviews = false;
-        }
 
         previousParametersHashCode = currentParametersHashCode;
     }
@@ -72,7 +68,6 @@
     public void Show() 
     {
         Modal.Show();
-        RenderPreviews = true;
         StateHasChanged();
     }
 
