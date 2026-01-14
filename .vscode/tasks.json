@@ -4,27 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Compile SCSS",
-            "command": "dotnet",
-            "type": "shell",
-            "args": [
-                "build",
-                "/t:CompileScss",
-                "./src/Recollections.Blazor.UI"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "silent",
-                "panel": "dedicated"
-            },
-            "problemMatcher": "$msCompile",
-            "options": {
-                "statusbar": {
-                    "label": "scss"
-                }
-            }
-        },
-        {
             "label": "Api build",
             "command": "dotnet",
             "type": "shell",
@@ -61,6 +40,27 @@
             "options": {
                 "statusbar": {
                     "label": "blazor:build"
+                }
+            }
+        },
+        {
+            "label": "Compile SCSS",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "./src/WatchScss.proj",
+                "-p:RootPath=./src/Recollections.Blazor.UI"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$msCompile",
+            "options": {
+                "statusbar": {
+                    "label": "blazor:scss"
                 }
             }
         },
