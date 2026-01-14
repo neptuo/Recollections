@@ -1,0 +1,18 @@
+<Project DefaultTargets="CompileScss">
+  <PropertyGroup>
+    <CssRootFolder>$([MSBuild]::NormalizeDirectory('$(RootPath)', 'wwwroot', 'css'))</CssRootFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <Watch Include="$(MSBuildThisFile)" />
+    <Watch Include="$(RootPath)\**\*.scss" />
+  </ItemGroup>
+  <Target Name="CompileScss" Inputs="@(Watch)" Outputs="$(CssRootFolder)\site.css">
+    <PropertyGroup>
+      <WebCompilerConfigPath>$([MSBuild]::NormalizePath('$(RootPath)', 'webcompilerconfiguration.json'))</WebCompilerConfigPath>
+    </PropertyGroup>
+    <Exec Command="dotnet webcompiler -r $(CssRootFolder) -c $(WebCompilerConfigPath)" />
+  </Target>
+
+  <!-- Import HotReload targets -->
+  <Import Project="$(CustomAfterMicrosoftCommonTargets)" Condition="Exists('$(CustomAfterMicrosoftCommonTargets)')" />
+</Project>
