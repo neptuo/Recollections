@@ -40,6 +40,10 @@
     <WasmEnvironmentVariable Include="API_BASE_ADDRESS" Value="$(ApiBaseAddress)" />
   </ItemGroup>
 
+  <!-- Watch and publish setup -->
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\*.scss</DefaultItemExcludes>
+  </PropertyGroup>
   <ItemGroup>
     <Content Remove="**\*.svg" />
     <Content Remove="**\*.scss" />
