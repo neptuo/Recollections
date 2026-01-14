@@ -28,8 +28,7 @@ if (isWatch)
         .WithReference(apiService);
 
     builder
-        .AddExecutable("watch-scss", "dotnet", ".", ["watch", "--non-interactive", "--verbose", "build", ".\\WatchScss.proj", $"--property:RootPath={uiProjectDirectory}"]);
-
+        .AddExecutable("watch-scss", "dotnet", ".", ["watch", "--no-restore", "--non-interactive", "--verbose", "build", ".\\WatchScss.proj", $"--property:RootPath={uiProjectDirectory}"]);
 }
 else
 {
