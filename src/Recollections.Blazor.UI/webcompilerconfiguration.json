@@ -10,7 +10,8 @@
         "OutputStyle": "Expanded",
         "RelativeUrls": true,
         "LineFeed": "Lf",
-        "SourceMap": false
+        "SourceMap": false,
+        "OmitSourceMapUrl": true
       },
       "Ignore": [
         "**/_*.*"
