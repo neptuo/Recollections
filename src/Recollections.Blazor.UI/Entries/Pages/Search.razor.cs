@@ -33,6 +33,7 @@ namespace Neptuo.Recollections.Entries.Pages
         /// Don't use here. Only for binding purposes.
         /// </summary>
         protected string SearchText { get; set; }
+        protected ElementReference SearchInput { get; set; }
 
         protected List<EntryListModel> Items { get; } = [];
         protected bool HasMore { get; private set; }
@@ -71,6 +72,14 @@ namespace Neptuo.Recollections.Entries.Pages
             Log.Debug("OnParametersSetAsync");
             await base.OnParametersSetAsync();
             await SearchAsync();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+                await SearchInput.FocusAsync();
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         protected async Task SearchAsync(bool append = false)
