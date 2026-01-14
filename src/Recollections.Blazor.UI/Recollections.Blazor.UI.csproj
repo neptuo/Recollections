@@ -40,6 +40,10 @@
     <WasmEnvironmentVariable Include="API_BASE_ADDRESS" Value="$(ApiBaseAddress)" />
   </ItemGroup>
 
+  <!-- Watch and publish setup -->
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\*.scss</DefaultItemExcludes>
+  </PropertyGroup>
   <ItemGroup>
     <Content Remove="**\*.svg" />
     <Content Remove="**\*.scss" />
@@ -56,18 +60,6 @@
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 
-  <Target Name="PrepareScss">
-    <ItemGroup>
-      <ScssFiles Include="wwwroot\css\**\*.scss" />
-    </ItemGroup>
-  </Target>
-  <Target Name="CompileScss" DependsOnTargets="PrepareScss" Inputs="@(ScssFiles)" Outputs="wwwroot\css\site.css">
-    <PropertyGroup>
-      <CssRootFolder>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', 'wwwroot', 'css'))</CssRootFolder>
-      <WebCompilerConfigPath>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', 'webcompilerconfiguration.json'))</WebCompilerConfigPath>
-    </PropertyGroup>
-    <Exec Command="dotnet webcompiler -r $(CssRootFolder) -c $(WebCompilerConfigPath)" />
-  </Target>
   <Target Name="LibmanRestore">
     <Exec Command="libman restore" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
