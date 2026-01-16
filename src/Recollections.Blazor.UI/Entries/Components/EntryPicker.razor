@@ -81,7 +81,7 @@
     <Buttons>
         @if (HasMore)
         {
-            <button class="btn btn-outline-primary" disabled="@IsLoading" @onclick="@LoadMoreAsync">
+            <button class="btn btn-secondary btn-sm-expand" disabled="@IsLoading" @onclick="@LoadMoreAsync">
                 @if (IsLoading) 
                 {
                     @: Loading...

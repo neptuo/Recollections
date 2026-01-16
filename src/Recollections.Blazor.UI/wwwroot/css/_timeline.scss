@@ -118,13 +118,6 @@ $dot-diameter: 18px;
     }
 }
 
-.entry-more {
-    position: relative;
-    margin-left: calc(15% - 34px);
-    margin-bottom: 48px;
-    background: var(--bs-body-bg);
-}
-
 @mixin narrow() {
     .timeline {
         &:before {
@@ -179,7 +172,7 @@ $dot-diameter: 18px;
     @include narrow;
 }
 
-.entry-detail {
+.timeline-narrow {
     .timeline:before {
         top: 20px;
         border-radius: 4px;
@@ -194,6 +187,6 @@ $dot-diameter: 18px;
     }
 }
 
-@media (max-width: 768px) {
+@include media-breakpoint-down(md) {
     @include narrow;
 }
