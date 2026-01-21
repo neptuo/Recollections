@@ -25931,43 +25931,6 @@ video.pswp__video {
   color: rgba(250, 128, 114, 0.5);
 }
 
-.search .card.selected, .search .card.selected-within {
-  border-color: salmon;
-}
-.search .card.selected .card-header {
-  background-color: rgba(250, 128, 114, 0.5);
-}
-.search .card:hover:not(.no-hover) {
-  background-color: rgba(250, 128, 114, 0.25);
-  border-color: salmon;
-}
-.search .card a:hover {
-  text-decoration: none;
-}
-.search .card .list-group-item.selected {
-  background-color: rgba(250, 128, 114, 0.5);
-}
-.search .information {
-  margin-right: 12px;
-}
-
-.yearlendar .card.selected, .yearlendar .card.selected-within {
-  border-color: salmon;
-}
-.yearlendar .card.selected .card-header {
-  background-color: rgba(250, 128, 114, 0.5);
-}
-.yearlendar .card:hover:not(.no-hover) {
-  background-color: rgba(250, 128, 114, 0.25);
-  border-color: salmon;
-}
-.yearlendar .card a:hover {
-  text-decoration: none;
-}
-.yearlendar .card .list-group-item.selected {
-  background-color: rgba(250, 128, 114, 0.5);
-}
-
 .calendar .badge {
   display: block;
   margin-bottom: 0.125rem;
@@ -25999,13 +25962,6 @@ video.pswp__video {
 }
 .calendar .calendar-cell {
   aspect-ratio: 1;
-}
-.yearlendar .badge {
-  margin-bottom: 0.25rem;
-}
-.yearlendar strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .date-picker .btn-outline-primary {

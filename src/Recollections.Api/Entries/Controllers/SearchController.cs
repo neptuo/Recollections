@@ -16,8 +16,6 @@ namespace Neptuo.Recollections.Entries.Controllers
     [Route("api/search")]
     public class SearchController : ControllerBase
     {
-        private const int PageSize = 10;
-
         private readonly DataContext dataContext;
         private readonly IUserNameProvider userNames;
         private readonly ShareStatusService shareStatus;
@@ -56,11 +54,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             var dbQuery = shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .OrderByDescending(e => e.When)
-                .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"))
-                .Skip(offset)
-                .Take(PageSize);
+                .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"));
             
-            var (models, hasMore) = await entryMapper.MapAsync(dbQuery, userId, connectedUsers, PageSize);
+            var (models, hasMore) = await entryMapper.MapAsync(dbQuery, userId, connectedUsers, offset);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         }
     }

@@ -1,8 +1,4 @@
-﻿.yearlendar {
-    @import "_salmon-card.scss";
-}
-
-.calendar {
+﻿.calendar {
     .badge {
         display: block;
         margin-bottom: $spacer * .125;
@@ -40,24 +36,7 @@
     .calendar-cell {
         aspect-ratio: 1;
     }
-
-    .calendar-row:last-child {
-        .calendar-cell {
-        }
-    }
 }
-
-.yearlendar {
-    .badge {
-        margin-bottom: .250rem;
-    }
-
-    strong {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-
 .date-picker {
     .btn-outline-primary {
         color: var(--bs-card-title-color) !important;
