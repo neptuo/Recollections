@@ -8,7 +8,7 @@ $primary: $accent-color;
 $theme-colors: map-merge($theme-colors, ( "primary": $primary ));
 
 @import "../lib/bootstrap/scss/bootstrap";
-@import "../lib/fontawesome/css/all.css"; // FontAwesome imports other files using relative paths
+@import "../lib/fontawesome/css/all"; // FontAwesome imports other files using relative paths
 @import "../lib/easymde/dist/easymde.min";
 @import "_easymde.customizations";
 

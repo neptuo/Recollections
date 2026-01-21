@@ -48,6 +48,9 @@
     <Content Remove="**\*.svg" />
     <Content Remove="**\*.scss" />
     <Content Remove="wwwroot\lib\leaflet\**\*.*" />
+    <Content Update="wwwroot\lib\fontawesome\webfonts\*.*">
+      <TargetPath>wwwroot\webfonts\%(Filename)%(Extension)</TargetPath>
+    </Content>
     <Compile Update="**\*.razor.cs" DependentUpon="%(Filename)" />
     <None Update="**\*.json.defaults" DependentUpon="%(Filename)" />
   </ItemGroup>
