@@ -9,8 +9,8 @@ $theme-colors: map-merge($theme-colors, ( "primary": $primary ));
 
 @import "../lib/bootstrap/scss/bootstrap";
 @import "../lib/fontawesome/css/all.css"; // FontAwesome imports other files using relative paths
-@import "../lib/easymde/dist/easymde.min.css";
-@import "_easymde.customizations.scss";
+@import "../lib/easymde/dist/easymde.min";
+@import "_easymde.customizations";
 
 ::-webkit-scrollbar {
     width: 8px;
