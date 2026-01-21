@@ -1,17 +1,4 @@
-﻿.file-upload {
-    float: left;
-    margin-right: 4px;
-
-    input[type=file] {
-        display: none;
-    }
-}
-
-.file-progress-global {
-    top: 50px;
+﻿.file-progress-global {
+    top: var(--blz-top-bar-height);
     z-index: 1021;
-
-    @include media-breakpoint-up(md) {
-        top: 64px;
-    }
 }

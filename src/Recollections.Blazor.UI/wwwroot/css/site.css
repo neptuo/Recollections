@@ -25289,22 +25289,9 @@ input.input-number-noarrows[type=number] {
   -moz-appearance: textfield;
 }
 
-.file-upload {
-  float: left;
-  margin-right: 4px;
-}
-.file-upload input[type=file] {
-  display: none;
-}
-
 .file-progress-global {
-  top: 50px;
+  top: var(--blz-top-bar-height);
   z-index: 1021;
-}
-@media (min-width: 768px) {
-  .file-progress-global {
-    top: 64px;
-  }
 }
 
 .btn-floating {
