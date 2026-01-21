@@ -10,53 +10,21 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class EntryPicker
+    public partial class EntryPicker(Api Api)
     {
-        [Inject]
-        protected Api Api { get; set; }
-
-        [Inject]
-        protected UiOptions UiOptions { get; set; }
-
         [Parameter]
         public Action<EntryListModel> Selected { get; set; }
 
         protected Modal Modal { get; set; }
 
-        private int offset;
-        private bool isFirstShow = true;
-
-        protected bool IsLoading { get; set; }
-        protected List<EntryListModel> Entries { get; } = new List<EntryListModel>();
-        protected bool HasMore { get; private set; }
-
-        private async Task LoadAsync()
-        {
-            IsLoading = true;
-            var response = await Api.GetTimelineListAsync(offset);
-            Entries.AddRange(response.Models);
-            HasMore = response.HasMore;
-            offset = Entries.Count;
-            IsLoading = false;
-
-            StateHasChanged();
-        }
-
-        protected async Task LoadMoreAsync()
-        {
-            if (HasMore)
-                await LoadAsync();
-        }
+        private bool wasVisible = false;
 
         public void Show()
         {
-            Modal.Show();
+            wasVisible = true;
+            StateHasChanged();
 
-            if (isFirstShow)
-            {
-                isFirstShow = false;
-                _ = LoadAsync();
-            }
+            Modal.Show();
         }
 
         public void Hide() => Modal.Hide();

@@ -10,20 +10,8 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class Timeline
+    public partial class Timeline(Navigator Navigator, UiOptions UiOptions, ILog<Timeline> Log)
     {
-        [Inject]
-        protected Api Api { get; set; }
-
-        [Inject]
-        protected Navigator Navigator { get; set; }
-
-        [Inject]
-        protected UiOptions UiOptions { get; set; }
-
-        [Inject]
-        protected ILog<Timeline> Log { get; set; }
-
         [Parameter]
         public RenderFragment BeforeContent { get; set; }
 
@@ -47,6 +35,9 @@ namespace Neptuo.Recollections.Entries.Components
 
         [Parameter]
         public Func<int, Task<PageableList<EntryListModel>>> DataGetter { get; set; }
+
+        [Parameter]
+        public EventCallback<EntryListModel> OnClick { get; set; }
 
         private int offset;
         private Task loadAsyncFromParametersSet;

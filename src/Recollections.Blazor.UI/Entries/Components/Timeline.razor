@@ -43,7 +43,7 @@
                     </div>
                     <div class="body">
                         <h2>
-                            <a href="@Navigator.UrlEntryDetail(entry.Id)">
+                            <a href="@Navigator.UrlEntryDetail(entry.Id)" @onclick="@(e => OnClick.InvokeAsync(entry))" @onclick:preventDefault="@OnClick.HasDelegate">
                                 @entry.Title
                             </a>
                         </h2>

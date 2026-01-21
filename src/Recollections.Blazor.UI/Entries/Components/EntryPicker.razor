@@ -2,95 +2,9 @@
 
 <Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker" IsOverflow="true">
     <ChildContent>
-        <div class="timeline">
-            <ListView Items="@Entries" EmptyMessage="You don't have any entry..." Context="entry">
-                <div class="entry">
-                    <div class="title">
-                        <h3>@entry.When.ToString(UiOptions.DateFormat)</h3>
-                    </div>
-                    <div class="body">
-                        <h2>
-                            <a @onclick="@(() => { Hide(); Selected?.Invoke(entry); })">
-                                @entry.Title
-                            </a>
-                        </h2>
-                        <p>
-                            @if (!String.IsNullOrEmpty(entry.StoryTitle) || !String.IsNullOrEmpty(entry.ChapterTitle))
-                            {
-                                <span class="information">
-                                    <Icon Identifier="book" />
-
-                                    @entry.StoryTitle
-                                    @if (!String.IsNullOrEmpty(entry.ChapterTitle))
-                                    {
-                                        <span>
-                                            - @entry.ChapterTitle
-                                        </span>
-                                    }
-                                </span>
-                            }
-
-                            @if (entry.TextWordCount > 0)
-                            {
-                                <span class="information">
-                                    <Icon Identifier="quote-right" />
-                                    @entry.TextWordCount words
-                                </span>
-                            }
-
-                            @if (entry.GpsCount > 0)
-                            {
-                                <span class="information">
-                                    <Icon Prefix="fas" Identifier="location-arrow" />
-                                    @entry.GpsCount
-                                </span>
-                            }
-
-                            @if (entry.ImageCount > 0)
-                            {
-                                <span class="information">
-                                    <Icon Identifier="image" />
-                                    @entry.ImageCount
-                                </span>
-                            }
-
-                            @if (UserState.UserId != entry.UserId)
-                            {
-                                <span class="information">
-                                    <Icon Identifier="user" />
-                                    @entry.UserName
-                                </span>
-                            }
-
-                            @if (entry.Beings != null)
-                            {
-                                foreach (var being in entry.Beings)
-                                {
-                                    <span class="information">
-                                        <BeingIcon Identifier="@being.Icon" />
-                                        @being.Name
-                                    </span>
-                                }
-                            }
-                        </p>
-                    </div>
-                </div>
-            </ListView>
-        </div>
-    </ChildContent>
-    <Buttons>
-        @if (HasMore)
+        @if (wasVisible)
         {
-            <button class="btn btn-secondary btn-sm-expand" disabled="@IsLoading" @onclick="@LoadMoreAsync">
-                @if (IsLoading) 
-                {
-                    @: Loading...
-                } 
-                else 
-                {
-                    @: More...
-                }
-            </button>
+            <Timeline OnClick="@(entry => { Hide(); Selected?.Invoke(entry); })" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />
         }
-    </Buttons>
+    </ChildContent>
 </Modal>
