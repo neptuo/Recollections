@@ -104,13 +104,17 @@ a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-z
     }
 }
 
+@mixin uni-icon {
+    width: $uni-icon-width;
+    text-align: center;
+}
+
 .dropdown-item,
 .list-group-item {
     .fa,
     .far,
     .fas {
-        width: $uni-icon-width;
-        text-align: center;
+        @include uni-icon;
     }
 }
 
@@ -118,8 +122,7 @@ a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-z
     &.fa,
     &.far,
     &.fas {
-        width: $uni-icon-width;
-        text-align: center;
+        @include uni-icon;
     }
 }
 
@@ -179,16 +182,15 @@ a:not(.btn,.nav-link,.dropdown-item,.leaflet-control-zoom-out,.leaflet-control-z
     }
 }
 
-@import "_exception-panel.scss";
 @import "_accounts.scss";
 @import "_timeline.scss";
 @import "_map.scss";
-@import "_entry-detail.scss";
+@import "_images.scss";
+@import "_gallery.scss";
 @import "_entry-picker.scss";
 @import "_image-detail.scss";
-@import "_stories.scss";
+@import "_card-list.scss";
 @import "_story-picker.scss";
-@import "_beings.scss";
 @import "_icon-picker.scss";
 @import "_search.scss";
 @import "_calendar.scss";

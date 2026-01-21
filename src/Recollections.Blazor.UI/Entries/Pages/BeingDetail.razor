@@ -22,7 +22,7 @@
                 </ItemGroup>
             </ActionMenu>
 
-            <div class="entry-detail my-sm-3">
+            <div class="my-sm-3">
                 <InlineTitleEdit Value="@Model.Name" ValueChanged="@(async value => await SaveNameAsync(value))" />
                 <h2 class="icon">
                     <InlineLink Value="@Model.Icon" PlaceHolder="user" OnClick="@(() => IconPicker.Show())">

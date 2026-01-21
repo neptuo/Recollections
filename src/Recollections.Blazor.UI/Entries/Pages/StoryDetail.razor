@@ -32,7 +32,7 @@
                 }
             </ActionMenu>
 
-            <div class="entry-detail my-sm-3">
+            <div class="my-sm-3">
                 <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
@@ -56,14 +56,14 @@
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                <div class="entries">
+                <div class="mb-3 timeline-narrow">
                     <Timeline Data="@Entries[Model.Id]" ShowStoryInfo="false" Collapsible="true" />
                 </div>
 
                 <div class="chapters">
                     @foreach (var chapter in Model.Chapters)
                     {
-                        <div class="chapter">
+                        <div class="mt-3">
                             <h4>
                                 <InlineTextEdit
                                     @ref="LastChapterTitleEdit"

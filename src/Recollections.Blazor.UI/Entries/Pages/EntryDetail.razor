@@ -23,7 +23,7 @@
                 </ItemGroup>
             </ActionMenu>
 
-            <div @ref="Container" class="entry-detail my-sm-3">
+            <div @ref="Container" class="my-sm-3">
                 <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <div class="datetime">
                     <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
