@@ -32,7 +32,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var results = await mapService.GetAsync(db.Entries, userId, connectedUsers);
+            var results = await mapService.GetAsync(db.Entries, [userId], connectedUsers);
             return Ok(results);
         }
 

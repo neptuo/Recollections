@@ -22,14 +22,12 @@ public class StoryMapController(MapService mapService, DataContext db, ShareStat
     [HttpGet]
     public Task<IActionResult> List(string storyId) => RunStoryAsync(storyId, Permission.Read, async entry =>
     {
-        string userId = HttpContext.User.FindUserId();
-        if (string.IsNullOrEmpty(userId))
-            return Unauthorized();
+        var userId = User.FindUserId();
 
         var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
         var results = await mapService.GetAsync(
             db.Entries.Where(e => e.Story.Id == storyId || e.Chapter.Story.Id == storyId), 
-            userId, 
+            [userId, ShareStatusService.PublicUserId], 
             connectedUsers
         );
         return Ok(results);

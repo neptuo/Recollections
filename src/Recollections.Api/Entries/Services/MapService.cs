@@ -20,10 +20,10 @@ public class MapService
         this.shareStatus = shareStatus;
     }
 
-    public async Task<List<MapEntryModel>> GetAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers)
+    public async Task<List<MapEntryModel>> GetAsync(IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers)
     {
         List<MapEntryModel> results = await shareStatus
-            .OwnedByOrExplicitlySharedWithUser(dataContext, query, userId, connectedUsers)
+            .OwnedByOrExplicitlySharedWithUser(dataContext, query, userIds, connectedUsers)
             .Select(e => new MapEntryModel()
             {
                 Id = e.Id,
