@@ -2,30 +2,32 @@
 @layout HeadLayout
 @inject Navigator Navigator
 
-<div class="container pt-1 mb-0">
+<div class="container pt-1">
     @Body
 </div>
-<footer class="navbar navbar-light d-none d-sm-block">
-    <div class="container">
-        <span class="navbar-text">
-            <small>
-                &copy; 2021
-                &#8226; <a href="@Navigator.UrlAbout()" target="_blank">Recollections</a> by  <a href="https://www.neptuo.com" target="_blank">Neptuo</a>
-            </small>
-        </span>
-        <span class="navbar-text text-end">
-            <small>
-                <span class="versions">
-                    <VersionInfo />
+<div class="d-none d-sm-block mt-5 pt-5">
+    <footer class="navbar position-absolute bottom-0 start-0 end-0 border-top navbar-light p-3">
+        <div class="container">
+            <span class="text-muted">
+                <small>
+                    &copy; 2021
+                    &#8226; <a href="@Navigator.UrlAbout()" target="_blank">Recollections</a> by  <a href="https://www.neptuo.com" target="_blank">Neptuo</a>
+                </small>
+            </span>
+            <span class="text-muted text-end">
+                <small>
+                    <span class="versions">
+                        <VersionInfo />
 
-                    &#8226;
-                </span>
+                        &#8226;
+                    </span>
 
-                <a href="@Navigator.UrlGithubRepositoryIssuesNew()" target="_blank">
-                    Report a bug
-                    <Icon Identifier="bug" />
-                </a>
-            </small>
-        </span>
-    </div>
-</footer>
+                    <a href="@Navigator.UrlGithubRepositoryIssuesNew()" target="_blank">
+                        Report a bug
+                        <Icon Identifier="bug" />
+                    </a>
+                </small>
+            </span>
+        </div>
+    </footer>
+</div>

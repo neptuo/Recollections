@@ -24965,23 +24965,6 @@ body {
   padding-bottom: calc(var(--blz-bottom-bar-height) + 2rem);
 }
 
-footer.navbar {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding-top: 0.5rem;
-}
-footer.navbar .navbar-text {
-  color: #aaaaaa !important;
-}
-footer.navbar a {
-  color: #aaaaaa !important;
-}
-footer.navbar a:hover {
-  text-decoration: underline;
-}
-
 .body-bg {
   background: var(--bs-body-bg);
 }
@@ -25981,4 +25964,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/Development/neptuo/Recollections/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=D:\Development\Neptuo\Recollections\src\Recollections.Blazor.UI\wwwroot\css\site.css.map */

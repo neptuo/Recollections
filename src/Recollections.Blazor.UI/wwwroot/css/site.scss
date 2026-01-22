@@ -40,26 +40,6 @@ body {
     padding-bottom: calc(var(--blz-bottom-bar-height) + 2rem);
 }
 
-footer.navbar {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid rgba(0,0,0,.1);
-    padding-top: $spacer * 0.5;
-
-    .navbar-text {
-        color: $placeholder-color !important;
-    }
-
-    a {
-        color: $placeholder-color !important;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-}
-
 .body-bg {
     background: var(--bs-body-bg);
 }
