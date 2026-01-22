@@ -12,6 +12,8 @@ public partial class Offcanvas : System.IDisposable
 {
     protected ElementReference Element { get; set; }
     private string cssClass;
+    private string style;
+    private string headerCssClass;
     private string bodyCssClass;
     private bool hasBodyRendered;
 
@@ -48,6 +50,12 @@ public partial class Offcanvas : System.IDisposable
     [Parameter]
     public bool IsBodyRenderedLazily { get; set; } = false;
 
+    [Parameter]
+    public bool IsFullScreen { get; set; } = false;
+
+    [Parameter]
+    public bool IsContainer { get; set; } = false;
+
     public bool IsVisible { get; private set; }
 
     protected override void OnParametersSet()
@@ -63,7 +71,21 @@ public partial class Offcanvas : System.IDisposable
         if (Attributes.TryGetValue("class", out var providedCssClass))
             cssClass += " " + providedCssClass;
 
+        headerCssClass = "offcanvas-header";
         bodyCssClass = string.IsNullOrEmpty(BodyCssClass) ? "offcanvas-body" : $"offcanvas-body {BodyCssClass}";
+
+        if (IsContainer)
+        {
+            headerCssClass += " container";
+            bodyCssClass += " container";
+        }
+
+        style = string.Empty;
+        if (Attributes.TryGetValue("style", out var providedStyle))
+            style = providedStyle.ToString();
+
+        if (IsFullScreen)
+            style += string.IsNullOrEmpty(style) ? "--bs-offcanvas-width: 100%;": "; --bs-offcanvas-width: 100%;";
     }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)

@@ -1,7 +1,7 @@
-<div @ref="Element" @attributes="Attributes" class="@cssClass" tabindex="-1">
+<div @ref="Element" @attributes="Attributes" class="@cssClass" style="@style" tabindex="-1">
     @if (IsHeader)
     {
-        <div class="offcanvas-header">
+        <div class="@headerCssClass">
             <h5 class="offcanvas-title">
                 @Title
                 @TitleContent
