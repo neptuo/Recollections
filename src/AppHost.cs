@@ -8,8 +8,18 @@ var builder = DistributedApplication.CreateBuilder(new DistributedApplicationOpt
     Args = args,
 });
 
-var apiService = builder
-    .AddProject<Projects.Recollections_Api>("api");
+string azureFileShareConnectionString = null;
+
+var api = builder
+    .AddProject<Projects.Recollections_Api>("api")
+    .WithEnvironment(context =>
+    {
+        if (azureFileShareConnectionString != null)
+        {
+            context.EnvironmentVariables["Entries__Storage__FileSystem__Server"] = "Azure";
+            context.EnvironmentVariables["Entries__Storage__FileSystem__ConnectionString"] = "<CONNECTION_STRING>";
+        }
+    });
 
 // var isWatch = builder.Configuration.GetValue<string>("DOTNET_WATCH") == "1";
 var isWatch = true;
@@ -25,7 +35,7 @@ if (isWatch)
             context.EnvironmentVariables["DOTNET_WATCH_RESTART_ON_RUDE_EDIT"] = "1";
         })
         .WithHttpEndpoint(targetPort: 33881, isProxied: false)
-        .WithReference(apiService);
+        .WithReference(api);
 
     builder
         .AddExecutable("watch-scss", "dotnet", ".", ["watch", "--no-restore", "--non-interactive", "--verbose", "build", ".\\WatchScss.proj", $"--property:RootPath={uiProjectDirectory}"]);
@@ -34,7 +44,7 @@ else
 {
     builder
         .AddProject<Projects.Recollections_Blazor_UI>("ui")
-        .WithReference(apiService);
+        .WithReference(api);
 }
 
 builder.Build().Run();
