@@ -25,7 +25,7 @@ namespace Neptuo.Recollections.Entries
 
         private ShareDirectoryClient GetRootDirectory()
         {
-            ShareClient share = new ShareClient(options.ConnectionString, "entries");
+            ShareClient share = new ShareClient(options.ConnectionString, options.FileShareName ?? "entries");
 
             if (!share.Exists())
                 throw Ensure.Exception.InvalidOperation("Missing file share.");
@@ -114,6 +114,8 @@ namespace Neptuo.Recollections.Entries
             {
                 case VideoType.Original:
                     return video.FileName;
+                case VideoType.Preview:
+                    return string.Concat(baseName, ".preview", DerivedImageExtension);
                 case VideoType.Thumbnail:
                     return string.Concat(baseName, ".thumbnail", DerivedImageExtension);
                 default:

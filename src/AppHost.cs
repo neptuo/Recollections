@@ -17,7 +17,8 @@ var api = builder
         if (azureFileShareConnectionString != null)
         {
             context.EnvironmentVariables["Entries__Storage__FileSystem__Server"] = "Azure";
-            context.EnvironmentVariables["Entries__Storage__FileSystem__ConnectionString"] = "<CONNECTION_STRING>";
+            context.EnvironmentVariables["Entries__Storage__FileSystem__ConnectionString"] = azureFileShareConnectionString;
+            context.EnvironmentVariables["Entries__Storage__FileSystem__FileShareName"] = "dev-entries";
         }
     });
 
