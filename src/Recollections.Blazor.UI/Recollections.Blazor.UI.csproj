@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
-    <VersionPrefix>0.16.0</VersionPrefix>
+    <VersionPrefix>0.17.0</VersionPrefix>
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
 	  <InvariantGlobalization>true</InvariantGlobalization>
     <PublishDomain>recollections.app</PublishDomain>
