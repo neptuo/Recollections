@@ -12,6 +12,7 @@ using Path = System.IO.Path;
 using Stream = System.IO.Stream;
 using IsImage = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.Metadata;
+using SixLabors.ImageSharp.Processing;
 using System.Globalization;
 
 namespace Neptuo.Recollections.Entries
@@ -99,9 +100,18 @@ namespace Neptuo.Recollections.Entries
             return entity;
         }
 
+        private bool TryGetMetadata(ImageMetadata imageMetadata, out AVMetadata metadata)
+        {
+            if (imageMetadata.DecodedImageFormat is IImageFormat<AVMetadata> avFormat && imageMetadata.TryGetFormatMetadata(avFormat, out metadata))
+                return metadata != null;
+
+            metadata = null;
+            return false;
+        }
+
         private void SetProperties(Video entity, ImageMetadata imageMetadata, bool isWhenIncluded = true)
         {
-            if (imageMetadata.DecodedImageFormat is IImageFormat<AVMetadata> avFormat && imageMetadata.TryGetFormatMetadata(avFormat, out var metadata))
+            if (TryGetMetadata(imageMetadata, out var metadata))
             {
                 entity.Duration = metadata.Duration.TotalSeconds;
 
@@ -155,6 +165,26 @@ namespace Neptuo.Recollections.Entries
                 var videoImage = IsImage.Load(decoderOptions, original);
                 if (videoImage.Frames.Count == 0)
                     throw new VideoUploadValidationException("Video contains no decodable frames.");
+
+                if (TryGetMetadata(videoImage.Metadata, out var metadata) && metadata.VideoStreams.Count > 0)
+                {
+                    var rotation = metadata.VideoStreams.First().Rotation;
+                    if (rotation != 0)
+                    {
+                        switch (rotation)
+                        {
+                            case 90:
+                                videoImage.Mutate(ctx => ctx.Rotate(RotateMode.Rotate90));
+                                break;
+                            case 180:
+                                videoImage.Mutate(ctx => ctx.Rotate(RotateMode.Rotate180));
+                                break;
+                            case 270:
+                                videoImage.Mutate(ctx => ctx.Rotate(RotateMode.Rotate270));
+                                break;
+                        }
+                    }
+                }
 
                 return videoImage;
             }
