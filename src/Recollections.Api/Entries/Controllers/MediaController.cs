@@ -74,9 +74,14 @@ namespace Neptuo.Recollections.Entries.Controllers
         });
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         [RequestSizeLimit(200_000_000)]
-        public Task<IActionResult> Create(string entryId, IFormFile file) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
+        [RequestFormLimits(MultipartBodyLengthLimit = 200_000_000)]
+        public Task<IActionResult> Create(string entryId, [FromForm] IFormFile file) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
+            if (file == null)
+                return BadRequest();
+
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
