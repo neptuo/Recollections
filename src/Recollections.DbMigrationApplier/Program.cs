@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Neptuo.Recollections.Migrations;
 using System;
 using AccountsDataContext = Neptuo.Recollections.Accounts.DataContext;
@@ -10,13 +11,21 @@ namespace Neptuo.Recollections
     {
         static void Main(string[] args)
         {
-            if (args.Length != 1)
+            string connectionString = null;
+
+            if (args.Length == 0)
+            {
+                connectionString = Console.ReadLine();
+            }
+            else if (args.Length != 1)
             {
                 Console.WriteLine("Pass one argument with connection string to database to migrate.");
                 return;
             }
-
-            string connectionString = args[0];
+            else
+            {
+                connectionString = args[0];
+            }
 
             Console.WriteLine("Creating contexts.");
             using var accounts = new AccountsDataContext(DbContextOptions<AccountsDataContext>(connectionString, "Accounts"), Schema<AccountsDataContext>("Accounts"));
@@ -35,6 +44,7 @@ namespace Neptuo.Recollections
             where T : DbContext
         {
             var builder = new DbContextOptionsBuilder<T>()
+                .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning))
                 .UseSqlServer(connectionString, sql =>
                 {
                     if (!String.IsNullOrEmpty(schema))
