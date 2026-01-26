@@ -344,7 +344,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task OnUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
         {
-            Log.Debug($"{EntryId}: OnUploadProgressAsync: " + Json.Serialize(progresses));
+            if (Log.IsDebugEnabled())
+                Log.Debug($"{EntryId}: OnUploadProgressAsync: " + Json.Serialize(progresses));
 
             UploadProgress.Clear();
             if (progresses.All(p => p.Status == "done" || p.Status == "error"))
