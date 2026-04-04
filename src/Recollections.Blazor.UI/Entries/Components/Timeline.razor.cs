@@ -39,6 +39,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public EventCallback<EntryListModel> OnClick { get; set; }
 
+        [Parameter]
+        public int? NewEntriesCount { get; set; }
+
         private int offset;
         private Task loadAsyncFromParametersSet;
 
@@ -46,6 +49,7 @@ namespace Neptuo.Recollections.Entries.Components
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; private set; } = true;
         protected bool IsCollapsed { get; set; } = false;
+        protected bool IsBannerDismissed { get; set; } = false;
 
         protected async override Task OnInitializedAsync()
         {
