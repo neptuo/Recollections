@@ -10,7 +10,8 @@ self.addEventListener('message', onMessage);
 function onFetch(event) {
     const response = shareTargetHandler(event);
     if (response) {
-        return response;
+        event.respondWith(response);
+        return;
     }
 }
 
