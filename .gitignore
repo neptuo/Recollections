@@ -338,5 +338,3 @@ ASALocalRun/
 .squad-workstream
 
 # Local-only Copilot/Squad workspace scaffolding
-.copilot/mcp-config.json
-.copilot/skills/
