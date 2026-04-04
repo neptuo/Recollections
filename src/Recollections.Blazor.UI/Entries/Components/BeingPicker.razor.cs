@@ -69,6 +69,9 @@ namespace Neptuo.Recollections.Entries.Components
 
             SelectedIds.Clear();
             SelectedIds.AddRange(beingIds);
+            if (isFirstShow)
+                IsLoading = true;
+
             Modal.Show();
 
             if (isFirstShow)
