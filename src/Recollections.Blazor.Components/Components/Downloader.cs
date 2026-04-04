@@ -18,8 +18,8 @@ namespace Neptuo.Recollections.Components
             this.jsRuntime = jsRuntime;
         }
 
-        public ValueTask FromUrlAsync(string name, string url) 
-            => jsRuntime.InvokeVoidAsync("Downloader.FromUrlAsync", name, url);
+        public ValueTask FromUrl(string name, string url) 
+            => jsRuntime.InvokeVoidAsync("Downloader.FromUrl", name, url);
 
         public ValueTask FromStreamAsync(string name, Stream stream, string mimeType) 
             => jsRuntime.InvokeVoidAsync("Downloader.FromStreamAsync", name, new DotNetStreamReference(stream), mimeType);

@@ -288,7 +288,7 @@ window.InlineDateEdit = {
 };
 
 window.Downloader = {
-    FromUrlAsync: function (name, url) {
+    FromUrl: function (name, url) {
         var link = document.createElement("a");
         link.target = "_blank";
         link.download = name;
@@ -304,7 +304,7 @@ window.Downloader = {
         });
         const url = URL.createObjectURL(blob);
         try {
-            return Downloader.FromUrlAsync(name, url);
+            return Downloader.FromUrl(name, url);
         } finally {
             setTimeout(function () {
                 URL.revokeObjectURL(url);
