@@ -25259,6 +25259,9 @@ h4 .inline-editor-viewmode .oi, .h4 .inline-editor-viewmode .oi {
 .inline-markdown .inline-submit {
   margin-top: -60px;
 }
+.inline-markdown .inline-editor-content a {
+  text-decoration: underline;
+}
 
 input.input-number-noarrows {
   /* Chrome, Safari, Edge, Opera */
