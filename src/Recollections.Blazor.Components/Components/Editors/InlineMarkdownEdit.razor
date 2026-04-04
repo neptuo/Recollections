@@ -9,7 +9,7 @@
     }
     else
     {
-        <a class="inline-editor-value d-inline-block py-1 @(String.IsNullOrEmpty(Value) ? "text-muted" : "")" @onclick="@OnEditAsync">
+        <div class="inline-editor-value d-inline-block py-1 @(String.IsNullOrEmpty(Value) ? "text-muted" : "")" @onclick="@OnEditAsync">
             <span class="inline-editor-content">
                 @if (String.IsNullOrEmpty(Value))
                 {
@@ -20,6 +20,6 @@
                     @MarkdownValue
                 }
             </span>
-        </a>
+        </div>
     }
 </div>
