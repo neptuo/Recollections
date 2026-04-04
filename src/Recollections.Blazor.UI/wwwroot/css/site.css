@@ -25482,8 +25482,8 @@ input.input-number-noarrows[type=number] {
   margin-left: calc(15% - 25px);
 }
 .timeline .separator:first-child {
-  top: var(--blz-top-bar-height);
-  padding-top: var(--separator-top-offset);
+  top: calc(var(--blz-top-bar-height) - 1px);
+  padding-top: calc(var(--separator-top-offset) + 1px);
   background: var(--bs-body-bg);
 }
 
