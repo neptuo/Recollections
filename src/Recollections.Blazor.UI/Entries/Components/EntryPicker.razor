@@ -4,20 +4,22 @@
     <ChildContent>
         @if (wasVisible)
         {
-            <ul class="nav nav-tabs entry-picker-tabs">
-                <li class="nav-item">
-                    <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
-                        <Icon Identifier="clock" />
-                        Timeline
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
-                        <Icon Identifier="search" />
-                        Search
-                    </a>
-                </li>
-            </ul>
+            <div class="entry-picker-nav">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
+                            <Icon Identifier="clock" />
+                            Timeline
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
+                            <Icon Identifier="search" />
+                            Search
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
             @if (ActiveTab == Tab.Timeline)
             {
@@ -36,21 +38,26 @@
                     </form>
                 </div>
 
-                @if (SearchResults.Count > 0)
-                {
-                    <Timeline Data="@SearchResults" OnClick="@(entry => OnEntrySelected(entry))" ShowYearSeparators="false" AllowMore="false" />
+                <div class="entry-picker-results">
+                    <ListView Items="@SearchResults" IsLoading="@(SearchResults.Count == 0 && IsSearching)" Context="entry">
+                        <EmptyContent>
+                            @if (!string.IsNullOrEmpty(SearchText))
+                            {
+                                <div class="entry-picker-empty">
+                                    No entries match '@SearchText'
+                                </div>
+                            }
+                        </EmptyContent>
+                        <ChildContent>
+                            <EntryCard Model="entry" OnCardClick="@(() => OnEntrySelected(entry))" />
 
-                    @if (SearchHasMore)
-                    {
-                        <AutoloadNext Intersected="LoadMoreSearchResultsAsync" />
-                    }
-                }
-                else if (!string.IsNullOrEmpty(SearchText) && !IsSearching)
-                {
-                    <div class="entry-picker-empty">
-                        No entries match '@SearchText'
-                    </div>
-                }
+                            @if (SearchResults.IndexOf(entry) == SearchResults.Count - 3 && SearchHasMore)
+                            {
+                                <AutoloadNext Intersected="LoadMoreSearchResultsAsync" />
+                            }
+                        </ChildContent>
+                    </ListView>
+                </div>
             }
         }
     </ChildContent>

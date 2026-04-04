@@ -4,25 +4,34 @@
         padding: 0;
     }
 
-    .entry-picker-tabs {
-        padding: 0 1rem;
-        padding-top: 0.5rem;
-        margin-bottom: 0;
-        border-bottom: 1px solid var(--bs-border-color);
+    .entry-picker-nav {
+        padding: 1rem 1rem 0;
+
+        .nav-pills {
+            gap: 0.25rem;
+        }
     }
 
     .entry-picker-search {
-        padding: 1rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .entry-picker-results {
+        padding: 0 1rem 1rem;
+
+        .card {
+            margin-bottom: 0.75rem;
+        }
     }
 
     .entry-picker-empty {
-        padding: 1rem;
+        padding: 2rem 1rem;
         text-align: center;
         color: var(--bs-secondary-color);
     }
 
     .timeline {
-        padding: 0 1rem;
+        padding: 0.5rem 1rem 0;
 
         &:before {
             left: 23px;
