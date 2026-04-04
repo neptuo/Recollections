@@ -34,6 +34,7 @@ $dot-diameter: 18px;
     .separator:first-child {
         top: calc(var(--blz-top-bar-height) - 1px);
         padding-top: calc(var(--separator-top-offset) + 1px);
+        z-index: 1019;
         background: var(--bs-body-bg);
     }
 }
