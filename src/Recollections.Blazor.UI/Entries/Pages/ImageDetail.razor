@@ -1,9 +1,10 @@
 ﻿@page "/entries/{EntryId}/images/{ImageId}"
 @inherits UserStateComponentBase
 
+<DocumentTitle Value="@(Model?.Name ?? "Image...")" />
+
 @if (Model != null)
 {
-    <DocumentTitle Value="@Model.Name" />
 
     <PermissionContainer State="@Permissions">
         <ActionMenu>

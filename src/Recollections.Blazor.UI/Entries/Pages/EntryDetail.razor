@@ -1,9 +1,10 @@
 ﻿@page "/entries/{EntryId}"
 @inherits UserStateComponentBase
 
+<DocumentTitle Value="@(Model?.Title ?? "Entry...")" />
+
 @if (Model != null)
 {
-    <DocumentTitle Value="@Model.Title" />
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
