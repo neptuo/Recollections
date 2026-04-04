@@ -24974,7 +24974,7 @@ body {
 }
 @media (min-width: 576px) {
   :root {
-    --blz-bottom-bar-height: 0;
+    --blz-bottom-bar-height: 0px;
   }
 }
 
