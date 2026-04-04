@@ -1,5 +1,6 @@
 ﻿let isLoaded = false;
 let Leaflet;
+let countriesGeoJson = null;
 
 export async function ensureApi() {
     if (isLoaded) {
@@ -15,6 +16,61 @@ export async function ensureApi() {
 
     await import('./leaflet/leaflet-src.js');
     Leaflet = window.L;
+}
+
+async function ensureCountriesGeoJson() {
+    if (countriesGeoJson != null) {
+        return countriesGeoJson;
+    }
+
+    const response = await fetch("./_content/Recollections.Blazor.Components/countries.geo.json");
+    countriesGeoJson = await response.json();
+    return countriesGeoJson;
+}
+
+function pointInPolygon(lat, lng, polygon) {
+    // Ray-casting algorithm for point-in-polygon
+    // polygon is an array of [lng, lat] coordinate pairs
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i][1], yi = polygon[i][0];
+        const xj = polygon[j][1], yj = polygon[j][0];
+
+        const intersect = ((yi > lng) !== (yj > lng))
+            && (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+function pointInGeometry(lat, lng, geometry) {
+    if (geometry.type === "Polygon") {
+        // Check the outer ring (index 0)
+        return pointInPolygon(lat, lng, geometry.coordinates[0]);
+    } else if (geometry.type === "MultiPolygon") {
+        for (const polygon of geometry.coordinates) {
+            if (pointInPolygon(lat, lng, polygon[0])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function computeVisitedCountries(markers, geojson) {
+    const visited = new Set();
+    for (const marker of markers) {
+        if (marker.latitude == null || marker.longitude == null) continue;
+        for (let i = 0; i < geojson.features.length; i++) {
+            const feature = geojson.features[i];
+            if (visited.has(i)) continue;
+            if (pointInGeometry(marker.latitude, marker.longitude, feature.geometry)) {
+                visited.add(i);
+                break;
+            }
+        }
+    }
+    return visited;
 }
 
 export function initialize(container, interop, isEditable) {
@@ -110,6 +166,20 @@ export function initialize(container, interop, isEditable) {
 export function updateMarkers(container, markers, isEditable) {
     const $container = $(container);
     const model = $container.data('map');
+    
+    model.lastMarkers = markers;
+    model.lastIsEditable = isEditable;
+
+    // In countries mode, update the countries layer instead of showing markers
+    if (model.viewMode === "countries") {
+        if (model.countriesLayer) {
+            model.countriesLayer.remove();
+            model.countriesLayer = null;
+        }
+        setViewMode(container, "countries", markers);
+        return;
+    }
+
     const points = setMarkers(model, markers, isEditable);
 
     model.isAdding = false;
@@ -223,4 +293,69 @@ export function centerAt(container, latitude, longitude, zoom) {
 export function redraw(container) {
     const model = $(container).data('map');
     model.tiles.redraw();
+}
+
+export async function setViewMode(container, mode, markers) {
+    const model = $(container).data('map');
+    if (!model) return;
+
+    model.viewMode = mode;
+
+    if (mode === "countries") {
+        // Hide markers
+        if (model.markers) {
+            for (const m of model.markers) {
+                m.remove();
+            }
+        }
+
+        // Show countries layer
+        if (!model.countriesLayer) {
+            const geojson = await ensureCountriesGeoJson();
+            const visited = computeVisitedCountries(markers || [], geojson);
+
+            model.countriesLayer = Leaflet.geoJSON(geojson, {
+                style: function (feature) {
+                    const index = geojson.features.indexOf(feature);
+                    const isVisited = visited.has(index);
+                    return {
+                        fillColor: isVisited ? "#0d6efd" : "#dee2e6",
+                        fillOpacity: isVisited ? 0.5 : 0.15,
+                        color: isVisited ? "#0a58ca" : "#adb5bd",
+                        weight: isVisited ? 2 : 0.5
+                    };
+                },
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.name) {
+                        layer.bindTooltip(feature.properties.name);
+                    }
+                }
+            });
+        }
+        model.countriesLayer.addTo(model.map);
+
+        // Fit bounds to show the whole world
+        if (model.points && model.points.length > 0) {
+            model.map.fitBounds(model.points, { maxZoom: 5 });
+        } else {
+            model.map.setView([20, 0], 2);
+        }
+    } else {
+        // Remove countries layer
+        if (model.countriesLayer) {
+            model.countriesLayer.remove();
+            model.countriesLayer = null;
+        }
+
+        // Re-add markers
+        if (model.lastMarkers && model.lastIsEditable !== undefined) {
+            setMarkers(model, model.lastMarkers, model.lastIsEditable);
+        }
+
+        if (model.points && model.points.length > 0) {
+            model.map.fitBounds(model.points, { maxZoom: 14 });
+        } else {
+            model.map.setView([0, 0], 1);
+        }
+    }
 }

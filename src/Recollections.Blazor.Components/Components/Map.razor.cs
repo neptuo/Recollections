@@ -29,6 +29,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsAdditive { get; set; }
 
+        [Parameter]
+        public bool EnableCountriesView { get; set; }
+
         [CascadingParameter]
         public FormState FormState { get; set; }
 
@@ -42,6 +45,7 @@ namespace Neptuo.Recollections.Components
         protected bool HasSearchResultsChanged { get; set;}
         protected Modal TileTypeModal { get; set; }
         protected string TileType { get; set; }
+        protected string ViewMode { get; set; } = "markers";
 
         internal bool IsEditable => FormState?.IsEditable ?? true;
 
@@ -58,6 +62,9 @@ namespace Neptuo.Recollections.Components
             await base.OnInitializedAsync();
             TileType = await Service.GetTypeAsync();
 
+            if (EnableCountriesView)
+                ViewMode = await Service.GetViewModeAsync();
+
             IsInitialized = true;
         }
 
@@ -70,6 +77,9 @@ namespace Neptuo.Recollections.Components
 
             await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this);
+
+            if (firstRender && EnableCountriesView && ViewMode == "countries")
+                await Interop.SetViewModeAsync(ViewMode);
 
             if (Markers.Count > 0)
                 IsZoomed = true;
@@ -154,6 +164,13 @@ namespace Neptuo.Recollections.Components
             await Interop.RedrawAsync();
             await Service.SetTypeAsync(type);
             TileTypeModal.Hide();
+        }
+
+        protected async Task ToggleViewModeAsync()
+        {
+            ViewMode = ViewMode == "markers" ? "countries" : "markers";
+            await Interop.SetViewModeAsync(ViewMode);
+            await Service.SetViewModeAsync(ViewMode);
         }
     }
 }

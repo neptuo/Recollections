@@ -21,6 +21,7 @@ namespace Neptuo.Recollections.Components
 
         private int previousMarkersHashCode;
         private int previousMapPositionHashCode;
+        private string previousViewMode;
 
         private int ComputeMarkersHashCode()
         {
@@ -175,6 +176,15 @@ namespace Neptuo.Recollections.Components
 
         public async Task RedrawAsync()
             => await module.InvokeVoidAsync("redraw", editor.Container);
+
+        public async Task SetViewModeAsync(string mode)
+        {
+            if (module == null)
+                return;
+
+            previousViewMode = mode;
+            await module.InvokeVoidAsync("setViewMode", editor.Container, mode, editor.Markers);
+        }
     }
 
     public record MapPosition(double Latitude, double Longitude, int Zoom);

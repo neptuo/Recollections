@@ -2,6 +2,13 @@
     <div class="map"></div>
 
     <div class="map-controls">
+        @if (EnableCountriesView)
+        {
+            <button class="btn btn-sm btn-@(ViewMode == "countries" ? "primary" : "light") me-1" @onclick="ToggleViewModeAsync" title="@(ViewMode == "countries" ? "Show markers" : "Show visited countries")">
+                <Icon Identifier="globe" />
+            </button>
+        }
+
         @if (IsEditable)
         {
             if (IsAdditive)
