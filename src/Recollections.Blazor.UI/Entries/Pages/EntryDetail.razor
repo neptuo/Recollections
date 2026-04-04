@@ -30,11 +30,44 @@
                     <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" />
                 </div>
                 <div class="story">
-                    <InlineLink Value="@StoryTitle" PlaceHolder="No story..." Icon="book" OnClick="@SelectStory" />
+                    @if (Permissions.IsEditable)
+                    {
+                        <InlineLink Value="@StoryTitle" PlaceHolder="No story..." Icon="book" OnClick="@SelectStory" />
+                    }
+                    else if (HasStory)
+                    {
+                        <div class="inline-editor inline-link inline-editor-viewmode">
+                            <a class="inline-editor-value d-inline-block py-1" href="@Navigator.UrlStoryDetail(Story.StoryId)">
+                                <Icon Identifier="book" />
+                                <span class="ms-1 inline-editor-content">@StoryTitle</span>
+                            </a>
+                        </div>
+                    }
                 </div>
                 <UserInformation Owner="@Owner" />
                 <div class="being">
-                    <InlineLink Value="@BeingsTitle" PlaceHolder="No beings..." Icon="user-friends" OnClick="@SelectBeing" />
+                    @if (Permissions.IsEditable)
+                    {
+                        <InlineLink Value="@BeingsTitle" PlaceHolder="No beings..." Icon="user-friends" OnClick="@SelectBeing" />
+                    }
+                    else if (Beings.Count > 0)
+                    {
+                        <div class="inline-editor inline-link inline-editor-viewmode">
+                            <span class="inline-editor-value d-inline-block py-1">
+                                <Icon Identifier="user-friends" />
+                                <span class="ms-1 inline-editor-content">
+                                    @for (int i = 0; i < Beings.Count; i++)
+                                    {
+                                        if (i > 0)
+                                        {
+                                            <text>, </text>
+                                        }
+                                        <a href="@Navigator.UrlBeingDetail(Beings[i].Id)">@Beings[i].Name</a>
+                                    }
+                                </span>
+                            </span>
+                        </div>
+                    }
                 </div>
                 @if (UserState.IsAuthenticated)
                 {
