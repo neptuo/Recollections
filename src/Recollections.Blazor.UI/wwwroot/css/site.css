@@ -25825,7 +25825,7 @@ video.pswp__video {
   color: var(--bs-secondary-color);
 }
 .entry-picker .timeline {
-  padding: 0.5rem 1rem 0;
+  padding: 0 1rem;
 }
 .entry-picker .timeline:before {
   left: 23px;
