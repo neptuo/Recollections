@@ -177,6 +177,12 @@ namespace Neptuo.Recollections.Entries
             return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
         }
 
+        public Task<List<EntryListModel>> GetOnThisDayListAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>("on-this-day"));
+
+        public Task<int> GetOnThisDayCountAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<int>("on-this-day/count"));
+
         public Task<List<EntryListModel>> GetYearEntryListAsync(int year)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"calendar/{year}"));
 

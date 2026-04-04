@@ -182,6 +182,12 @@ namespace Neptuo.Recollections
         public void OpenVideoDetail(string entryId, string videoId)
             => uri.NavigateTo(UrlVideoDetail(entryId, videoId));
 
+        public string UrlOnThisDay()
+            => "/on-this-day";
+
+        public void OpenOnThisDay()
+            => uri.NavigateTo(UrlOnThisDay());
+
         public string UrlBeings()
             => "/beings";
 
