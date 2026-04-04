@@ -4,15 +4,25 @@
 
 <DocumentTitle Value="Timeline" />
 
-<Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true" NewEntriesCount="@newEntriesCount">
+<Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true">
     <BeforeContent>
         <OnThisDayBanner />
         <EntryCreate />
+
+        @if (newEntriesCount > 0 && !isNewEntriesBannerDismissed)
+        {
+            <div class="alert alert-info alert-dismissible mb-4 ms-2" role="alert">
+                <Icon Identifier="bell" CssClass="me-1" />
+                @newEntriesCount new @(newEntriesCount == 1 ? "entry" : "entries") since your last visit
+                <button type="button" class="btn-close" @onclick="@(() => isNewEntriesBannerDismissed = true)"></button>
+            </div>
+        }
     </BeforeContent>
 </Timeline>
 
 @code {
     private int? newEntriesCount;
+    private bool isNewEntriesBannerDismissed;
 
     protected override async Task OnInitializedAsync()
     {
