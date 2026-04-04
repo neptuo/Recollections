@@ -28,7 +28,7 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public RenderFragment<string> ValueContent { get; set; } = (value) => (builder) => builder.AddContent(0, value);
 
-        protected override bool IsEditable => IsClickable ?? base.IsEditable;
+        protected override bool IsEditable => IsClickable ?? (OnClick.HasDelegate && base.IsEditable);
 
         protected async override Task OnEditAsync()
         {
