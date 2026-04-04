@@ -126,7 +126,7 @@ export function initialize(intr, i) {
                         if (isVideo(model)) {
                             title += ' (click to play video)';
                         }
-                        el.innerHTML = title;
+                        el.textContent = title;
                         el.style.display = '';
                     });
                 }
@@ -183,7 +183,7 @@ export function initialize(intr, i) {
                 const titleEl = lightbox.pswp.scrollWrap.parentElement.querySelector(".pswp__title");
                 const originalTitle = lightbox.pswp.currSlide.data.alt || '';
 
-                titleEl.innerHTML = `${originalTitle} (loading video...)`;
+                titleEl.textContent = `${originalTitle} (loading video...)`;
                 
                 const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
                 const imageEl = lightbox.pswp.currSlide.image;
@@ -201,7 +201,7 @@ export function initialize(intr, i) {
                     titleEl.style.display = 'none';
                 }, { once: true });
                 videoEl.addEventListener('error', () => {
-                    titleEl.innerHTML = `${originalTitle} (unable to load video)`;
+                    titleEl.textContent = `${originalTitle} (unable to load video)`;
                     titleEl.style.display = '';
                 }, { once: true });
 

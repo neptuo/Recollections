@@ -303,7 +303,13 @@ window.Downloader = {
             type: mimeType
         });
         const url = URL.createObjectURL(blob);
-        return Downloader.FromUrlAsync(name, url);
+        try {
+            return Downloader.FromUrlAsync(name, url);
+        } finally {
+            setTimeout(function () {
+                URL.revokeObjectURL(url);
+            }, 0);
+        }
     }
 };
 
@@ -358,11 +364,63 @@ function setStreamingVideoSource(element, stream, mimeType) {
 
         const reader = stream.stream().getReader();
         const pendingChunks = [];
+        const maxPendingChunks = 8;
+        let pendingChunkIndex = 0;
         let isReadingCompleted = false;
         let isAppending = false;
+        let queueDrainPromise = null;
+        let queueDrainResolver = null;
+
+        const pendingChunkCount = () => pendingChunks.length - pendingChunkIndex;
+
+        const resolveQueueDrain = () => {
+            if (pendingChunkCount() < maxPendingChunks && queueDrainResolver != null) {
+                queueDrainResolver();
+                queueDrainPromise = null;
+                queueDrainResolver = null;
+            }
+        };
+
+        const waitForQueueDrain = () => {
+            if (pendingChunkCount() < maxPendingChunks) {
+                return Promise.resolve();
+            }
+
+            if (queueDrainPromise == null) {
+                queueDrainPromise = new Promise(resolve => {
+                    queueDrainResolver = resolve;
+                });
+            }
+
+            return queueDrainPromise;
+        };
+
+        const resetPendingChunks = () => {
+            pendingChunks.length = 0;
+            pendingChunkIndex = 0;
+            resolveQueueDrain();
+        };
+
+        const dequeueNextChunk = () => {
+            if (pendingChunkCount() === 0) {
+                return null;
+            }
+
+            const chunk = pendingChunks[pendingChunkIndex++];
+            if (pendingChunkIndex >= pendingChunks.length) {
+                pendingChunks.length = 0;
+                pendingChunkIndex = 0;
+            } else if (pendingChunkIndex > 32 && pendingChunkIndex * 2 >= pendingChunks.length) {
+                pendingChunks.splice(0, pendingChunkIndex);
+                pendingChunkIndex = 0;
+            }
+
+            resolveQueueDrain();
+            return chunk;
+        };
 
         const closeStreamIfReady = () => {
-            if (!isReadingCompleted || isAppending || sourceBuffer.updating || pendingChunks.length > 0 || mediaSource.readyState !== "open") {
+            if (!isReadingCompleted || isAppending || sourceBuffer.updating || pendingChunkCount() > 0 || mediaSource.readyState !== "open") {
                 return;
             }
 
@@ -374,18 +432,24 @@ function setStreamingVideoSource(element, stream, mimeType) {
         };
 
         const appendNextChunk = () => {
-            if (isAppending || sourceBuffer.updating || pendingChunks.length === 0) {
+            if (isAppending || sourceBuffer.updating || pendingChunkCount() === 0) {
+                closeStreamIfReady();
+                return;
+            }
+
+            const nextChunk = dequeueNextChunk();
+            if (nextChunk == null) {
                 closeStreamIfReady();
                 return;
             }
 
             isAppending = true;
             try {
-                sourceBuffer.appendBuffer(pendingChunks.shift());
+                sourceBuffer.appendBuffer(nextChunk);
             } catch (error) {
                 isAppending = false;
                 isReadingCompleted = true;
-                pendingChunks.length = 0;
+                resetPendingChunks();
                 console.error("Unable to append streamed video chunk.", error);
                 reader.cancel(error).catch(() => { });
                 closeStreamIfReady();
@@ -399,7 +463,7 @@ function setStreamingVideoSource(element, stream, mimeType) {
 
         sourceBuffer.addEventListener("error", error => {
             isReadingCompleted = true;
-            pendingChunks.length = 0;
+            resetPendingChunks();
             console.error("Streaming video source buffer error.", error);
             reader.cancel(error).catch(() => { });
             closeStreamIfReady();
@@ -408,6 +472,11 @@ function setStreamingVideoSource(element, stream, mimeType) {
         void (async () => {
             try {
                 while (true) {
+                    if (pendingChunkCount() >= maxPendingChunks) {
+                        await waitForQueueDrain();
+                        continue;
+                    }
+
                     const { value, done } = await reader.read();
                     if (done) {
                         isReadingCompleted = true;
