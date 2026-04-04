@@ -4,7 +4,54 @@
     <ChildContent>
         @if (wasVisible)
         {
-            <Timeline OnClick="@(entry => { Hide(); Selected?.Invoke(entry); })" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />
+            <ul class="nav nav-tabs entry-picker-tabs">
+                <li class="nav-item">
+                    <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
+                        <Icon Identifier="clock" />
+                        Timeline
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
+                        <Icon Identifier="search" />
+                        Search
+                    </a>
+                </li>
+            </ul>
+
+            @if (ActiveTab == Tab.Timeline)
+            {
+                <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />
+            }
+            else
+            {
+                <div class="entry-picker-search">
+                    <form @onsubmit="SearchAsync">
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
+                            <button class="btn btn-primary" type="submit">
+                                <Icon Identifier="search" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                @if (SearchResults.Count > 0)
+                {
+                    <Timeline Data="@SearchResults" OnClick="@(entry => OnEntrySelected(entry))" ShowYearSeparators="false" AllowMore="false" />
+
+                    @if (SearchHasMore)
+                    {
+                        <AutoloadNext Intersected="LoadMoreSearchResultsAsync" />
+                    }
+                }
+                else if (!string.IsNullOrEmpty(SearchText) && !IsSearching)
+                {
+                    <div class="entry-picker-empty">
+                        No entries match '@SearchText'
+                    </div>
+                }
+            }
         }
     </ChildContent>
 </Modal>
