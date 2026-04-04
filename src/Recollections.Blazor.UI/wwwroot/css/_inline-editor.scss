@@ -56,7 +56,7 @@
 }
 
 .inline-editor-viewmode {
-    a.inline-editor-value {
+    .inline-editor-value {
         cursor: inherit;
         
         &:hover {
@@ -71,7 +71,7 @@
         }
     }
 
-    &.inline-editable a.inline-editor-value {
+    &.inline-editable .inline-editor-value {
         cursor: pointer;
     }
 
@@ -120,6 +120,10 @@ h4 {
 .inline-markdown {
     .inline-submit {
         margin-top: -60px;
+    }
+
+    .inline-editor-content a {
+        text-decoration: underline;
     }
 }
 

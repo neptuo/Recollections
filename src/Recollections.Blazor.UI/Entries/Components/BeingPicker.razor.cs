@@ -40,6 +40,8 @@ namespace Neptuo.Recollections.Entries.Components
         private async Task LoadAsync()
         {
             IsLoading = true;
+            StateHasChanged();
+
             Beings.Clear();
             Beings.AddRange(await Api.GetBeingListAsync());
             IsLoading = false;
@@ -69,6 +71,7 @@ namespace Neptuo.Recollections.Entries.Components
 
             SelectedIds.Clear();
             SelectedIds.AddRange(beingIds);
+
             Modal.Show();
 
             if (isFirstShow)

@@ -32,11 +32,32 @@ class CustomHtmlFormatter : CommonMark.Formatters.HtmlFormatter
     {
     }
 
-    private Regex urlRegex = new Regex(@"(?<Protocol>\w+):\/\/(?<Domain>[\w@][\w.:@]+)\/?[\w\.?=%&=\-@/$,]*");
+    private Regex urlRegex = new Regex(@"(?:\w+:\/\/[\w@][\w.:@]+|www\.[\w][\w.:@]+)\/?[\w\.?=%&=\-@/$,#]*");
 
     protected override void WriteInline(Inline inline, bool isOpening, bool isClosing, out bool ignoreChildNodes)
     {
-        if (inline.Tag == InlineTag.String)
+        if (inline.Tag == InlineTag.Link)
+        {
+            if (isOpening)
+            {
+                Write("<a href=\"");
+                WriteEncodedUrl(inline.TargetUrl);
+                Write("\" target=\"_blank\" onclick=\"event.stopPropagation()\"");
+                if (!string.IsNullOrEmpty(inline.LiteralContent))
+                {
+                    Write(" title=\"");
+                    WriteEncodedHtml(inline.LiteralContent);
+                    Write("\"");
+                }
+                Write(">");
+            }
+            if (isClosing)
+            {
+                Write("</a>");
+            }
+            ignoreChildNodes = false;
+        }
+        else if (inline.Tag == InlineTag.String)
         {
             Match match = urlRegex.Match(inline.LiteralContent);
             if (match.Success)
@@ -45,9 +66,14 @@ class CustomHtmlFormatter : CommonMark.Formatters.HtmlFormatter
                 while (match.Success)
                 {
                     Write(inline.LiteralContent.Substring(lastIndex, match.Index));
-                    Write($"<a href='");
-                    WriteEncodedUrl(match.Value);
-                    Write($"' target='_blank'>{match.Value}</a>");
+                    Write("<a href=\"");
+                    var url = match.Value;
+                    if (url.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
+                        Write("https://");
+                    WriteEncodedUrl(url);
+                    Write("\" target=\"_blank\" onclick=\"event.stopPropagation()\">");
+                    WriteEncodedHtml(url);
+                    Write("</a>");
 
                     lastIndex = match.Index + match.Length;
 

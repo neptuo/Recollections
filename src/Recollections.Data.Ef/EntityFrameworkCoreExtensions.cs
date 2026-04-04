@@ -23,7 +23,26 @@ namespace Microsoft.EntityFrameworkCore
             }
             else
             {
-                options.UseSqlite(pathResolver(configuration.GetValue<string>("ConnectionString")));
+                var connectionString = pathResolver(configuration.GetValue<string>("ConnectionString"));
+
+                var dbPath = connectionString
+                    .Split(';')
+                    .Select(p => p.Trim())
+                    .Where(p => p.StartsWith("Filename=", StringComparison.OrdinalIgnoreCase))
+                    .Select(p => p.Substring("Filename=".Length))
+                    .FirstOrDefault();
+
+                if (dbPath != null)
+                {
+                    var fullPath = Path.GetFullPath(dbPath);
+                    var dir = Path.GetDirectoryName(fullPath);
+                    if (!String.IsNullOrEmpty(dir))
+                        Directory.CreateDirectory(dir);
+
+                    connectionString = connectionString.Replace(dbPath, fullPath);
+                }
+
+                options.UseSqlite(connectionString);
             }
         }
     }

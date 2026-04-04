@@ -47,11 +47,13 @@ namespace Neptuo.Recollections.Entries.Components
         private async Task LoadAsync()
         {
             IsLoading = true;
+            StateHasChanged();
+
             AllStories.Clear();
             AllStories.AddRange(await Api.GetStoryListAsync());
             OnSearch();
-            IsLoading = false;
 
+            IsLoading = false;
             StateHasChanged();
         }
 
