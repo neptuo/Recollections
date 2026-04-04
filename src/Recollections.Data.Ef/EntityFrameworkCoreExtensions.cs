@@ -34,9 +34,12 @@ namespace Microsoft.EntityFrameworkCore
 
                 if (dbPath != null)
                 {
-                    var dir = Path.GetDirectoryName(Path.GetFullPath(dbPath));
+                    var fullPath = Path.GetFullPath(dbPath);
+                    var dir = Path.GetDirectoryName(fullPath);
                     if (!String.IsNullOrEmpty(dir))
                         Directory.CreateDirectory(dir);
+
+                    connectionString = connectionString.Replace(dbPath, fullPath);
                 }
 
                 options.UseSqlite(connectionString);
