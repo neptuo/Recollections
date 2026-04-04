@@ -4,6 +4,41 @@
         padding: 0;
     }
 
+    .modal-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-grow: 1;
+    }
+
+    .entry-picker-nav {
+        gap: 0.25rem;
+        margin-left: auto;
+
+        .nav-link {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    .entry-picker-search {
+        padding: 0.75rem 1rem;
+    }
+
+    .entry-picker-results {
+        padding: 0 1rem 1rem;
+
+        .card {
+            margin-bottom: 0.75rem;
+        }
+    }
+
+    .entry-picker-empty {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--bs-secondary-color);
+    }
+
     .timeline {
         padding: 0 1rem;
 
