@@ -14,7 +14,13 @@
                 if (mediaIndex >= CurrentLimit)
                     break;
 
-                <EntryMedia Image="@item.Image" Video="@item.Video" OnClick="@(() => OnMediaClick.InvokeAsync(currentIndex))" />
+                <EntryMedia Image="@item.Image" Video="@item.Video" OnClick="@(() => OnMediaClick.InvokeAsync(currentIndex))">
+                    <ThumbnailContent>
+                        <span class="media-type-badge">
+                            <Icon Identifier="@(item.Video != null ? "film" : "image")" Prefix="fas" />
+                        </span>
+                    </ThumbnailContent>
+                </EntryMedia>
             }
         </div>
     </ChildContent>

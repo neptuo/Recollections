@@ -24,3 +24,16 @@ img.pswp__video {
 video.pswp__video {
     cursor: auto !important;
 }
+
+.pswp__media-type-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 1rem;
+    z-index: 10;
+    pointer-events: none;
+}
