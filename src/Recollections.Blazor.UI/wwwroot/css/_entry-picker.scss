@@ -4,11 +4,20 @@
         padding: 0;
     }
 
-    .entry-picker-nav {
-        padding: 1rem 1rem 0;
+    .modal-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-grow: 1;
+    }
 
-        .nav-pills {
-            gap: 0.25rem;
+    .entry-picker-nav {
+        gap: 0.25rem;
+        margin-left: auto;
+
+        .nav-link {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
         }
     }
 

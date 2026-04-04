@@ -1,26 +1,26 @@
 ﻿@inherits UserStateComponentBase
 
-<Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker" IsOverflow="true">
+<Modal @ref="Modal" CssClass="entry-picker" IsOverflow="true">
+    <TitleContent>
+        Select an Entry
+        <ul class="nav nav-pills entry-picker-nav">
+            <li class="nav-item">
+                <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
+                    <Icon Identifier="clock" />
+                    Timeline
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
+                    <Icon Identifier="search" />
+                    Search
+                </a>
+            </li>
+        </ul>
+    </TitleContent>
     <ChildContent>
         @if (wasVisible)
         {
-            <div class="entry-picker-nav">
-                <ul class="nav nav-pills">
-                    <li class="nav-item">
-                        <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
-                            <Icon Identifier="clock" />
-                            Timeline
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
-                            <Icon Identifier="search" />
-                            Search
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
             @if (ActiveTab == Tab.Timeline)
             {
                 <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />

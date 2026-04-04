@@ -25790,11 +25790,25 @@ video.pswp__video {
 .entry-picker .modal-body {
   padding: 0;
 }
-.entry-picker .entry-picker-nav {
-  padding: 1rem 1rem 0;
+.entry-picker .modal-title {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 1rem;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
-.entry-picker .entry-picker-nav .nav-pills {
+.entry-picker .entry-picker-nav {
   gap: 0.25rem;
+  margin-left: auto;
+}
+.entry-picker .entry-picker-nav .nav-link {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
 }
 .entry-picker .entry-picker-search {
   padding: 0.75rem 1rem;
