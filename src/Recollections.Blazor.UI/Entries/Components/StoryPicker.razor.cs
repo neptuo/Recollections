@@ -125,9 +125,6 @@ namespace Neptuo.Recollections.Entries.Components
             StoryStates.Clear();
             SearchQuery = null;
 
-            if (isFirstShow)
-                IsLoading = true;
-
             Modal.Show();
 
             if (isFirstShow)
