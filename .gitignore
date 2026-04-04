@@ -336,3 +336,7 @@ ASALocalRun/
 .squad/sessions/
 # Squad: SubSquad activation file (local to this machine)
 .squad-workstream
+
+# Local-only Copilot/Squad workspace scaffolding
+.copilot/mcp-config.json
+.copilot/skills/
