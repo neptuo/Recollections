@@ -43,6 +43,30 @@ function isVideo(model) {
     return type === 'video';
 }
 
+async function setVideoSource(element, stream, contentType) {
+    if (window.ImageSource && typeof window.ImageSource.Set === 'function') {
+        return window.ImageSource.Set(element, stream, contentType || 'video/mp4');
+    }
+
+    const arrayBuffer = await stream.arrayBuffer();
+    const blob = new Blob([arrayBuffer], {
+        type: contentType || 'video/mp4'
+    });
+    const url = URL.createObjectURL(blob);
+    const cleanup = () => {
+        URL.revokeObjectURL(url);
+        element.removeEventListener('loadeddata', cleanup);
+        element.removeEventListener('error', cleanup);
+    };
+
+    element.addEventListener('loadeddata', cleanup, { once: true });
+    element.addEventListener('error', cleanup, { once: true });
+    element.src = url;
+    if (typeof element.load === 'function') {
+        element.load();
+    }
+}
+
 export function initialize(intr, i) {
     interop = intr;
     items = i;
@@ -162,25 +186,28 @@ export function initialize(intr, i) {
                 titleEl.innerHTML = `${originalTitle} (loading video...)`;
                 
                 const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
-                const arrayBuffer = await stream.arrayBuffer();
-                const blob = new Blob([arrayBuffer], {
-                    type: model.contentType || "video/mp4"
-                });
-                const url = URL.createObjectURL(blob);
-
                 const imageEl = lightbox.pswp.currSlide.image;
                 const videoEl = document.createElement('video');
-                videoEl.src = url;
                 videoEl.controls = true;
                 videoEl.playsInline = true;
                 videoEl.autoplay = true;
+                videoEl.preload = 'auto';
                 videoEl.className = imageEl.className;
                 videoEl.style.width = imageEl.style.width;
                 videoEl.style.height = imageEl.style.height;
+                videoEl.poster = imageEl.currentSrc || imageEl.src || '';
+
+                videoEl.addEventListener('loadeddata', () => {
+                    titleEl.style.display = 'none';
+                }, { once: true });
+                videoEl.addEventListener('error', () => {
+                    titleEl.innerHTML = `${originalTitle} (unable to load video)`;
+                    titleEl.style.display = '';
+                }, { once: true });
 
                 imageEl.parentNode.replaceChild(videoEl, imageEl);
                 lightbox.pswp.currSlide.image = videoEl;
-                titleEl.style.display = 'none';
+                await setVideoSource(videoEl, stream, model.contentType);
             });
         });
 

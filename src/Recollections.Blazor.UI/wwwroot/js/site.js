@@ -307,16 +307,147 @@ window.Downloader = {
     }
 };
 
-window.ImageSource = {
-    Set: async function(element, stream, mimeType) {
-        const arrayBuffer = await stream.arrayBuffer();
-        const blob = new Blob([arrayBuffer], {
-            type: mimeType
-        });
-        const url = URL.createObjectURL(blob);
-        element.onload = () => {
-            URL.revokeObjectURL(url);
-        }
-        element.src = url;
+async function setObjectUrlSource(element, stream, mimeType) {
+    const arrayBuffer = await stream.arrayBuffer();
+    const blob = new Blob([arrayBuffer], {
+        type: mimeType
+    });
+    const url = URL.createObjectURL(blob);
+    const loadEvent = element.tagName && element.tagName.toLowerCase() === "video"
+        ? "loadeddata"
+        : "load";
+    const cleanup = () => {
+        URL.revokeObjectURL(url);
+        element.removeEventListener(loadEvent, cleanup);
+        element.removeEventListener("error", cleanup);
+    };
+
+    element.addEventListener(loadEvent, cleanup, { once: true });
+    element.addEventListener("error", cleanup, { once: true });
+    element.src = url;
+
+    if (typeof element.load === "function") {
+        element.load();
     }
 }
+
+function setStreamingVideoSource(element, stream, mimeType) {
+    const normalizedMimeType = mimeType || "video/mp4";
+    const isSupported = typeof MediaSource !== "undefined"
+        && stream != null
+        && typeof stream.stream === "function"
+        && (typeof MediaSource.isTypeSupported !== "function" || MediaSource.isTypeSupported(normalizedMimeType));
+    if (!isSupported) {
+        return setObjectUrlSource(element, stream, normalizedMimeType);
+    }
+
+    const mediaSource = new MediaSource();
+    const url = URL.createObjectURL(mediaSource);
+    element.src = url;
+    URL.revokeObjectURL(url);
+
+    mediaSource.addEventListener("sourceopen", () => {
+        let sourceBuffer;
+        try {
+            sourceBuffer = mediaSource.addSourceBuffer(normalizedMimeType);
+        } catch (error) {
+            console.error("Unable to initialize streaming video playback.", error);
+            void setObjectUrlSource(element, stream, normalizedMimeType);
+            return;
+        }
+
+        const reader = stream.stream().getReader();
+        const pendingChunks = [];
+        let isReadingCompleted = false;
+        let isAppending = false;
+
+        const closeStreamIfReady = () => {
+            if (!isReadingCompleted || isAppending || sourceBuffer.updating || pendingChunks.length > 0 || mediaSource.readyState !== "open") {
+                return;
+            }
+
+            try {
+                mediaSource.endOfStream();
+            } catch (error) {
+                console.error("Unable to finalize streaming video playback.", error);
+            }
+        };
+
+        const appendNextChunk = () => {
+            if (isAppending || sourceBuffer.updating || pendingChunks.length === 0) {
+                closeStreamIfReady();
+                return;
+            }
+
+            isAppending = true;
+            try {
+                sourceBuffer.appendBuffer(pendingChunks.shift());
+            } catch (error) {
+                isAppending = false;
+                isReadingCompleted = true;
+                pendingChunks.length = 0;
+                console.error("Unable to append streamed video chunk.", error);
+                reader.cancel(error).catch(() => { });
+                closeStreamIfReady();
+            }
+        };
+
+        sourceBuffer.addEventListener("updateend", () => {
+            isAppending = false;
+            appendNextChunk();
+        });
+
+        sourceBuffer.addEventListener("error", error => {
+            isReadingCompleted = true;
+            pendingChunks.length = 0;
+            console.error("Streaming video source buffer error.", error);
+            reader.cancel(error).catch(() => { });
+            closeStreamIfReady();
+        });
+
+        void (async () => {
+            try {
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        isReadingCompleted = true;
+                        closeStreamIfReady();
+                        break;
+                    }
+
+                    if (value != null && value.byteLength > 0) {
+                        pendingChunks.push(value.slice());
+                        appendNextChunk();
+                    }
+                }
+            } catch (error) {
+                console.error("Unable to read streamed video data.", error);
+                if (mediaSource.readyState === "open") {
+                    try {
+                        mediaSource.endOfStream("network");
+                    } catch (endOfStreamError) {
+                        console.error("Unable to terminate failed video stream.", endOfStreamError);
+                    }
+                }
+            } finally {
+                reader.releaseLock();
+            }
+        })();
+    }, { once: true });
+
+    if (typeof element.load === "function") {
+        element.load();
+    }
+}
+
+window.ImageSource = {
+    Set: async function(element, stream, mimeType) {
+        const isVideo = (mimeType && mimeType.startsWith("video/"))
+            || (element.tagName && element.tagName.toLowerCase() === "video");
+        if (isVideo) {
+            return setStreamingVideoSource(element, stream, mimeType);
+        }
+
+        return setObjectUrlSource(element, stream, mimeType);
+    }
+};
