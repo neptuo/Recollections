@@ -17,7 +17,7 @@ public class CountryService
         countries = JsonSerializer.Deserialize<GeoJsonFeatureCollection>(stream);
     }
 
-    public GeoJsonFeatureCollection GetVisitedCountries(List<MapEntryModel> entries)
+    public string GetVisitedCountriesJson(List<MapEntryModel> entries)
     {
         var visitedIndices = new HashSet<int>();
 
@@ -50,7 +50,7 @@ public class CountryService
         foreach (var index in visitedIndices)
             result.Features.Add(countries.Features[index]);
 
-        return result;
+        return JsonSerializer.Serialize(result);
     }
 
     private static bool PointInGeometry(double lat, double lng, GeoJsonGeometry geometry)

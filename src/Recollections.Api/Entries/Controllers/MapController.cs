@@ -45,8 +45,8 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
             var entries = await mapService.GetAsync(db.Entries, [userId], connectedUsers);
-            var visitedCountries = countryService.GetVisitedCountries(entries);
-            return Ok(visitedCountries);
+            var json = countryService.GetVisitedCountriesJson(entries);
+            return Content(json, "application/json");
         }
 
         [HttpGet]
