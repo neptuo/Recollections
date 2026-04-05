@@ -37,9 +37,9 @@
                     else if (HasStory)
                     {
                         <div class="inline-editor inline-link inline-editor-viewmode">
-                            <a class="inline-editor-value d-inline-block py-1" href="@Navigator.UrlStoryDetail(Story.StoryId)">
+                            <a class="inline-editor-value d-inline-block cursor-pointer py-1" href="@Navigator.UrlStoryDetail(Story.StoryId)">
                                 <Icon Identifier="book" />
-                                <span class="ms-1 inline-editor-content">@StoryTitle</span>
+                                <span class="inline-editor-content">@StoryTitle</span>
                             </a>
                         </div>
                     }
@@ -55,14 +55,14 @@
                         <div class="inline-editor inline-link inline-editor-viewmode">
                             <span class="inline-editor-value d-inline-block py-1">
                                 <Icon Identifier="user-friends" />
-                                <span class="ms-1 inline-editor-content">
+                                <span class="inline-editor-content">
                                     @for (int i = 0; i < Beings.Count; i++)
                                     {
                                         if (i > 0)
                                         {
                                             <text>, </text>
                                         }
-                                        <a href="@Navigator.UrlBeingDetail(Beings[i].Id)">@Beings[i].Name</a>
+                                        <a class="cursor-pointer" href="@Navigator.UrlBeingDetail(Beings[i].Id)">@Beings[i].Name</a>
                                     }
                                 </span>
                             </span>
