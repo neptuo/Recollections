@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 {
     [Authorize]
     [Route("api/map/[action]")]
-    public class MapController(DataContext db, MapService mapService, IConnectionProvider connections, IHttpClientFactory httpFactory) : Controller
+    public class MapController(DataContext db, MapService mapService, CountryService countryService, IConnectionProvider connections, IHttpClientFactory httpFactory) : Controller
     {
         private readonly HttpClient http = httpFactory.CreateClient("mapy.cz");
 
@@ -34,6 +34,19 @@ namespace Neptuo.Recollections.Entries.Controllers
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
             var results = await mapService.GetAsync(db.Entries, [userId], connectedUsers);
             return Ok(results);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Countries()
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            var entries = await mapService.GetAsync(db.Entries, [userId], connectedUsers);
+            var visitedCountries = countryService.GetVisitedCountries(entries);
+            return Ok(visitedCountries);
         }
 
         [HttpGet]

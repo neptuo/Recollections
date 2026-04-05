@@ -13,4 +13,5 @@ public interface IMapService
     Task SetTypeAsync(string type);
     Task<string> GetViewModeAsync();
     Task SetViewModeAsync(string mode);
+    Task<string> GetCountriesGeoJsonAsync();
 }

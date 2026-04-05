@@ -26,4 +26,7 @@ internal class ApiMapService(Api api, PropertyCollection properties) : IMapServi
 
     public Task SetViewModeAsync(string mode)
         => properties.MapViewModeAsync(mode);
+
+    public Task<string> GetCountriesGeoJsonAsync()
+        => api.GetMapCountriesAsync();
 }

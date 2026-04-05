@@ -82,7 +82,8 @@ namespace Neptuo.Recollections.Components
             if (!IsViewModeApplied && EnableCountriesView && ViewMode == "countries")
             {
                 IsViewModeApplied = true;
-                await Interop.SetViewModeAsync(ViewMode);
+                var geoJson = await Service.GetCountriesGeoJsonAsync();
+                await Interop.SetViewModeAsync(ViewMode, geoJson);
             }
 
             if (Markers.Count > 0)
@@ -173,7 +174,17 @@ namespace Neptuo.Recollections.Components
         protected async Task ToggleViewModeAsync()
         {
             ViewMode = ViewMode == "markers" ? "countries" : "markers";
-            await Interop.SetViewModeAsync(ViewMode);
+
+            if (ViewMode == "countries")
+            {
+                var geoJson = await Service.GetCountriesGeoJsonAsync();
+                await Interop.SetViewModeAsync(ViewMode, geoJson);
+            }
+            else
+            {
+                await Interop.SetViewModeAsync(ViewMode, null);
+            }
+
             await Service.SetViewModeAsync(ViewMode);
         }
     }

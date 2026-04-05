@@ -177,13 +177,13 @@ namespace Neptuo.Recollections.Components
         public async Task RedrawAsync()
             => await module.InvokeVoidAsync("redraw", editor.Container);
 
-        public async Task SetViewModeAsync(string mode)
+        public async Task SetViewModeAsync(string mode, string countriesGeoJson)
         {
             if (module == null)
                 return;
 
             previousViewMode = mode;
-            await module.InvokeVoidAsync("setViewMode", editor.Container, mode, editor.Markers);
+            await module.InvokeVoidAsync("setViewMode", editor.Container, mode, countriesGeoJson);
         }
     }
 
