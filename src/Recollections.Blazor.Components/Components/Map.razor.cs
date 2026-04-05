@@ -40,6 +40,7 @@ namespace Neptuo.Recollections.Components
         protected string SearchQuery { get; set; }
         protected List<MapSearchModel> SearchResults { get; } = [];
         protected bool HasSearchResultsChanged { get; set;}
+        protected bool HasTileTypeChanged { get; set; }
         protected Modal TileTypeModal { get; set; }
         protected string TileType { get; set; }
 
@@ -77,8 +78,9 @@ namespace Neptuo.Recollections.Components
 
         protected override bool ShouldRender()
         {
-            var result = Interop.ShouldRender() || HasSearchResultsChanged;
+            var result = Interop.ShouldRender() || HasSearchResultsChanged || HasTileTypeChanged;
             HasSearchResultsChanged = false;
+            HasTileTypeChanged = false;
             Log.Debug($"ShouldRender: {result}");
             return result;
         }
@@ -151,6 +153,7 @@ namespace Neptuo.Recollections.Components
         protected async Task SelectTypeAsync(string type)
         {
             TileType = type;
+            HasTileTypeChanged = true;
             await Interop.RedrawAsync();
             await Service.SetTypeAsync(type);
             TileTypeModal.Hide();
