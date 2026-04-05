@@ -44,7 +44,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesDefaultResponseType(typeof(PageableList<EntryListModel>))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public Task<IActionResult> List(string beingId, int offset) => RunBeingAsync(beingId, Permission.Read, async being =>
+        public Task<IActionResult> List(string beingId, int offset, int? count = null) => RunBeingAsync(beingId, Permission.Read, async being =>
         {
             var userId = User.FindUserId();
 
@@ -58,7 +58,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 connectedUsers
             );
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset);
+            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset, count);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
 

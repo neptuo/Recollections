@@ -320,3 +320,12 @@ window.ImageSource = {
         element.src = url;
     }
 }
+
+window.Timeline = {
+    ScrollToEntry: function (entryId) {
+        var element = document.querySelector('[data-entry-id="' + entryId + '"]');
+        if (element) {
+            element.scrollIntoView({ block: "center" });
+        }
+    }
+};

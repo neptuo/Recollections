@@ -23,7 +23,7 @@
         {
             @if (ActiveTab == Tab.Timeline)
             {
-                <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />
+                <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@((offset, count) => Api.GetTimelineListAsync(offset, count))" ShowYearSeparators="false" />
             }
             else
             {

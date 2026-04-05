@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="mb-3 timeline-narrow">
-                    <Timeline DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" NoMoreText="@($"Here {Model.Name} started...")" />
+                    <Timeline DataGetter="@((offset, count) => Api.GetBeingTimelineAsync(Model.Id, offset, count))" NoMoreText="@($"Here {Model.Name} started...")" />
                 </div>
             </div>
         </PermissionContainer>

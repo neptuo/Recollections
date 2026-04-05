@@ -42,7 +42,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpGet("api/timeline/list")]
-        public async Task<IActionResult> List(int offset)
+        public async Task<IActionResult> List(int offset, int? count = null)
         {
             string userId = HttpContext.User.FindUserId();
             if (string.IsNullOrEmpty(userId))
@@ -56,7 +56,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 connectedUsers
             );
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset);
+            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset, count);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         }
 

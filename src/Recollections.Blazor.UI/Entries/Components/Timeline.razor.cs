@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.RenderTree;
+using Microsoft.JSInterop;
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class Timeline(Navigator Navigator, UiOptions UiOptions, ILog<Timeline> Log)
+    public record TimelinePosition(int Offset, string EntryId);
+
+    public partial class Timeline(Navigator Navigator, NavigationManager NavigationManager, IJSRuntime JSRuntime, UiOptions UiOptions, ILog<Timeline> Log)
     {
         [Parameter]
         public RenderFragment BeforeContent { get; set; }
@@ -34,13 +38,14 @@ namespace Neptuo.Recollections.Entries.Components
         public List<EntryListModel> Data { get; set; }
 
         [Parameter]
-        public Func<int, Task<PageableList<EntryListModel>>> DataGetter { get; set; }
+        public Func<int, int?, Task<PageableList<EntryListModel>>> DataGetter { get; set; }
 
         [Parameter]
         public EventCallback<EntryListModel> OnClick { get; set; }
 
         private int offset;
         private Task loadAsyncFromParametersSet;
+        private string scrollToEntryId;
 
         protected List<EntryListModel> Entries { get; } = [];
         protected bool HasMore { get; private set; }
@@ -54,6 +59,24 @@ namespace Neptuo.Recollections.Entries.Components
             await base.OnInitializedAsync();
         }
 
+        private TimelinePosition FindPositionFromHistoryEntry()
+        {
+            if (!string.IsNullOrEmpty(NavigationManager.HistoryEntryState))
+            {
+                try
+                {
+                    Log.Debug($"Reading timeline position from history state '{NavigationManager.HistoryEntryState}'");
+                    return JsonSerializer.Deserialize<TimelinePosition>(NavigationManager.HistoryEntryState);
+                }
+                catch
+                {
+                    // State might be from a different component (e.g., Map)
+                }
+            }
+
+            return null;
+        }
+
         protected async override Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -64,6 +87,10 @@ namespace Neptuo.Recollections.Entries.Components
                 Entries.Clear();
                 Entries.AddRange(Data);
                 Log.Debug($"Got parameter Data '{Data.Count}'");
+
+                var position = FindPositionFromHistoryEntry();
+                if (position != null)
+                    scrollToEntryId = position.EntryId;
             }
             else if (Entries.Count == 0)
             {
@@ -79,6 +106,19 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (scrollToEntryId != null)
+            {
+                var entryId = scrollToEntryId;
+                scrollToEntryId = null;
+                Log.Debug($"Scrolling to entry '{entryId}'");
+                await JSRuntime.InvokeVoidAsync("Timeline.ScrollToEntry", entryId);
+            }
+        }
+
         private async Task LoadAsync()
         {
             Ensure.NotNull(DataGetter, "DataGetter");
@@ -87,7 +127,19 @@ namespace Neptuo.Recollections.Entries.Components
             {
                 IsLoading = true;
 
-                PageableList<EntryListModel> response = await DataGetter(offset);
+                int? count = null;
+                if (Entries.Count == 0)
+                {
+                    var position = FindPositionFromHistoryEntry();
+                    if (position != null && position.Offset > 0)
+                    {
+                        count = position.Offset;
+                        scrollToEntryId = position.EntryId;
+                        Log.Debug($"Restoring timeline position: offset={position.Offset}, entryId={position.EntryId}");
+                    }
+                }
+
+                PageableList<EntryListModel> response = await DataGetter(offset, count);
 
                 Entries.AddRange(response.Models);
                 HasMore = response.HasMore;
@@ -103,5 +155,29 @@ namespace Neptuo.Recollections.Entries.Components
 
         public Task LoadMoreAsync()
             => LoadAsync();
+
+        private void OnEntryClicked(EntryListModel entry)
+        {
+            if (OnClick.HasDelegate)
+            {
+                _ = OnClick.InvokeAsync(entry);
+                return;
+            }
+
+            var position = new TimelinePosition(offset, entry.Id);
+            var state = JsonSerializer.Serialize(position);
+            Log.Debug($"Saving timeline position to history state: {state}");
+
+            NavigationManager.NavigateTo(
+                NavigationManager.Uri,
+                new NavigationOptions
+                {
+                    ReplaceHistoryEntry = true,
+                    HistoryEntryState = state
+                }
+            );
+
+            NavigationManager.NavigateTo(Navigator.UrlEntryDetail(entry.Id));
+        }
     }
 }
