@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Neptuo;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -9,71 +8,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Neptuo.Recollections.Entries.Controllers
+namespace Neptuo.Recollections.Entries.Controllers;
+
+[Authorize]
+[Route("api/on-this-day")]
+public class OnThisDayController(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus, IConnectionProvider connections)
+    : ControllerBase(dataContext, shareStatus)
 {
-    [Authorize]
-    [Route("api/on-this-day")]
-    public class OnThisDayController : ControllerBase
+    private IQueryable<Entry> GetOnThisDayQuery(string userId, ConnectedUsersModel connectedUsers)
     {
-        private readonly DataContext dataContext;
-        private readonly EntryListMapper entryMapper;
-        private readonly ShareStatusService shareStatus;
-        private readonly IConnectionProvider connections;
+        var today = DateTime.Today;
+        return shareStatus
+            .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
+            .Where(e => e.When.Month == today.Month && e.When.Day == today.Day && e.When.Year != today.Year)
+            .OrderByDescending(e => e.When);
+    }
 
-        public OnThisDayController(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus, IConnectionProvider connections)
-            : base(dataContext, shareStatus)
-        {
-            Ensure.NotNull(dataContext, "dataContext");
-            Ensure.NotNull(entryMapper, "entryMapper");
-            Ensure.NotNull(shareStatus, "shareStatus");
-            Ensure.NotNull(connections, "connections");
-            this.dataContext = dataContext;
-            this.entryMapper = entryMapper;
-            this.shareStatus = shareStatus;
-            this.connections = connections;
-        }
+    [HttpGet]
+    [ProducesDefaultResponseType(typeof(List<EntryListModel>))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetList()
+    {
+        string userId = HttpContext.User.FindUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
 
-        private IQueryable<Entry> GetOnThisDayQuery(string userId, ConnectedUsersModel connectedUsers)
-        {
-            var today = DateTime.Today;
-            return shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
-                .Where(e => e.When.Month == today.Month && e.When.Day == today.Day && e.When.Year != today.Year)
-                .OrderByDescending(e => e.When);
-        }
+        var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+        var query = GetOnThisDayQuery(userId, connectedUsers);
 
-        [HttpGet]
-        [ProducesDefaultResponseType(typeof(List<EntryListModel>))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetList()
-        {
-            string userId = HttpContext.User.FindUserId();
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+        var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
+        return Ok(models);
+    }
 
-            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = GetOnThisDayQuery(userId, connectedUsers);
+    [HttpGet("count")]
+    [ProducesDefaultResponseType(typeof(int))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetCount()
+    {
+        string userId = HttpContext.User.FindUserId();
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
 
-            var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
-            return Ok(models);
-        }
+        var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+        var query = GetOnThisDayQuery(userId, connectedUsers);
 
-        [HttpGet("count")]
-        [ProducesDefaultResponseType(typeof(int))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetCount()
-        {
-            string userId = HttpContext.User.FindUserId();
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var query = GetOnThisDayQuery(userId, connectedUsers);
-
-            int count = query.Count();
-            return Ok(count);
-        }
+        int count = query.Count();
+        return Ok(count);
     }
 }
