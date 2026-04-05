@@ -46,14 +46,12 @@
             position: absolute;
             bottom: 6px;
             left: 6px;
-            background: rgba(0, 0, 0, 0.55);
             color: white;
-            border-radius: 4px;
-            padding: 2px 5px;
             font-size: 0.75rem;
             line-height: 1;
             z-index: 1;
             pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
         }
 
         img, .img {
