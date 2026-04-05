@@ -13,7 +13,7 @@
         {
             <div class="entry">
                 <div class="body">
-                    <div class="alert alert-info alert-dismissible" role="alert">
+                    <div class="alert alert-info alert-dismissible d-flex align-items-center" role="alert">
                         <Icon Identifier="bell" CssClass="me-1" />
                         @newEntriesCount new @(newEntriesCount == 1 ? "entry" : "entries") since your last visit
                         <button type="button" class="btn-close" @onclick="@(() => isNewEntriesBannerDismissed = true)"></button>
