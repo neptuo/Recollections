@@ -3,9 +3,11 @@
 
 self.importScripts('./service-worker-assets.js');
 
-const shareTargetAsset = self.assetsManifest.assets.find(a => a.url.startsWith('share-target') && a.url.endsWith('.js'));
+const shareTargetAsset = self.assetsManifest.assets.find(a => /^share-target(\.[a-z0-9]+)?\.js$/.test(a.url));
 if (shareTargetAsset) {
     self.importScripts('./' + shareTargetAsset.url);
+} else {
+    function shareTargetHandler() { return null; }
 }
 
 const cacheNamePrefix = 'offline-cache-';
