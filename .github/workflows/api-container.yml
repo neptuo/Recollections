@@ -1,0 +1,37 @@
+name: API Container
+
+on:
+  push:
+    tags:
+      - 'api-*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "value=${GITHUB_REF_NAME#api-}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Log in to ghcr.io
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Publish container
+        run: >
+          dotnet publish src/Recollections.Api/Recollections.Api.csproj
+          --configuration Release
+          --os linux
+          --arch x64
+          -p:PublishProfile=DefaultContainer
+          -p:VersionPrefix=${{ steps.version.outputs.value }}
