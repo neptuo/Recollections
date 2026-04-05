@@ -315,7 +315,6 @@ export async function setViewMode(container, mode, markers) {
             const visited = computeVisitedCountries(markers || [], geojson);
 
             model.countriesLayer = Leaflet.geoJSON(geojson, {
-                interactive: false,
                 style: function (feature) {
                     const index = geojson.features.indexOf(feature);
                     const isVisited = visited.has(index);
@@ -325,6 +324,14 @@ export async function setViewMode(container, mode, markers) {
                         color: isVisited ? "#E06050" : "#adb5bd",
                         weight: isVisited ? 2 : 0.5
                     };
+                },
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.name) {
+                        layer.bindTooltip(feature.properties.name);
+                        layer.on("click", function (e) {
+                            Leaflet.DomEvent.stopPropagation(e);
+                        });
+                    }
                 }
             });
         }
