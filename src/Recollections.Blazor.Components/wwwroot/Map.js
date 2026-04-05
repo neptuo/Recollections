@@ -1,6 +1,8 @@
 ﻿let isLoaded = false;
 let Leaflet;
 
+let countriesStyleInjected = false;
+
 export async function ensureApi() {
     if (isLoaded) {
         return;
@@ -110,6 +112,15 @@ export function initialize(container, interop, isEditable) {
 export function updateMarkers(container, markers, isEditable) {
     const $container = $(container);
     const model = $container.data('map');
+    
+    model.lastMarkers = markers;
+    model.lastIsEditable = isEditable;
+
+    // In countries mode, don't show markers
+    if (model.viewMode === "countries") {
+        return;
+    }
+
     const points = setMarkers(model, markers, isEditable);
 
     model.isAdding = false;
@@ -223,4 +234,79 @@ export function centerAt(container, latitude, longitude, zoom) {
 export function redraw(container) {
     const model = $(container).data('map');
     model.tiles.redraw();
+}
+
+export function setViewMode(container, mode, countriesGeoJsonString) {
+    const model = $(container).data('map');
+    if (!model) return;
+
+    model.viewMode = mode;
+
+    if (mode === "countries" && countriesGeoJsonString) {
+        // Hide markers
+        if (model.markers) {
+            for (const m of model.markers) {
+                m.remove();
+            }
+        }
+
+        // Remove previous countries layer
+        if (model.countriesLayer) {
+            model.countriesLayer.remove();
+            model.countriesLayer = null;
+        }
+
+        // Parse and render server-provided visited countries GeoJSON
+        const geojson = JSON.parse(countriesGeoJsonString);
+
+        model.countriesLayer = Leaflet.geoJSON(geojson, {
+            style: function () {
+                return {
+                    fillColor: "#FA8072",
+                    fillOpacity: 0.5,
+                    color: "#E06050",
+                    weight: 2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.name) {
+                    layer.bindTooltip(feature.properties.name);
+                }
+            }
+        });
+
+        if (!countriesStyleInjected) {
+            countriesStyleInjected = true;
+            const style = document.createElement("style");
+            style.textContent = ".leaflet-overlay-pane path { outline: none !important; }";
+            document.head.appendChild(style);
+        }
+
+        model.countriesLayer.addTo(model.map);
+
+        // Fit to visited countries bounds, or show world
+        const bounds = model.countriesLayer.getBounds();
+        if (bounds.isValid()) {
+            model.map.fitBounds(bounds, { maxZoom: 5, padding: [20, 20] });
+        } else {
+            model.map.setView([20, 0], 2);
+        }
+    } else {
+        // Remove countries layer
+        if (model.countriesLayer) {
+            model.countriesLayer.remove();
+            model.countriesLayer = null;
+        }
+
+        // Re-add markers
+        if (model.lastMarkers && model.lastIsEditable !== undefined) {
+            setMarkers(model, model.lastMarkers, model.lastIsEditable);
+        }
+
+        if (model.points && model.points.length > 0) {
+            model.map.fitBounds(model.points, { maxZoom: 14 });
+        } else {
+            model.map.setView([0, 0], 1);
+        }
+    }
 }

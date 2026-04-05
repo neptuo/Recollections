@@ -29,6 +29,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsAdditive { get; set; }
 
+        [Parameter]
+        public bool EnableCountriesView { get; set; }
+
         [CascadingParameter]
         public FormState FormState { get; set; }
 
@@ -40,8 +43,10 @@ namespace Neptuo.Recollections.Components
         protected string SearchQuery { get; set; }
         protected List<MapSearchModel> SearchResults { get; } = [];
         protected bool HasSearchResultsChanged { get; set;}
+        protected bool HasTileTypeChanged { get; set; }
         protected Modal TileTypeModal { get; set; }
         protected string TileType { get; set; }
+        protected string ViewMode { get; set; } = "markers";
 
         internal bool IsEditable => FormState?.IsEditable ?? true;
 
@@ -52,11 +57,15 @@ namespace Neptuo.Recollections.Components
             && Markers[0].Longitude != null;
 
         protected bool IsInitialized { get; set; }
+        protected bool IsViewModeApplied { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
             TileType = await Service.GetTypeAsync();
+
+            if (EnableCountriesView)
+                ViewMode = await Service.GetViewModeAsync();
 
             IsInitialized = true;
         }
@@ -71,14 +80,22 @@ namespace Neptuo.Recollections.Components
             await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this);
 
+            if (!IsViewModeApplied && EnableCountriesView && ViewMode == "countries")
+            {
+                IsViewModeApplied = true;
+                var geoJson = await Service.GetCountriesGeoJsonAsync();
+                await Interop.SetViewModeAsync(ViewMode, geoJson);
+            }
+
             if (Markers.Count > 0)
                 IsZoomed = true;
         }
 
         protected override bool ShouldRender()
         {
-            var result = Interop.ShouldRender() || HasSearchResultsChanged;
+            var result = Interop.ShouldRender() || HasSearchResultsChanged || HasTileTypeChanged;
             HasSearchResultsChanged = false;
+            HasTileTypeChanged = false;
             Log.Debug($"ShouldRender: {result}");
             return result;
         }
@@ -151,9 +168,27 @@ namespace Neptuo.Recollections.Components
         protected async Task SelectTypeAsync(string type)
         {
             TileType = type;
+            HasTileTypeChanged = true;
             await Interop.RedrawAsync();
             await Service.SetTypeAsync(type);
             TileTypeModal.Hide();
+        }
+
+        protected async Task ToggleViewModeAsync()
+        {
+            ViewMode = ViewMode == "markers" ? "countries" : "markers";
+
+            if (ViewMode == "countries")
+            {
+                var geoJson = await Service.GetCountriesGeoJsonAsync();
+                await Interop.SetViewModeAsync(ViewMode, geoJson);
+            }
+            else
+            {
+                await Interop.SetViewModeAsync(ViewMode, null);
+            }
+
+            await Service.SetViewModeAsync(ViewMode);
         }
     }
 }

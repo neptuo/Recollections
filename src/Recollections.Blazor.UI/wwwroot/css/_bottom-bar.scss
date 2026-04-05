@@ -2,7 +2,7 @@
     --blz-bottom-bar-height: 53px;
 
     @include media-breakpoint-up(sm) {
-        --blz-bottom-bar-height: 0;
+        --blz-bottom-bar-height: 0px;
     }
 }
 

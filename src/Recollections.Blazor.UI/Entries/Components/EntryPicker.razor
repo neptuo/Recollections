@@ -1,10 +1,64 @@
 ﻿@inherits UserStateComponentBase
 
-<Modal @ref="Modal" Title="Select an Entry" CssClass="entry-picker" IsOverflow="true">
+<Modal @ref="Modal" CssClass="entry-picker" IsOverflow="true">
+    <TitleContent>
+        Select an Entry
+        <ul class="nav nav-pills entry-picker-nav">
+            <li class="nav-item">
+                <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
+                    <Icon Identifier="clock" />
+                    Timeline
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
+                    <Icon Identifier="search" />
+                    Search
+                </a>
+            </li>
+        </ul>
+    </TitleContent>
     <ChildContent>
         @if (wasVisible)
         {
-            <Timeline OnClick="@(entry => { Hide(); Selected?.Invoke(entry); })" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />
+            @if (ActiveTab == Tab.Timeline)
+            {
+                <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="false" />
+            }
+            else
+            {
+                <div class="entry-picker-search">
+                    <form @onsubmit="SearchAsync">
+                        <div class="input-group">
+                            <input class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
+                            <button class="btn btn-primary" type="submit">
+                                <Icon Identifier="search" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="entry-picker-results">
+                    <ListView Items="@SearchResults" IsLoading="@(SearchResults.Count == 0 && IsSearching)" Context="entry">
+                        <EmptyContent>
+                            @if (!string.IsNullOrEmpty(SearchText))
+                            {
+                                <div class="entry-picker-empty">
+                                    No entries match '@SearchText'
+                                </div>
+                            }
+                        </EmptyContent>
+                        <ChildContent>
+                            <EntryCard Model="entry" OnCardClick="@(() => OnEntrySelected(entry))" />
+
+                            @if (SearchResults.IndexOf(entry) == SearchResults.Count - 3 && SearchHasMore)
+                            {
+                                <AutoloadNext Intersected="LoadMoreSearchResultsAsync" />
+                            }
+                        </ChildContent>
+                    </ListView>
+                </div>
+            }
         }
     </ChildContent>
 </Modal>
