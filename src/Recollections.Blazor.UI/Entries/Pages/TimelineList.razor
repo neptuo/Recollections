@@ -6,6 +6,7 @@
 
 <Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true">
     <BeforeContent>
+        <OnThisDayBanner />
         <EntryCreate />
     </BeforeContent>
 </Timeline>

@@ -1,0 +1,9 @@
+@if (Count > 0)
+{
+    <a href="@Navigator.UrlOnThisDay()" class="d-block mb-4 text-decoration-none">
+        <Alert Mode="@AlertMode.Info">
+            <Icon Identifier="history" CssClass="me-1" />
+            You have @Count @(Count == 1 ? "memory" : "memories") from this day in previous years.
+        </Alert>
+    </a>
+}
