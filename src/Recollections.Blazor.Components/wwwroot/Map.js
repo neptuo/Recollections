@@ -2,6 +2,8 @@
 let Leaflet;
 let countriesGeoJson = null;
 
+let countriesStyleInjected = false;
+
 export async function ensureApi() {
     if (isLoaded) {
         return;
@@ -328,14 +330,19 @@ export async function setViewMode(container, mode, markers) {
                 onEachFeature: function (feature, layer) {
                     if (feature.properties && feature.properties.name) {
                         layer.bindTooltip(feature.properties.name);
-                        layer.on("click", function (e) {
-                            Leaflet.DomEvent.stopPropagation(e);
-                        });
                     }
                 }
             });
+
+            if (!countriesStyleInjected) {
+                countriesStyleInjected = true;
+                const style = document.createElement("style");
+                style.textContent = ".countries-layer path { outline: none !important; }";
+                document.head.appendChild(style);
+            }
         }
         model.countriesLayer.addTo(model.map);
+        model.countriesLayer.getContainer().classList.add("countries-layer");
 
         // Fit bounds to show the whole world
         if (model.points && model.points.length > 0) {
