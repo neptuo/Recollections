@@ -56,6 +56,7 @@ namespace Neptuo.Recollections.Components
             && Markers[0].Longitude != null;
 
         protected bool IsInitialized { get; set; }
+        protected bool IsViewModeApplied { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
@@ -78,8 +79,11 @@ namespace Neptuo.Recollections.Components
             await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this);
 
-            if (firstRender && EnableCountriesView && ViewMode == "countries")
+            if (!IsViewModeApplied && EnableCountriesView && ViewMode == "countries")
+            {
+                IsViewModeApplied = true;
                 await Interop.SetViewModeAsync(ViewMode);
+            }
 
             if (Markers.Count > 0)
                 IsZoomed = true;

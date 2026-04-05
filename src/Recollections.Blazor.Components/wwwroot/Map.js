@@ -337,12 +337,11 @@ export async function setViewMode(container, mode, markers) {
             if (!countriesStyleInjected) {
                 countriesStyleInjected = true;
                 const style = document.createElement("style");
-                style.textContent = ".countries-layer path { outline: none !important; }";
+                style.textContent = ".leaflet-overlay-pane path { outline: none !important; }";
                 document.head.appendChild(style);
             }
         }
         model.countriesLayer.addTo(model.map);
-        model.countriesLayer.getContainer().classList.add("countries-layer");
 
         // Fit bounds to show the whole world
         if (model.points && model.points.length > 0) {
