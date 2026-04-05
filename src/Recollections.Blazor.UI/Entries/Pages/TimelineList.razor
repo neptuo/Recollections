@@ -6,7 +6,46 @@
 
 <Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true">
     <BeforeContent>
-        <OnThisDayBanner />
         <EntryCreate />
+        <OnThisDayBanner />
+
+        @if (newEntriesCount > 0 && !isNewEntriesBannerDismissed)
+        {
+            <div class="entry">
+                <div class="body">
+                    <div class="alert alert-info alert-dismissible d-flex align-items-center" role="alert">
+                        <Icon Identifier="bell" CssClass="me-1" />
+                        @newEntriesCount new @(newEntriesCount == 1 ? "entry" : "entries") since your last visit
+                        <button type="button" class="btn-close" @onclick="@(() => isNewEntriesBannerDismissed = true)"></button>
+                    </div>
+                </div>
+            </div>
+        }
     </BeforeContent>
 </Timeline>
+
+@code {
+    private int? newEntriesCount;
+    private bool isNewEntriesBannerDismissed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _ = LoadNewEntriesCountAsync();
+    }
+
+    private async Task LoadNewEntriesCountAsync()
+    {
+        try
+        {
+            var response = await Api.VisitTimelineAsync();
+            newEntriesCount = response.NewEntriesCount;
+            StateHasChanged();
+        }
+        catch
+        {
+            // Non-critical feature; don't block timeline on failure
+        }
+    }
+}

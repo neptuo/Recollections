@@ -57,6 +57,9 @@ namespace Neptuo.Recollections.Entries
         public Task<PageableList<EntryListModel>> GetTimelineListAsync(int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
+        public Task<TimelineVisitResponse> VisitTimelineAsync()
+            => faultHandler.Wrap(http.PostAsJsonAsync<object, TimelineVisitResponse>("timeline/visit", null));
+
         public Task<PageableList<EntryListModel>> GetTimelineListAsync(string userId, int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"profiles/{userId}/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
         
