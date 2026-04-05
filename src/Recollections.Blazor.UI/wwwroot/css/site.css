@@ -25745,6 +25745,17 @@ input.input-number-noarrows[type=number] {
   display: inline-block;
   z-index: 1;
 }
+.images .image .media-type-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  color: white;
+  font-size: 0.75rem;
+  line-height: 1;
+  z-index: 1;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
 @media (min-width: 520px) {
   .images .image img, .images .image .img {
     -webkit-transition: -webkit-transform 0.5s;
@@ -25785,6 +25796,19 @@ img.pswp__video {
 
 video.pswp__video {
   cursor: auto !important;
+}
+
+.pswp__media-type-badge {
+  position: absolute;
+  bottom: 60px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 1rem;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .entry-picker .modal-body {
@@ -26002,4 +26026,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-396-on-this-day-page-and-banner-5c26b7/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-402-add-visual-glyph-to-distinguish-image-an-399b7e/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
