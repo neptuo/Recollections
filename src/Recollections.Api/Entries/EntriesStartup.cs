@@ -86,6 +86,7 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageResizeService>()
                 .AddTransient<EntryListMapper>()
                 .AddTransient<MapService>()
+                .AddSingleton<CountryService>()
                 .AddTransient<IImageValidator, PremiumImageSizeValidator>()
                 .AddTransient<IVideoValidator, VideoValidator>()
                 .AddSingleton(ImageFormatDefinition.Jpeg);

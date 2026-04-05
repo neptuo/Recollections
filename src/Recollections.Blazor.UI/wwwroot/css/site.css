@@ -25694,6 +25694,10 @@ input.input-number-noarrows[type=number] {
   top: 10px;
   z-index: 401;
   left: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 0.25rem;
 }
 .map-container .card .card-header,
 .map-container .card .card-footer {
@@ -26026,4 +26030,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-397-banner-with-x-new-entries-since-last-vis-7798e0/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-202-identify-visited-countries-620640/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

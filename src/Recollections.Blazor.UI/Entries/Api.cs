@@ -66,6 +66,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
+        public async Task<string> GetMapCountriesAsync()
+            => await faultHandler.Wrap(http.GetStringAsync("map/countries"));
+
         public Task<List<MapSearchModel>> GetGeoLocateListAsync(string query)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapSearchModel>>(QueryHelpers.AddQueryString("map/geolocate", "q", query)));
 
