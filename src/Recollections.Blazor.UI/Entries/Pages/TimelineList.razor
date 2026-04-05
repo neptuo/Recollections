@@ -6,8 +6,8 @@
 
 <Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true">
     <BeforeContent>
-        <OnThisDayBanner />
         <EntryCreate />
+        <OnThisDayBanner />
 
         @if (newEntriesCount > 0 && !isNewEntriesBannerDismissed)
         {
