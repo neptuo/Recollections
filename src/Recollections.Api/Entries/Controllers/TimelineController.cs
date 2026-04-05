@@ -82,7 +82,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 ).CountAsync();
             }
 
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             if (property == null)
             {
                 property = new UserPropertyValue
