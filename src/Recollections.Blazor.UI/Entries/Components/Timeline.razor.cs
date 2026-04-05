@@ -68,9 +68,9 @@ namespace Neptuo.Recollections.Entries.Components
                     Log.Debug($"Reading timeline position from history state '{NavigationManager.HistoryEntryState}'");
                     return JsonSerializer.Deserialize<TimelinePosition>(NavigationManager.HistoryEntryState);
                 }
-                catch
+                catch (JsonException ex)
                 {
-                    // State might be from a different component (e.g., Map)
+                    Log.Debug($"Ignoring non-timeline history state: {ex.Message}");
                 }
             }
 
@@ -156,11 +156,11 @@ namespace Neptuo.Recollections.Entries.Components
         public Task LoadMoreAsync()
             => LoadAsync();
 
-        private void OnEntryClicked(EntryListModel entry)
+        private async Task OnEntryClicked(EntryListModel entry)
         {
             if (OnClick.HasDelegate)
             {
-                _ = OnClick.InvokeAsync(entry);
+                await OnClick.InvokeAsync(entry);
                 return;
             }
 
@@ -176,8 +176,6 @@ namespace Neptuo.Recollections.Entries.Components
                     HistoryEntryState = state
                 }
             );
-
-            NavigationManager.NavigateTo(Navigator.UrlEntryDetail(entry.Id));
         }
     }
 }
