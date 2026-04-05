@@ -27,13 +27,13 @@ jobs:
       - name: Download release artifact
         run: |
           mkdir dist
-          gh release download "${{ inputs.tag }}" --pattern '*.zip' --dir .
-          zip_count=$(ls -1 *.zip 2>/dev/null | wc -l)
+          gh release download "${{ inputs.tag }}" --pattern 'recollections-client-*.zip' --dir .
+          zip_count=$(ls -1 recollections-client-*.zip 2>/dev/null | wc -l)
           if [ "$zip_count" -ne 1 ]; then
-            echo "Error: Expected exactly one zip artifact, found $zip_count"
+            echo "Error: Expected exactly one client zip artifact, found $zip_count"
             exit 1
           fi
-          unzip *.zip -d dist
+          unzip recollections-client-*.zip -d dist
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
