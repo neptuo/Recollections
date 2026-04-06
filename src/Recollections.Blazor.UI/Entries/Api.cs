@@ -172,6 +172,9 @@ namespace Neptuo.Recollections.Entries
         public Task<PageableList<EntryListModel>> GetBeingTimelineAsync(string beingId, int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"beings/{beingId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
+        public Task<List<MapEntryModel>> GetBeingMapAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>($"beings/{beingId}/map"));
+
         public Task<PageableList<EntryListModel>> SearchAsync(string query, int offset = 0)
         {
             string url = "search";
