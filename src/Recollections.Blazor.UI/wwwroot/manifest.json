@@ -47,7 +47,7 @@
     {
       "src": "/img/screenshots/map-sample.png",
       "type": "image/png",
-      "sizes": "1440x836",
+      "sizes": "1440x900",
       "label": "Map view with sample locations",
       "form_factor": "wide"
     }
