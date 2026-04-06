@@ -25007,6 +25007,15 @@ body {
   margin-bottom: var(--blz-bottom-bar-height);
 }
 
+.offcanvas-half {
+  --bs-offcanvas-width: 100%;
+}
+@media (min-width: 768px) {
+  .offcanvas-half {
+    --bs-offcanvas-width: 50%;
+  }
+}
+
 blockquote {
   color: #aaaaaa;
 }
@@ -26030,4 +26039,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-446-being-map-6bd813/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-447-being-stories-4e88e5/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

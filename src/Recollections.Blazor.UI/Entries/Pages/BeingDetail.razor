@@ -38,6 +38,14 @@
                         <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
                     </MapToggle>
                 </div>
+
+                @if (StoriesCount > 0)
+                {
+                    <div class="my-2">
+                        <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
+                    </div>
+                }
+
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
@@ -50,4 +58,14 @@
     </CascadingValue>
 
     <BeingIconPicker @ref="IconPicker" Value="@Model.Icon" Selected="@(async value => await SaveIconAsync(value))" />
+
+    <Offcanvas @ref="StoriesOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Stories with {Model.Name}")" IsBodyRenderedLazily="true">
+        <div class="row">
+            <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." Context="story">
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <StoryCard Model="story" OnCardClick="@(() => Navigator.OpenStoryDetail(story.Id))" />
+                </div>
+            </ListView>
+        </div>
+    </Offcanvas>
 }
