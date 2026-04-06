@@ -38,6 +38,7 @@
 	<PackageVersion Include="ImageSharp.AVCodecFormats.Native" Version="3.0.0" />
 	<PackageVersion Include="System.Drawing.Common" Version="$(FrameworkPackageVersion)" />
 	<PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+	<PackageVersion Include="WebPush" Version="1.0.12" />
 	<PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
   </ItemGroup>
 </Project>

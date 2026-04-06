@@ -22,6 +22,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
     <PackageReference Include="System.Drawing.Common" />
+    <PackageReference Include="WebPush" />
     <PackageReference Include="Neptuo.Events" />
     <PackageReference Include="Yarp.ReverseProxy" />
   </ItemGroup>

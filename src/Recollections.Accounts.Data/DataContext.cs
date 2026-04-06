@@ -15,6 +15,10 @@ namespace Neptuo.Recollections.Accounts
 
         public DbSet<UserPropertyValue> UserProperties { get; set; }
         public DbSet<UserConnection> Connections { get; set; }
+        public DbSet<UserNotificationSettings> NotificationSettings { get; set; }
+        public DbSet<UserNotificationNewEntriesSettings> NotificationNewEntriesSettings { get; set; }
+        public DbSet<UserNotificationPushSubscription> PushSubscriptions { get; set; }
+        public DbSet<NotificationDispatch> NotificationDispatches { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
             : base(options)
@@ -48,6 +52,66 @@ namespace Neptuo.Recollections.Accounts
                 .HasOne(p => p.OtherUser)
                 .WithMany()
                 .HasForeignKey(p => p.OtherUserId);
+
+            modelBuilder.Entity<UserNotificationSettings>()
+                .ToTable("UserNotificationSettings")
+                .HasKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationSettings>()
+                .Property(p => p.TimeZoneId)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationSettings>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationNewEntriesSettings>()
+                .ToTable("UserNotificationNewEntriesSettings")
+                .HasKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationNewEntriesSettings>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .ToTable("PushSubscriptions")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .Property(p => p.Endpoint)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .Property(p => p.P256dh)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .Property(p => p.Auth)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .HasIndex(p => p.Endpoint)
+                .IsUnique();
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<NotificationDispatch>()
+                .ToTable("NotificationDispatches")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<NotificationDispatch>()
+                .HasIndex(p => new { p.UserId, p.Kind, p.LocalDate })
+                .IsUnique();
+
+            modelBuilder.Entity<NotificationDispatch>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
 
             if (!String.IsNullOrEmpty(schema.Name))
             {

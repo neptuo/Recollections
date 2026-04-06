@@ -90,6 +90,7 @@ public class MenuList
 
         Add(new MenuItem("Profile", "address-card", OnClick: () => navigator.OpenProfile(userState.UserId)), User);
         Add(new MenuItem("Connections", "link", Url: navigator.UrlConnections()), User);
+        Add(new MenuItem("Notifications", "bell", Url: navigator.UrlNotifications()), User);
         Add(new MenuItem("Change password", "key", OnClick: changePassword), User);
         Add(new MenuItem("Theme", "moon", OnClick: changeTheme), User);
         Add(new MenuItem("Logout", "sign-out-alt", OnClick: () => _ = userState.LogoutAsync()), User);

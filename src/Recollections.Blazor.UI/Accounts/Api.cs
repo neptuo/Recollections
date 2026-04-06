@@ -52,6 +52,25 @@ namespace Neptuo.Recollections.Accounts
         public Task SetPropertyAsync(UserPropertyModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync("accounts/properties", model));
 
+        public Task<UserNotificationSettingsModel> GetNotificationSettingsAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<UserNotificationSettingsModel>("accounts/notifications"));
+
+        public Task SetNotificationSettingsAsync(UserNotificationSettingsModel model)
+            => faultHandler.Wrap(http.PutAsJsonAsync("accounts/notifications", model));
+
+        public Task CreateNotificationSubscriptionAsync(PushSubscriptionModel model)
+            => faultHandler.Wrap(http.PostAsJsonAsync("accounts/notifications/subscriptions", model));
+
+        public Task DeleteNotificationSubscriptionAsync(PushSubscriptionModel model)
+        {
+            HttpRequestMessage request = new(HttpMethod.Delete, "accounts/notifications/subscriptions")
+            {
+                Content = JsonContent.Create(model)
+            };
+
+            return faultHandler.Wrap(http.SendAsync(request));
+        }
+
         public Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)
             => faultHandler.Wrap(http.PostAsJsonAsync<ChangePasswordRequest, ChangePasswordResponse>("accounts/changepassword", request));
 

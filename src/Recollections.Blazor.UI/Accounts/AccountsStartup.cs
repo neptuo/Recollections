@@ -17,6 +17,7 @@ namespace Neptuo.Recollections.Accounts
             services.AddTransient<Api>();
 
             services
+                .AddSingleton<PushNotificationInterop>()
                 .AddTransient<TokenStorage>()
                 .AddSingleton<PropertyCollection>()
                 .AddBlazoredLocalStorage()

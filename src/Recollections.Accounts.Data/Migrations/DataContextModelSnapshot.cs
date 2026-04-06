@@ -212,6 +212,33 @@ namespace Neptuo.Recollections.Accounts.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.NotificationDispatch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LocalDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Kind", "LocalDate")
+                        .IsUnique();
+
+                    b.ToTable("NotificationDispatches", (string)null);
+                });
+
             modelBuilder.Entity("Neptuo.Recollections.Accounts.UserConnection", b =>
                 {
                     b.Property<string>("UserId")
@@ -234,6 +261,80 @@ namespace Neptuo.Recollections.Accounts.Migrations
                     b.HasIndex("OtherUserId");
 
                     b.ToTable("UserConnections", (string)null);
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.UserNotificationNewEntriesSettings", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserNotificationNewEntriesSettings", (string)null);
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.UserNotificationPushSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Endpoint")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PushSubscriptions", (string)null);
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.UserNotificationSettings", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PreferredHour")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TimeZoneId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UserNotificationSettings", (string)null);
                 });
 
             modelBuilder.Entity("Neptuo.Recollections.Accounts.UserPropertyValue", b =>
@@ -318,6 +419,50 @@ namespace Neptuo.Recollections.Accounts.Migrations
                         .IsRequired();
 
                     b.Navigation("OtherUser");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.NotificationDispatch", b =>
+                {
+                    b.HasOne("Neptuo.Recollections.Accounts.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.UserNotificationNewEntriesSettings", b =>
+                {
+                    b.HasOne("Neptuo.Recollections.Accounts.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.UserNotificationPushSubscription", b =>
+                {
+                    b.HasOne("Neptuo.Recollections.Accounts.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Neptuo.Recollections.Accounts.UserNotificationSettings", b =>
+                {
+                    b.HasOne("Neptuo.Recollections.Accounts.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

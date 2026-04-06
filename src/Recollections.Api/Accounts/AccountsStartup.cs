@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Neptuo.Recollections.Accounts.Notifications;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,11 +38,17 @@ namespace Neptuo.Recollections.Accounts
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
             services.Configure<TokenLoginOptions>(o => configuration.GetSection("TokenLogin").Bind(o.Tokens));
             services.Configure<UserPropertyOptions>(configuration.GetSection("Properties"));
+            services.Configure<NotificationOptions>(configuration.GetSection("Notifications"));
 
             services
                 .AddTransient<IUserNameProvider, DbUserNameProvider>()
                 .AddTransient<IConnectionProvider, DbConnectionProvider>()
                 .AddTransient<IUserPremiumProvider, DbUserPremiumProvider>();
+
+            services
+                .AddTransient<WebPush.WebPushClient>()
+                .AddTransient<PushNotificationSender>()
+                .AddHostedService<NewEntriesNotificationBackgroundService>();
 
             services
                 .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)

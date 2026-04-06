@@ -112,6 +112,12 @@ namespace Neptuo.Recollections
         public void OpenConnections()
             => uri.NavigateTo(UrlConnections());
 
+        public string UrlNotifications()
+            => "/notifications";
+
+        public void OpenNotifications()
+            => uri.NavigateTo(UrlNotifications());
+
         public string UrlTimeline()
             => "/";
 
