@@ -239,23 +239,26 @@ export function setBearerToken(userIdValue, bearerTokenValue) {
     bearerToken = bearerTokenValue;
 }
 
-export function bindForm(entityType, entityId, url, form, dragAndDropContainer) {
-    form = $(form);
+const _formData = new WeakMap();
 
-    if (form.data('fileUpload') != null)
+export function bindForm(entityType, entityId, url, form, dragAndDropContainer) {
+    if (_formData.has(form))
         return;
 
-    form.data('fileUpload', queue);
+    _formData.set(form, queue);
 
-    var input = form.find("input[type=file]");
+    var input = form.querySelector("input[type=file]");
 
-    form.find("button").click(function (e) {
-        input.click();
-        e.preventDefault();
-    });
-    input.change(async () => {
-        await queue.storeAndQueueFiles(input[0].files, url, entityType, entityId);
-        form[0].reset();
+    var button = form.querySelector("button");
+    if (button) {
+        button.addEventListener('click', function (e) {
+            input.click();
+            e.preventDefault();
+        });
+    }
+    input.addEventListener('change', async () => {
+        await queue.storeAndQueueFiles(input.files, url, entityType, entityId);
+        form.reset();
     });
 
     if (dragAndDropContainer) {
