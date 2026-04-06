@@ -2,6 +2,7 @@
 let Leaflet;
 
 let countriesStyleInjected = false;
+const _mapData = new WeakMap();
 
 export async function ensureApi() {
     if (isLoaded) {
@@ -22,9 +23,8 @@ export async function ensureApi() {
 export function initialize(container, interop, isEditable) {
     let model = null;
 
-    const $container = $(container);
-    if ($container.data('map') == null) {
-        const map = Leaflet.map($container.find('.map')[0]);
+    if (!_mapData.has(container)) {
+        const map = Leaflet.map(container.querySelector('.map'));
         map.zoomControl.setPosition("topright");
 
         model = {
@@ -35,7 +35,7 @@ export function initialize(container, interop, isEditable) {
             isEmptyPoint: false,
             isAdding: false
         };
-        $container.data('map', model);
+        _mapData.set(container, model);
 
         // Map layer
         const BackendLayer = L.TileLayer.extend({
@@ -80,7 +80,7 @@ export function initialize(container, interop, isEditable) {
         new LogoControl().addTo(map);
 
         if (isEditable) {
-            bindEvents(model, $container);
+            bindEvents(model, container);
         }
 
         model.map.on("moveend", () => {
@@ -110,8 +110,7 @@ export function initialize(container, interop, isEditable) {
 }
 
 export function updateMarkers(container, markers, isEditable) {
-    const $container = $(container);
-    const model = $container.data('map');
+    const model = _mapData.get(container);
     
     model.lastMarkers = markers;
     model.lastIsEditable = isEditable;
@@ -126,15 +125,15 @@ export function updateMarkers(container, markers, isEditable) {
     model.isAdding = false;
     model.isEmptyPoint = points.length == 0 && !model.isAdditive;
 
-    $container.find('.map').css("cursor", "");
+    const mapEl = container.querySelector('.map');
+    mapEl.style.cursor = "";
     if (model.isEmptyPoint) {
-        $container.find('.map').css("cursor", "crosshair");
+        mapEl.style.cursor = "crosshair";
     }
 }
 
 export function centerAtMarkers(container) {
-    const $container = $(container);
-    const model = $container.data('map');
+    const model = _mapData.get(container);
     if (model.points.length == 0) {
         model.map.setView([0, 0], 1);
     } else {
@@ -142,7 +141,7 @@ export function centerAtMarkers(container) {
     }
 }
 
-function bindEvents(model, $container) {
+function bindEvents(model, container) {
     function mapClick(e) {
         if (model.isEmptyPoint || model.isAdding) {
             var id = null;
@@ -157,14 +156,16 @@ function bindEvents(model, $container) {
 
     model.map.on("click", mapClick);
 
-    var $addButton = $container.find(".btn-add-location");
+    var addButton = container.querySelector(".btn-add-location");
 
-    $addButton.click(function () {
-        model.isAdding = true;
-        $container.find('.map').css("cursor", "crosshair");
-    });
+    if (addButton) {
+        addButton.addEventListener('click', function () {
+            model.isAdding = true;
+            container.querySelector('.map').style.cursor = "crosshair";
+        });
+    }
 
-    model.isAdditive = $addButton.length > 0;
+    model.isAdditive = addButton != null;
 }
 
 function setMarkers(model, markers, isEditable) {
@@ -227,17 +228,17 @@ function moveMarker(model, id, latitude, longitude) {
 }
 
 export function centerAt(container, latitude, longitude, zoom) {
-    const model = $(container).data('map');
+    const model = _mapData.get(container);
     model.map.setView([latitude, longitude], zoom ?? 17);
 }
 
 export function redraw(container) {
-    const model = $(container).data('map');
+    const model = _mapData.get(container);
     model.tiles.redraw();
 }
 
 export function setViewMode(container, mode, countriesGeoJsonString) {
-    const model = $(container).data('map');
+    const model = _mapData.get(container);
     if (!model) return;
 
     model.viewMode = mode;
