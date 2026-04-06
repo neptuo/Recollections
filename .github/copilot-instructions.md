@@ -6,6 +6,7 @@
 
 ## Running the Application
 
+- Restore .NET tools with `dotnet tool restore` before building. This installs the `excubo.webcompiler` tool needed to compile SCSS files.
 - Run the application with `dotnet run ./src/AppHost.cs`.
 
 ## Pull Request Reviews
