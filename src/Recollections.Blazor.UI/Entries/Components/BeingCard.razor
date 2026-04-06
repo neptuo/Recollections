@@ -8,9 +8,6 @@
     [CascadingParameter]
     public UserState UserState { get; set; }
 
-    [Parameter]
-    public EventCallback OnStoriesClick { get; set; }
-
     protected override string Title => $"{Model.Name}{(UserState.UserId == Model.Id ? " (me)" : string.Empty)}";
 
     protected override RenderFragment DefaultBodyContent =>
@@ -19,16 +16,6 @@
                 <Icon Prefix="fas" Identifier="comment-alt" CssClass="uniform" />
                 @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
             </div>
-
-            @if (Model.Stories > 0)
-            {
-                <div class="information">
-                    <a href="" @onclick="@OnStoriesClick" @onclick:preventDefault @onclick:stopPropagation>
-                        <Icon Identifier="book" CssClass="uniform" />
-                        @Model.Stories @(Model.Stories == 1 ? "story" : "stories")
-                    </a>
-                </div>
-            }
 
             @if (UserState.UserId != Model.UserId)
             {

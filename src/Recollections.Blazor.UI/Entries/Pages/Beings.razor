@@ -23,18 +23,8 @@
     <div class="row">
         <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any being..." Context="being">
             <div class="col-sm-12 col-md-3 mb-4">
-                <BeingCard Model="being" CardCssClass="h-100" OnCardClick="@(() => Navigator.OpenBeingDetail(being.Id))" OnStoriesClick="@(() => ShowStoriesAsync(being))" />
+                <BeingCard Model="being" CardCssClass="h-100" OnCardClick="@(() => Navigator.OpenBeingDetail(being.Id))" />
             </div>
         </ListView>
     </div>
 </div>
-
-<Offcanvas @ref="StoriesOffcanvas" Direction="end" Title="@StoriesTitle" IsBodyRenderedLazily="true">
-    <div class="row p-3">
-        <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." Context="story">
-            <div class="col-12 mb-3">
-                <StoryCard Model="story" OnCardClick="@(() => Navigator.OpenStoryDetail(story.Id))" />
-            </div>
-        </ListView>
-    </div>
-</Offcanvas>

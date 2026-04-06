@@ -67,16 +67,11 @@ namespace Neptuo.Recollections.Entries.Controllers
 
                 MapEntityToModel(entity, model);
 
-                var beingEntries = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
-                    .Where(e => e.Beings.Contains(entity));
-
-                model.Entries = await beingEntries.CountAsync();
-
-                model.Stories = await beingEntries
-                    .Where(e => e.Story != null || e.Chapter != null)
-                    .Select(e => e.Story != null ? e.Story.Id : e.Chapter.Story.Id)
-                    .Distinct()
+                int entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
+                    .Where(e => e.Beings.Contains(entity))
                     .CountAsync();
+
+                model.Entries = entries;
             }
 
             var userNames = await this.userNames.GetUserNamesAsync(models.Select(e => e.UserId).ToArray());
