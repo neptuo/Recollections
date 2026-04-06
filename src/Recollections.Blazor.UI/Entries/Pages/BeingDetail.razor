@@ -42,7 +42,9 @@
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
 
-                <Timeline DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" NoMoreText="@($"Here {Model.Name} started...")" />
+                <div class="mb-3 timeline-narrow">
+                    <Timeline DataGetter="@(offset => Api.GetBeingTimelineAsync(Model.Id, offset))" NoMoreText="@($"Here {Model.Name} started...")" />
+                </div>
             </div>
         </PermissionContainer>
     </CascadingValue>
