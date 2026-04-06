@@ -33,6 +33,11 @@
                     </InlineLink>
                 </h2>
                 <UserInformation Owner="@Owner" />
+                <div class="gps">
+                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                    </MapToggle>
+                </div>
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>

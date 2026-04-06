@@ -33,6 +33,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected BeingIconPicker IconPicker { get; set; }
 
+        protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
+        protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
+
         public override Task SetParametersAsync(ParameterView parameters)
         {
             previousBeingId = BeingId;
@@ -52,6 +55,30 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
+
+            await LoadMapAsync();
+        }
+
+        private async Task LoadMapAsync()
+        {
+            MapEntries = await Api.GetBeingMapAsync(BeingId);
+            Markers.Clear();
+            foreach (var entry in MapEntries)
+            {
+                Markers.Add(new MapMarkerModel()
+                {
+                    Latitude = entry.Location.Latitude,
+                    Longitude = entry.Location.Longitude,
+                    Altitude = entry.Location.Altitude,
+                    Title = entry.Title
+                });
+            }
+        }
+
+        protected void OnMarkerSelected(int index)
+        {
+            var entry = MapEntries[index];
+            Navigator.OpenEntryDetail(entry.Id);
         }
 
         protected async Task SaveAsync()
