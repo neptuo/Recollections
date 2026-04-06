@@ -79,7 +79,9 @@ namespace Neptuo.Recollections.Entries.Controllers
                     db.Entries.Where(e => e.Created > lastVisitAt),
                     userId,
                     connectedUsers
-                ).CountAsync();
+                )
+                .Where(e => e.UserId != userId)
+                .CountAsync();
             }
 
             var now = DateTime.Now;
