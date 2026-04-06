@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Beings;
+using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,6 +30,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
         public List<BeingListModel> Items { get; } = new List<BeingListModel>();
 
+        protected Offcanvas StoriesOffcanvas { get; set; }
+        protected string StoriesTitle { get; set; }
+        protected bool IsStoriesLoading { get; set; }
+        protected List<StoryListModel> StoryItems { get; } = new List<StoryListModel>();
+
         protected async override Task OnInitializedAsync()
         {
             IsLoading = true;
@@ -54,6 +61,19 @@ namespace Neptuo.Recollections.Entries.Pages
 
             await Api.CreateBeingAsync(model);
             Navigator.OpenBeingDetail(model.Id);
+        }
+
+        protected async Task ShowStoriesAsync(BeingListModel being)
+        {
+            StoriesTitle = $"Stories with {being.Name}";
+            IsStoriesLoading = true;
+            StoryItems.Clear();
+            StoriesOffcanvas.Show();
+            StateHasChanged();
+
+            StoryItems.AddRange(await Api.GetBeingStoriesAsync(being.Id));
+            IsStoriesLoading = false;
+            StateHasChanged();
         }
     }
 }

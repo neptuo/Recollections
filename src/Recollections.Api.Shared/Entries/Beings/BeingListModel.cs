@@ -17,6 +17,7 @@ namespace Neptuo.Recollections.Entries.Beings
         public string Icon { get; set; }
 
         public int Entries { get; set; }
+        public int Stories { get; set; }
 
     }
 }
