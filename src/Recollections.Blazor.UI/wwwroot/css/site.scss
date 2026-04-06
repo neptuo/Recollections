@@ -62,7 +62,7 @@ body {
 .offcanvas-half {
     --bs-offcanvas-width: 100%;
 
-    @media (min-width: 768px) {
+    @include media-breakpoint-up(md) {
         --bs-offcanvas-width: 50%;
     }
 }
