@@ -59,6 +59,14 @@ body {
     margin-bottom: var(--blz-bottom-bar-height); // To avoid bottom bar
 }
 
+.offcanvas-half {
+    --bs-offcanvas-width: 100%;
+
+    @media (min-width: 768px) {
+        --bs-offcanvas-width: 50%;
+    }
+}
+
 blockquote {
     color: $placeholder-color;
 }

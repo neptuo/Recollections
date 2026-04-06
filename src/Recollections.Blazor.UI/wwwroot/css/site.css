@@ -25007,6 +25007,15 @@ body {
   margin-bottom: var(--blz-bottom-bar-height);
 }
 
+.offcanvas-half {
+  --bs-offcanvas-width: 100%;
+}
+@media (min-width: 768px) {
+  .offcanvas-half {
+    --bs-offcanvas-width: 50%;
+  }
+}
+
 blockquote {
   color: #aaaaaa;
 }
