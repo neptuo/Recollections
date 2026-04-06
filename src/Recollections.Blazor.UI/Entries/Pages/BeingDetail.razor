@@ -42,10 +42,7 @@
                 @if (StoriesCount > 0)
                 {
                     <div class="my-2">
-                        <a href="" @onclick="ShowStoriesAsync" @onclick:preventDefault>
-                            <Icon Identifier="book" CssClass="uniform" />
-                            @StoriesCount @(StoriesCount == 1 ? "story" : "stories")
-                        </a>
+                        <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
                     </div>
                 }
 
