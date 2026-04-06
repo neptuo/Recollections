@@ -22,21 +22,21 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
         private readonly EntryListMapper entryMapper;
-        private readonly IUserNameProvider userNames;
+        private readonly StoryListMapper storyMapper;
         private readonly IConnectionProvider connections;
 
-        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, IUserNameProvider userNames, IConnectionProvider connections)
+        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, StoryListMapper storyMapper, IConnectionProvider connections)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(entryMapper, "entryMapper");
-            Ensure.NotNull(userNames, "userNames");
+            Ensure.NotNull(storyMapper, "storyMapper");
             Ensure.NotNull(connections, "connections");
             this.db = db;
             this.shareStatus = shareStatus;
             this.entryMapper = entryMapper;
-            this.userNames = userNames;
+            this.storyMapper = storyMapper;
             this.connections = connections;
         }
 
@@ -87,51 +87,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Where(s => storyIds.Contains(s.Id))
                 .ToListAsync();
 
-            List<StoryListModel> models = new();
-            foreach (var story in stories)
-            {
-                var model = new StoryListModel();
-                models.Add(model);
-
-                model.Id = story.Id;
-                model.UserId = story.UserId;
-                model.Title = story.Title;
-
-                int chapters = await db.Stories
-                    .Where(s => s.Id == story.Id)
-                    .SelectMany(s => s.Chapters)
-                    .CountAsync();
-
-                var entries = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries, [userId, ShareStatusService.PublicUserId], connectedUsers)
-                    .Where(e => e.Story.Id == story.Id || e.Chapter.Story.Id == story.Id)
-                    .Select(e => e.When)
-                    .ToListAsync();
-
-                model.Chapters = chapters;
-                model.Entries = entries.Count;
-
-                if (entries.Count > 0)
-                {
-                    model.MinDate = entries.Min();
-                    model.MaxDate = entries.Max();
-                }
-            }
-
-            var userNamesList = await userNames.GetUserNamesAsync(models.Select(e => e.UserId).ToArray());
-            for (int i = 0; i < models.Count; i++)
-                models[i].UserName = userNamesList[i];
-
-            models.Sort((a, b) =>
-            {
-                int compare = (b.MaxDate ?? DateTime.MinValue).CompareTo(a.MaxDate ?? DateTime.MinValue);
-                if (compare == 0)
-                    compare = (b.MinDate ?? DateTime.MinValue).CompareTo(a.MinDate ?? DateTime.MinValue);
-
-                if (compare == 0)
-                    compare = a.Title.CompareTo(b.Title);
-
-                return compare;
-            });
+            var models = await storyMapper.MapAsync(stories, userId, connectedUsers);
 
             return Ok(models);
         });
