@@ -25565,20 +25565,9 @@ input.input-number-noarrows[type=number] {
   background: var(--bs-body-bg);
 }
 
-.entry-new .body {
-  margin-bottom: 1.5rem;
-}
 .entry-new .date-box {
   width: 100px;
   float: right;
-}
-
-.entry-banner .body {
-  margin-bottom: 1.5rem;
-}
-.entry-banner .body > :last-child,
-.entry-banner .body > :last-child > .alert:last-child {
-  margin-bottom: 0;
 }
 
 .entry-picker .timeline:before {
