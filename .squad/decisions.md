@@ -33,6 +33,21 @@ Updated `site.js` to centralize source cleanup logic and preserve MediaSource ob
 
 **Result:** Video streaming now works end-to-end with safe cleanup and browser fallback.
 
+## Blob URL Lifetime Management (2026-04-07)
+
+### Trinity Decision — Playback Cleanup Timing
+Keep video object URLs alive for the full lifetime of the active media element source. Do not revoke blob URLs on `loadeddata`, and do not revoke MediaSource URLs on `sourceended`. The browser continues resolving blob URLs during playback, replay, and seek even after initial data loads. Early revocation causes `GET blob:... net::ERR_FILE_NOT_FOUND` while the element is still using the source.
+
+**Implementation:** Release blob URLs only on `emptied`/`error`/`abort`. Do not revoke MediaSource URLs on `sourceended`.
+
+### Trinity Decision — Tighten Blob Cleanup Ordering
+When assigning a new `blob:` or `MediaSource` URL to an element: (1) release the previous source first, (2) set `element.src = url`, (3) only after that register `emptied`/failure cleanup for the new URL. The source swap itself emits `emptied`; if cleanup is already armed, that event revokes the just-assigned URL and the browser fails with `ERR_FILE_NOT_FOUND`.
+
+**Affected files:** `src/Recollections.Blazor.UI/wwwroot/js/site.js` and `src/Recollections.Blazor.Components/wwwroot/Gallery.js`
+
+### Switch Finding — Gallery Image Provider Cleanup Gap
+Image gallery lazy-load path (Gallery.js lines 239–250) creates blob URLs for images but does not register cleanup. When Gallery component re-renders, PhotoSwipe reuses cached blob URLs that are no longer valid, causing `ERR_FILE_NOT_FOUND`. Video path (site.js) correctly uses `registerMediaElementSource()` for cleanup. Gallery image path must bind blob URLs to element lifecycle or implement equivalent cleanup strategy. This is a separate architectural issue from the video streaming fix and requires team decision on cleanup binding approach.
+
 ## Governance
 
 - All meaningful changes require team consensus

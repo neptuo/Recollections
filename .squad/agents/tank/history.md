@@ -13,6 +13,7 @@ Tank owns the backend delivery path for recollections, accounts, and entry/media
 
 - 📌 Team hired on 2026-04-04
 - ✅ **2026-04-07:** Enabled browser response streaming in `Entries/Api.cs` for authenticated media fetches; wrapped stream lifecycle and hardened MIME fallback behavior
+- ✅ **2026-04-07:** Coordinated with Trinity on cleanup ordering; streaming fix ready for merge
 
 ## Learnings
 
