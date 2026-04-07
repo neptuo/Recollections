@@ -22,7 +22,7 @@
 
     <div class="row">
         <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="You don't have any story..." Context="story">
-            <div class="col-sm-12 col-md-3 mb-4">
+            <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-4">
                 <StoryCard Model="story" CardCssClass="h-100" OnCardClick="@(() => Navigator.OpenStoryDetail(story.Id))" />
             </div>
         </ListView>

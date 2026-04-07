@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.RenderTree;
+using Microsoft.JSInterop;
 using Neptuo.Logging;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class Timeline(Navigator Navigator, UiOptions UiOptions, ILog<Timeline> Log)
+    public partial class Timeline(Navigator Navigator, NavigationManager NavigationManager, IJSRuntime JSRuntime, UiOptions UiOptions, ILog<Timeline> Log)
     {
         [Parameter]
         public RenderFragment BeforeContent { get; set; }
@@ -34,13 +36,14 @@ namespace Neptuo.Recollections.Entries.Components
         public List<EntryListModel> Data { get; set; }
 
         [Parameter]
-        public Func<int, Task<PageableList<EntryListModel>>> DataGetter { get; set; }
+        public Func<int, int?, Task<PageableList<EntryListModel>>> DataGetter { get; set; }
 
         [Parameter]
         public EventCallback<EntryListModel> OnClick { get; set; }
 
         private int offset;
         private Task loadAsyncFromParametersSet;
+        private string scrollToEntryId;
 
         protected List<EntryListModel> Entries { get; } = [];
         protected bool HasMore { get; private set; }
@@ -54,6 +57,12 @@ namespace Neptuo.Recollections.Entries.Components
             await base.OnInitializedAsync();
         }
 
+        private TimelinePosition FindPositionFromHistoryEntry()
+        {
+            Log.Debug($"Finding timeline position from history entry, state='{NavigationManager.HistoryEntryState}'");
+            return PageHistoryState.Parse(NavigationManager.HistoryEntryState).Timeline;
+        }
+
         protected async override Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -64,6 +73,10 @@ namespace Neptuo.Recollections.Entries.Components
                 Entries.Clear();
                 Entries.AddRange(Data);
                 Log.Debug($"Got parameter Data '{Data.Count}'");
+
+                var position = FindPositionFromHistoryEntry();
+                if (position != null)
+                    scrollToEntryId = position.EntryId;
             }
             else if (Entries.Count == 0)
             {
@@ -79,6 +92,19 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (loadAsyncFromParametersSet == null && scrollToEntryId != null)
+            {
+                var entryId = scrollToEntryId;
+                scrollToEntryId = null;
+                Log.Debug($"Scrolling to entry '{entryId}'");
+                await JSRuntime.InvokeVoidAsync("Timeline.ScrollToEntry", entryId);
+            }
+        }
+
         private async Task LoadAsync()
         {
             Ensure.NotNull(DataGetter, "DataGetter");
@@ -87,7 +113,21 @@ namespace Neptuo.Recollections.Entries.Components
             {
                 IsLoading = true;
 
-                PageableList<EntryListModel> response = await DataGetter(offset);
+                int? count = null;
+
+                Log.Debug($"Loading timeline with offset '{offset}' and count '{count}', current count '{Entries.Count}'");
+                if (Entries.Count == 0)
+                {
+                    var position = FindPositionFromHistoryEntry();
+                    if (position != null && position.Offset > 0)
+                    {
+                        count = position.Offset;
+                        scrollToEntryId = position.EntryId;
+                        Log.Debug($"Restoring timeline position: offset={position.Offset}, entryId={position.EntryId}");
+                    }
+                }
+
+                PageableList<EntryListModel> response = await DataGetter(offset, count);
 
                 Entries.AddRange(response.Models);
                 HasMore = response.HasMore;
@@ -103,5 +143,11 @@ namespace Neptuo.Recollections.Entries.Components
 
         public Task LoadMoreAsync()
             => LoadAsync();
+
+        private async Task OnEntryClicked(EntryListModel entry)
+        {
+            if (OnClick.HasDelegate)
+                await OnClick.InvokeAsync(entry);
+        }
     }
 }

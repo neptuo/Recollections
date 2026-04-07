@@ -54,7 +54,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         });
 
         [HttpGet("{id}/timeline/list")]
-        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, [FromServices] IConnectionProvider connections, string id, int offset) => RunBeingAsync(id, Permission.Read, async _ =>
+        public Task<IActionResult> GetEntriesAsync([FromServices] EntriesDataContext dataContext, [FromServices] IConnectionProvider connections, string id, int offset, int? count = null) => RunBeingAsync(id, Permission.Read, async _ =>
         {
             var userId = User.FindUserId();
 
@@ -68,7 +68,8 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 connectedUsers
             );
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, id, connectedUsers, offset);
+            int pageSize = EntryListMapper.NormalizePageSize(count);
+            var (models, hasMore) = await entryMapper.MapAsync(query, id, connectedUsers, offset, pageSize);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
 
