@@ -3,6 +3,7 @@ using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Beings;
 using Neptuo.Recollections.Entries.Components;
+using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,14 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected BeingIconPicker IconPicker { get; set; }
 
+        protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
+        protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
+
+        protected int StoriesCount { get; set; }
+        protected Offcanvas StoriesOffcanvas { get; set; }
+        protected bool IsStoriesLoading { get; set; }
+        protected List<StoryListModel> StoryItems { get; } = new List<StoryListModel>();
+
         public override Task SetParametersAsync(ParameterView parameters)
         {
             previousBeingId = BeingId;
@@ -52,6 +61,33 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
+
+            await LoadMapAsync();
+
+            var stories = await Api.GetBeingStoriesAsync(BeingId);
+            StoriesCount = stories.Count;
+        }
+
+        private async Task LoadMapAsync()
+        {
+            MapEntries = await Api.GetBeingMapAsync(BeingId);
+            Markers.Clear();
+            foreach (var entry in MapEntries)
+            {
+                Markers.Add(new MapMarkerModel()
+                {
+                    Latitude = entry.Location.Latitude,
+                    Longitude = entry.Location.Longitude,
+                    Altitude = entry.Location.Altitude,
+                    Title = entry.Title
+                });
+            }
+        }
+
+        protected void OnMarkerSelected(int index)
+        {
+            var entry = MapEntries[index];
+            Navigator.OpenEntryDetail(entry.Id);
         }
 
         protected async Task SaveAsync()
@@ -85,6 +121,18 @@ namespace Neptuo.Recollections.Entries.Pages
                 await Api.DeleteBeingAsync(Model.Id);
                 Navigator.OpenBeings();
             }
+        }
+
+        protected async Task ShowStoriesAsync()
+        {
+            IsStoriesLoading = true;
+            StoryItems.Clear();
+            StoriesOffcanvas.Show();
+            StateHasChanged();
+
+            StoryItems.AddRange(await Api.GetBeingStoriesAsync(BeingId));
+            IsStoriesLoading = false;
+            StateHasChanged();
         }
     }
 }

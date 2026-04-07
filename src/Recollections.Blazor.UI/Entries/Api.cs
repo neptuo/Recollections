@@ -58,11 +58,17 @@ namespace Neptuo.Recollections.Entries
         public Task<PageableList<EntryListModel>> GetTimelineListAsync(int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
+        public Task<TimelineVisitResponse> VisitTimelineAsync()
+            => faultHandler.Wrap(http.PostAsJsonAsync<object, TimelineVisitResponse>("timeline/visit", null));
+
         public Task<PageableList<EntryListModel>> GetTimelineListAsync(string userId, int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"profiles/{userId}/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
         
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
+
+        public async Task<string> GetMapCountriesAsync()
+            => await faultHandler.Wrap(http.GetStringAsync("map/countries"));
 
         public Task<List<MapSearchModel>> GetGeoLocateListAsync(string query)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapSearchModel>>(QueryHelpers.AddQueryString("map/geolocate", "q", query)));
@@ -254,6 +260,12 @@ namespace Neptuo.Recollections.Entries
         public Task<PageableList<EntryListModel>> GetBeingTimelineAsync(string beingId, int? offset)
             => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"beings/{beingId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
 
+        public Task<List<MapEntryModel>> GetBeingMapAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>($"beings/{beingId}/map"));
+
+        public Task<List<StoryListModel>> GetBeingStoriesAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryListModel>>($"beings/{beingId}/stories"));
+
         public Task<PageableList<EntryListModel>> SearchAsync(string query, int offset = 0)
         {
             string url = "search";
@@ -264,6 +276,12 @@ namespace Neptuo.Recollections.Entries
 
             return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
         }
+
+        public Task<List<EntryListModel>> GetOnThisDayListAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>("on-this-day"));
+
+        public Task<int> GetOnThisDayCountAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<int>("on-this-day/count"));
 
         public Task<List<EntryListModel>> GetYearEntryListAsync(int year)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"calendar/{year}"));

@@ -1,9 +1,10 @@
 ﻿@page "/stories/{StoryId}"
 @inherits UserStateComponentBase
 
+<DocumentTitle Value="@(Model?.Title ?? "Story...")" />
+
 @if (Model != null)
 {
-    <DocumentTitle Value="@Model.Title" />
 
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
@@ -74,7 +75,7 @@
                             <div class="my-3">
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
-                            <div class="entries">
+                            <div class="timeline-narrow">
                                 <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" Collapsible="true" />
                             </div>
                         </div>

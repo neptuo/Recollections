@@ -7,7 +7,7 @@
     <div class="timeline">
         @if (ShowYearSeparators)
         {
-            <div class="separator sticky-top mb-4 d-inline-block">
+            <div class="separator sticky-top mb-3 d-inline-block">
                 <div class="badge p-2 d-inline-block bg-secondary">
                     Now
                 </div>
@@ -16,9 +16,9 @@
 
         @BeforeContent
 
-        @if (Collapsible && Entries.Count > 5)
+        @if(Collapsible && Entries.Count > 5)
         {
-            <div class="separator @(!IsCollapsed ? "mb-4" : "") badge p-2 d-inline-block bg-body-secondary position-relative top-0 z-1 cursor-pointer" style="margin-left: -6px;" @onclick="@(e => IsCollapsed = !IsCollapsed)">
+            <div class="separator @(!IsCollapsed ? "mb-3" : "") badge p-2 d-inline-block bg-body-secondary position-relative top-0 z-1 cursor-pointer" style="margin-left: -6px;" @onclick="@(e => IsCollapsed = !IsCollapsed)">
                 <Icon Identifier="comment-alt" CssClass="me-1" />
                 @Entries.Count
 @(Entries.Count > 1 ? "entries" : "entry")
@@ -32,7 +32,7 @@
                 if (ShowYearSeparators && entry.When.Year != lastYear)
                 {
                     lastYear = entry.When.Year;
-                    <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
+                    <div class="separator sticky-top mb-3 badge p-2 d-inline-block bg-secondary">
                         @lastYear
                     </div>
                 }

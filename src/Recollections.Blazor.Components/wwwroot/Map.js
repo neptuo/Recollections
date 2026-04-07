@@ -1,6 +1,9 @@
 ﻿let isLoaded = false;
 let Leaflet;
 
+let countriesStyleInjected = false;
+const _mapData = new WeakMap();
+
 export async function ensureApi() {
     if (isLoaded) {
         return;
@@ -20,9 +23,8 @@ export async function ensureApi() {
 export function initialize(container, interop, isEditable) {
     let model = null;
 
-    const $container = $(container);
-    if ($container.data('map') == null) {
-        const map = Leaflet.map($container.find('.map')[0]);
+    if (!_mapData.has(container)) {
+        const map = Leaflet.map(container.querySelector('.map'));
         map.zoomControl.setPosition("topright");
 
         model = {
@@ -33,7 +35,7 @@ export function initialize(container, interop, isEditable) {
             isEmptyPoint: false,
             isAdding: false
         };
-        $container.data('map', model);
+        _mapData.set(container, model);
 
         // Map layer
         const BackendLayer = L.TileLayer.extend({
@@ -78,7 +80,7 @@ export function initialize(container, interop, isEditable) {
         new LogoControl().addTo(map);
 
         if (isEditable) {
-            bindEvents(model, $container);
+            bindEvents(model, container);
         }
 
         model.map.on("moveend", () => {
@@ -108,22 +110,30 @@ export function initialize(container, interop, isEditable) {
 }
 
 export function updateMarkers(container, markers, isEditable) {
-    const $container = $(container);
-    const model = $container.data('map');
+    const model = _mapData.get(container);
+    
+    model.lastMarkers = markers;
+    model.lastIsEditable = isEditable;
+
+    // In countries mode, don't show markers
+    if (model.viewMode === "countries") {
+        return;
+    }
+
     const points = setMarkers(model, markers, isEditable);
 
     model.isAdding = false;
     model.isEmptyPoint = points.length == 0 && !model.isAdditive;
 
-    $container.find('.map').css("cursor", "");
+    const mapEl = container.querySelector('.map');
+    mapEl.style.cursor = "";
     if (model.isEmptyPoint) {
-        $container.find('.map').css("cursor", "crosshair");
+        mapEl.style.cursor = "crosshair";
     }
 }
 
 export function centerAtMarkers(container) {
-    const $container = $(container);
-    const model = $container.data('map');
+    const model = _mapData.get(container);
     if (model.points.length == 0) {
         model.map.setView([0, 0], 1);
     } else {
@@ -131,7 +141,7 @@ export function centerAtMarkers(container) {
     }
 }
 
-function bindEvents(model, $container) {
+function bindEvents(model, container) {
     function mapClick(e) {
         if (model.isEmptyPoint || model.isAdding) {
             var id = null;
@@ -146,14 +156,16 @@ function bindEvents(model, $container) {
 
     model.map.on("click", mapClick);
 
-    var $addButton = $container.find(".btn-add-location");
+    var addButton = container.querySelector(".btn-add-location");
 
-    $addButton.click(function () {
-        model.isAdding = true;
-        $container.find('.map').css("cursor", "crosshair");
-    });
+    if (addButton) {
+        addButton.addEventListener('click', function () {
+            model.isAdding = true;
+            container.querySelector('.map').style.cursor = "crosshair";
+        });
+    }
 
-    model.isAdditive = $addButton.length > 0;
+    model.isAdditive = addButton != null;
 }
 
 function setMarkers(model, markers, isEditable) {
@@ -216,11 +228,86 @@ function moveMarker(model, id, latitude, longitude) {
 }
 
 export function centerAt(container, latitude, longitude, zoom) {
-    const model = $(container).data('map');
+    const model = _mapData.get(container);
     model.map.setView([latitude, longitude], zoom ?? 17);
 }
 
 export function redraw(container) {
-    const model = $(container).data('map');
+    const model = _mapData.get(container);
     model.tiles.redraw();
+}
+
+export function setViewMode(container, mode, countriesGeoJsonString) {
+    const model = _mapData.get(container);
+    if (!model) return;
+
+    model.viewMode = mode;
+
+    if (mode === "countries" && countriesGeoJsonString) {
+        // Hide markers
+        if (model.markers) {
+            for (const m of model.markers) {
+                m.remove();
+            }
+        }
+
+        // Remove previous countries layer
+        if (model.countriesLayer) {
+            model.countriesLayer.remove();
+            model.countriesLayer = null;
+        }
+
+        // Parse and render server-provided visited countries GeoJSON
+        const geojson = JSON.parse(countriesGeoJsonString);
+
+        model.countriesLayer = Leaflet.geoJSON(geojson, {
+            style: function () {
+                return {
+                    fillColor: "#FA8072",
+                    fillOpacity: 0.5,
+                    color: "#E06050",
+                    weight: 2
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.name) {
+                    layer.bindTooltip(feature.properties.name);
+                }
+            }
+        });
+
+        if (!countriesStyleInjected) {
+            countriesStyleInjected = true;
+            const style = document.createElement("style");
+            style.textContent = ".leaflet-overlay-pane path { outline: none !important; }";
+            document.head.appendChild(style);
+        }
+
+        model.countriesLayer.addTo(model.map);
+
+        // Fit to visited countries bounds, or show world
+        const bounds = model.countriesLayer.getBounds();
+        if (bounds.isValid()) {
+            model.map.fitBounds(bounds, { maxZoom: 5, padding: [20, 20] });
+        } else {
+            model.map.setView([20, 0], 2);
+        }
+    } else {
+        // Remove countries layer
+        if (model.countriesLayer) {
+            model.countriesLayer.remove();
+            model.countriesLayer = null;
+        }
+
+        // Re-add markers
+        if (model.lastMarkers && model.lastIsEditable !== undefined) {
+            setMarkers(model, model.lastMarkers, model.lastIsEditable);
+        }
+
+        if (model.points && model.points.length > 0) {
+            model.map.fitBounds(model.points, { maxZoom: 14 });
+        } else {
+            model.map.setView([0, 0], 1);
+        }
+    }
 }

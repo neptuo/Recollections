@@ -41,5 +41,9 @@
   <ItemGroup>
 	  <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Entries\countries.50m.geo.json" />
+  </ItemGroup>
 	
 </Project>

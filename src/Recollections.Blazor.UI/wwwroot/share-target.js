@@ -1,7 +1,7 @@
 function shareTargetHandler(event) {
     const isRootPost = event.request.method === 'POST' && event.request.mode === 'navigate';
     if (isRootPost) {
-        return event.respondWith((async () => {
+        return (async () => {
             const formData = await event.request.formData();
             const files = formData.getAll("allfiles");
             await storeFiles(files, null, null, null, null);
@@ -12,7 +12,7 @@ function shareTargetHandler(event) {
             } else {
                 return Response.redirect('/', 303);
             }
-        })());
+        })();
     }
 
     return null;

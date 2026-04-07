@@ -1,49 +1,45 @@
-﻿window.Bootstrap = {
+﻿const _modalData = new WeakMap();
+
+window.Bootstrap = {
     Modal: {
         Show: function (container) {
-            var $container = $(container);
-            if (!$container.data("modal-initialized")) {
+            let data = _modalData.get(container);
+            if (!data) {
                 var modal = new bootstrap.Modal(container, {});
-                $container.data("modal", modal);
-
-                $container.data("modal-initialized", true);
+                data = { modal: modal };
+                _modalData.set(container, data);
                 
-                $container.on('shown.bs.modal', function () {
-                    if ($container.data("autofocus") === undefined) {
+                container.addEventListener('shown.bs.modal', function () {
+                    if (container.dataset.autofocus === undefined) {
                         return;
                     }
 
-                    var $select = $container.find("[data-select]");
-                    if ($select.length > 0) {
-                        $select[0].setSelectionRange(0, $select[0].value.length)
+                    var selectEl = container.querySelector("[data-select]");
+                    if (selectEl) {
+                        selectEl.setSelectionRange(0, selectEl.value.length);
                     }
 
-                    const autofocus = $container.find('[data-autofocus]');
-                    let targetFocusElement;
-                    if (autofocus.length > 0) {
-                        targetFocusElement = autofocus.first();
-                    } else {
-                        targetFocusElement = $container.find("input").first();
-                    }
+                    const autofocusEl = container.querySelector('[data-autofocus]');
+                    let targetFocusElement = autofocusEl || container.querySelector("input");
 
-                    if (targetFocusElement.length > 0)
-                    {
-                        targetFocusElement[0].scrollIntoView(true);
-                        targetFocusElement.trigger('focus');
+                    if (targetFocusElement) {
+                        targetFocusElement.scrollIntoView(true);
+                        targetFocusElement.focus();
                     }
                 });
             }
 
-            $container.data("modal").show();
+            data.modal.show();
         },
         Hide: function (container) {
-            $(container).data("modal")?.hide();
+            _modalData.get(container)?.modal?.hide();
         },
         IsOpen: function (container) {
-            return $(container).hasClass("show");
+            return container.classList.contains("show");
         },
         Dispose: function (container) {
-            $(container).data("modal").dispose();
+            _modalData.get(container)?.modal?.dispose();
+            _modalData.delete(container);
         }
     },
     Offcanvas: {
@@ -159,7 +155,7 @@ window.ElementReference = {
         element.blur();
     },
     GetValue: function (input) {
-        return $(input).val();
+        return input.value;
     }
 };
 
@@ -176,10 +172,11 @@ window.Recollections = {
 };
 window.Recollections._DotNetPromise = new Promise(resolve => window.Recollections._DotNetPromiseResolve = resolve);
 
+const _easyMdeData = new WeakMap();
+
 window.InlineMarkdownEdit = {
     Initialize: function (interop, textArea, value) {
-        $textArea = $(textArea);
-        if ($textArea.data("easymde") != null) {
+        if (_easyMdeData.has(textArea)) {
             return;
         }
 
@@ -227,16 +224,17 @@ window.InlineMarkdownEdit = {
             }
         });
 
-        $textArea.data("easymde", editor);
+        _easyMdeData.set(textArea, editor);
 
         if (value !== null) {
             InlineMarkdownEdit.SetValue(textArea, value);
         }
     },
     Destroy: function (textArea) {
-        var editor = $(textArea).data("easymde");
+        var editor = _easyMdeData.get(textArea);
         if (editor != null) {
             editor.toTextArea();
+            _easyMdeData.delete(textArea);
         }
     },
     SetValue: function (textArea, value) {
@@ -244,13 +242,13 @@ window.InlineMarkdownEdit = {
             value = "";
         }
 
-        var editor = $(textArea).data("easymde");
+        var editor = _easyMdeData.get(textArea);
         if (editor != null) {
             editor.value(value);
         }
     },
     GetValue: function (textArea) {
-        var editor = $(textArea).data("easymde");
+        var editor = _easyMdeData.get(textArea);
         if (editor != null) {
             return editor.value();
         }
@@ -259,31 +257,15 @@ window.InlineMarkdownEdit = {
 
 window.InlineTextEdit = {
     Initialize: function (interop, input) {
-        $(input).focus().keyup(function (e) {
+        input.focus();
+        input.addEventListener('keyup', function (e) {
             if (e.keyCode == 27) {
-                $(this).blur();
+                input.blur();
                 setTimeout(function () {
                     interop.invokeMethodAsync("TextEdit.OnCancel");
                 }, 1);
             }
         });
-    }
-};
-
-window.InlineDateEdit = {
-    Initialize: function (input, format) {
-        $(input).focus().datepicker({
-            format: format.toLowerCase(),
-            autoclose: true,
-            todayHighlight: true,
-            todayBtn: "linked"
-        });
-    },
-    Destroy: function (input) {
-        $(input).datepicker("destroy");
-    },
-    GetValue: function (input) {
-        return $(input).val();
     }
 };
 

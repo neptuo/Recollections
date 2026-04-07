@@ -15,6 +15,8 @@ let items = [];
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
 const pauseIcon = '<i class="fas fa-pause"></i>';
+const imageIcon = '<i class="fas fa-image"></i>';
+const videoIcon = '<i class="fas fa-film"></i>';
 
 function next(el) {
     if (lightbox.pswp.currIndex < lightbox.pswp.numItems - 1) {
@@ -167,6 +169,22 @@ export function initialize(intr, i) {
                         } else {
                             el.style.display = "none";
                         }
+                    });
+                }
+            });
+
+            lightbox.pswp.ui.registerElement({
+                name: 'media-type-badge',
+                order: 9,
+                isButton: false,
+                appendTo: 'root',
+                html: '',
+                onInit: (el, pswp) => {
+                    el.className = 'pswp__media-type-badge';
+                    lightbox.pswp.on('change', () => {
+                        const index = lightbox.pswp.currIndex;
+                        const model = items[index];
+                        el.innerHTML = isVideo(model) ? videoIcon : imageIcon;
                     });
                 }
             });
