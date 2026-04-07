@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Neptuo.Activators;
 using Neptuo.Recollections.Commons.Exceptions;
@@ -88,7 +89,94 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<ImageModel>>($"entries/{entryId}/images/{imageId}"));
 
         public Task<Stream> GetMediaDataAsync(string url)
-            => faultHandler.Wrap(http.GetStreamAsync((settings.BaseUrl + url).Replace("api/api", "api")));
+            => faultHandler.Wrap(GetMediaDataCoreAsync(url));
+
+        private async Task<Stream> GetMediaDataCoreAsync(string url)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, (settings.BaseUrl + url).Replace("api/api", "api"));
+            request.SetBrowserResponseStreamingEnabled(true);
+
+            var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+
+            var stream = await response.Content.ReadAsStreamAsync();
+            return new HttpResponseStream(stream, request, response);
+        }
+
+        private sealed class HttpResponseStream : Stream
+        {
+            private readonly Stream inner;
+            private readonly HttpRequestMessage request;
+            private readonly HttpResponseMessage response;
+
+            public HttpResponseStream(Stream inner, HttpRequestMessage request, HttpResponseMessage response)
+            {
+                Ensure.NotNull(inner, "inner");
+                Ensure.NotNull(request, "request");
+                Ensure.NotNull(response, "response");
+                this.inner = inner;
+                this.request = request;
+                this.response = response;
+            }
+
+            public override bool CanRead => inner.CanRead;
+            public override bool CanSeek => inner.CanSeek;
+            public override bool CanWrite => inner.CanWrite;
+            public override long Length => inner.Length;
+
+            public override long Position
+            {
+                get => inner.Position;
+                set => inner.Position = value;
+            }
+
+            public override void Flush()
+                => inner.Flush();
+
+            public override int Read(byte[] buffer, int offset, int count)
+                => inner.Read(buffer, offset, count);
+
+            public override long Seek(long offset, SeekOrigin origin)
+                => inner.Seek(offset, origin);
+
+            public override void SetLength(long value)
+                => inner.SetLength(value);
+
+            public override void Write(byte[] buffer, int offset, int count)
+                => inner.Write(buffer, offset, count);
+
+            public override Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+                => inner.ReadAsync(buffer, offset, count, cancellationToken);
+
+            public override ValueTask<int> ReadAsync(Memory<byte> buffer, System.Threading.CancellationToken cancellationToken = default)
+                => inner.ReadAsync(buffer, cancellationToken);
+
+            public override Task WriteAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+                => inner.WriteAsync(buffer, offset, count, cancellationToken);
+
+            public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, System.Threading.CancellationToken cancellationToken = default)
+                => inner.WriteAsync(buffer, cancellationToken);
+
+            public override async ValueTask DisposeAsync()
+            {
+                await inner.DisposeAsync();
+                response.Dispose();
+                request.Dispose();
+                await base.DisposeAsync();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    inner.Dispose();
+                    response.Dispose();
+                    request.Dispose();
+                }
+
+                base.Dispose(disposing);
+            }
+        }
 
         public Task UpdateImageAsync(string entryId, ImageModel model)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/images/{model.Id}", model));

@@ -53,15 +53,28 @@ async function setVideoSource(element, stream, contentType) {
         type: contentType || 'video/mp4'
     });
     const url = URL.createObjectURL(blob);
+    const release = element.__recollectionsReleaseSource;
+    if (typeof release === 'function') {
+        release();
+    }
+
     const cleanup = () => {
+        if (element.__recollectionsReleaseSource !== cleanup) {
+            return;
+        }
+
+        element.__recollectionsReleaseSource = null;
         URL.revokeObjectURL(url);
-        element.removeEventListener('loadeddata', cleanup);
+        element.removeEventListener('emptied', cleanup);
         element.removeEventListener('error', cleanup);
+        element.removeEventListener('abort', cleanup);
     };
 
-    element.addEventListener('loadeddata', cleanup, { once: true });
-    element.addEventListener('error', cleanup, { once: true });
     element.src = url;
+    element.__recollectionsReleaseSource = cleanup;
+    element.addEventListener('emptied', cleanup, { once: true });
+    element.addEventListener('error', cleanup, { once: true });
+    element.addEventListener('abort', cleanup, { once: true });
     if (typeof element.load === 'function') {
         element.load();
     }

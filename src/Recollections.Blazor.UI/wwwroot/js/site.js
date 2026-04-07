@@ -314,55 +314,148 @@ window.Downloader = {
 };
 
 async function setObjectUrlSource(element, stream, mimeType) {
+    releaseMediaElementSource(element);
+
     const arrayBuffer = await stream.arrayBuffer();
     const blob = new Blob([arrayBuffer], {
         type: mimeType
     });
     const url = URL.createObjectURL(blob);
-    const loadEvent = element.tagName && element.tagName.toLowerCase() === "video"
-        ? "loadeddata"
-        : "load";
-    const cleanup = () => {
-        URL.revokeObjectURL(url);
-        element.removeEventListener(loadEvent, cleanup);
-        element.removeEventListener("error", cleanup);
-    };
-
-    element.addEventListener(loadEvent, cleanup, { once: true });
-    element.addEventListener("error", cleanup, { once: true });
+    const isVideo = element.tagName && element.tagName.toLowerCase() === "video";
+    const releaseEvents = isVideo
+        ? ["emptied", "error", "abort"]
+        : ["load", "error", "abort"];
     element.src = url;
+    registerMediaElementSource(element, () => {
+        URL.revokeObjectURL(url);
+    }, releaseEvents);
 
     if (typeof element.load === "function") {
         element.load();
     }
 }
 
+function registerMediaElementSource(element, cleanup, eventNames = []) {
+    const wrappedCleanup = () => {
+        if (element.__recollectionsReleaseSource !== wrappedCleanup) {
+            return;
+        }
+
+        element.__recollectionsReleaseSource = null;
+        for (const eventName of eventNames) {
+            element.removeEventListener(eventName, wrappedCleanup);
+        }
+
+        cleanup();
+    };
+
+    element.__recollectionsReleaseSource = wrappedCleanup;
+    for (const eventName of eventNames) {
+        element.addEventListener(eventName, wrappedCleanup, { once: true });
+    }
+
+    return wrappedCleanup;
+}
+
+function releaseMediaElementSource(element) {
+    const cleanup = element.__recollectionsReleaseSource;
+    if (typeof cleanup === "function") {
+        cleanup();
+    }
+}
+
+function getStreamingMimeTypeCandidates(mimeType) {
+    const normalizedMimeType = (mimeType || "video/mp4").toLowerCase();
+    const [containerType] = normalizedMimeType.split(";");
+    const candidates = [normalizedMimeType];
+
+    if (containerType === "video/mp4") {
+        candidates.push(
+            'video/mp4; codecs="avc1.42E01E"',
+            'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+            'video/mp4; codecs="avc1.4D401E, mp4a.40.2"',
+            'video/mp4; codecs="avc1.64001F, mp4a.40.2"',
+            'video/mp4; codecs="hev1.1.6.L93.B0"',
+            'video/mp4; codecs="hvc1.1.6.L93.B0"',
+            'video/mp4; codecs="hev1.1.6.L93.B0, mp4a.40.2"',
+            'video/mp4; codecs="hvc1.1.6.L93.B0, mp4a.40.2"'
+        );
+    } else if (containerType === "video/webm") {
+        candidates.push(
+            'video/webm; codecs="vp8"',
+            'video/webm; codecs="vp8, vorbis"',
+            'video/webm; codecs="vp9"',
+            'video/webm; codecs="vp9, opus"'
+        );
+    }
+
+    return [...new Set(candidates)];
+}
+
+function findStreamingMimeType(mimeType) {
+    if (typeof MediaSource === "undefined" || typeof MediaSource.isTypeSupported !== "function") {
+        return mimeType || "video/mp4";
+    }
+
+    for (const candidate of getStreamingMimeTypeCandidates(mimeType)) {
+        if (MediaSource.isTypeSupported(candidate)) {
+            return candidate;
+        }
+    }
+
+    return null;
+}
+
 function setStreamingVideoSource(element, stream, mimeType) {
     const normalizedMimeType = mimeType || "video/mp4";
+    const streamingMimeType = findStreamingMimeType(normalizedMimeType);
     const isSupported = typeof MediaSource !== "undefined"
         && stream != null
         && typeof stream.stream === "function"
-        && (typeof MediaSource.isTypeSupported !== "function" || MediaSource.isTypeSupported(normalizedMimeType));
+        && streamingMimeType != null;
     if (!isSupported) {
         return setObjectUrlSource(element, stream, normalizedMimeType);
     }
 
+    releaseMediaElementSource(element);
+
     const mediaSource = new MediaSource();
     const url = URL.createObjectURL(mediaSource);
+    let reader = null;
+    let isDisposed = false;
+    let resetPendingChunks = () => { };
     element.src = url;
-    URL.revokeObjectURL(url);
+    const cleanup = registerMediaElementSource(element, () => {
+        if (isDisposed) {
+            return;
+        }
+
+        isDisposed = true;
+        resetPendingChunks();
+        if (reader != null) {
+            reader.cancel().catch(() => { });
+        }
+
+        URL.revokeObjectURL(url);
+    }, ["emptied", "error", "abort"]);
+
+    mediaSource.addEventListener("sourceclose", cleanup, { once: true });
 
     mediaSource.addEventListener("sourceopen", () => {
+        if (isDisposed) {
+            return;
+        }
+
         let sourceBuffer;
         try {
-            sourceBuffer = mediaSource.addSourceBuffer(normalizedMimeType);
+            sourceBuffer = mediaSource.addSourceBuffer(streamingMimeType);
         } catch (error) {
             console.error("Unable to initialize streaming video playback.", error);
             void setObjectUrlSource(element, stream, normalizedMimeType);
             return;
         }
 
-        const reader = stream.stream().getReader();
+        reader = stream.stream().getReader();
         const pendingChunks = [];
         const maxPendingChunks = 8;
         let pendingChunkIndex = 0;
@@ -395,7 +488,7 @@ function setStreamingVideoSource(element, stream, mimeType) {
             return queueDrainPromise;
         };
 
-        const resetPendingChunks = () => {
+        resetPendingChunks = () => {
             pendingChunks.length = 0;
             pendingChunkIndex = 0;
             resolveQueueDrain();
@@ -420,7 +513,7 @@ function setStreamingVideoSource(element, stream, mimeType) {
         };
 
         const closeStreamIfReady = () => {
-            if (!isReadingCompleted || isAppending || sourceBuffer.updating || pendingChunkCount() > 0 || mediaSource.readyState !== "open") {
+            if (isDisposed || !isReadingCompleted || isAppending || sourceBuffer.updating || pendingChunkCount() > 0 || mediaSource.readyState !== "open") {
                 return;
             }
 
@@ -432,7 +525,7 @@ function setStreamingVideoSource(element, stream, mimeType) {
         };
 
         const appendNextChunk = () => {
-            if (isAppending || sourceBuffer.updating || pendingChunkCount() === 0) {
+            if (isDisposed || isAppending || sourceBuffer.updating || pendingChunkCount() === 0) {
                 closeStreamIfReady();
                 return;
             }
@@ -472,6 +565,10 @@ function setStreamingVideoSource(element, stream, mimeType) {
         void (async () => {
             try {
                 while (true) {
+                    if (isDisposed) {
+                        break;
+                    }
+
                     if (pendingChunkCount() >= maxPendingChunks) {
                         await waitForQueueDrain();
                         continue;
