@@ -68,7 +68,8 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 connectedUsers
             );
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, id, connectedUsers, offset, count);
+            int pageSize = EntryListMapper.NormalizePageSize(count);
+            var (models, hasMore) = await entryMapper.MapAsync(query, id, connectedUsers, offset, pageSize);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
 

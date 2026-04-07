@@ -147,31 +147,7 @@ namespace Neptuo.Recollections.Entries.Components
         private async Task OnEntryClicked(EntryListModel entry)
         {
             if (OnClick.HasDelegate)
-            {
                 await OnClick.InvokeAsync(entry);
-                return;
-            }
-
-            var position = new TimelinePosition(offset, entry.Id);
-            var state = PageHistoryState.Parse(NavigationManager.HistoryEntryState);
-            if (state.Timeline != position)
-            {
-                state.Timeline = position;
-                var historyState = state.ToJson();
-                Log.Debug($"Saving timeline position to history state: {historyState}");
-
-                NavigationManager.NavigateTo(
-                    NavigationManager.Uri,
-                    new NavigationOptions
-                    {
-                        ReplaceHistoryEntry = true,
-                        HistoryEntryState = historyState
-                    }
-                );
-            }
-
-            await Task.Yield();
-            Navigator.OpenEntryDetail(entry.Id);
         }
     }
 }

@@ -11,11 +11,18 @@ namespace Neptuo.Recollections.Entries;
 public class EntryListMapper(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
 {
     private const int PageSize = 10;
-    private const int MaxPageSize = PageSize * 25;
+    private const int MaxPageSize = PageSize * 100;
     private IUserNameProvider userNames = userNames;
 
     public Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int offset)
         => MapAsync(query, userId, connectedUsers, offset, PageSize);
+
+    public static int NormalizePageSize(int? pageSize)
+    {
+        int normalizedPageSize = pageSize ?? PageSize;
+        Ensure.Positive(normalizedPageSize, "pageSize");
+        return Math.Min(normalizedPageSize, MaxPageSize);
+    }
 
     public async Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int? offset = null, int? pageSize = null)
     {
@@ -25,10 +32,12 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             query = query.Skip(offset.Value);
         }
 
-        int normalizedPageSize = pageSize ?? PageSize;
-        Ensure.Positive(normalizedPageSize, "pageSize");
-        normalizedPageSize = Math.Min(normalizedPageSize, MaxPageSize);
-        query = query.Take(normalizedPageSize);
+        int? normalizedPageSize = null;
+        if (pageSize != null)
+        {
+            normalizedPageSize = NormalizePageSize(pageSize.Value);
+            query = query.Take(normalizedPageSize.Value);
+        }
 
         var result = await query
             .Select(e => new
@@ -83,6 +92,6 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             ImageCount: e.ImageCount,
             VideoCount: e.VideoCount,
             GpsCount: e.GpsCount
-        )).ToList(), result.Count == normalizedPageSize);
+        )).ToList(), normalizedPageSize != null && result.Count == normalizedPageSize.Value);
     }
 }

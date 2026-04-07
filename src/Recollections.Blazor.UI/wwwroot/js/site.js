@@ -332,6 +332,55 @@ function escapeCssSelectorValue(value) {
 }
 
 window.Timeline = {
+    StorePosition: function (element) {
+        if (!element || !window.history || typeof window.history.replaceState !== "function") {
+            return;
+        }
+
+        var entryId = element.getAttribute("data-entry-id");
+        var offset = Number.parseInt(element.getAttribute("data-entry-offset"), 10);
+        if (!entryId || Number.isNaN(offset)) {
+            return;
+        }
+
+        var userState = {};
+        var historyState = window.history.state;
+        var serializedUserState = historyState && typeof historyState === "object" ? historyState.userState : null;
+        if (typeof serializedUserState === "string" && serializedUserState.length > 0) {
+            try {
+                userState = JSON.parse(serializedUserState);
+            } catch {
+                userState = {};
+            }
+        }
+
+        if (userState && typeof userState === "object") {
+            if (!userState.Map && typeof userState.Latitude === "number" && typeof userState.Longitude === "number") {
+                userState = { Map: userState };
+            } else if (!userState.Timeline && typeof userState.Offset === "number" && typeof userState.EntryId === "string") {
+                userState = { Timeline: userState };
+            }
+        } else {
+            userState = {};
+        }
+
+        userState.Timeline = {
+            Offset: offset,
+            EntryId: entryId
+        };
+
+        var nextHistoryState = historyState && typeof historyState === "object"
+            ? Object.assign({}, historyState)
+            : {};
+
+        nextHistoryState.userState = JSON.stringify(userState);
+        window.history.replaceState(nextHistoryState, "", window.location.href);
+    },
+    StorePositionOnKeyDown: function (element, event) {
+        if (event && (event.key === "Enter" || event.key === " ")) {
+            window.Timeline.StorePosition(element);
+        }
+    },
     ScrollToEntry: function (entryId) {
         var escapedEntryId = escapeCssSelectorValue(entryId);
         var element = document.querySelector('[data-entry-id="' + escapedEntryId + '"]');

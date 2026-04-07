@@ -43,7 +43,7 @@
                     </div>
                     <div class="body">
                         <h2>
-                            <a href="@Navigator.UrlEntryDetail(entry.Id)" @onclick="(() => OnEntryClicked(entry))" @onclick:preventDefault="@OnClick.HasDelegate">
+                            <a href="@Navigator.UrlEntryDetail(entry.Id)" data-entry-id="@entry.Id" data-entry-offset="@offset" onpointerdown="@(OnClick.HasDelegate ? null : "window.Timeline.StorePosition(this)")" onkeydown="@(OnClick.HasDelegate ? null : "window.Timeline.StorePositionOnKeyDown(this, event)")" @onclick="(() => OnEntryClicked(entry))" @onclick:preventDefault="@OnClick.HasDelegate">
                                 @entry.Title
                             </a>
                         </h2>
