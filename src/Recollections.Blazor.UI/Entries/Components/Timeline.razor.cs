@@ -2,18 +2,16 @@
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.JSInterop;
 using Neptuo.Logging;
+using Neptuo.Recollections.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public record TimelinePosition(int Offset, string EntryId);
-
     public partial class Timeline(Navigator Navigator, NavigationManager NavigationManager, IJSRuntime JSRuntime, UiOptions UiOptions, ILog<Timeline> Log)
     {
         [Parameter]
@@ -62,21 +60,7 @@ namespace Neptuo.Recollections.Entries.Components
         private TimelinePosition FindPositionFromHistoryEntry()
         {
             Log.Debug($"Finding timeline position from history entry, state='{NavigationManager.HistoryEntryState}'");
-
-            if (!string.IsNullOrEmpty(NavigationManager.HistoryEntryState))
-            {
-                try
-                {
-                    Log.Debug($"Reading timeline position from history state '{NavigationManager.HistoryEntryState}'");
-                    return JsonSerializer.Deserialize<TimelinePosition>(NavigationManager.HistoryEntryState);
-                }
-                catch (JsonException ex)
-                {
-                    Log.Debug($"Ignoring non-timeline history state: {ex.Message}");
-                }
-            }
-
-            return null;
+            return PageHistoryState.Parse(NavigationManager.HistoryEntryState).Timeline;
         }
 
         protected async override Task OnParametersSetAsync()
@@ -169,17 +153,25 @@ namespace Neptuo.Recollections.Entries.Components
             }
 
             var position = new TimelinePosition(offset, entry.Id);
-            var state = JsonSerializer.Serialize(position);
-            Log.Debug($"Saving timeline position to history state: {state}");
+            var state = PageHistoryState.Parse(NavigationManager.HistoryEntryState);
+            if (state.Timeline != position)
+            {
+                state.Timeline = position;
+                var historyState = state.ToJson();
+                Log.Debug($"Saving timeline position to history state: {historyState}");
 
-            NavigationManager.NavigateTo(
-                NavigationManager.Uri,
-                new NavigationOptions
-                {
-                    ReplaceHistoryEntry = true,
-                    HistoryEntryState = state
-                }
-            );
+                NavigationManager.NavigateTo(
+                    NavigationManager.Uri,
+                    new NavigationOptions
+                    {
+                        ReplaceHistoryEntry = true,
+                        HistoryEntryState = historyState
+                    }
+                );
+            }
+
+            await Task.Yield();
+            Navigator.OpenEntryDetail(entry.Id);
         }
     }
 }
