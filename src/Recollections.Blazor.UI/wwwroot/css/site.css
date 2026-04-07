@@ -24988,7 +24988,7 @@ body {
 }
 
 .offcanvas-bottom-menu {
-  --bs-offcanvas-height: 320px;
+  --bs-offcanvas-height: auto;
 }
 .offcanvas-bottom-menu .versions {
   font-size: 0.6rem;
@@ -26039,4 +26039,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-447-being-stories-4e88e5/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/kenspeckle-sharan/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
