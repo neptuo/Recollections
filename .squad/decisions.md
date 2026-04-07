@@ -20,6 +20,19 @@ Reviewed PR #424 scope. Confirmed: Recollections project does not need multi-tea
 - Remove: `.copilot/skills/*`, all squad-related GitHub workflows, `.github/agents/squad.agent.md`, ceremony docs and templates
 - Result: Cleaner repo, faster CLI startup, no GitHub automation burden
 
+## Video Streaming Fix (2026-04-07)
+
+### Switch Finding — PR #425 URL Revocation Bug
+MediaSource object URL was revoked synchronously before browser could attach it, blocking streaming. URL must remain valid from assignment through `endOfStream()`. Fallback path for unsupported browsers must remain functional.
+
+### Tank Decision — Progressive Streaming Path
+Enabled browser response streaming in `Entries/Api.cs` for authenticated media fetches. MediaSource path delays object-URL revocation until metadata loads. Falls back to blob URL when MIME type is unsupported. Response stream lifecycle properly bounded.
+
+### Trinity Implementation — URL Lifetime Preservation
+Updated `site.js` to centralize source cleanup logic and preserve MediaSource object URL lifetime throughout stream attachment. Maintained fallback for unsupported browsers/MIME types.
+
+**Result:** Video streaming now works end-to-end with safe cleanup and browser fallback.
+
 ## Governance
 
 - All meaningful changes require team consensus

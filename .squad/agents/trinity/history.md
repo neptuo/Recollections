@@ -12,9 +12,25 @@ Trinity owns the Blazor UI experience for the recollections product.
 ## Recent Updates
 
 - 📌 Team hired on 2026-04-04
+- ✅ **2026-04-07:** Fixed video streaming URL lifetime issue in `site.js` — preserved MediaSource object URL through full playback lifecycle and centralized cleanup logic
 
 ## Learnings
 
 - The main UI lives in `src/Recollections.Blazor.UI`.
 - Shared Blazor components also exist in `src/Recollections.Blazor.Components`.
 - UI work should stay coordinated with the API and shared models rather than duplicating server logic.
+- MediaSource-backed video playback requires precise URL lifecycle management: URL must remain valid from assignment through `mediaSource.endOfStream()`, and cleanup must be deferred until playback completion or error.
+
+## 2026-04-07 Video Streaming Fix
+
+### Implementation
+Updated `src/Recollections.Blazor.UI/wwwroot/js/site.js` to fix MediaSource object URL lifetime:
+- Preserved URL validity from assignment through stream completion
+- Centralized source cleanup logic to prevent premature revocation
+- Maintained fallback behavior for unsupported browsers/MIME types
+- Properly wrapped response stream lifecycle
+
+### Result
+✅ Node syntax check passed  
+✅ Browser fallback path preserved  
+✅ Coordinated with Tank on API streaming enablement
