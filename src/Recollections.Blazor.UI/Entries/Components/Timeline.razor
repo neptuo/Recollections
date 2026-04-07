@@ -43,7 +43,7 @@
                     </div>
                     <div class="body">
                         <h2>
-                            <a href="@Navigator.UrlEntryDetail(entry.Id)" @onclick="@(e => OnEntryClicked(entry))" @onclick:preventDefault="@OnClick.HasDelegate">
+                            <a href="@Navigator.UrlEntryDetail(entry.Id)" @onclick="(() => OnEntryClicked(entry))" @onclick:preventDefault="true">
                                 @entry.Title
                             </a>
                         </h2>

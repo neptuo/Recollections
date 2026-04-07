@@ -61,6 +61,8 @@ namespace Neptuo.Recollections.Entries.Components
 
         private TimelinePosition FindPositionFromHistoryEntry()
         {
+            Log.Debug($"Finding timeline position from history entry, state='{NavigationManager.HistoryEntryState}'");
+
             if (!string.IsNullOrEmpty(NavigationManager.HistoryEntryState))
             {
                 try
@@ -110,7 +112,7 @@ namespace Neptuo.Recollections.Entries.Components
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (scrollToEntryId != null)
+            if (loadAsyncFromParametersSet == null && scrollToEntryId != null)
             {
                 var entryId = scrollToEntryId;
                 scrollToEntryId = null;
@@ -128,6 +130,8 @@ namespace Neptuo.Recollections.Entries.Components
                 IsLoading = true;
 
                 int? count = null;
+
+                Log.Debug($"Loading timeline with offset '{offset}' and count '{count}', current count '{Entries.Count}'");
                 if (Entries.Count == 0)
                 {
                     var position = FindPositionFromHistoryEntry();
@@ -176,6 +180,10 @@ namespace Neptuo.Recollections.Entries.Components
                     HistoryEntryState = state
                 }
             );
+            
+            await Task.Yield();
+
+            Navigator.OpenEntryDetail(entry.Id);
         }
     }
 }
