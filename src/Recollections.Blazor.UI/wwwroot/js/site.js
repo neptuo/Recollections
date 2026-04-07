@@ -321,9 +321,20 @@ window.ImageSource = {
     }
 }
 
+function escapeCssSelectorValue(value) {
+    var stringValue = String(value);
+
+    if (window.CSS && typeof window.CSS.escape === "function") {
+        return window.CSS.escape(stringValue);
+    }
+
+    return stringValue.replace(/["\\]/g, "\\$&");
+}
+
 window.Timeline = {
     ScrollToEntry: function (entryId) {
-        var element = document.querySelector('[data-entry-id="' + entryId + '"]');
+        var escapedEntryId = escapeCssSelectorValue(entryId);
+        var element = document.querySelector('[data-entry-id="' + escapedEntryId + '"]');
         if (element) {
             element.scrollIntoView({ block: "center" });
         }

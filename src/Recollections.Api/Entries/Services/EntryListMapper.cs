@@ -11,6 +11,7 @@ namespace Neptuo.Recollections.Entries;
 public class EntryListMapper(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
 {
     private const int PageSize = 10;
+    private const int MaxPageSize = PageSize * 25;
     private IUserNameProvider userNames = userNames;
 
     public Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int offset)
@@ -24,11 +25,10 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             query = query.Skip(offset.Value);
         }
 
-        if (pageSize != null)
-        {
-            Ensure.Positive(pageSize.Value, "pageSize");
-            query = query.Take(pageSize.Value);
-        }
+        int normalizedPageSize = pageSize ?? PageSize;
+        Ensure.Positive(normalizedPageSize, "pageSize");
+        normalizedPageSize = Math.Min(normalizedPageSize, MaxPageSize);
+        query = query.Take(normalizedPageSize);
 
         var result = await query
             .Select(e => new
@@ -83,6 +83,6 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             ImageCount: e.ImageCount,
             VideoCount: e.VideoCount,
             GpsCount: e.GpsCount
-        )).ToList(), result.Count == pageSize);
+        )).ToList(), result.Count == normalizedPageSize);
     }
 }

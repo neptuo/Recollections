@@ -180,10 +180,6 @@ namespace Neptuo.Recollections.Entries.Components
                     HistoryEntryState = state
                 }
             );
-            
-            await Task.Yield();
-
-            Navigator.OpenEntryDetail(entry.Id);
         }
     }
 }
