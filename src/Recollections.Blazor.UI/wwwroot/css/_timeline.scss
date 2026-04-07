@@ -118,9 +118,24 @@ $dot-diameter: 18px;
 }
 
 .entry-new {
+    .body {
+        margin-bottom: 1.5rem;
+    }
+
     .date-box {
         width: 100px;
         float: right;
+    }
+}
+
+.entry-banner {
+    .body {
+        margin-bottom: 1.5rem;
+
+        > :last-child,
+        > :last-child > .alert:last-child {
+            margin-bottom: 0;
+        }
     }
 }
 
