@@ -58,6 +58,8 @@
 .inline-editor-viewmode {
     .inline-editor-value {
         cursor: inherit;
+        border-radius: .375rem;
+        transition: background-color .15s ease;
         
         &:hover {
             text-decoration: none;
@@ -73,13 +75,18 @@
 
     &.inline-editable .inline-editor-value {
         cursor: pointer;
+        padding-left: .25rem;
+        padding-right: .25rem;
     }
 
     &.inline-editable:hover {
+        .inline-editor-value {
+            background: rgba(99, 102, 241, .06);
+        }
+
         .fa::before,
         .fas::before,
         .far::before {
-            // Swap to pen icon on hover
             content: "\f304";
         }
     }

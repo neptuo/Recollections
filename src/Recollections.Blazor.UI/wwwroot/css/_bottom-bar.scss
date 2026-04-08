@@ -1,5 +1,5 @@
 :root {
-    --blz-bottom-bar-height: 53px;
+    --blz-bottom-bar-height: 50px;
 
     @include media-breakpoint-up(sm) {
         --blz-bottom-bar-height: 0px;
@@ -8,8 +8,39 @@
 
 .bottom-bar {
     z-index: 1050;
-    background: var(--bs-body-bg);
-    border-top: 1px solid var(--bs-border-color-translucent);
+    background: rgba(255, 255, 255, .8);
+    border-top: 1px solid $border-color;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: none;
+
+    .container {
+        padding-top: .1rem;
+        padding-bottom: .2rem;
+    }
+
+    .bottom-bar-item {
+        border-radius: .5rem;
+        color: $text-tertiary;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .25rem;
+        padding: .3rem .25rem;
+        transition: color .15s ease, background .15s ease;
+
+        .fa, .fas, .far {
+            font-size: 1.1rem;
+        }
+
+        &.text-primary,
+        &:focus-visible {
+            background: $accent-bg;
+            color: $accent-color !important;
+            box-shadow: none;
+        }
+    }
 
     .items-6, .items-5, .items-4, .items-3 {
         span.text {
@@ -20,8 +51,26 @@
 
 .offcanvas-bottom-menu {
     --bs-offcanvas-height: 320px;
+    background: $card-color;
+    border-top: 1px solid $border-color;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, .1);
+    color: $text-primary;
 
     .versions {
         font-size: .6rem;
+        color: $text-tertiary;
+    }
+}
+
+.bottom-drawer-item {
+    border-radius: .5rem;
+    color: $text-primary;
+
+    &:hover,
+    &:focus {
+        background: rgba(0, 0, 0, .04);
+        color: $accent-color;
     }
 }

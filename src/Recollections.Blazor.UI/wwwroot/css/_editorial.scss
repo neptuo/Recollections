@@ -1,0 +1,186 @@
+// ── Glass Gallery canvas ──
+.editorial-shell {
+    min-height: calc(100vh - var(--blz-top-bar-height));
+}
+
+body {
+    background: $bg-color;
+    color: $text-primary;
+    font-family: 'Inter', -apple-system, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+// ── Footer ──
+.editorial-footer {
+    background: rgba(255, 255, 255, .72);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid $border-color;
+    color: $text-tertiary;
+
+    a { color: $accent-color; }
+}
+
+// ── CTA button ──
+.editorial-cta-button {
+    border-radius: .75rem;
+    font-weight: 600;
+    background: $accent-color;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, .25);
+    transition: all .15s ease;
+
+    &:hover, &:focus {
+        background: $accent-dark;
+        color: white;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, .35);
+    }
+}
+
+.story-create-hint {
+    color: $text-tertiary;
+    font-size: .9rem;
+    line-height: 1.5;
+}
+
+.editorial-date-trigger {
+    border-top-right-radius: .75rem;
+    border-bottom-right-radius: .75rem;
+    border-color: $border-color;
+    color: $text-tertiary;
+}
+
+// ── On-this-day banner ──
+.timeline-banner-link .alert {
+    border-radius: .75rem;
+    border: 1px solid rgba(99, 102, 241, .15);
+    background: $accent-bg;
+    color: $accent-dark;
+}
+
+// ── Entry detail ──
+.entry-detail-shell {
+    display: grid;
+    gap: .75rem;
+}
+
+.entry-detail-hero,
+.entry-detail-section {
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    background: $card-color;
+    border: 1px solid $border-color;
+    box-shadow: $shadow-sm;
+
+    @include media-breakpoint-up(md) {
+        padding: 1.5rem;
+    }
+}
+
+.entry-detail-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.entry-detail-hero .datetime {
+    margin-top: .5rem;
+}
+
+// ── Meta grid ──
+.entry-detail-meta-grid {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    margin-top: 1rem;
+}
+
+.entry-detail-meta-grid > div {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border-radius: .75rem;
+    border: 1px solid $border-color;
+    background: $bg-color;
+    padding: .25rem .75rem;
+}
+
+.entry-detail-meta-grid .inline-editor,
+.entry-detail-meta-grid .inline-editor-value { width: 100%; }
+
+.entry-detail-meta-grid .inline-editor-value {
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+}
+
+.entry-detail-section .inline-markdown textarea {
+    min-height: 280px;
+    background: $bg-color;
+    color: $text-primary;
+    border-color: $border-color;
+    border-radius: .75rem;
+}
+
+.entry-detail-section p:last-child { margin-bottom: 0; }
+
+// ── Gallery ──
+.entry-detail-media .h5 {
+    font-weight: 600;
+    color: $text-primary;
+}
+
+.entry-detail-media .images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: .75rem;
+}
+
+.entry-detail-media .image {
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid $border-color;
+    background: $bg-color;
+    aspect-ratio: 1;
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-hover;
+    }
+}
+
+.entry-detail-media .image a,
+.entry-detail-media .image img,
+.entry-detail-media .image video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+// ── Upload ──
+.entry-detail-upload .h5 {
+    font-weight: 600;
+    color: $text-primary;
+}
+
+.entry-detail-upload .actions { margin-bottom: 0; }
+
+// ── Panels ──
+.editorial-panel .editorial-section-label,
+.editorial-panel .story-create-hint { color: $text-tertiary; }
+
+// ── Responsive ──
+@include media-breakpoint-down(sm) {
+    .entry-detail-meta-grid {
+        gap: .6rem;
+        margin-top: .75rem;
+    }
+
+    .entry-detail-meta-grid > div {
+        min-height: 44px;
+        padding: .2rem .6rem;
+    }
+}

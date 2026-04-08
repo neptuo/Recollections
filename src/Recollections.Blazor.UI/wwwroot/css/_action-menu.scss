@@ -1,33 +1,50 @@
 .btn-floating {
-    --self-width: 46px;
+    --self-width: 36px;
 
     position: fixed;
-    bottom: 30px;
-    left: calc((100vw - var(--self-width)) / 2);
+    bottom: calc(var(--blz-bottom-bar-height) + 14px);
+    right: 14px;
+    left: unset;
     width: var(--self-width);
     height: var(--self-width);
-    font-size: 1.25rem;
+    padding: 0;
+    font-size: .9rem;
     z-index: 1051;
+    border: 1px solid rgba(0, 0, 0, .06);
+    background: white;
+    color: $text-primary;
+    border-radius: .75rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+    transition: transform .15s ease, box-shadow .15s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+    }
 
     @include media-breakpoint-up(sm) {
         position: sticky;
-        top: 70px;
+        top: 62px;
         right: 10px;
         bottom: unset;
         left: unset;
-        z-index: 1001; // Map controls has z-index 1000, bootstrap offcanvas 1045
+        z-index: 1001;
         float: right;
     }
     
     @include media-breakpoint-up(md) {
-        top: 85px;
+        top: 62px;
     }
 }
 
 .btn-floating-offcanvas {
-    --bs-offcanvas-height: auto; // 420px
+    --bs-offcanvas-height: auto;
     --bs-offcanvas-width: 280px;
-    --bs-offcanvas-zindex: 1046; // To overlap other offcanvas (1045)
+    --bs-offcanvas-zindex: 1046;
+    background: white;
+    border-left: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, .08);
+    color: $text-primary;
 
     .offcanvas-body {
         padding-bottom: 2rem !important;
@@ -35,6 +52,17 @@
 
     .list-group:not(:first-child) {
         margin-top: 1rem;
+    }
+
+    .list-group-item {
+        background: transparent;
+        color: $text-primary;
+        border-radius: .5rem;
+
+        &:hover {
+            background: rgba(0, 0, 0, .03);
+            color: $accent-color;
+        }
     }
 }
 

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recollections — Glass Gallery</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        bg: '#f5f5f7',
+        card: '#ffffff',
+        subtle: '#86868b',
+        accent: { DEFAULT: '#6366f1', light: '#818cf8', dark: '#4f46e5', bg: '#eef2ff' },
+        text: { primary: '#1d1d1f', secondary: '#6e6e73', tertiary: '#86868b' },
+      },
+      borderRadius: {
+        '2xl': '16px',
+        '3xl': '20px',
+        '4xl': '28px',
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: #f5f5f7; -webkit-font-smoothing: antialiased; }
+  .glass { background: rgba(255,255,255,0.72); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
+  .card-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card-lift:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+  .bento-item { border-radius: 20px; overflow: hidden; }
+  .nav-pill { transition: all 0.2s ease; }
+  .nav-pill.active { background: #1d1d1f; color: white; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .timeline-line { width: 2px; background: linear-gradient(180deg, #6366f1, #c7d2fe, transparent); }
+  .story-color-1 { --c: #f59e0b; }
+  .story-color-2 { --c: #06b6d4; }
+  .story-color-3 { --c: #10b981; }
+  .story-color-4 { --c: #f43f5e; }
+</style>
+</head>
+<body class="min-h-screen text-text-primary font-sans">
+
+<!-- ═══════════ TOP NAV ═══════════ -->
+<nav class="sticky top-0 z-50 glass border-b border-black/5">
+  <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-12">
+    <div class="flex items-center gap-6">
+      <span class="text-[15px] font-semibold tracking-tight">Recollections</span>
+      <div class="flex items-center bg-black/5 rounded-full p-0.5">
+        <button onclick="showPage('timeline')" id="nav-timeline" class="nav-pill active text-xs font-medium px-3.5 py-1 rounded-full">Timeline</button>
+        <button onclick="showPage('stories')" id="nav-stories" class="nav-pill text-xs font-medium px-3.5 py-1 rounded-full text-text-secondary hover:text-text-primary">Stories</button>
+        <button onclick="showPage('detail')" id="nav-detail" class="nav-pill text-xs font-medium px-3.5 py-1 rounded-full text-text-secondary hover:text-text-primary">Entry</button>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center hover:bg-black/10 transition-colors">
+        <svg class="w-3.5 h-3.5 text-text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </button>
+      <div class="w-7 h-7 rounded-full bg-accent text-white flex items-center justify-center text-[10px] font-bold">JD</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ TIMELINE ═══════════ -->
+<div id="page-timeline" class="page active">
+<main class="max-w-5xl mx-auto px-6 py-8">
+  <!-- Date & filter bar -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-[28px] font-bold tracking-tight text-text-primary leading-none mb-1">June 2025</h1>
+      <p class="text-text-tertiary text-[13px]">24 entries · 3 stories · 47 photos</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="text-[13px] font-medium text-text-secondary bg-white rounded-xl px-3 py-1.5 shadow-sm hover:shadow transition-shadow">◀ May</button>
+      <button class="text-[13px] font-medium text-accent bg-accent-bg rounded-xl px-3 py-1.5 shadow-sm">Today</button>
+    </div>
+  </div>
+
+  <!-- Bento timeline grid -->
+  <div class="space-y-10">
+    <!-- Day section -->
+    <section>
+      <div class="flex items-baseline gap-3 mb-4">
+        <h2 class="text-lg font-bold text-text-primary">Sunday, June 15</h2>
+        <span class="text-[11px] text-text-tertiary font-medium">Prague, Czech Republic</span>
+      </div>
+
+      <div class="grid grid-cols-12 gap-3">
+        <!-- Large photo card — spans 8 cols -->
+        <div class="col-span-8 bento-item card-lift bg-card shadow-sm cursor-pointer">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=800&h=400&fit=crop" class="w-full h-56 object-cover" />
+            <div class="absolute top-3 left-3">
+              <span class="inline-flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-0.5 text-[11px] font-semibold text-amber-600 shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Prague Trip 2025
+              </span>
+            </div>
+            <div class="absolute top-3 right-3">
+              <span class="bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 text-[11px] font-medium text-text-secondary shadow-sm">12 photos</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-[15px] font-semibold text-text-primary mb-1">Morning walk through Old Town</h3>
+            <p class="text-text-tertiary text-[13px] line-clamp-2 leading-relaxed">Woke up early to catch the sunrise over Charles Bridge. The light was absolutely magical, painting the Vltava river...</p>
+            <div class="flex items-center gap-3 mt-3">
+              <span class="text-[11px] text-text-tertiary">📍 Old Town Square</span>
+              <span class="text-[11px] text-text-tertiary">8:30 AM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stacked small cards — 4 cols -->
+        <div class="col-span-4 flex flex-col gap-3">
+          <!-- Text card -->
+          <div class="bento-item card-lift bg-card shadow-sm p-4 cursor-pointer flex-1">
+            <div class="flex items-center gap-1.5 mb-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span class="text-[11px] font-semibold text-emerald-600">Daily Journal</span>
+            </div>
+            <h3 class="text-[14px] font-semibold text-text-primary mb-1 leading-snug">Reflections on the trip so far</h3>
+            <p class="text-text-tertiary text-[12px] line-clamp-3 leading-relaxed">Three days in and I'm already falling in love with this city...</p>
+            <span class="text-[11px] text-text-tertiary mt-2 block">2:15 PM</span>
+          </div>
+
+          <!-- Mini photo card -->
+          <div class="bento-item card-lift bg-card shadow-sm overflow-hidden cursor-pointer flex-1">
+            <div class="flex h-full">
+              <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=200&fit=crop" class="w-24 h-full object-cover flex-shrink-0" />
+              <div class="p-3 flex flex-col justify-center">
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  <span class="text-[10px] font-semibold text-rose-600">Food & Drink</span>
+                </div>
+                <h3 class="text-[13px] font-semibold text-text-primary leading-snug">Czech cuisine adventures</h3>
+                <span class="text-[11px] text-text-tertiary mt-1">8 photos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Day 2 -->
+    <section>
+      <div class="flex items-baseline gap-3 mb-4">
+        <h2 class="text-lg font-bold text-text-primary">Saturday, June 14</h2>
+        <span class="text-[11px] text-text-tertiary font-medium">Prague</span>
+      </div>
+      <div class="grid grid-cols-12 gap-3">
+        <div class="col-span-6 bento-item card-lift bg-card shadow-sm cursor-pointer">
+          <img src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=600&h=300&fit=crop" class="w-full h-40 object-cover" />
+          <div class="p-4">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              <span class="text-[11px] font-semibold text-amber-600">Prague Trip 2025</span>
+            </div>
+            <h3 class="text-[15px] font-semibold text-text-primary">Arrival day — first impressions</h3>
+          </div>
+        </div>
+        <div class="col-span-6 bento-item card-lift bg-card shadow-sm p-5 cursor-pointer flex flex-col justify-center">
+          <div class="flex items-center gap-1.5 mb-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span class="text-[11px] font-semibold text-emerald-600">Daily Journal</span>
+          </div>
+          <h3 class="text-[15px] font-semibold text-text-primary mb-1">Packing thoughts</h3>
+          <p class="text-text-tertiary text-[13px] line-clamp-3 leading-relaxed">Can't believe tomorrow I'll be walking the streets of Prague. I've been dreaming about this trip for months. The apartment in Vinohrady looks perfect — just a short walk from the main sights but in a quiet local neighborhood...</p>
+          <span class="text-[11px] text-text-tertiary mt-3 block">11:45 PM</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Month separator -->
+    <div class="flex items-center gap-4 py-2">
+      <span class="text-[13px] font-bold text-accent bg-accent-bg rounded-xl px-3 py-1">May 2025</span>
+      <div class="flex-1 h-px bg-black/5"></div>
+      <span class="text-[11px] text-text-tertiary">18 entries</span>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- ═══════════ STORIES ═══════════ -->
+<div id="page-stories" class="page">
+<main class="max-w-5xl mx-auto px-6 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-[28px] font-bold tracking-tight">Stories</h1>
+    <button class="text-[13px] font-semibold text-accent bg-accent-bg rounded-xl px-4 py-2 hover:bg-accent hover:text-white transition-colors shadow-sm">+ New Story</button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Story 1 -->
+    <div class="card-lift bg-card rounded-3xl overflow-hidden shadow-sm cursor-pointer group">
+      <div class="relative h-52 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=600&h=300&fit=crop" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="absolute bottom-4 left-5 right-5">
+          <h3 class="text-xl font-bold text-white mb-0.5">Prague Trip 2025</h3>
+          <p class="text-white/70 text-[12px]">Jun 12 – Jun 20 · 12 entries · 47 photos</p>
+        </div>
+        <div class="absolute top-3 left-3">
+          <span class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white/40 block"></span>
+        </div>
+      </div>
+      <!-- Mini thumbnails -->
+      <div class="p-3 flex gap-1.5">
+        <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <img src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <img src="https://images.unsplash.com/photo-1592906209472-a36b1f3782ef?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <div class="w-12 h-12 rounded-xl bg-bg flex items-center justify-center text-[11px] font-semibold text-text-tertiary">+9</div>
+      </div>
+    </div>
+
+    <!-- Story 2 -->
+    <div class="card-lift bg-card rounded-3xl overflow-hidden shadow-sm cursor-pointer group">
+      <div class="relative h-52 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="absolute bottom-4 left-5 right-5">
+          <h3 class="text-xl font-bold text-white mb-0.5">Alpine Adventure</h3>
+          <p class="text-white/70 text-[12px]">Mar 1 – Mar 15 · 8 entries · 32 photos</p>
+        </div>
+        <div class="absolute top-3 left-3">
+          <span class="w-3 h-3 rounded-full bg-sky-400 ring-2 ring-white/40 block"></span>
+        </div>
+      </div>
+      <div class="p-3 flex gap-1.5">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <div class="w-12 h-12 rounded-xl bg-bg flex items-center justify-center text-[11px] font-semibold text-text-tertiary">+4</div>
+      </div>
+    </div>
+
+    <!-- Story 3 — no image -->
+    <div class="card-lift bg-card rounded-3xl shadow-sm cursor-pointer">
+      <div class="h-52 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center rounded-t-3xl">
+        <div class="text-center">
+          <div class="w-16 h-16 rounded-2xl bg-white shadow-sm mx-auto mb-3 flex items-center justify-center">
+            <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <p class="text-emerald-500/60 text-[12px] font-medium">156 entries since Jan 2024</p>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <h3 class="text-[15px] font-bold text-text-primary">Daily Journal</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Story 4 -->
+    <div class="card-lift bg-card rounded-3xl overflow-hidden shadow-sm cursor-pointer group">
+      <div class="relative h-52 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=300&fit=crop" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+        <div class="absolute bottom-4 left-5 right-5">
+          <h3 class="text-xl font-bold text-white mb-0.5">Food & Drink</h3>
+          <p class="text-white/70 text-[12px]">Ongoing · 23 entries · 89 photos</p>
+        </div>
+        <div class="absolute top-3 left-3">
+          <span class="w-3 h-3 rounded-full bg-rose-400 ring-2 ring-white/40 block"></span>
+        </div>
+      </div>
+      <div class="p-3 flex gap-1.5">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=100&h=100&fit=crop" class="w-12 h-12 rounded-xl object-cover" />
+        <div class="w-12 h-12 rounded-xl bg-bg flex items-center justify-center text-[11px] font-semibold text-text-tertiary">+12</div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- ═══════════ ENTRY DETAIL ═══════════ -->
+<div id="page-detail" class="page">
+<main class="max-w-3xl mx-auto px-6 py-8">
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-1.5 text-[12px] text-text-tertiary mb-6">
+    <span class="hover:text-accent cursor-pointer">Timeline</span>
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span class="hover:text-accent cursor-pointer">June 15</span>
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span class="text-text-secondary font-medium">Morning walk through Old Town</span>
+  </div>
+
+  <!-- Hero photo -->
+  <div class="rounded-3xl overflow-hidden mb-6 shadow-sm">
+    <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=1200&h=500&fit=crop" class="w-full h-80 object-cover" />
+  </div>
+
+  <!-- Meta -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2.5">
+      <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-full px-3 py-1 text-[12px] font-semibold">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+        Prague Trip 2025
+      </span>
+      <span class="text-[12px] text-text-tertiary">June 15, 2025 · 8:30 AM</span>
+    </div>
+    <button class="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-text-tertiary hover:bg-bg transition-colors">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    </button>
+  </div>
+
+  <h1 class="text-[32px] font-bold tracking-tight text-text-primary leading-tight mb-3">Morning walk through Old Town</h1>
+
+  <div class="flex items-center gap-2 mb-8 text-text-tertiary">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <span class="text-[13px]">Old Town Square, Prague, Czech Republic</span>
+  </div>
+
+  <!-- Body -->
+  <div class="space-y-4 mb-10">
+    <p class="text-text-secondary text-[15px] leading-[1.7]">Woke up early to catch the sunrise over Charles Bridge. The light was absolutely magical, painting the Vltava river in shades of gold and amber. At 6 AM, the bridge was almost empty — just a few photographers and a lone street musician playing violin.</p>
+    <p class="text-text-secondary text-[15px] leading-[1.7]">Walked through the narrow cobblestone streets toward Old Town Square. The Astronomical Clock was about to strike the hour, and a small crowd had already gathered. There's something timeless about standing in a square that's been the heart of a city for over 600 years.</p>
+    <p class="text-text-secondary text-[15px] leading-[1.7]">Stopped at a tiny bakery for a coffee and koláče — the pastry was still warm from the oven. Sat on a bench and just watched the city wake up. These quiet morning moments are my favorite part of traveling.</p>
+  </div>
+
+  <!-- Photos -->
+  <div class="mb-10">
+    <h2 class="text-[13px] font-semibold text-text-secondary uppercase tracking-wider mb-3">Photos</h2>
+    <div class="grid grid-cols-3 gap-2 rounded-3xl overflow-hidden">
+      <div class="col-span-2 row-span-2">
+        <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=600&h=600&fit=crop" class="w-full h-full object-cover" />
+      </div>
+      <img src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=300&h=300&fit=crop" class="w-full aspect-square object-cover" />
+      <img src="https://images.unsplash.com/photo-1592906209472-a36b1f3782ef?w=300&h=300&fit=crop" class="w-full aspect-square object-cover" />
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="mb-10 rounded-3xl overflow-hidden shadow-sm border border-black/5">
+    <div class="h-44 bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+      <div class="text-center">
+        <div class="w-10 h-10 rounded-xl bg-white shadow-sm mx-auto mb-2 flex items-center justify-center">
+          <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        </div>
+        <span class="text-text-tertiary text-[13px]">Map View</span>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-pill').forEach(b => { b.classList.remove('active'); b.classList.add('text-text-secondary'); });
+  const btn = document.getElementById('nav-' + name);
+  btn.classList.add('active');
+  btn.classList.remove('text-text-secondary');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

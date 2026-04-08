@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recollections — Polaroid Journal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        serif: ['Playfair Display', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        cream: '#faf8f5',
+        warm: { 50: '#fefdfb', 100: '#fdf8f0', 200: '#faebd7', 300: '#f5deb3', 400: '#deb887', 500: '#c9a96e', 600: '#b8860b', 700: '#8b6914', 800: '#704214', 900: '#3d2b1f' },
+        ink: { 50: '#f8f7f6', 100: '#e8e6e3', 200: '#d1cdc8', 300: '#9e9891', 400: '#6b645c', 500: '#4a4540', 600: '#3a3632', 700: '#2d2a27', 800: '#1f1d1b', 900: '#141210' },
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { background: #faf8f5; }
+  .photo-tilt { transform: rotate(-1.5deg); }
+  .photo-tilt-r { transform: rotate(1.2deg); }
+  .tape { position: absolute; width: 60px; height: 22px; background: rgba(255,235,180,0.7); top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg); border-radius: 1px; }
+  .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: #c9a96e; border: 3px solid #faf8f5; box-shadow: 0 0 0 2px #c9a96e; }
+  .entry-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .entry-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(61,43,31,0.12); }
+  .nav-active { border-bottom: 2px solid #c9a96e; color: #3d2b1f; }
+  /* hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .page { display: none; }
+  .page.active { display: block; }
+</style>
+</head>
+<body class="min-h-screen text-ink-800 font-sans">
+
+<!-- ═══════════ TOP NAV ═══════════ -->
+<nav class="sticky top-0 z-50 bg-cream/90 backdrop-blur-md border-b border-warm-200/50">
+  <div class="max-w-5xl mx-auto px-6 flex items-center justify-between h-16">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-lg bg-warm-600 flex items-center justify-center">
+        <svg class="w-4 h-4 text-cream" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      </div>
+      <span class="font-serif text-xl font-bold text-ink-900 tracking-tight">Recollections</span>
+    </div>
+    <div class="flex items-center gap-8 text-sm font-medium text-ink-400">
+      <button onclick="showPage('timeline')" id="nav-timeline" class="nav-active pb-0.5">Timeline</button>
+      <button onclick="showPage('stories')" id="nav-stories" class="hover:text-ink-700 pb-0.5">Stories</button>
+      <button onclick="showPage('detail')" id="nav-detail" class="hover:text-ink-700 pb-0.5">Entry</button>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="w-9 h-9 rounded-full bg-warm-200/60 flex items-center justify-center hover:bg-warm-300/60">
+        <svg class="w-4 h-4 text-ink-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </button>
+      <div class="w-8 h-8 rounded-full bg-warm-400 text-cream flex items-center justify-center text-xs font-semibold">JD</div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ TIMELINE PAGE ═══════════ -->
+<div id="page-timeline" class="page active">
+<main class="max-w-4xl mx-auto px-6 py-10">
+  <!-- Hero month -->
+  <div class="text-center mb-12">
+    <p class="text-warm-500 text-sm font-medium tracking-widest uppercase mb-2">Your memories</p>
+    <h1 class="font-serif text-5xl font-bold text-ink-900 mb-1">June 2025</h1>
+    <p class="text-ink-400 text-sm">24 entries · 3 stories · 47 photos</p>
+  </div>
+
+  <!-- Timeline -->
+  <div class="relative">
+    <!-- Vertical line -->
+    <div class="absolute left-8 top-0 bottom-0 w-px bg-warm-200"></div>
+
+    <!-- Day group -->
+    <div class="mb-12">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="relative z-10 flex-shrink-0">
+          <div class="w-16 h-16 rounded-2xl bg-white border border-warm-200 flex flex-col items-center justify-center shadow-sm">
+            <span class="text-2xl font-serif font-bold text-ink-900 leading-none">15</span>
+            <span class="text-[10px] text-warm-500 font-medium uppercase tracking-wider">Jun</span>
+          </div>
+        </div>
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-ink-900">Sunday</h2>
+          <p class="text-ink-400 text-xs">Prague, Czech Republic</p>
+        </div>
+      </div>
+
+      <!-- Photo entry card -->
+      <div class="ml-20 mb-6">
+        <div class="entry-card bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=800&h=400&fit=crop" class="w-full h-56 object-cover" />
+            <div class="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-medium text-ink-600">
+              <span>📷 12 photos</span>
+            </div>
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span class="text-xs font-medium text-warm-500">Prague Trip 2025</span>
+            </div>
+            <h3 class="font-serif text-xl font-semibold text-ink-900 mb-1.5">Morning walk through Old Town</h3>
+            <p class="text-ink-400 text-sm leading-relaxed line-clamp-2">Woke up early to catch the sunrise over Charles Bridge. The light was absolutely magical, painting the Vltava river in shades of gold and amber...</p>
+            <div class="flex items-center gap-3 mt-4 pt-3 border-t border-warm-100">
+              <span class="text-xs text-ink-300">📍 Old Town Square</span>
+              <span class="text-xs text-ink-300">·</span>
+              <span class="text-xs text-ink-300">8:30 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text-only entry -->
+      <div class="ml-20 mb-6">
+        <div class="entry-card bg-white rounded-2xl p-5 shadow-sm border border-warm-100 cursor-pointer">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-medium text-warm-500">Daily Journal</span>
+          </div>
+          <h3 class="font-serif text-lg font-semibold text-ink-900 mb-1">Reflections on the trip so far</h3>
+          <p class="text-ink-400 text-sm leading-relaxed line-clamp-2">Three days in and I'm already falling in love with this city. The architecture, the food, the people — everything feels like a page from a fairy tale...</p>
+          <div class="flex items-center gap-3 mt-3 pt-3 border-t border-warm-100">
+            <span class="text-xs text-ink-300">2:15 PM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-photo entry with polaroid feel -->
+      <div class="ml-20 mb-6">
+        <div class="entry-card bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+          <div class="p-5 pb-3">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              <span class="text-xs font-medium text-warm-500">Food & Drink</span>
+            </div>
+            <h3 class="font-serif text-xl font-semibold text-ink-900 mb-1.5">Czech cuisine adventures</h3>
+            <p class="text-ink-400 text-sm leading-relaxed line-clamp-2">Tried trdelník for the first time — crispy on the outside, warm and soft inside. Paired with a local craft beer at a hidden courtyard pub...</p>
+          </div>
+          <div class="px-5 pb-5 flex gap-2 overflow-x-auto no-scrollbar">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=200&fit=crop" class="w-28 h-28 rounded-xl object-cover flex-shrink-0" />
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop" class="w-28 h-28 rounded-xl object-cover flex-shrink-0" />
+            <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=200&h=200&fit=crop" class="w-28 h-28 rounded-xl object-cover flex-shrink-0" />
+            <div class="w-28 h-28 rounded-xl bg-warm-100 flex items-center justify-center flex-shrink-0 text-warm-500 text-sm font-medium">+5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Earlier day group -->
+    <div class="mb-12">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="relative z-10 flex-shrink-0">
+          <div class="w-16 h-16 rounded-2xl bg-white border border-warm-200 flex flex-col items-center justify-center shadow-sm">
+            <span class="text-2xl font-serif font-bold text-ink-900 leading-none">14</span>
+            <span class="text-[10px] text-warm-500 font-medium uppercase tracking-wider">Jun</span>
+          </div>
+        </div>
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-ink-900">Saturday</h2>
+          <p class="text-ink-400 text-xs">Prague, Czech Republic</p>
+        </div>
+      </div>
+
+      <div class="ml-20 mb-6">
+        <div class="entry-card bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=800&h=400&fit=crop" class="w-full h-48 object-cover" />
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <span class="text-xs font-medium text-warm-500">Prague Trip 2025</span>
+            </div>
+            <h3 class="font-serif text-xl font-semibold text-ink-900 mb-1.5">Arrival day — first impressions</h3>
+            <p class="text-ink-400 text-sm leading-relaxed line-clamp-2">Landed at Václav Havel Airport around noon. The taxi ride into the city was already breathtaking...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month separator -->
+    <div class="flex items-center gap-4 mb-10">
+      <div class="relative z-10 flex-shrink-0">
+        <div class="w-16 h-16 rounded-2xl bg-warm-500 flex flex-col items-center justify-center shadow-md">
+          <span class="text-cream font-serif text-lg font-bold">May</span>
+          <span class="text-cream/70 text-[10px]">2025</span>
+        </div>
+      </div>
+      <div class="flex-1 h-px bg-warm-200"></div>
+      <span class="text-xs text-warm-400 font-medium">18 entries</span>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- ═══════════ STORIES PAGE ═══════════ -->
+<div id="page-stories" class="page">
+<main class="max-w-5xl mx-auto px-6 py-10">
+  <div class="mb-10">
+    <h1 class="font-serif text-4xl font-bold text-ink-900 mb-2">Your Stories</h1>
+    <p class="text-ink-400 text-sm">Collections of memories, organized by chapters of your life</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Story card 1 -->
+    <div class="entry-card group bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+      <div class="relative h-52 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=600&h=300&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white/30"></span>
+            <span class="text-white/80 text-xs font-medium">Jun 12 – Jun 20, 2025</span>
+          </div>
+          <h3 class="font-serif text-2xl font-bold text-white">Prague Trip 2025</h3>
+        </div>
+      </div>
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-ink-400">12 entries</span>
+          <span class="text-xs text-ink-400">47 photos</span>
+          <span class="text-xs text-ink-400">4 locations</span>
+        </div>
+        <svg class="w-4 h-4 text-ink-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+
+    <!-- Story card 2 -->
+    <div class="entry-card group bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+      <div class="relative h-52 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="w-3 h-3 rounded-full bg-sky-400 ring-2 ring-white/30"></span>
+            <span class="text-white/80 text-xs font-medium">Mar 1 – Mar 15, 2025</span>
+          </div>
+          <h3 class="font-serif text-2xl font-bold text-white">Alpine Adventure</h3>
+        </div>
+      </div>
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-ink-400">8 entries</span>
+          <span class="text-xs text-ink-400">32 photos</span>
+          <span class="text-xs text-ink-400">3 locations</span>
+        </div>
+        <svg class="w-4 h-4 text-ink-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+
+    <!-- Story card 3 — no cover image -->
+    <div class="entry-card group bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+      <div class="relative h-52 bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
+        <div class="text-center">
+          <div class="w-16 h-16 rounded-2xl bg-emerald-200 mx-auto mb-3 flex items-center justify-center">
+            <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <span class="text-emerald-600/60 text-xs font-medium">Daily Journal</span>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+          <h3 class="font-serif text-lg font-bold text-ink-900">Daily Journal</h3>
+        </div>
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-ink-400">156 entries</span>
+          <span class="text-xs text-ink-400">Since Jan 2024</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Story card 4 -->
+    <div class="entry-card group bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-100 cursor-pointer">
+      <div class="relative h-52 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=300&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+        <div class="absolute bottom-4 left-4 right-4">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="w-3 h-3 rounded-full bg-rose-400 ring-2 ring-white/30"></span>
+            <span class="text-white/80 text-xs font-medium">Ongoing</span>
+          </div>
+          <h3 class="font-serif text-2xl font-bold text-white">Food & Drink</h3>
+        </div>
+      </div>
+      <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-ink-400">23 entries</span>
+          <span class="text-xs text-ink-400">89 photos</span>
+        </div>
+        <svg class="w-4 h-4 text-ink-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- ═══════════ ENTRY DETAIL PAGE ═══════════ -->
+<div id="page-detail" class="page">
+<main class="max-w-3xl mx-auto px-6 py-10">
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2 text-sm text-ink-400 mb-6">
+    <span class="hover:text-ink-600 cursor-pointer">Timeline</span>
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span class="hover:text-ink-600 cursor-pointer">June 15</span>
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+    <span class="text-ink-700">Morning walk through Old Town</span>
+  </div>
+
+  <!-- Hero image -->
+  <div class="rounded-2xl overflow-hidden mb-8 shadow-sm">
+    <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=1200&h=500&fit=crop" class="w-full h-80 object-cover" />
+  </div>
+
+  <!-- Meta bar -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 rounded-full px-3 py-1 text-xs font-medium">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        Prague Trip 2025
+      </span>
+      <span class="text-ink-300 text-xs">June 15, 2025 · 8:30 AM</span>
+    </div>
+    <button class="w-8 h-8 rounded-lg hover:bg-warm-100 flex items-center justify-center text-ink-400">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+    </button>
+  </div>
+
+  <!-- Title -->
+  <h1 class="font-serif text-4xl font-bold text-ink-900 mb-4 leading-tight">Morning walk through Old Town</h1>
+
+  <!-- Location -->
+  <div class="flex items-center gap-2 mb-8 text-ink-400">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <span class="text-sm">Old Town Square, Prague, Czech Republic</span>
+  </div>
+
+  <!-- Body text -->
+  <div class="prose-custom mb-10">
+    <p class="text-ink-600 text-base leading-relaxed mb-4">Woke up early to catch the sunrise over Charles Bridge. The light was absolutely magical, painting the Vltava river in shades of gold and amber. At 6 AM, the bridge was almost empty — just a few photographers and a lone street musician playing violin.</p>
+    <p class="text-ink-600 text-base leading-relaxed mb-4">Walked through the narrow cobblestone streets toward Old Town Square. The Astronomical Clock was about to strike the hour, and a small crowd had already gathered. There's something timeless about standing in a square that's been the heart of a city for over 600 years.</p>
+    <p class="text-ink-600 text-base leading-relaxed">Stopped at a tiny bakery for a coffee and koláče — the pastry was still warm from the oven. Sat on a bench and just watched the city wake up. These quiet morning moments are my favorite part of traveling.</p>
+  </div>
+
+  <!-- Photo gallery -->
+  <div class="mb-10">
+    <h2 class="font-serif text-lg font-semibold text-ink-900 mb-4">Photos</h2>
+    <div class="grid grid-cols-3 gap-2 rounded-2xl overflow-hidden">
+      <img src="https://images.unsplash.com/photo-1541849546-216549ae216d?w=400&h=400&fit=crop" class="w-full h-40 object-cover col-span-2 row-span-2 h-full" />
+      <img src="https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=400&h=200&fit=crop" class="w-full h-40 object-cover" />
+      <img src="https://images.unsplash.com/photo-1592906209472-a36b1f3782ef?w=400&h=200&fit=crop" class="w-full h-40 object-cover" />
+    </div>
+  </div>
+
+  <!-- Map placeholder -->
+  <div class="mb-10 rounded-2xl overflow-hidden border border-warm-100">
+    <div class="h-48 bg-warm-50 flex items-center justify-center">
+      <div class="text-center">
+        <svg class="w-8 h-8 text-warm-400 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        <span class="text-warm-400 text-sm font-medium">Map View</span>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('nav-active'));
+  document.getElementById('nav-' + name).classList.add('nav-active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

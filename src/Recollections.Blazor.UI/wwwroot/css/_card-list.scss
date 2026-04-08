@@ -2,7 +2,7 @@
     @import "_salmon-card.scss";
 
     .card {
-        // position: relative;
+        border: none;
         
         .card-header .card-header-spread-icon.fa, 
         .card-header .card-header-spread-icon.fas {
@@ -30,5 +30,72 @@
 
     .information {
         color: var(--bs-secondary-color);
+    }
+
+    // ── Story card ──
+    .story-card-body {
+        min-height: 100%;
+    }
+
+    .story-card-preview {
+        padding: .75rem;
+        border: 1px solid $border-color;
+        border-radius: .75rem;
+        background: $bg-color;
+    }
+
+    .story-card-kicker {
+        display: inline-flex;
+        align-items: center;
+        border-radius: .375rem;
+        padding: .2rem .5rem;
+        background: $accent-bg;
+        border: none;
+        color: $accent-color;
+        font-size: .65rem;
+        font-weight: 600;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+    }
+
+    .story-card-summary {
+        color: $text-secondary;
+        font-size: .875rem;
+        line-height: 1.5;
+        min-height: 2.5rem;
+    }
+
+    .story-card-details {
+        color: $text-secondary;
+        font-size: .875rem;
+    }
+
+    .story-card-footer {
+        padding-top: .6rem;
+        border-top: 1px solid $border-color;
+    }
+
+    .story-card-duration {
+        color: $text-tertiary;
+        font-size: .8rem;
+    }
+
+    .story-card-open {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        color: $accent-color;
+        font-weight: 600;
+        font-size: .85rem;
+    }
+
+    @include media-breakpoint-down(sm) {
+        .story-card-summary {
+            min-height: 0;
+        }
+
+        .story-card-footer {
+            flex-wrap: wrap;
+        }
     }
 }

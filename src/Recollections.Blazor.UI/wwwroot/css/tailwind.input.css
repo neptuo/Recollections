@@ -1,0 +1,83 @@
+﻿@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .r-page {
+    @apply mx-auto max-w-5xl px-4 pb-8 pt-5 sm:px-6 lg:px-8;
+  }
+
+  .r-page-header {
+    @apply mb-6;
+  }
+
+  .r-page-title {
+    @apply text-[28px] font-bold tracking-tight sm:text-3xl;
+    color: #1d1d1f;
+  }
+
+  .r-page-subtitle {
+    @apply mt-1.5 max-w-xl text-[13px];
+    color: #86868b;
+  }
+
+  /* Cards */
+  .r-card {
+    @apply bg-white transition-all duration-200;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+  }
+
+  .r-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .08);
+    transform: translateY(-2px);
+  }
+
+  /* Surface */
+  .r-surface {
+    @apply bg-white p-5 sm:p-6;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+  }
+
+  /* Chips */
+  .r-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    background: #f5f5f7;
+    color: #6e6e73;
+  }
+
+  .r-chip-accent {
+    background: #eef2ff;
+    color: #6366f1;
+  }
+
+  /* Primary button */
+  .r-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200;
+    background: #6366f1;
+  }
+
+  .r-btn-primary:hover {
+    background: #4f46e5;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, .3);
+    transform: translateY(-1px);
+  }
+
+  .r-label {
+    @apply text-[11px] font-semibold uppercase tracking-wider;
+    color: #86868b;
+  }
+
+  .r-input {
+    @apply rounded-xl border bg-white px-3.5 py-2.5 text-sm shadow-sm transition-all duration-150;
+    border-color: rgba(0, 0, 0, .1);
+  }
+
+  .r-input:focus {
+    @apply outline-none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .1);
+  }
+}
