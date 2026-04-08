@@ -60,6 +60,7 @@ namespace Neptuo.Recollections.Entries
                 Created = DateTime.Now,
                 When = entry.When,
                 Entry = entry,
+                OriginalSize = file.Length
             };
 
             await dataContext.Videos.AddAsync(entity);
@@ -216,6 +217,7 @@ namespace Neptuo.Recollections.Entries
             model.ContentType = entity.ContentType;
 
             model.Duration = entity.Duration;
+            model.OriginalSize = entity.OriginalSize;
             if (entity.Location != null)
             {
                 model.Location.Latitude = entity.Location.Latitude;

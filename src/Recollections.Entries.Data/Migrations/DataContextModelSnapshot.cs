@@ -268,6 +268,9 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.Property<int>("OriginalWidth")
                         .HasColumnType("INTEGER");
 
+                    b.Property<long?>("OriginalSize")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("When")
                         .HasColumnType("TEXT");
 

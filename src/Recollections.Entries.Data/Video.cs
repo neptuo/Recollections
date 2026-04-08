@@ -19,6 +19,7 @@ namespace Neptuo.Recollections.Entries
 
         public int OriginalWidth { get; set; }
         public int OriginalHeight { get; set; }
+        public long? OriginalSize { get; set; }
         public double? Duration { get; set; }
 
         public MediaLocation Location { get; set; }

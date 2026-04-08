@@ -62,6 +62,18 @@ async function invokeInterop(methodName, ...args) {
     }
 }
 
+function formatTitle(model, title) {
+    if (!isVideo(model)) {
+        return title;
+    }
+
+    const sizeText = model?.sizeText;
+    const hint = sizeText
+        ? `click to play video, ${sizeText}`
+        : 'click to play video';
+    return `${title} (${hint})`;
+}
+
 export function initialize(intr, i) {
     interop = intr;
     items = i;
@@ -118,10 +130,7 @@ export function initialize(intr, i) {
                         const model = items[index];
 
                         const icon = isVideo(model) ? videoIcon : imageIcon;
-                        let title = lightbox.pswp.currSlide.data.alt || '';
-                        if (isVideo(model)) {
-                            title += ' (click to play video)';
-                        }
+                        let title = formatTitle(model, lightbox.pswp.currSlide.data.alt || '');
                         el.innerHTML = icon + ' ' + title;
                         el.style.display = '';
                     });

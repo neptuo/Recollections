@@ -20,6 +20,39 @@ Reviewed PR #424 scope. Confirmed: Recollections project does not need multi-tea
 - Remove: `.copilot/skills/*`, all squad-related GitHub workflows, `.github/agents/squad.agent.md`, ceremony docs and templates
 - Result: Cleaner repo, faster CLI startup, no GitHub automation burden
 
+## Tactical Decisions
+
+### Tank: Video Backfill Build Fix (2026-04-08)
+
+Keep `src\VideoSizeBackfill.cs` as a file-based .NET app and resolve shared EF schema types by importing the repo root namespace explicitly.
+
+**Why:** The script is compiled outside the project namespace wrapper that exists in the older tool programs, so unqualified references to `SchemaOptions<T>` do not bind automatically. Adding `using Neptuo.Recollections;` preserves the current behavior without duplicating schema helpers or changing the migration flow.
+
+**Implementation:**
+- Added `using Neptuo.Recollections;` to `src\VideoSizeBackfill.cs`.
+- Verified the script now builds and runs; initial pass updated 46 videos and identified 2 missing-original edge cases.
+
+**Learning:** File-based .NET apps in this repo need an explicit `using Neptuo.Recollections;` when they reference root-namespace types such as `SchemaOptions<T>`.
+
+### Trinity & Switch: Video Detail Metadata Stacking (2026-04-08)
+
+Render video original size on its own row underneath duration by stacking the metadata container vertically.
+
+**Why:** Duration is the primary scan target in the metadata block. Treating original size as a second row preserves the existing inline-link styling while removing the cramped inline read.
+
+**Implementation:**
+- Modified `src\Recollections.Blazor.UI\Entries\Pages\VideoDetail.razor` metadata wrapper from `d-flex flex-wrap` (horizontal with wrap) to vertical stack layout.
+- Size now renders below duration.
+
+**Acceptance Criteria (verified by Switch):**
+- Duration remains on its own metadata row.
+- Original size appears on a separate row beneath duration when both values exist.
+- Size does not sit beside duration at desktop or mobile widths.
+- Entry title, parent link, date, owner, location, description, and media preview spacing remain unchanged.
+- Conditional rendering works cleanly when only duration or only size exists.
+
+**Review:** Build verified; no regressions detected.
+
 ## Governance
 
 - All meaningful changes require team consensus
