@@ -73,6 +73,7 @@ namespace Neptuo.Recollections.Components
 
             if (module != null)
             {
+                await module.InvokeVoidAsync("dispose");
                 await module.DisposeAsync();
                 module = null;
             }
