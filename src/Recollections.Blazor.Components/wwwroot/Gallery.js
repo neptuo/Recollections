@@ -117,11 +117,12 @@ export function initialize(intr, i) {
                         const index = lightbox.pswp.currIndex;
                         const model = items[index];
 
+                        const icon = isVideo(model) ? videoIcon : imageIcon;
                         let title = lightbox.pswp.currSlide.data.alt || '';
                         if (isVideo(model)) {
                             title += ' (click to play video)';
                         }
-                        el.innerHTML = title;
+                        el.innerHTML = icon + ' ' + title;
                         el.style.display = '';
                     });
                 }
@@ -153,22 +154,6 @@ export function initialize(intr, i) {
                 }
             });
 
-            lightbox.pswp.ui.registerElement({
-                name: 'media-type-badge',
-                order: 9,
-                isButton: false,
-                appendTo: 'root',
-                html: '',
-                onInit: (el, pswp) => {
-                    el.className = 'pswp__media-type-badge';
-                    lightbox.pswp.on('change', () => {
-                        const index = lightbox.pswp.currIndex;
-                        const model = items[index];
-                        el.innerHTML = isVideo(model) ? videoIcon : imageIcon;
-                    });
-                }
-            });
-
             lightbox.pswp.on('change', () => {
                 const index = lightbox.pswp.currIndex;
                 const model = items[index];
@@ -194,7 +179,7 @@ export function initialize(intr, i) {
                 const titleEl = lightbox.pswp.scrollWrap.parentElement.querySelector(".pswp__title");
                 const originalTitle = lightbox.pswp.currSlide.data.alt || '';
 
-                titleEl.innerHTML = `${originalTitle} (loading video...)`;
+                titleEl.innerHTML = `${videoIcon} ${originalTitle} (loading video...)`;
                 
                 const stream = await invokeInterop("GetImageDataAsync", index, "original");
                 if (!stream) {

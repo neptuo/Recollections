@@ -25825,19 +25825,6 @@ video.pswp__video {
   cursor: auto !important;
 }
 
-.pswp__media-type-badge {
-  position: absolute;
-  bottom: 60px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 1rem;
-  z-index: 10;
-  pointer-events: none;
-}
-
 .entry-picker .modal-body {
   padding: 0;
 }
@@ -26053,4 +26040,8 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
+<<<<<<< HEAD
 /*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf/issue-459-show-first-few-images-in-the-timeline-0e3ef1/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+=======
+/*# sourceMappingURL=src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+>>>>>>> e38ff18 (Move media type glyph into PhotoSwipe gallery title)
