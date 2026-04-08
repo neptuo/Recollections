@@ -20,6 +20,20 @@ Reviewed PR #424 scope. Confirmed: Recollections project does not need multi-tea
 - Remove: `.copilot/skills/*`, all squad-related GitHub workflows, `.github/agents/squad.agent.md`, ceremony docs and templates
 - Result: Cleaner repo, faster CLI startup, no GitHub automation burden
 
+## Tactical Decisions
+
+### Tank: Video Backfill Build Fix (2026-04-08)
+
+Keep `src\VideoSizeBackfill.cs` as a file-based .NET app and resolve shared EF schema types by importing the repo root namespace explicitly.
+
+**Why:** The script is compiled outside the project namespace wrapper that exists in the older tool programs, so unqualified references to `SchemaOptions<T>` do not bind automatically. Adding `using Neptuo.Recollections;` preserves the current behavior without duplicating schema helpers or changing the migration flow.
+
+**Implementation:**
+- Added `using Neptuo.Recollections;` to `src\VideoSizeBackfill.cs`.
+- Verified the script now builds and runs; initial pass updated 46 videos and identified 2 missing-original edge cases.
+
+**Learning:** File-based .NET apps in this repo need an explicit `using Neptuo.Recollections;` when they reference root-namespace types such as `SchemaOptions<T>`.
+
 ## Governance
 
 - All meaningful changes require team consensus
