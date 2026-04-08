@@ -12,6 +12,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
 {
     private const int PageSize = 10;
     private const int MaxPageSize = PageSize * 100;
+    private const int QueryBatchSize = 250;
     private const int PreviewMediaCount = 3;
     private IUserNameProvider userNames = userNames;
 
@@ -68,28 +69,55 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
 
         if (entryIdsWithBeings.Count > 0)
         {
-            var beings = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
-                .Where(e => entryIdsWithBeings.Contains(e.Id))
-                .SelectMany(e => e.Beings.Select(b => new
-                {
-                    EntryId = e.Id,
-                    Being = new EntryBeingModel(
-                        Id: b.Id,
-                        Name: b.Name,
-                        Icon: b.Icon
-                    )
-                }))
-                .OrderBy(item => item.EntryId)
-                .ThenBy(item => item.Being.Name)
-                .ToListAsync();
-
-            foreach (var item in beings)
+            foreach (List<string> entryIdBatch in Batch(entryIdsWithBeings, QueryBatchSize))
             {
-                if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
-                    beingsByEntryId[item.EntryId] = entryBeings = [];
+                var accessibleBeings = await shareStatus
+                    .OwnedByOrExplicitlySharedWithUser(
+                        dataContext,
+                        dataContext.Beings
+                            .AsNoTracking()
+                            .Where(b => b.Entries.Any(e => entryIdBatch.Contains(e.Id))),
+                        userId,
+                        connectedUsers)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        b.Name,
+                        b.Icon
+                    })
+                    .ToDictionaryAsync(b => b.Id);
 
-                entryBeings.Add(item.Being);
+                if (accessibleBeings.Count == 0)
+                    continue;
+
+                var entryBeingLinks = await dataContext.Entries
+                    .AsNoTracking()
+                    .Where(e => entryIdBatch.Contains(e.Id))
+                    .SelectMany(
+                        e => e.Beings,
+                        (e, b) => new
+                        {
+                            EntryId = e.Id,
+                            BeingId = b.Id
+                        })
+                    .ToListAsync();
+
+                foreach (var item in entryBeingLinks
+                    .Where(item => accessibleBeings.ContainsKey(item.BeingId))
+                    .OrderBy(item => item.EntryId)
+                    .ThenBy(item => accessibleBeings[item.BeingId].Name))
+                {
+                    if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
+                        beingsByEntryId[item.EntryId] = entryBeings = [];
+
+                    var being = accessibleBeings[item.BeingId];
+
+                    entryBeings.Add(new EntryBeingModel(
+                        Id: being.Id,
+                        Name: being.Name,
+                        Icon: being.Icon
+                    ));
+                }
             }
         }
 
@@ -131,5 +159,11 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                 ? media
                 : []
         }).ToList(), normalizedPageSize != null && result.Count == normalizedPageSize.Value);
+    }
+
+    private static IEnumerable<List<string>> Batch(List<string> values, int size)
+    {
+        for (int i = 0; i < values.Count; i += size)
+            yield return values.Skip(i).Take(size).ToList();
     }
 }

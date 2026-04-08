@@ -58,8 +58,11 @@ namespace Neptuo.Recollections.Components
         {
             if (component?.DataGetter == null)
                 return null;
-
+ 
             var stream = await component.DataGetter(index, type);
+            if (stream == null)
+                return null;
+
             return new DotNetStreamReference(stream);
         }
 

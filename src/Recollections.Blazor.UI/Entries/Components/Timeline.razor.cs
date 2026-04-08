@@ -163,8 +163,13 @@ namespace Neptuo.Recollections.Entries.Components
                 return;
 
             currentGalleryEntryId = entry.Id;
-            galleryMediaByEntryId[entry.Id] = entry.PreviewMedia ?? [];
-            UpdateGalleryItems(galleryMediaByEntryId[entry.Id]);
+            if (!galleryMediaByEntryId.TryGetValue(entry.Id, out List<MediaModel> media) || media.Count == 0)
+            {
+                media = entry.PreviewMedia ?? [];
+                galleryMediaByEntryId[entry.Id] = media;
+            }
+
+            UpdateGalleryItems(media);
 
             await Gallery.OpenAsync(index);
             _ = EnsureFullMediaAsync(entry);
@@ -186,6 +191,10 @@ namespace Neptuo.Recollections.Entries.Components
                     UpdateGalleryItems(media);
                     await InvokeAsync(StateHasChanged);
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Info($"Unable to load full media for entry '{entry.Id}': {ex}");
             }
             finally
             {
