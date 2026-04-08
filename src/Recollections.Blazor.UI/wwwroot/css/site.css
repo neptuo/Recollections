@@ -25783,6 +25783,20 @@ input.input-number-noarrows[type=number] {
   }
 }
 
+@media (min-width: 520px) {
+  .timeline-preview-media .image img, .timeline-preview-media .image .img {
+    -webkit-transition: -webkit-transform 0.5s;
+    transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+    transition: transform 0.5s, -webkit-transform 0.5s;
+  }
+  .timeline-preview-media .image img:hover, .timeline-preview-media .image .img:hover {
+    -webkit-transform: scale(1.05);
+        -ms-transform: scale(1.05);
+            transform: scale(1.05);
+  }
+}
+
 .pswp__title {
   position: absolute;
   bottom: 20px;
@@ -26039,4 +26053,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/issue-447-being-stories-4e88e5/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf/issue-459-show-first-few-images-in-the-timeline-0e3ef1/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

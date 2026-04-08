@@ -1,4 +1,4 @@
-﻿@inherits UserStateComponentBase
+@inherits UserStateComponentBase
 
 @if (BeforeContent != null || Entries.Count > 0)
 {
@@ -14,6 +14,7 @@
             </div>
         }
 
+        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="OnGalleryOpenInfoAsync" />
         @BeforeContent
 
         @if(Collapsible && Entries.Count > 5)
@@ -114,6 +115,27 @@
                                 </span>
                             }
                         </p>
+
+                        @if (entry.PreviewMedia?.Count > 0)
+                        {
+                            <div class="row row-cols-3 row-cols-sm-4 row-cols-lg-6 g-2 mt-2 timeline-preview-media">
+                                @for (var mediaIndex = 0; mediaIndex < entry.PreviewMedia.Count; mediaIndex++)
+                                {
+                                    var previewIndex = mediaIndex;
+                                    var media = entry.PreviewMedia[previewIndex];
+
+                                    <div class="col mt-0">
+                                        <EntryMedia EntryId="@entry.Id" Image="@media.Image" Video="@media.Video" OnClick="@(() => OpenGalleryAsync(entry, previewIndex))">
+                                            <ThumbnailContent>
+                                                <span class="badge text-bg-dark position-absolute bottom-0 start-0 m-1 opacity-75">
+                                                    <Icon Identifier="@(media.Video != null ? "film" : "image")" Prefix="fas" />
+                                                </span>
+                                            </ThumbnailContent>
+                                        </EntryMedia>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -126,4 +148,3 @@
         }
     </div>
 }
-

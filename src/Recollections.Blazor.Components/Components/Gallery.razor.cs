@@ -67,12 +67,13 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        public Task OpenAsync(int index)
+        public async Task OpenAsync(int index)
         {
             if (Models.Count > index)
-                return Interop.OpenAsync(index);
-
-            return Task.CompletedTask;
+            {
+                await Interop.InitializedAsync(this, Models ?? []);
+                await Interop.OpenAsync(index);
+            }
         }
 
         public Task CloseAsync()
@@ -81,7 +82,7 @@ namespace Neptuo.Recollections.Components
         public Task<bool> IsOpenAsync()
             => Interop.IsOpenAsync();
 
-        public async ValueTask DisposeAsync() 
-            => await Interop.CloseAsync();
+        public async ValueTask DisposeAsync()
+            => await Interop.DisposeAsync();
     }
 }

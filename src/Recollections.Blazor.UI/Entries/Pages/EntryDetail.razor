@@ -108,7 +108,7 @@
                                         <span class="media-type-badge">
                                             <Icon Identifier="@(item.Video != null ? "film" : "image")" Prefix="fas" />
                                         </span>
-                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="@onClick" @onclick:stopPropagation="true">
+                                        <button class="btn btn-outline-primary border-0 p-0 position-absolute top-0 end-0 m-1 z-1" @onclick="@onClick" @onclick:stopPropagation="true">
                                             <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
                                         </button>
                                     </ThumbnailContent>

@@ -187,6 +187,9 @@ namespace Neptuo.Recollections.Entries
         }
 
         public void MapEntityToModel(Image entity, ImageModel model, string userId)
+            => MapEntityToModel(entity, model, userId, entity.Entry.Id);
+
+        public void MapEntityToModel(Image entity, ImageModel model, string userId, string entryId)
         {
             model.Id = entity.Id;
             model.UserId = userId;
@@ -201,7 +204,7 @@ namespace Neptuo.Recollections.Entries
                 model.Location.Altitude = entity.Location.Altitude;
             }
 
-            string basePath = $"api/entries/{entity.Entry.Id}/images/{entity.Id}";
+            string basePath = $"api/entries/{entryId}/images/{entity.Id}";
 
             var previewSize = resizeService.GetResizedBounds(entity.OriginalWidth, entity.OriginalHeight, PreviewWidth);
             model.Preview = new MediaSourceModel($"{basePath}/preview", previewSize.width, previewSize.height);

@@ -41,8 +41,25 @@ function stop(el) {
 }
 
 function isVideo(model) {
-    const type = (model.type || 'image').toLowerCase();
+    const type = (model?.type || 'image').toLowerCase();
     return type === 'video';
+}
+
+async function invokeInterop(methodName, ...args) {
+    const currentInterop = interop;
+    if (!currentInterop) {
+        return null;
+    }
+
+    try {
+        return await currentInterop.invokeMethodAsync(methodName, ...args);
+    } catch (error) {
+        if (error?.message?.includes('There is no tracked object with id')) {
+            return null;
+        }
+
+        throw error;
+    }
 }
 
 export function initialize(intr, i) {
@@ -84,8 +101,8 @@ export function initialize(intr, i) {
                 order: 9,
                 isButton: true,
                 html: '<i class="fas fa-info-circle"></i>',
-                onClick: () => {
-                    interop.invokeMethodAsync("OpenInfoAsync", lightbox.pswp.currIndex);
+                onClick: async () => {
+                    await invokeInterop("OpenInfoAsync", lightbox.pswp.currIndex);
                 }
             });
 
@@ -179,7 +196,11 @@ export function initialize(intr, i) {
 
                 titleEl.innerHTML = `${originalTitle} (loading video...)`;
                 
-                const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
+                const stream = await invokeInterop("GetImageDataAsync", index, "original");
+                if (!stream) {
+                    return;
+                }
+
                 const arrayBuffer = await stream.arrayBuffer();
                 const blob = new Blob([arrayBuffer], {
                     type: model.contentType || "video/mp4"
@@ -228,7 +249,12 @@ export function initialize(intr, i) {
                 e.itemData.provider = model.provider;
             } else {
                 e.itemData.provider = model.provider = new Promise(async resolve => {
-                    const stream = await interop.invokeMethodAsync("GetImageDataAsync", e.index, "");
+                    const stream = await invokeInterop("GetImageDataAsync", e.index, "");
+                    if (!stream) {
+                        resolve('');
+                        return;
+                    }
+
                     const arrayBuffer = await stream.arrayBuffer();
                     const blob = new Blob([arrayBuffer], {
                         type: "image/png"
@@ -263,4 +289,14 @@ export function close() {
     if (lightbox.pswp) {
         lightbox.pswp.close();
     }
+}
+
+export function dispose() {
+    interop = null;
+    close();
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = null;
+    stopCallback();
+    stopCallback = () => { };
+    items = [];
 }

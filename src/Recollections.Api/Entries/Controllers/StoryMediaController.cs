@@ -11,7 +11,7 @@ namespace Neptuo.Recollections.Entries.Controllers;
 
 [ApiController]
 [Route("api/stories/{storyId}/media")]
-public class StoryMediaController(ImageService imageService, VideoService videoService, DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
+public class StoryMediaController(EntryMediaMapper entryMediaMapper, DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
     : ControllerBase(db, shareStatus)
 {
     [HttpGet]
@@ -26,45 +26,20 @@ public class StoryMediaController(ImageService imageService, VideoService videoS
             connectedUsers
         );
 
-        var entryIds = await query.Select(e => e.Id).ToListAsync();
+        Dictionary<string, string> entryIdsWithUserIds = await query
+            .Select(e => new { e.Id, e.UserId })
+            .ToDictionaryAsync(e => e.Id, e => e.UserId);
 
-        List<Image> images = await db.Images
-            .Where(i => entryIds.Contains(i.Entry.Id))
-            .Include(i => i.Entry)
-            .OrderBy(i => i.When)
-            .ToListAsync();
+        Dictionary<string, List<MediaModel>> mediaByEntryId = await entryMediaMapper.MapByEntryIdAsync(entryIdsWithUserIds);
+        var result = mediaByEntryId
+            .Where(item => item.Value.Count > 0)
+            .Select(item => new EntryMediaModel
+            {
+                EntryId = item.Key,
+                Media = item.Value
+            })
+            .OrderBy(m => m.EntryId);
 
-        List<Video> videos = await db.Videos
-            .Where(v => entryIds.Contains(v.Entry.Id))
-            .Include(v => v.Entry)
-            .OrderBy(v => v.When)
-            .ToListAsync();
-
-        var result = new Dictionary<string, EntryMediaModel>();
-
-        foreach (var image in images)
-        {
-            if (!result.TryGetValue(image.Entry.Id, out var entryModel))
-                result[image.Entry.Id] = entryModel = new EntryMediaModel { EntryId = image.Entry.Id };
-
-            var model = new ImageModel();
-            imageService.MapEntityToModel(image, model, image.Entry.UserId);
-            entryModel.Media.Add(new MediaModel { Type = "image", Image = model });
-        }
-
-        foreach (var video in videos)
-        {
-            if (!result.TryGetValue(video.Entry.Id, out var entryModel))
-                result[video.Entry.Id] = entryModel = new EntryMediaModel { EntryId = video.Entry.Id };
-
-            var model = new VideoModel();
-            videoService.MapEntityToModel(video, model, video.Entry.UserId);
-            entryModel.Media.Add(new MediaModel { Type = "video", Video = model });
-        }
-
-        foreach (var entryModel in result.Values)
-            entryModel.Media = entryModel.Media.OrderBy(m => m.Type == "image" ? m.Image.When : m.Video.When).ToList();
-
-        return Ok(result.Values.OrderBy(m => m.EntryId));
+        return Ok(result);
     });
 }
