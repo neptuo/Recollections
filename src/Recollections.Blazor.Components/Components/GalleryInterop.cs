@@ -58,8 +58,11 @@ namespace Neptuo.Recollections.Components
         {
             if (component?.DataGetter == null)
                 return null;
-
+ 
             var stream = await component.DataGetter(index, type);
+            if (stream == null)
+                return null;
+
             return new DotNetStreamReference(stream);
         }
 
@@ -69,8 +72,6 @@ namespace Neptuo.Recollections.Components
 
         public async ValueTask DisposeAsync()
         {
-            await CloseAsync();
-
             if (module != null)
             {
                 await module.InvokeVoidAsync("dispose");
