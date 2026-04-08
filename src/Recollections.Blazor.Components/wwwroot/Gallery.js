@@ -45,6 +45,37 @@ function isVideo(model) {
     return type === 'video';
 }
 
+function pauseCachedVideo(model) {
+    if (model?.videoElement instanceof HTMLVideoElement) {
+        model.videoElement.pause();
+    }
+}
+
+function attachCachedVideo(currentSlide, model, titleEl, originalTitle) {
+    const cachedVideoEl = model?.videoElement;
+    if (!(cachedVideoEl instanceof HTMLVideoElement)) {
+        return null;
+    }
+
+    const imageEl = currentSlide.image;
+    cachedVideoEl.autoplay = true;
+    if (cachedVideoEl.ended) {
+        cachedVideoEl.currentTime = 0;
+    }
+
+    imageEl.parentNode.replaceChild(cachedVideoEl, imageEl);
+    currentSlide.image = cachedVideoEl;
+
+    if (cachedVideoEl.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        titleEl.style.display = 'none';
+    } else {
+        titleEl.textContent = `${originalTitle} (loading video...)`;
+        titleEl.style.display = '';
+    }
+
+    return cachedVideoEl;
+}
+
 async function setVideoSource(element, stream, contentType) {
     if (window.ImageSource && typeof window.ImageSource.Set === 'function') {
         return window.ImageSource.Set(element, stream, contentType || 'video/mp4');
@@ -77,9 +108,6 @@ async function setVideoSource(element, stream, contentType) {
     element.addEventListener('emptied', cleanup, { once: true });
     element.addEventListener('error', cleanup, { once: true });
     element.addEventListener('abort', cleanup, { once: true });
-    if (typeof element.load === 'function') {
-        element.load();
-    }
 }
 
 export function initialize(intr, i) {
@@ -95,12 +123,19 @@ export function initialize(intr, i) {
                 html: playIcon,
                 onInit: (el, pswp) => {
                     lightbox.pswp.on('close', () => {
+                        items.forEach(pauseCachedVideo);
                         stop(el);
                     });
-                    
+                     
                     lightbox.pswp.on('change', () => {
                         const index = lightbox.pswp.currIndex;
                         const model = items[index];
+                        items.forEach((item, itemIndex) => {
+                            if (itemIndex !== index) {
+                                pauseCachedVideo(item);
+                            }
+                        });
+
                         if (isVideo(model)) {
                             stop(el);
                         }
@@ -214,31 +249,42 @@ export function initialize(intr, i) {
                 const titleEl = lightbox.pswp.scrollWrap.parentElement.querySelector(".pswp__title");
                 const originalTitle = lightbox.pswp.currSlide.data.alt || '';
 
-                titleEl.textContent = `${originalTitle} (loading video...)`;
-                
-                const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
-                const imageEl = lightbox.pswp.currSlide.image;
-                const videoEl = document.createElement('video');
-                videoEl.controls = true;
-                videoEl.playsInline = true;
-                videoEl.autoplay = true;
-                videoEl.preload = 'auto';
-                videoEl.className = imageEl.className;
-                videoEl.style.width = imageEl.style.width;
-                videoEl.style.height = imageEl.style.height;
-                videoEl.poster = imageEl.currentSrc || imageEl.src || '';
+                let videoEl = attachCachedVideo(lightbox.pswp.currSlide, model, titleEl, originalTitle);
+                if (videoEl == null) {
+                    titleEl.textContent = `${originalTitle} (loading video...)`;
+                    const imageEl = lightbox.pswp.currSlide.image;
+                    videoEl = document.createElement('video');
+                    videoEl.controls = true;
+                    videoEl.playsInline = true;
+                    videoEl.autoplay = true;
+                    videoEl.preload = 'auto';
+                    videoEl.className = imageEl.className;
+                    videoEl.style.width = imageEl.style.width;
+                    videoEl.style.height = imageEl.style.height;
+                    videoEl.poster = imageEl.currentSrc || imageEl.src || '';
 
-                videoEl.addEventListener('loadeddata', () => {
-                    titleEl.style.display = 'none';
-                }, { once: true });
-                videoEl.addEventListener('error', () => {
-                    titleEl.textContent = `${originalTitle} (unable to load video)`;
-                    titleEl.style.display = '';
-                }, { once: true });
+                    videoEl.addEventListener('loadeddata', () => {
+                        titleEl.style.display = 'none';
+                    }, { once: true });
+                    videoEl.addEventListener('error', () => {
+                        titleEl.textContent = `${originalTitle} (unable to load video)`;
+                        titleEl.style.display = '';
+                    }, { once: true });
 
-                imageEl.parentNode.replaceChild(videoEl, imageEl);
-                lightbox.pswp.currSlide.image = videoEl;
-                await setVideoSource(videoEl, stream, model.contentType);
+                    imageEl.parentNode.replaceChild(videoEl, imageEl);
+                    lightbox.pswp.currSlide.image = videoEl;
+                    model.videoElement = videoEl;
+                    if (model.originalUrl) {
+                        videoEl.src = model.originalUrl;
+                    } else {
+                        const stream = await interop.invokeMethodAsync("GetImageDataAsync", index, "original");
+                        await setVideoSource(videoEl, stream, model.contentType);
+                    }
+                }
+
+                if (videoEl.paused) {
+                    videoEl.play().catch(() => { });
+                }
             });
         });
 

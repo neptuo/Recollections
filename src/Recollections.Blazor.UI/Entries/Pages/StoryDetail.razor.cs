@@ -125,6 +125,7 @@ namespace Neptuo.Recollections.Entries.Pages
                             Width = item.Video.Preview.Width,
                             Height = item.Video.Preview.Height,
                             ContentType = item.Video.ContentType,
+                            OriginalUrl = Api.AuthorizedMediaUrl(item.Video.Original.Url),
                         });
                     }
                 }

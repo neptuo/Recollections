@@ -97,9 +97,22 @@ namespace Neptuo.Recollections.Entries
         public Task<Stream> GetMediaDataAsync(string url)
             => faultHandler.Wrap(GetMediaDataCoreAsync(url));
 
+        public string MediaUrl(string url)
+            => (settings.BaseUrl + url).Replace("api/api", "api");
+
+        public string AuthorizedMediaUrl(string url)
+        {
+            string result = MediaUrl(url);
+            string bearerToken = http.DefaultRequestHeaders.Authorization?.Parameter;
+            if (String.IsNullOrEmpty(bearerToken))
+                return result;
+
+            return QueryHelpers.AddQueryString(result, "access_token", bearerToken);
+        }
+
         private async Task<Stream> GetMediaDataCoreAsync(string url)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, (settings.BaseUrl + url).Replace("api/api", "api"));
+            var request = new HttpRequestMessage(HttpMethod.Get, MediaUrl(url));
             request.SetBrowserResponseStreamingEnabled(true);
 
             var response = await http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);

@@ -50,7 +50,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return NotFound();
 
             var model = new VideoModel();
-            service.MapEntityToModel(entity, model, entry.UserId);
+            await service.MapEntityToModelAsync(entry, entity, model, entry.UserId);
 
             var result = new AuthorizedModel<VideoModel>(model)
             {
@@ -99,7 +99,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             }
 
             // Original video
-            string contentType = entity.ContentType;
+            string contentType = await service.GetStreamingContentTypeAsync(entry, entity);
             if (string.IsNullOrEmpty(contentType))
                 contentType = GetFileContentType(entity.FileName);
 

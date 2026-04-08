@@ -58,7 +58,7 @@ public class StoryMediaController(ImageService imageService, VideoService videoS
                 result[video.Entry.Id] = entryModel = new EntryMediaModel { EntryId = video.Entry.Id };
 
             var model = new VideoModel();
-            videoService.MapEntityToModel(video, model, video.Entry.UserId);
+            await videoService.MapEntityToModelAsync(video, model, video.Entry.UserId);
             entryModel.Media.Add(new MediaModel { Type = "video", Video = model });
         }
 

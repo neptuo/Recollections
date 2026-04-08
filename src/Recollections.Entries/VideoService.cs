@@ -22,6 +22,16 @@ namespace Neptuo.Recollections.Entries
         private const int PreviewWidth = 1024;
         private const int ThumbnailWidth = 200;
         private const int ThumbnailHeight = 150;
+        private static readonly Configuration VideoConfiguration = new Configuration().WithAVDecoders();
+        private static readonly DecoderOptions VideoMetadataDecoderOptions = new()
+        {
+            Configuration = VideoConfiguration,
+        };
+        private static readonly DecoderOptions VideoImageDecoderOptions = new()
+        {
+            Configuration = VideoConfiguration,
+            MaxFrames = 1,
+        };
 
         private readonly DataContext dataContext;
         private readonly IFileStorage fileStorage;
@@ -56,7 +66,7 @@ namespace Neptuo.Recollections.Entries
                 Id = videoId,
                 Name = Path.GetFileNameWithoutExtension(file.FileName),
                 FileName = videoId + Path.GetExtension(file.FileName),
-                ContentType = file.ContentType,
+                ContentType = NormalizeContentType(file.ContentType, file.FileName),
                 Created = DateTime.Now,
                 When = entry.When,
                 Entry = entry,
@@ -67,6 +77,8 @@ namespace Neptuo.Recollections.Entries
 
             using (Stream source = file.OpenReadStream())
                 await fileStorage.SaveAsync(entry, entity, source, VideoType.Original);
+
+            entity.ContentType = await GetStreamingContentTypeAsync(entry, entity);
 
             using var imageContent = new MemoryStream();
             using (var videoImage = await ExtractImageFromVideoAsync(entry, entity))
@@ -102,6 +114,12 @@ namespace Neptuo.Recollections.Entries
 
         private bool TryGetMetadata(ImageMetadata imageMetadata, out AVMetadata metadata)
         {
+            if (imageMetadata == null)
+            {
+                metadata = null;
+                return false;
+            }
+
             if (imageMetadata.DecodedImageFormat is IImageFormat<AVMetadata> avFormat && imageMetadata.TryGetFormatMetadata(avFormat, out metadata))
                 return metadata != null;
 
@@ -114,6 +132,7 @@ namespace Neptuo.Recollections.Entries
             if (TryGetMetadata(imageMetadata, out var metadata))
             {
                 entity.Duration = metadata.Duration.TotalSeconds;
+                entity.ContentType = BuildStreamingContentType(entity.ContentType, metadata);
 
                 if (isWhenIncluded && metadata.ContainerMetadata.TryGetValue("creation_time", out var creationTimeRaw) && DateTime.TryParse(creationTimeRaw.ToString(), out var creationTime))
                 {
@@ -153,16 +172,9 @@ namespace Neptuo.Recollections.Entries
 
             // Decode a small number of frames from the video and use the first decoded frame.
             // Requires ImageSharp.AVCodecFormats (+ native package) to be available at runtime.
-            var configuration = new Configuration().WithAVDecoders();
-            var decoderOptions = new DecoderOptions
-            {
-                Configuration = configuration,
-                MaxFrames = 1,
-            };
-
             try
             {
-                var videoImage = IsImage.Load(decoderOptions, original);
+                var videoImage = IsImage.Load(VideoImageDecoderOptions, original);
                 if (videoImage.Frames.Count == 0)
                     throw new VideoUploadValidationException("Video contains no decodable frames.");
 
@@ -194,6 +206,109 @@ namespace Neptuo.Recollections.Entries
             }
         }
 
+        private static string NormalizeContentType(string contentType, string fileName)
+            => Mp4StreamingContentTypeProvider.NormalizeContainerContentType(contentType, fileName);
+
+        private static string MapVideoCodec(string codecName)
+        {
+            switch (codecName?.Trim().ToLowerInvariant())
+            {
+                case "avc":
+                case "avc1":
+                case "h264":
+                    return "avc1";
+                case "hev1":
+                case "hevc":
+                case "h265":
+                case "hvc1":
+                    return "hvc1";
+                case "av1":
+                case "av01":
+                    return "av01";
+                case "vp8":
+                    return "vp8";
+                case "vp9":
+                    return "vp9";
+                default:
+                    return null;
+            }
+        }
+
+        private static string MapAudioCodec(string codecName, string containerType)
+        {
+            switch (codecName?.Trim().ToLowerInvariant())
+            {
+                case "aac":
+                case "mp4a":
+                    return containerType is "video/mp4" or "video/quicktime"
+                        ? "mp4a.40.2"
+                        : null;
+                case "opus":
+                    return "opus";
+                case "vorbis":
+                    return "vorbis";
+                default:
+                    return null;
+            }
+        }
+
+        private static string BuildStreamingContentType(string contentType, AVMetadata metadata)
+        {
+            string normalizedContentType = contentType?.Trim();
+            if (String.IsNullOrEmpty(normalizedContentType) || Mp4StreamingContentTypeProvider.HasExplicitCodecs(normalizedContentType))
+                return normalizedContentType;
+
+            string containerType = normalizedContentType.Split(';')[0].Trim().ToLowerInvariant();
+            string videoCodec = metadata?.VideoStreams?
+                .Select(s => MapVideoCodec(s.CodecName))
+                .FirstOrDefault(c => !String.IsNullOrEmpty(c));
+            if (String.IsNullOrEmpty(videoCodec))
+                return normalizedContentType;
+
+            var codecs = new List<string> { videoCodec };
+            string audioCodec = metadata.AudioStreams?
+                .Select(s => MapAudioCodec(s.CodecName, containerType))
+                .FirstOrDefault(c => !String.IsNullOrEmpty(c));
+            if (!String.IsNullOrEmpty(audioCodec))
+                codecs.Add(audioCodec);
+
+            return $"{containerType}; codecs=\"{string.Join(", ", codecs)}\"";
+        }
+
+        private async Task<AVMetadata> FindMetadataAsync(Entry entry, Video video)
+        {
+            await using Stream original = await fileStorage.FindAsync(entry, video, VideoType.Original);
+            if (original == null)
+                return null;
+
+            try
+            {
+                var imageInfo = IsImage.Identify(VideoMetadataDecoderOptions, original);
+                return TryGetMetadata(imageInfo?.Metadata, out var metadata)
+                    ? metadata
+                    : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<string> GetStreamingContentTypeAsync(Entry entry, Video entity)
+        {
+            string contentType = NormalizeContentType(entity.ContentType, entity.FileName);
+            if (Mp4StreamingContentTypeProvider.HasExplicitCodecs(contentType))
+                return contentType;
+
+            await using Stream content = await fileStorage.FindAsync(entry, entity, VideoType.Original);
+            string parsedContentType = Mp4StreamingContentTypeProvider.NormalizeStreamingContentType(contentType, entity.FileName, content);
+            if (Mp4StreamingContentTypeProvider.HasExplicitCodecs(parsedContentType))
+                return parsedContentType;
+
+            var metadata = await FindMetadataAsync(entry, entity);
+            return BuildStreamingContentType(parsedContentType, metadata);
+        }
+
         public async Task DeleteAsync(Entry entry, Video entity)
         {
             dataContext.Videos.Remove(entity);
@@ -210,7 +325,7 @@ namespace Neptuo.Recollections.Entries
             model.Name = entity.Name;
             model.Description = entity.Description;
             model.When = entity.When;
-            model.ContentType = entity.ContentType;
+            model.ContentType = NormalizeContentType(entity.ContentType, entity.FileName);
 
             model.Duration = entity.Duration;
             if (entity.Location != null)
@@ -228,12 +343,31 @@ namespace Neptuo.Recollections.Entries
             model.Thumbnail = new MediaSourceModel($"{basePath}/thumbnail", ThumbnailWidth, ThumbnailHeight);
         }
 
+        public async Task MapEntityToModelAsync(Entry entry, Video entity, VideoModel model, string userId)
+        {
+            MapEntityToModel(entity, model, userId);
+            model.ContentType = await GetStreamingContentTypeAsync(entry, entity);
+        }
+
+        public Task MapEntityToModelAsync(Video entity, VideoModel model, string userId)
+            => MapEntityToModelAsync(entity.Entry, entity, model, userId);
+
         public void MapEntitiesToModels(IEnumerable<Video> entities, ICollection<VideoModel> models, string userId)
         {
             foreach (var entity in entities)
             {
                 var model = new VideoModel();
                 MapEntityToModel(entity, model, userId);
+                models.Add(model);
+            }
+        }
+
+        public async Task MapEntitiesToModelsAsync(IEnumerable<Video> entities, ICollection<VideoModel> models, string userId)
+        {
+            foreach (var entity in entities)
+            {
+                var model = new VideoModel();
+                await MapEntityToModelAsync(entity, model, userId);
                 models.Add(model);
             }
         }

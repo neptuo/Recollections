@@ -312,9 +312,6 @@ async function setObjectUrlSource(element, stream, mimeType) {
         URL.revokeObjectURL(url);
     }, releaseEvents);
 
-    if (typeof element.load === "function") {
-        element.load();
-    }
 }
 
 function registerMediaElementSource(element, cleanup, eventNames = []) {
@@ -350,28 +347,61 @@ function getStreamingMimeTypeCandidates(mimeType) {
     const normalizedMimeType = (mimeType || "video/mp4").toLowerCase();
     const [containerType] = normalizedMimeType.split(";");
     const candidates = [normalizedMimeType];
+    const codecTokens = getMimeTypeCodecTokens(normalizedMimeType);
+    const hasAudioCodec = codecTokens.some(codec => ["aac", "mp4a", "opus", "vorbis"].includes(codec));
 
     if (containerType === "video/mp4") {
-        candidates.push(
-            'video/mp4; codecs="avc1.42E01E"',
-            'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-            'video/mp4; codecs="avc1.4D401E, mp4a.40.2"',
-            'video/mp4; codecs="avc1.64001F, mp4a.40.2"',
-            'video/mp4; codecs="hev1.1.6.L93.B0"',
-            'video/mp4; codecs="hvc1.1.6.L93.B0"',
-            'video/mp4; codecs="hev1.1.6.L93.B0, mp4a.40.2"',
-            'video/mp4; codecs="hvc1.1.6.L93.B0, mp4a.40.2"'
-        );
+        if (codecTokens.some(codec => ["hev1", "hevc", "h265", "hvc1"].includes(codec))) {
+            candidates.push(
+                'video/mp4; codecs="hev1.1.6.L93.B0"',
+                'video/mp4; codecs="hvc1.1.6.L93.B0"'
+            );
+
+            if (hasAudioCodec) {
+                candidates.push(
+                    'video/mp4; codecs="hev1.1.6.L93.B0, mp4a.40.2"',
+                    'video/mp4; codecs="hvc1.1.6.L93.B0, mp4a.40.2"'
+                );
+            }
+        } else {
+            candidates.push('video/mp4; codecs="avc1.42E01E"');
+
+            if (hasAudioCodec) {
+                candidates.push(
+                    'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+                    'video/mp4; codecs="avc1.4D401E, mp4a.40.2"',
+                    'video/mp4; codecs="avc1.64001F, mp4a.40.2"'
+                );
+            }
+        }
     } else if (containerType === "video/webm") {
-        candidates.push(
-            'video/webm; codecs="vp8"',
-            'video/webm; codecs="vp8, vorbis"',
-            'video/webm; codecs="vp9"',
-            'video/webm; codecs="vp9, opus"'
-        );
+        if (codecTokens.includes("vp9")) {
+            candidates.push('video/webm; codecs="vp9"');
+            if (hasAudioCodec) {
+                candidates.push('video/webm; codecs="vp9, opus"');
+            }
+        } else {
+            candidates.push('video/webm; codecs="vp8"');
+            if (hasAudioCodec) {
+                candidates.push('video/webm; codecs="vp8, vorbis"');
+            }
+        }
     }
 
     return [...new Set(candidates)];
+}
+
+function getMimeTypeCodecTokens(mimeType) {
+    const match = /codecs\s*=\s*"?([^";]+)"?/i.exec(mimeType || "");
+    if (match == null) {
+        return [];
+    }
+
+    return match[1]
+        .split(",")
+        .map(codec => codec.trim().toLowerCase())
+        .filter(codec => codec.length > 0)
+        .map(codec => codec.split(".")[0]);
 }
 
 function findStreamingMimeType(mimeType) {
@@ -379,7 +409,14 @@ function findStreamingMimeType(mimeType) {
         return mimeType || "video/mp4";
     }
 
-    for (const candidate of getStreamingMimeTypeCandidates(mimeType)) {
+    const normalizedMimeType = mimeType || "video/mp4";
+    if (!/;\s*codecs=/i.test(normalizedMimeType)) {
+        return null;
+    }
+
+    const candidates = getStreamingMimeTypeCandidates(normalizedMimeType);
+
+    for (const candidate of candidates) {
         if (MediaSource.isTypeSupported(candidate)) {
             return candidate;
         }
@@ -423,7 +460,7 @@ function setStreamingVideoSource(element, stream, mimeType) {
 
     mediaSource.addEventListener("sourceclose", cleanup, { once: true });
 
-    mediaSource.addEventListener("sourceopen", () => {
+    mediaSource.addEventListener("sourceopen", async () => {
         if (isDisposed) {
             return;
         }
@@ -437,7 +474,20 @@ function setStreamingVideoSource(element, stream, mimeType) {
             return;
         }
 
-        reader = stream.stream().getReader();
+        try {
+            const readableStream = await stream.stream();
+            if (readableStream == null || typeof readableStream.getReader !== "function") {
+                throw new TypeError("JS stream interop did not provide a readable stream.");
+            }
+
+            reader = readableStream.getReader();
+        } catch (error) {
+            console.error("Unable to access streamed video data.", error);
+            cleanup();
+            void setObjectUrlSource(element, stream, normalizedMimeType);
+            return;
+        }
+
         const pendingChunks = [];
         const maxPendingChunks = 8;
         let pendingChunkIndex = 0;
@@ -583,9 +633,6 @@ function setStreamingVideoSource(element, stream, mimeType) {
         })();
     }, { once: true });
 
-    if (typeof element.load === "function") {
-        element.load();
-    }
 }
 
 window.ImageSource = {

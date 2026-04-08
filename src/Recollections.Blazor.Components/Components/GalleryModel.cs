@@ -19,9 +19,10 @@ namespace Neptuo.Recollections.Components
         public int Height { get; set; }
 
         public string ContentType { get; set; }
+        public string OriginalUrl { get; set; }
 
         public override int GetHashCode()
-            => HashCode.Combine(Type, Title, Width, Height, ContentType);
+            => HashCode.Combine(Type, Title, Width, Height, ContentType, OriginalUrl);
 
         public override bool Equals(object obj)
             => (obj is GalleryModel other) && Equals(other);
@@ -31,6 +32,7 @@ namespace Neptuo.Recollections.Components
                 && Title == other.Title
                 && Width == other.Width
                 && Height == other.Height
-                && ContentType == other.ContentType;
+                && ContentType == other.ContentType
+                && OriginalUrl == other.OriginalUrl;
     }
 }

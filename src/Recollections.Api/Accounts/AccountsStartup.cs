@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -73,6 +74,16 @@ namespace Neptuo.Recollections.Accounts
                     };
 
                     options.SaveToken = true;
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            if (String.IsNullOrEmpty(context.Token) && context.Request.Query.TryGetValue("access_token", out StringValues accessToken))
+                                context.Token = accessToken.ToString();
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             services

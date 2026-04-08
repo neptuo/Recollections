@@ -63,7 +63,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             foreach (var video in videos)
             {
                 var model = new VideoModel();
-                videoService.MapEntityToModel(video, model, entry.UserId);
+                await videoService.MapEntityToModelAsync(entry, video, model, entry.UserId);
                 result.Add(new MediaModel { Type = "video", Video = model });
             }
 
@@ -98,7 +98,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 {
                     Video entity = await videoService.CreateAsync(entry, new FormFileInput(file));
                     var model = new VideoModel();
-                    videoService.MapEntityToModel(entity, model, entry.UserId);
+                    await videoService.MapEntityToModelAsync(entry, entity, model, entry.UserId);
                     return Ok(new MediaModel { Type = "video", Video = model });
                 }
                 catch (VideoUploadValidationException)
