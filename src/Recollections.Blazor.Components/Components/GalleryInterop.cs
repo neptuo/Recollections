@@ -69,9 +69,10 @@ namespace Neptuo.Recollections.Components
 
         public async ValueTask DisposeAsync()
         {
+            await CloseAsync();
+
             if (module != null)
             {
-                await module.InvokeVoidAsync("dispose");
                 await module.DisposeAsync();
                 module = null;
             }
