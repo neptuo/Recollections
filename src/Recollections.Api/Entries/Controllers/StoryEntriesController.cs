@@ -53,7 +53,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 connectedUsers
             );
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers);
+            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, includePreviewMedia: true);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
 
@@ -68,7 +68,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
             var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Entries.Where(e => e.Chapter.Id == chapterId).OrderBy(e => e.When), [userId, ShareStatusService.PublicUserId], connectedUsers);
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers);
+            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, includePreviewMedia: true);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
     }

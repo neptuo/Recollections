@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.JSInterop;
 using Neptuo.Logging;
@@ -12,8 +12,11 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
 {
-    public partial class Timeline(Navigator Navigator, NavigationManager NavigationManager, IJSRuntime JSRuntime, UiOptions UiOptions, ILog<Timeline> Log)
+    public partial class Timeline(Navigator Navigator, NavigationManager NavigationManager, IJSRuntime JSRuntime, UiOptions UiOptions, Api Api, ILog<Timeline> Log)
     {
+        private readonly Dictionary<string, List<MediaModel>> galleryMediaByEntryId = [];
+        private readonly HashSet<string> galleryMediaLoading = [];
+
         [Parameter]
         public RenderFragment BeforeContent { get; set; }
 
@@ -44,8 +47,11 @@ namespace Neptuo.Recollections.Entries.Components
         private int offset;
         private Task loadAsyncFromParametersSet;
         private string scrollToEntryId;
+        private string currentGalleryEntryId;
 
         protected List<EntryListModel> Entries { get; } = [];
+        protected Gallery Gallery { get; set; }
+        protected List<GalleryModel> GalleryItems { get; } = [];
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; private set; } = true;
         protected bool IsCollapsed { get; set; } = false;
@@ -148,6 +154,102 @@ namespace Neptuo.Recollections.Entries.Components
         {
             if (OnClick.HasDelegate)
                 await OnClick.InvokeAsync(entry);
+        }
+
+        protected async Task OpenGalleryAsync(EntryListModel entry, int index)
+        {
+            Ensure.NotNull(entry, "entry");
+            if (Gallery == null)
+                return;
+
+            currentGalleryEntryId = entry.Id;
+            galleryMediaByEntryId[entry.Id] = entry.PreviewMedia ?? [];
+            UpdateGalleryItems(galleryMediaByEntryId[entry.Id]);
+
+            await Gallery.OpenAsync(index);
+            _ = EnsureFullMediaAsync(entry);
+        }
+
+        private async Task EnsureFullMediaAsync(EntryListModel entry)
+        {
+            int totalMediaCount = entry.ImageCount + entry.VideoCount;
+            if (totalMediaCount <= (entry.PreviewMedia?.Count ?? 0) || !galleryMediaLoading.Add(entry.Id))
+                return;
+
+            try
+            {
+                List<MediaModel> media = await Api.GetMediaAsync(entry.Id);
+                galleryMediaByEntryId[entry.Id] = media;
+
+                if (currentGalleryEntryId == entry.Id)
+                {
+                    UpdateGalleryItems(media);
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            finally
+            {
+                galleryMediaLoading.Remove(entry.Id);
+            }
+        }
+
+        private void UpdateGalleryItems(IEnumerable<MediaModel> media)
+        {
+            GalleryItems.Clear();
+            foreach (MediaModel item in media)
+            {
+                if (item.Image != null)
+                {
+                    GalleryItems.Add(new GalleryModel
+                    {
+                        Type = "image",
+                        Title = item.Image.Name,
+                        Width = item.Image.Preview.Width,
+                        Height = item.Image.Preview.Height
+                    });
+                }
+                else if (item.Video != null)
+                {
+                    GalleryItems.Add(new GalleryModel
+                    {
+                        Type = "video",
+                        Title = item.Video.Name,
+                        Width = item.Video.Preview.Width,
+                        Height = item.Video.Preview.Height,
+                        ContentType = item.Video.ContentType
+                    });
+                }
+            }
+        }
+
+        protected Task<Stream> OnGetMediaDataAsync(int index, string type)
+        {
+            if (currentGalleryEntryId == null || !galleryMediaByEntryId.TryGetValue(currentGalleryEntryId, out List<MediaModel> media) || index >= media.Count)
+                return Task.FromResult<Stream>(null);
+
+            MediaModel item = media[index];
+            if (item.Image != null)
+                return Api.GetMediaDataAsync(item.Image.Preview.Url);
+
+            if (item.Video != null)
+                return Api.GetMediaDataAsync(type == "original" ? item.Video.Original.Url : item.Video.Preview.Url);
+
+            return Task.FromResult<Stream>(null);
+        }
+
+        protected async Task OnGalleryOpenInfoAsync(int index)
+        {
+            if (currentGalleryEntryId == null || !galleryMediaByEntryId.TryGetValue(currentGalleryEntryId, out List<MediaModel> media) || index < 0 || index >= media.Count)
+                return;
+
+            if (Gallery != null)
+                await Gallery.CloseAsync();
+
+            MediaModel item = media[index];
+            if (item.Image != null)
+                Navigator.OpenImageDetail(currentGalleryEntryId, item.Image.Id);
+            else if (item.Video != null)
+                Navigator.OpenVideoDetail(currentGalleryEntryId, item.Video.Id);
         }
     }
 }

@@ -21,4 +21,7 @@ public record EntryListModel
     int ImageCount,
     int VideoCount,
     int GpsCount
-);
+)
+{
+    public List<MediaModel> PreviewMedia { get; init; } = [];
+}
