@@ -14,15 +14,17 @@ Use this skill when the default ports (33880 for API, 33881 for Blazor UI, 33882
 
 ## Port Selection
 
-Pick a new base port (e.g., 34880) and derive all ports from it:
+Pick a new base port (e.g., 34880) and derive the main ports from it. The OTLP and Resource Service ports don't follow a formula — just pick any free ports.
 
-| Component        | Formula      | Example (base=34880) |
-|------------------|-------------|----------------------|
-| API              | base         | 34880                |
-| Blazor UI        | base + 1     | 34881                |
-| Aspire Dashboard | base + 2 / base + 3 | 34882 / 34883 |
-| OTLP Endpoint    | base + 155 / base + 269 | 35035 / 35149 |
-| Resource Service | base + 173 / base + 341 | 35053 / 35221 |
+> **Note:** These formulas are only for choosing a new alternate port set. They intentionally don't reproduce the default ports (e.g., the default OTLP port 19035 is unrelated to 33880).
+
+| Component        | Formula              | Example (base=34880) |
+|------------------|---------------------|----------------------|
+| API              | base                 | 34880                |
+| Blazor UI        | base + 1             | 34881                |
+| Aspire Dashboard | base + 2 / base + 3  | 34882 / 34883        |
+| OTLP Endpoint    | any free port pair   | 35035 / 35149        |
+| Resource Service | any free port pair   | 35053 / 35221        |
 
 ## Files to Update
 
