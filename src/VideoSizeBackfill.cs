@@ -8,6 +8,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Neptuo.Recollections;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Migrations;
 using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
