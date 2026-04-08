@@ -56,7 +56,7 @@ namespace Neptuo.Recollections.Components
         [JSInvokable]
         public async Task<DotNetStreamReference> GetImageDataAsync(int index, string type)
         {
-            if (component.DataGetter == null)
+            if (component?.DataGetter == null)
                 return null;
 
             var stream = await component.DataGetter(index, type);
@@ -65,14 +65,13 @@ namespace Neptuo.Recollections.Components
 
         [JSInvokable]
         public Task OpenInfoAsync(int index)
-            => component.OnOpenInfo.InvokeAsync(index);
+            => component?.OnOpenInfo.InvokeAsync(index) ?? Task.CompletedTask;
 
         public async ValueTask DisposeAsync()
         {
-            await CloseAsync();
-
             if (module != null)
             {
+                await module.InvokeVoidAsync("dispose");
                 await module.DisposeAsync();
                 module = null;
             }
