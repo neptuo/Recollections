@@ -37,7 +37,7 @@ public class OnThisDayController(DataContext dataContext, EntryListMapper entryM
         var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
         var query = GetOnThisDayQuery(userId, connectedUsers);
 
-        var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
+        var (models, _) = await entryMapper.MapAsync(query);
         return Ok(models);
     }
 
