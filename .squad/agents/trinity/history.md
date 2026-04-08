@@ -25,6 +25,8 @@ Trinity owns the Blazor UI experience for the recollections product.
 - MediaSource URLs must also outlive `sourceended`; release them only when the element is reset, replaced, or fails.
 - The runtime fix for this regression lives in `src/Recollections.Blazor.UI/wwwroot/js/site.js`, with fallback parity in `src/Recollections.Blazor.Components/wwwroot/Gallery.js`.
 - When a media element swaps to a new object URL, `emptied` can fire during `element.src = url`; arm cleanup listeners only after assignment so the fresh `blob:` URL is not revoked mid-attach.
+- Gallery video replay state lives best in `src/Recollections.Blazor.Components/wwwroot/Gallery.js`: cache the created `HTMLVideoElement` on the gallery item model and reattach it on reopen so the browser can reuse the buffered media instead of starting a fresh fetch.
+- When reusing a cached gallery video element, pause non-active cached videos on slide change/close; that keeps audio from leaking while preserving the already-buffered source for replay.
 
 ## 2026-04-07 Video Streaming Fix
 

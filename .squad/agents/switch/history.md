@@ -20,6 +20,8 @@ Switch protects the release path by focusing on regressions, edge cases, and rea
 - Recollections is split across many projects, so regressions may cross UI, API, and data boundaries.
 - End-to-end checks should account for both the Blazor UI and the API surface.
 - The Aspire AppHost is a likely anchor for broader validation when multiple services are involved.
+- Gallery video replay reuse is implemented in `src/Recollections.Blazor.Components/wwwroot/Gallery.js` by caching the created `HTMLVideoElement` on the gallery model and reattaching it on reopen.
+- Replay verification for this fix lives in `artifacts/playwright-video-repro.js`; it measures first-frame warm start and asserts that replay adds no new `/videos/{id}/original` requests in the same gallery session.
 
 ## PR #425 Review — Video Streaming (2026-04-04)
 
