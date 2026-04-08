@@ -8,6 +8,7 @@
 
 - Restore .NET tools with `dotnet tool restore` before building. This installs the `excubo.webcompiler` tool needed to compile SCSS files.
 - Run the application with `dotnet run ./src/AppHost.cs`.
+- If the default ports are already in use, invoke the `run-custom-ports` skill to run the application on a different set of ports.
 
 ## Pull Request Reviews
 
