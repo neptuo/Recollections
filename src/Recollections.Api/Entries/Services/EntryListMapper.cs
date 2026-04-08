@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Sharing;
 
 namespace Neptuo.Recollections.Entries;
 
-public class EntryListMapper(DataContext dataContext, IUserNameProvider userNames, EntryMediaMapper entryMediaMapper)
+public class EntryListMapper(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus, EntryMediaMapper entryMediaMapper)
 {
     private const int PageSize = 10;
     private const int MaxPageSize = PageSize * 100;
@@ -15,8 +16,8 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
     private const int PreviewMediaCount = 3;
     private IUserNameProvider userNames = userNames;
 
-    public Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, int offset, bool includePreviewMedia = false)
-        => MapAsync(query, offset, PageSize, includePreviewMedia);
+    public Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int offset, bool includePreviewMedia = false)
+        => MapAsync(query, userId, connectedUsers, offset, PageSize, includePreviewMedia);
 
     public static int NormalizePageSize(int? pageSize)
     {
@@ -25,7 +26,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
         return Math.Min(normalizedPageSize, MaxPageSize);
     }
 
-    public async Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, int? offset = null, int? pageSize = null, bool includePreviewMedia = false)
+    public async Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int? offset = null, int? pageSize = null, bool includePreviewMedia = false)
     {
         if (offset != null)
         {
@@ -70,7 +71,26 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
         {
             foreach (List<string> entryIdBatch in Batch(entryIdsWithBeings, QueryBatchSize))
             {
-                var beings = await dataContext.Entries
+                var accessibleBeings = await shareStatus
+                    .OwnedByOrExplicitlySharedWithUser(
+                        dataContext,
+                        dataContext.Beings
+                            .AsNoTracking()
+                            .Where(b => b.Entries.Any(e => entryIdBatch.Contains(e.Id))),
+                        userId,
+                        connectedUsers)
+                    .Select(b => new
+                    {
+                        b.Id,
+                        b.Name,
+                        b.Icon
+                    })
+                    .ToDictionaryAsync(b => b.Id);
+
+                if (accessibleBeings.Count == 0)
+                    continue;
+
+                var entryBeingLinks = await dataContext.Entries
                     .AsNoTracking()
                     .Where(e => entryIdBatch.Contains(e.Id))
                     .SelectMany(
@@ -78,23 +98,24 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                         (e, b) => new
                         {
                             EntryId = e.Id,
-                            BeingId = b.Id,
-                            BeingName = b.Name,
-                            BeingIcon = b.Icon
+                            BeingId = b.Id
                         })
-                    .OrderBy(item => item.EntryId)
-                    .ThenBy(item => item.BeingName)
                     .ToListAsync();
 
-                foreach (var item in beings)
+                foreach (var item in entryBeingLinks
+                    .Where(item => accessibleBeings.ContainsKey(item.BeingId))
+                    .OrderBy(item => item.EntryId)
+                    .ThenBy(item => accessibleBeings[item.BeingId].Name))
                 {
                     if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
                         beingsByEntryId[item.EntryId] = entryBeings = [];
 
+                    var being = accessibleBeings[item.BeingId];
+
                     entryBeings.Add(new EntryBeingModel(
-                        Id: item.BeingId,
-                        Name: item.BeingName,
-                        Icon: item.BeingIcon
+                        Id: being.Id,
+                        Name: being.Name,
+                        Icon: being.Icon
                     ));
                 }
             }

@@ -56,7 +56,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .OrderByDescending(e => e.When)
                 .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"));
             
-            var (models, hasMore) = await entryMapper.MapAsync(dbQuery, offset);
+            var (models, hasMore) = await entryMapper.MapAsync(dbQuery, userId, connectedUsers, offset);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         }
     }

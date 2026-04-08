@@ -61,7 +61,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Where(e => e.When.Year == year)
                 .OrderByDescending(e => e.When);
 
-            var (models, _) = await entryMapper.MapAsync(query);
+            var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
             return Ok(models);
         }
 
@@ -83,7 +83,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 .Where(e => e.When.Year == year && e.When.Month == month)
                 .OrderByDescending(e => e.When);
                 
-            var (models, _) = await entryMapper.MapAsync(query);
+            var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers);
             return Ok(models);
         }
     }
