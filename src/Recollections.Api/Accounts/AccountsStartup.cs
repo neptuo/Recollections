@@ -48,7 +48,7 @@ namespace Neptuo.Recollections.Accounts
             services
                 .AddTransient<WebPush.WebPushClient>()
                 .AddTransient<PushNotificationSender>()
-                .AddHostedService<NewEntriesNotificationBackgroundService>();
+                .AddTransient<NewEntriesNotificationNotifier>();
 
             services
                 .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)

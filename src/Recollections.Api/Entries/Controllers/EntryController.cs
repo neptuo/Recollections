@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Accounts.Notifications;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -29,8 +30,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareDeleter shareDeleter;
         private readonly IUserNameProvider userNames;
         private readonly FreeLimitsChecker freeLimits;
+        private readonly NewEntriesNotificationNotifier notificationNotifier;
 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits, NewEntriesNotificationNotifier notificationNotifier)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
@@ -39,12 +41,14 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(shareDeleter, "shareDeleter");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(freeLimits, "freeLimits");
+            Ensure.NotNull(notificationNotifier, "notificationNotifier");
             this.db = db;
             this.imageService = imageService;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
             this.userNames = userNames;
             this.freeLimits = freeLimits;
+            this.notificationNotifier = notificationNotifier;
         }
 
         [HttpGet("{id}")]
@@ -90,6 +94,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             await db.Entries.AddAsync(entity);
             await db.SaveChangesAsync();
+            await notificationNotifier.NotifyEntriesAsync(new[] { entity.Id }, NewEntriesNotificationSnapshot.Empty, "entry-create");
 
             MapEntityToModel(entity, model);
             return CreatedAtAction(nameof(Get), new { id = entity.Id }, model);

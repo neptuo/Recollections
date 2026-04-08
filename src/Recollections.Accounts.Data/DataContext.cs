@@ -17,8 +17,8 @@ namespace Neptuo.Recollections.Accounts
         public DbSet<UserConnection> Connections { get; set; }
         public DbSet<UserNotificationSettings> NotificationSettings { get; set; }
         public DbSet<UserNotificationNewEntriesSettings> NotificationNewEntriesSettings { get; set; }
+        public DbSet<UserNotificationNewEntriesDispatch> NotificationNewEntriesDispatches { get; set; }
         public DbSet<UserNotificationPushSubscription> PushSubscriptions { get; set; }
-        public DbSet<NotificationDispatch> NotificationDispatches { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
             : base(options)
@@ -58,10 +58,6 @@ namespace Neptuo.Recollections.Accounts
                 .HasKey(p => p.UserId);
 
             modelBuilder.Entity<UserNotificationSettings>()
-                .Property(p => p.TimeZoneId)
-                .IsRequired();
-
-            modelBuilder.Entity<UserNotificationSettings>()
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId);
@@ -75,9 +71,34 @@ namespace Neptuo.Recollections.Accounts
                 .WithMany()
                 .HasForeignKey(p => p.UserId);
 
+            modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
+                .ToTable("UserNotificationNewEntriesDispatches")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
+                .Property(p => p.UserId)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
+                .Property(p => p.EntryId)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
+                .HasIndex(p => new { p.UserId, p.EntryId })
+                .IsUnique();
+
+            modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
             modelBuilder.Entity<UserNotificationPushSubscription>()
                 .ToTable("PushSubscriptions")
                 .HasKey(p => p.Id);
+
+            modelBuilder.Entity<UserNotificationPushSubscription>()
+                .Property(p => p.UserId)
+                .IsRequired();
 
             modelBuilder.Entity<UserNotificationPushSubscription>()
                 .Property(p => p.Endpoint)
@@ -96,19 +117,6 @@ namespace Neptuo.Recollections.Accounts
                 .IsUnique();
 
             modelBuilder.Entity<UserNotificationPushSubscription>()
-                .HasOne(p => p.User)
-                .WithMany()
-                .HasForeignKey(p => p.UserId);
-
-            modelBuilder.Entity<NotificationDispatch>()
-                .ToTable("NotificationDispatches")
-                .HasKey(p => p.Id);
-
-            modelBuilder.Entity<NotificationDispatch>()
-                .HasIndex(p => new { p.UserId, p.Kind, p.LocalDate })
-                .IsUnique();
-
-            modelBuilder.Entity<NotificationDispatch>()
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId);

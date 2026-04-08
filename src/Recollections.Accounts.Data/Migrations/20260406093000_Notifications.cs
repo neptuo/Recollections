@@ -12,30 +12,6 @@ namespace Neptuo.Recollections.Accounts.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "NotificationDispatches",
-                schema: Schema.Name,
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(maxLength: 36, nullable: false),
-                    Kind = table.Column<int>(nullable: false),
-                    LocalDate = table.Column<DateTime>(nullable: false),
-                    SentAt = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_NotificationDispatches", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_NotificationDispatches_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalSchema: Schema.Name,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "PushSubscriptions",
                 schema: Schema.Name,
                 columns: table => new
@@ -88,9 +64,7 @@ namespace Neptuo.Recollections.Accounts.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(maxLength: 36, nullable: false),
-                    IsEnabled = table.Column<bool>(nullable: false),
-                    TimeZoneId = table.Column<string>(nullable: false),
-                    PreferredHour = table.Column<int>(nullable: false)
+                    IsEnabled = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,13 +77,6 @@ namespace Neptuo.Recollections.Accounts.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_NotificationDispatches_UserId_Kind_LocalDate",
-                table: "NotificationDispatches",
-                schema: Schema.Name,
-                columns: new[] { "UserId", "Kind", "LocalDate" },
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PushSubscriptions_Endpoint",
@@ -127,10 +94,6 @@ namespace Neptuo.Recollections.Accounts.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "NotificationDispatches",
-                schema: Schema.Name);
-
             migrationBuilder.DropTable(
                 name: "PushSubscriptions",
                 schema: Schema.Name);

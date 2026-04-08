@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Accounts.Notifications;
 using Neptuo.Recollections.Entries;
 using DataContext = Neptuo.Recollections.Entries.DataContext;
 
@@ -15,15 +16,18 @@ public class ShareCreator
     private readonly DataContext db;
     private readonly IUserNameProvider userNames;
     private readonly IConnectionProvider connections;
+    private readonly NewEntriesNotificationNotifier notificationNotifier;
 
-    public ShareCreator(DataContext db, IUserNameProvider userNames, IConnectionProvider connections)
+    public ShareCreator(DataContext db, IUserNameProvider userNames, IConnectionProvider connections, NewEntriesNotificationNotifier notificationNotifier)
     {
         Ensure.NotNull(db, "db");
         Ensure.NotNull(userNames, "userNames");
         Ensure.NotNull(connections, "connections");
+        Ensure.NotNull(notificationNotifier, "notificationNotifier");
         this.db = db;
         this.userNames = userNames;
         this.connections = connections;
+        this.notificationNotifier = notificationNotifier;
     }
 
     private async Task<bool> SaveAsync<TEntity, TShare>(TEntity entity, Func<string, IQueryable<TShare>> findQuery, Func<string, TShare> entityFactory, ShareRootModel model)
@@ -81,6 +85,8 @@ public class ShareCreator
 
     public async Task<bool> SaveEntryAsync(Entry entry, ShareRootModel model)
     {
+        NewEntriesNotificationSnapshot beforeSnapshot = await notificationNotifier.CaptureEntriesAsync(entry.Id);
+
         // Ensure story owner has co-owner permission to entry.
         if (entry.Story != null && entry.UserId != entry.Story.UserId)
         {
@@ -107,12 +113,17 @@ public class ShareCreator
             }
         }
 
-        return await SaveAsync(
+        bool isSaved = await SaveAsync(
             entry,
             userId => db.EntryShares.Where(s => s.EntryId == entry.Id && s.UserId == userId),
             userId => new EntryShare(entry.Id, userId),
             model
         );
+
+        if (isSaved)
+            await notificationNotifier.NotifyEntriesAsync(new[] { entry.Id }, beforeSnapshot, "entry-sharing");
+
+        return isSaved;
     }
 
     public async Task<bool> SaveStoryAsync(Story story, ShareRootModel model)
@@ -133,12 +144,19 @@ public class ShareCreator
             }
         }
 
-        return await SaveAsync(
+        NewEntriesNotificationSnapshot beforeSnapshot = await notificationNotifier.CaptureStoryAsync(story.Id);
+
+        bool isSaved = await SaveAsync(
             story,
             userId => db.StoryShares.Where(s => s.StoryId == story.Id && s.UserId == userId),
             userId => new StoryShare(story.Id, userId),
             model
         );
+
+        if (isSaved)
+            await notificationNotifier.NotifyStoryAsync(story.Id, beforeSnapshot, "story-sharing");
+
+        return isSaved;
     }
 
     public async Task<bool> SaveBeingAsync(Being being, ShareRootModel model)
@@ -165,24 +183,40 @@ public class ShareCreator
             }
         }
 
-        return await SaveAsync(
+        NewEntriesNotificationSnapshot beforeSnapshot = await notificationNotifier.CaptureBeingAsync(being.Id);
+
+        bool isSaved = await SaveAsync(
             being,
             userId => db.BeingShares.Where(s => s.BeingId == being.Id && s.UserId == userId),
             userId => new BeingShare(being.Id, userId),
             model
         );
+
+        if (isSaved)
+            await notificationNotifier.NotifyBeingAsync(being.Id, beforeSnapshot, "being-sharing");
+
+        return isSaved;
     }
 
     public async Task<bool> CreateBeingAsync(string beingId, string userName, Permission permission)
         => await CreateBeingAsync(await db.Beings.SingleAsync(b => b.Id == beingId), new ShareModel(userName, permission));
 
     public Task<bool> CreateBeingAsync(Being being, ShareModel model)
+        => CreateBeingWithNotificationsAsync(being, model);
+
+    private async Task<bool> CreateBeingWithNotificationsAsync(Being being, ShareModel model)
     {
-        return CreateAsync(
+        NewEntriesNotificationSnapshot beforeSnapshot = await notificationNotifier.CaptureBeingAsync(being.Id);
+        bool isSaved = await CreateAsync(
             model,
             userId => db.BeingShares.Where(s => s.BeingId == being.Id && s.UserId == userId),
             () => new BeingShare(being.Id)
         );
+
+        if (isSaved)
+            await notificationNotifier.NotifyBeingAsync(being.Id, beforeSnapshot, "being-share-create");
+
+        return isSaved;
     }
 
     private async Task<bool> CreateAsync<T>(ShareModel model, Func<string, IQueryable<T>> findQuery, Func<T> entityFactory)

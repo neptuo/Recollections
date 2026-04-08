@@ -50,9 +50,6 @@ public partial class Notifications
     {
         await RunBusyAsync(async () =>
         {
-            if (String.IsNullOrWhiteSpace(Model.TimeZoneId))
-                Model.TimeZoneId = await PushInterop.GetTimeZoneAsync();
-
             await Api.SetNotificationSettingsAsync(Model);
             Model = await Api.GetNotificationSettingsAsync();
             StatusMessage = "Notification settings saved.";
@@ -60,18 +57,12 @@ public partial class Notifications
         });
     }
 
-    protected Task UseBrowserTimeZoneAsync()
-        => RunBusyAsync(async () => Model.TimeZoneId = await PushInterop.GetTimeZoneAsync());
-
     protected async Task SubscribeAsync()
     {
         await RunBusyAsync(async () =>
         {
             if (String.IsNullOrWhiteSpace(Model.PushPublicKey))
                 throw new InvalidOperationException("Push notifications are not configured on the server yet.");
-
-            if (String.IsNullOrWhiteSpace(Model.TimeZoneId))
-                Model.TimeZoneId = await PushInterop.GetTimeZoneAsync();
 
             Model.IsEnabled = true;
             Model.NewEntries.IsEnabled = true;
@@ -108,9 +99,6 @@ public partial class Notifications
 
         Model = await Api.GetNotificationSettingsAsync();
         await RefreshBrowserStateAsync();
-
-        if (String.IsNullOrWhiteSpace(Model.TimeZoneId))
-            Model.TimeZoneId = await PushInterop.GetTimeZoneAsync();
 
         IsLoading = false;
     }

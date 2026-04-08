@@ -13,13 +13,5 @@ namespace Neptuo.Recollections.Accounts
         public string UserId { get; set; }
 
         public bool IsEnabled { get; set; }
-        public string TimeZoneId { get; set; }
-        public int PreferredHour { get; set; }
-
-        public UserNotificationSettings()
-        {
-            TimeZoneId = "UTC";
-            PreferredHour = 8;
-        }
     }
 }

@@ -49,20 +49,41 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
         private async Task<int> SendAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, NotificationPayload payload)
         {
-            if (!IsConfigured)
+            bool hasSubject = !String.IsNullOrWhiteSpace(options.Subject);
+            bool hasPublicKey = !String.IsNullOrWhiteSpace(options.PublicKey);
+            bool hasPrivateKey = !String.IsNullOrWhiteSpace(options.PrivateKey);
+            if (!hasSubject || !hasPublicKey || !hasPrivateKey)
             {
-                log.LogWarning("Push notifications are not configured because the VAPID keys or subject are missing.");
+                log.LogWarning(
+                    "Push notifications are not configured because the VAPID keys or subject are missing. Subject configured: {HasSubject}, public key configured: {HasPublicKey}, private key configured: {HasPrivateKey}.",
+                    hasSubject,
+                    hasPublicKey,
+                    hasPrivateKey
+                );
                 return 0;
             }
+
+            List<UserNotificationPushSubscription> activeSubscriptions = subscriptions
+                .Where(s => s.RevokedAt == null)
+                .ToList();
 
             int deliveredCount = 0;
             string rawPayload = JsonSerializer.Serialize(payload, serializerOptions);
             VapidDetails vapidDetails = new VapidDetails(options.Subject, options.PublicKey, options.PrivateKey);
 
-            foreach (var subscriptionModel in subscriptions.Where(s => s.RevokedAt == null))
+            log.LogDebug(
+                "Sending push notification '{Tag}' to {SubscriptionCount} active subscription(s).",
+                payload.Tag,
+                activeSubscriptions.Count
+            );
+
+            foreach (var subscriptionModel in activeSubscriptions)
             {
+                string endpoint = DescribeEndpoint(subscriptionModel.Endpoint);
                 try
                 {
+                    log.LogDebug("Delivering push notification '{Tag}' to '{Endpoint}'.", payload.Tag, endpoint);
+
                     PushSubscription subscription = new PushSubscription(
                         subscriptionModel.Endpoint,
                         subscriptionModel.P256dh,
@@ -71,19 +92,38 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
                     await client.SendNotificationAsync(subscription, rawPayload, vapidDetails);
                     deliveredCount++;
+                    log.LogDebug("Push notification '{Tag}' delivered to '{Endpoint}'.", payload.Tag, endpoint);
                 }
                 catch (WebPushException ex) when (ex.StatusCode == HttpStatusCode.Gone || ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    log.LogInformation(ex, "Revoking stale push subscription '{Endpoint}'.", subscriptionModel.Endpoint);
+                    log.LogInformation(ex, "Revoking stale push subscription '{Endpoint}' for notification '{Tag}'.", endpoint, payload.Tag);
                     subscriptionModel.RevokedAt = DateTime.Now;
                 }
                 catch (WebPushException ex)
                 {
-                    log.LogError(ex, "Failed to deliver push notification to '{Endpoint}'.", subscriptionModel.Endpoint);
+                    log.LogError(ex, "Failed to deliver push notification '{Tag}' to '{Endpoint}' with status code '{StatusCode}'.", payload.Tag, endpoint, ex.StatusCode);
                 }
             }
 
+            log.LogDebug(
+                "Push notification '{Tag}' delivery finished. Delivered to {DeliveredCount} of {SubscriptionCount} active subscription(s).",
+                payload.Tag,
+                deliveredCount,
+                activeSubscriptions.Count
+            );
+
             return deliveredCount;
+        }
+
+        private static string DescribeEndpoint(string endpoint)
+        {
+            if (String.IsNullOrWhiteSpace(endpoint))
+                return "<empty>";
+
+            if (Uri.TryCreate(endpoint, UriKind.Absolute, out Uri uri))
+                return $"{uri.Host}{uri.AbsolutePath}";
+
+            return endpoint;
         }
 
         private record NotificationPayload(string Title, string Body, string Url, string Tag);

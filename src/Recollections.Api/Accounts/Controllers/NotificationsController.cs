@@ -59,9 +59,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            if (model.PreferredHour < 0 || model.PreferredHour > 23)
-                return BadRequest();
-
             UserNotificationSettings settings = await db.NotificationSettings
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
@@ -75,8 +72,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
             }
 
             settings.IsEnabled = model.IsEnabled;
-            settings.TimeZoneId = String.IsNullOrWhiteSpace(model.TimeZoneId) ? GetDefaultTimeZoneId() : model.TimeZoneId.Trim();
-            settings.PreferredHour = NormalizePreferredHour(model.PreferredHour);
 
             UserNotificationNewEntriesSettings newEntries = await db.NotificationNewEntriesSettings
                 .FirstOrDefaultAsync(s => s.UserId == userId);
@@ -112,11 +107,14 @@ namespace Neptuo.Recollections.Accounts.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            if (String.IsNullOrWhiteSpace(model.Endpoint) || String.IsNullOrWhiteSpace(model.P256dh) || String.IsNullOrWhiteSpace(model.Auth))
+            string endpoint = model.Endpoint?.Trim();
+            string p256dh = model.P256dh?.Trim();
+            string auth = model.Auth?.Trim();
+            if (String.IsNullOrWhiteSpace(endpoint) || String.IsNullOrWhiteSpace(p256dh) || String.IsNullOrWhiteSpace(auth))
                 return BadRequest();
 
             UserNotificationPushSubscription entity = await db.PushSubscriptions
-                .FirstOrDefaultAsync(s => s.Endpoint == model.Endpoint);
+                .FirstOrDefaultAsync(s => s.Endpoint == endpoint);
 
             if (entity == null)
             {
@@ -128,9 +126,9 @@ namespace Neptuo.Recollections.Accounts.Controllers
             }
 
             entity.UserId = userId;
-            entity.Endpoint = model.Endpoint.Trim();
-            entity.P256dh = model.P256dh.Trim();
-            entity.Auth = model.Auth.Trim();
+            entity.Endpoint = endpoint;
+            entity.P256dh = p256dh;
+            entity.Auth = auth;
             entity.LastSeenAt = DateTime.Now;
             entity.RevokedAt = null;
 
@@ -150,11 +148,12 @@ namespace Neptuo.Recollections.Accounts.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            if (String.IsNullOrWhiteSpace(model.Endpoint))
+            string endpoint = model.Endpoint?.Trim();
+            if (String.IsNullOrWhiteSpace(endpoint))
                 return BadRequest();
 
             UserNotificationPushSubscription entity = await db.PushSubscriptions
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.Endpoint == model.Endpoint);
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.Endpoint == endpoint);
 
             if (entity != null)
             {
@@ -171,8 +170,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
             return new UserNotificationSettingsModel()
             {
                 IsEnabled = settings?.IsEnabled == true,
-                TimeZoneId = settings?.TimeZoneId ?? GetDefaultTimeZoneId(),
-                PreferredHour = NormalizePreferredHour(settings?.PreferredHour ?? options.DefaultPreferredHour),
                 HasSubscription = hasSubscription,
                 PushPublicKey = options.PublicKey,
                 NewEntries = new UserNotificationNewEntriesSettingsModel()
@@ -181,11 +178,5 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 }
             };
         }
-
-        private string GetDefaultTimeZoneId()
-            => String.IsNullOrWhiteSpace(options.DefaultTimeZoneId) ? "UTC" : options.DefaultTimeZoneId;
-
-        private static int NormalizePreferredHour(int preferredHour)
-            => Math.Max(0, Math.Min(23, preferredHour));
     }
 }
