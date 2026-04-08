@@ -70,13 +70,15 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             var beings = await dataContext.Entries
                 .AsNoTracking()
                 .Where(e => entryIdsWithBeings.Contains(e.Id))
-                .SelectMany(e => e.Beings.Select(b => new
-                {
-                    EntryId = e.Id,
-                    BeingId = b.Id,
-                    BeingName = b.Name,
-                    BeingIcon = b.Icon
-                }))
+                .SelectMany(
+                    e => e.Beings,
+                    (e, b) => new
+                    {
+                        EntryId = e.Id,
+                        BeingId = b.Id,
+                        BeingName = b.Name,
+                        BeingIcon = b.Icon
+                    })
                 .OrderBy(item => item.EntryId)
                 .ThenBy(item => item.BeingName)
                 .ToListAsync();
