@@ -11,6 +11,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
 {
     private const int PageSize = 10;
     private const int MaxPageSize = PageSize * 100;
+    private const int QueryBatchSize = 250;
     private const int PreviewMediaCount = 3;
     private IUserNameProvider userNames = userNames;
 
@@ -67,32 +68,35 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
 
         if (entryIdsWithBeings.Count > 0)
         {
-            var beings = await dataContext.Entries
-                .AsNoTracking()
-                .Where(e => entryIdsWithBeings.Contains(e.Id))
-                .SelectMany(
-                    e => e.Beings,
-                    (e, b) => new
-                    {
-                        EntryId = e.Id,
-                        BeingId = b.Id,
-                        BeingName = b.Name,
-                        BeingIcon = b.Icon
-                    })
-                .OrderBy(item => item.EntryId)
-                .ThenBy(item => item.BeingName)
-                .ToListAsync();
-
-            foreach (var item in beings)
+            foreach (List<string> entryIdBatch in Batch(entryIdsWithBeings, QueryBatchSize))
             {
-                if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
-                    beingsByEntryId[item.EntryId] = entryBeings = [];
+                var beings = await dataContext.Entries
+                    .AsNoTracking()
+                    .Where(e => entryIdBatch.Contains(e.Id))
+                    .SelectMany(
+                        e => e.Beings,
+                        (e, b) => new
+                        {
+                            EntryId = e.Id,
+                            BeingId = b.Id,
+                            BeingName = b.Name,
+                            BeingIcon = b.Icon
+                        })
+                    .OrderBy(item => item.EntryId)
+                    .ThenBy(item => item.BeingName)
+                    .ToListAsync();
 
-                entryBeings.Add(new EntryBeingModel(
-                    Id: item.BeingId,
-                    Name: item.BeingName,
-                    Icon: item.BeingIcon
-                ));
+                foreach (var item in beings)
+                {
+                    if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
+                        beingsByEntryId[item.EntryId] = entryBeings = [];
+
+                    entryBeings.Add(new EntryBeingModel(
+                        Id: item.BeingId,
+                        Name: item.BeingName,
+                        Icon: item.BeingIcon
+                    ));
+                }
             }
         }
 
@@ -134,5 +138,11 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                 ? media
                 : []
         }).ToList(), normalizedPageSize != null && result.Count == normalizedPageSize.Value);
+    }
+
+    private static IEnumerable<List<string>> Batch(List<string> values, int size)
+    {
+        for (int i = 0; i < values.Count; i += size)
+            yield return values.Skip(i).Take(size).ToList();
     }
 }

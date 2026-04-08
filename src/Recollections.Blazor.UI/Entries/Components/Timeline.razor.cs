@@ -192,6 +192,10 @@ namespace Neptuo.Recollections.Entries.Components
                     await InvokeAsync(StateHasChanged);
                 }
             }
+            catch (Exception ex)
+            {
+                Log.Info($"Unable to load full media for entry '{entry.Id}': {ex}");
+            }
             finally
             {
                 galleryMediaLoading.Remove(entry.Id);
