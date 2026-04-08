@@ -71,14 +71,18 @@ public class TimelineFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
     }
 
     [Fact]
-    public async Task Timeline_UserA_SeesOwnEntries()
+    public async Task Timeline_UserA_SeesOwnAndConnectedEntries()
     {
         var client = factory.CreateClientForUser(UserAId, UserAName);
         var entryIds = await GetTimelineEntryIdsAsync(client);
 
+        // A sees own entries
         Assert.Contains(EntryOwnedByA, entryIds);
         Assert.Contains(EntrySharedWithB, entryIds);
         Assert.Contains(EntryPrivateA, entryIds);
+
+        // A also sees B's inherited entry (bidirectional connection, B grants Read to A)
+        Assert.Contains(EntryOwnedByB, entryIds);
     }
 
     [Fact]

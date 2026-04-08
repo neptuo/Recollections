@@ -1,4 +1,5 @@
 using System.Net;
+using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using Neptuo.Recollections.Tests.Infrastructure;
 using Xunit;
@@ -60,30 +61,43 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 
+    private async Task<AuthorizedModel<StoryModel>> GetStoryAsync(HttpClient client, string storyId)
+    {
+        var response = await client.GetAsync($"/api/stories/{storyId}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        return await response.ReadJsonAsync<AuthorizedModel<StoryModel>>();
+    }
+
     // ===== Inherited story =====
 
     [Fact]
-    public async Task InheritedStory_AsOwner_ReturnsOk()
+    public async Task InheritedStory_AsOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(OwnerUserId, OwnerUserName);
-        var response = await client.GetAsync($"/api/stories/{InheritedStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, InheritedStoryId);
+
+        Assert.Equal(InheritedStoryId, result.Model.Id);
+        Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
     [Fact]
-    public async Task InheritedStory_AsConnectedReader_ReturnsOk()
+    public async Task InheritedStory_AsConnectedReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var response = await client.GetAsync($"/api/stories/{InheritedStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, InheritedStoryId);
+
+        Assert.Equal(InheritedStoryId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
-    public async Task InheritedStory_AsConnectedCoOwner_ReturnsOk()
+    public async Task InheritedStory_AsConnectedCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var response = await client.GetAsync($"/api/stories/{InheritedStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, InheritedStoryId);
+
+        Assert.Equal(InheritedStoryId, result.Model.Id);
+        Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
     [Fact]
@@ -114,19 +128,23 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     // ===== Explicit story =====
 
     [Fact]
-    public async Task ExplicitStory_AsExplicitReader_ReturnsOk()
+    public async Task ExplicitStory_AsExplicitReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var response = await client.GetAsync($"/api/stories/{ExplicitStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, ExplicitStoryId);
+
+        Assert.Equal(ExplicitStoryId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
-    public async Task ExplicitStory_AsExplicitCoOwner_ReturnsOk()
+    public async Task ExplicitStory_AsExplicitCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var response = await client.GetAsync($"/api/stories/{ExplicitStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, ExplicitStoryId);
+
+        Assert.Equal(ExplicitStoryId, result.Model.Id);
+        Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
     [Fact]
@@ -140,18 +158,22 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     // ===== Public story =====
 
     [Fact]
-    public async Task PublicStory_AsAnonymous_ReturnsOk()
+    public async Task PublicStory_AsAnonymous_ReturnsReadPermission()
     {
         var client = factory.CreateAnonymousClient();
-        var response = await client.GetAsync($"/api/stories/{PublicStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, PublicStoryId);
+
+        Assert.Equal(PublicStoryId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
-    public async Task PublicStory_AsStranger_ReturnsOk()
+    public async Task PublicStory_AsStranger_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(StrangerUserId, StrangerUserName);
-        var response = await client.GetAsync($"/api/stories/{PublicStoryId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetStoryAsync(client, PublicStoryId);
+
+        Assert.Equal(PublicStoryId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 }

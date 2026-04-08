@@ -1,4 +1,5 @@
 using System.Net;
+using Neptuo.Recollections.Entries.Beings;
 using Neptuo.Recollections.Sharing;
 using Neptuo.Recollections.Tests.Infrastructure;
 using Xunit;
@@ -66,23 +67,34 @@ public class BeingAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 
+    private async Task<AuthorizedModel<BeingModel>> GetBeingAsync(HttpClient client, string beingId)
+    {
+        var response = await client.GetAsync($"/api/beings/{beingId}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        return await response.ReadJsonAsync<AuthorizedModel<BeingModel>>();
+    }
+
     // ===== User being (profile) =====
 
     [Fact]
-    public async Task UserBeing_AsOwner_ReturnsOk()
+    public async Task UserBeing_AsOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(OwnerUserId, OwnerUserName);
-        var response = await client.GetAsync($"/api/beings/{UserBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, UserBeingId);
+
+        Assert.Equal(UserBeingId, result.Model.Id);
+        Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
     [Fact]
-    public async Task UserBeing_AsConnectedReader_ReturnsOk()
+    public async Task UserBeing_AsConnectedReader_ReturnsReadPermission()
     {
         // User being has explicit BeingShare for reader (auto-created on connection)
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var response = await client.GetAsync($"/api/beings/{UserBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, UserBeingId);
+
+        Assert.Equal(UserBeingId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
@@ -96,19 +108,23 @@ public class BeingAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     // ===== Inherited being =====
 
     [Fact]
-    public async Task InheritedBeing_AsOwner_ReturnsOk()
+    public async Task InheritedBeing_AsOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(OwnerUserId, OwnerUserName);
-        var response = await client.GetAsync($"/api/beings/{InheritedBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, InheritedBeingId);
+
+        Assert.Equal(InheritedBeingId, result.Model.Id);
+        Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
     [Fact]
-    public async Task InheritedBeing_AsConnectedReader_ReturnsOk()
+    public async Task InheritedBeing_AsConnectedReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var response = await client.GetAsync($"/api/beings/{InheritedBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, InheritedBeingId);
+
+        Assert.Equal(InheritedBeingId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
@@ -130,19 +146,23 @@ public class BeingAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     // ===== Explicit being =====
 
     [Fact]
-    public async Task ExplicitBeing_AsExplicitReader_ReturnsOk()
+    public async Task ExplicitBeing_AsExplicitReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var response = await client.GetAsync($"/api/beings/{ExplicitBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, ExplicitBeingId);
+
+        Assert.Equal(ExplicitBeingId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
-    public async Task ExplicitBeing_AsExplicitCoOwner_ReturnsOk()
+    public async Task ExplicitBeing_AsExplicitCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var response = await client.GetAsync($"/api/beings/{ExplicitBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, ExplicitBeingId);
+
+        Assert.Equal(ExplicitBeingId, result.Model.Id);
+        Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
     [Fact]
@@ -165,18 +185,22 @@ public class BeingAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     // ===== Public being =====
 
     [Fact]
-    public async Task PublicBeing_AsAnonymous_ReturnsOk()
+    public async Task PublicBeing_AsAnonymous_ReturnsReadPermission()
     {
         var client = factory.CreateAnonymousClient();
-        var response = await client.GetAsync($"/api/beings/{PublicBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, PublicBeingId);
+
+        Assert.Equal(PublicBeingId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 
     [Fact]
-    public async Task PublicBeing_AsStranger_ReturnsOk()
+    public async Task PublicBeing_AsStranger_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(StrangerUserId, StrangerUserName);
-        var response = await client.GetAsync($"/api/beings/{PublicBeingId}");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = await GetBeingAsync(client, PublicBeingId);
+
+        Assert.Equal(PublicBeingId, result.Model.Id);
+        Assert.Equal(Permission.Read, result.UserPermission);
     }
 }
