@@ -15,13 +15,14 @@ namespace Neptuo.Recollections.Components
         public string Type { get; set; }
 
         public string Title { get; set; }
+        public string SizeText { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
 
         public string ContentType { get; set; }
 
         public override int GetHashCode()
-            => HashCode.Combine(Type, Title, Width, Height, ContentType);
+            => HashCode.Combine(Type, Title, SizeText, Width, Height, ContentType);
 
         public override bool Equals(object obj)
             => (obj is GalleryModel other) && Equals(other);
@@ -29,6 +30,7 @@ namespace Neptuo.Recollections.Components
         public bool Equals(GalleryModel other)
             => Type == other.Type
                 && Title == other.Title
+                && SizeText == other.SizeText
                 && Width == other.Width
                 && Height == other.Height
                 && ContentType == other.ContentType;

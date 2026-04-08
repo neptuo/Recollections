@@ -27,10 +27,21 @@
             <div class="datetime">
                 <InlineDateEdit Value="@Model.When" ValueChanged="@(async value => await SaveWhenAsync(value))" Format="@UiOptions.DateFormat" IsTimeSelection="true" />
             </div>
-            @if (Model.Duration != null)
+            @if (Model.Duration != null || Model.OriginalSize != null)
             {
-                <div class="duration">
-                    <InlineLink Value="@TimeSpan.FromSeconds(Model.Duration.Value).ToString(@"hh\:mm\:ss")" Icon="stopwatch" />
+                <div class="d-flex flex-wrap gap-3">
+                    @if (Model.Duration != null)
+                    {
+                        <div class="duration">
+                            <InlineLink Value="@TimeSpan.FromSeconds(Model.Duration.Value).ToString(@"hh\:mm\:ss")" Icon="stopwatch" />
+                        </div>
+                    }
+                    @if (Model.OriginalSize != null)
+                    {
+                        <div class="duration">
+                            <InlineLink Value="@($"Original size: {Utils.FileSizeText(Model.OriginalSize)}")" Icon="download" />
+                        </div>
+                    }
                 </div>
             }
             <UserInformation Owner="@Owner" />
