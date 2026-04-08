@@ -52,7 +52,6 @@ internal sealed class VideoSizeBackfill
 
             long size = await GetLengthAsync(content);
             video.OriginalSize = size;
-            entries.Videos.Update(video);
             Console.WriteLine($"Video '{video.Id}' updated to {size} bytes.");
         }
 
@@ -95,7 +94,7 @@ internal sealed class VideoSizeBackfill
     private static DbContextOptions<T> DbContextOptions<T>(string connectionString, string schema)
         where T : DbContext
     {
-        if (connectionString.StartsWith("Filename"))
+        if (connectionString.StartsWith("Filename", StringComparison.OrdinalIgnoreCase))
         {
             var builder = new DbContextOptionsBuilder<T>()
                 .UseSqlite(connectionString);
