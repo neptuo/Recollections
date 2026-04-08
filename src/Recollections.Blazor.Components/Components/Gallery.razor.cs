@@ -82,7 +82,7 @@ namespace Neptuo.Recollections.Components
         public Task<bool> IsOpenAsync()
             => Interop.IsOpenAsync();
 
-        public async ValueTask DisposeAsync() 
-            => await Interop.CloseAsync();
+        public async ValueTask DisposeAsync()
+            => await Interop.DisposeAsync();
     }
 }
