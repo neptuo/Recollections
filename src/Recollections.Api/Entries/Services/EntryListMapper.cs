@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
-using Neptuo.Recollections.Sharing;
 
 namespace Neptuo.Recollections.Entries;
 
-public class EntryListMapper(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus, EntryMediaMapper entryMediaMapper)
+public class EntryListMapper(DataContext dataContext, IUserNameProvider userNames, EntryMediaMapper entryMediaMapper)
 {
     private const int PageSize = 10;
     private const int MaxPageSize = PageSize * 100;
@@ -68,20 +67,18 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
 
         if (entryIdsWithBeings.Count > 0)
         {
-            var beings = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
+            var beings = await dataContext.Entries
+                .AsNoTracking()
                 .Where(e => entryIdsWithBeings.Contains(e.Id))
                 .SelectMany(e => e.Beings.Select(b => new
                 {
                     EntryId = e.Id,
-                    Being = new EntryBeingModel(
-                        Id: b.Id,
-                        Name: b.Name,
-                        Icon: b.Icon
-                    )
+                    BeingId = b.Id,
+                    BeingName = b.Name,
+                    BeingIcon = b.Icon
                 }))
                 .OrderBy(item => item.EntryId)
-                .ThenBy(item => item.Being.Name)
+                .ThenBy(item => item.BeingName)
                 .ToListAsync();
 
             foreach (var item in beings)
@@ -89,7 +86,11 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                 if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
                     beingsByEntryId[item.EntryId] = entryBeings = [];
 
-                entryBeings.Add(item.Being);
+                entryBeings.Add(new EntryBeingModel(
+                    Id: item.BeingId,
+                    Name: item.BeingName,
+                    Icon: item.BeingIcon
+                ));
             }
         }
 
