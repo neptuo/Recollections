@@ -12,7 +12,7 @@ public static class DatabaseSeeder
     /// Creates an Identity user in the Accounts database.
     /// Does NOT create the user's Being (profile) — use <see cref="SeedUserBeing"/> for that.
     /// </summary>
-    public static async Task SeedUser(AccountsDataContext db, string userId, string userName)
+    public static async Task SeedUser(AccountsDataContext db, string userId, string userName, bool isPremium = true)
     {
         db.Users.Add(new User(userName)
         {
@@ -20,7 +20,7 @@ public static class DatabaseSeeder
             NormalizedUserName = userName.ToUpperInvariant(),
             Email = $"{userName}@test.local",
             NormalizedEmail = $"{userName}@test.local".ToUpperInvariant(),
-            EmailConfirmed = true,
+            EmailConfirmed = isPremium,
             SecurityStamp = Guid.NewGuid().ToString("N"),
         });
         await db.SaveChangesAsync();
@@ -60,15 +60,26 @@ public static class DatabaseSeeder
         await db.SaveChangesAsync();
     }
 
-    public static async Task<Entry> SeedEntry(EntriesDataContext db, string entryId, string userId, bool isSharingInherited = true, Story story = null, StoryChapter chapter = null)
+    public static async Task<Entry> SeedEntry(
+        EntriesDataContext db,
+        string entryId,
+        string userId,
+        bool isSharingInherited = true,
+        Story story = null,
+        StoryChapter chapter = null,
+        string title = null,
+        string text = null,
+        DateTime? when = null)
     {
+        var entryWhen = when ?? DateTime.UtcNow;
         var entry = new Entry
         {
             Id = entryId,
             UserId = userId,
-            Title = $"Entry {entryId}",
-            When = DateTime.UtcNow,
-            Created = DateTime.UtcNow,
+            Title = title ?? $"Entry {entryId}",
+            Text = text,
+            When = entryWhen,
+            Created = entryWhen,
             IsSharingInherited = isSharingInherited,
             Story = story,
             Chapter = chapter,
@@ -93,6 +104,21 @@ public static class DatabaseSeeder
         return story;
     }
 
+    public static async Task<StoryChapter> SeedChapter(EntriesDataContext db, string chapterId, Story story, string title = null, int order = 1)
+    {
+        var chapter = new StoryChapter
+        {
+            Id = chapterId,
+            Story = story,
+            Order = order,
+            Title = title ?? $"Chapter {chapterId}",
+            Created = DateTime.UtcNow,
+        };
+        db.Add(chapter);
+        await db.SaveChangesAsync();
+        return chapter;
+    }
+
     public static async Task<Being> SeedBeing(EntriesDataContext db, string beingId, string userId, bool isSharingInherited = false)
     {
         var being = new Being
@@ -106,6 +132,52 @@ public static class DatabaseSeeder
         db.Beings.Add(being);
         await db.SaveChangesAsync();
         return being;
+    }
+
+    public static async Task SeedEntryLocation(EntriesDataContext db, Entry entry, double latitude, double longitude, double? altitude = null)
+    {
+        entry.Locations.Add(new OrderedLocation
+        {
+            Order = entry.Locations.Count,
+            Latitude = latitude,
+            Longitude = longitude,
+            Altitude = altitude,
+        });
+        await db.SaveChangesAsync();
+    }
+
+    public static async Task<Image> SeedImage(
+        EntriesDataContext db,
+        string imageId,
+        Entry entry,
+        string name = null,
+        DateTime? when = null,
+        double? latitude = null,
+        double? longitude = null,
+        double? altitude = null)
+    {
+        var image = new Image
+        {
+            Id = imageId,
+            Entry = entry,
+            Name = name ?? $"Image {imageId}",
+            FileName = $"{imageId}.jpg",
+            Created = when ?? entry.When,
+            When = when ?? entry.When,
+            OriginalWidth = 1200,
+            OriginalHeight = 800,
+            Location = latitude != null && longitude != null
+                ? new MediaLocation
+                {
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    Altitude = altitude,
+                }
+                : null,
+        };
+        db.Images.Add(image);
+        await db.SaveChangesAsync();
+        return image;
     }
 
     public static async Task SeedEntryShare(EntriesDataContext db, string entryId, string userId, Permission permission)

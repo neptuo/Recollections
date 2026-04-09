@@ -61,11 +61,16 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private async Task<AuthorizedModel<StoryModel>> GetStoryAsync(HttpClient client, string storyId)
+    private async Task<AuthorizedModel<StoryModel>> GetStoryAsync(HttpClient client, string storyId, params string[] forbiddenStoryIds)
     {
         var response = await client.GetAsync($"/api/stories/{storyId}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return await response.ReadJsonAsync<AuthorizedModel<StoryModel>>();
+        var result = await response.ReadJsonAsync<AuthorizedModel<StoryModel>>();
+        Assert.Equal(storyId, result.Model.Id);
+        foreach (var forbiddenStoryId in forbiddenStoryIds)
+            Assert.NotEqual(forbiddenStoryId, result.Model.Id);
+
+        return result;
     }
 
     // ===== Inherited story =====
@@ -74,9 +79,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedStory_AsOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(OwnerUserId, OwnerUserName);
-        var result = await GetStoryAsync(client, InheritedStoryId);
-
-        Assert.Equal(InheritedStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, InheritedStoryId, ExplicitStoryId, PublicStoryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
@@ -84,9 +87,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedStory_AsConnectedReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var result = await GetStoryAsync(client, InheritedStoryId);
-
-        Assert.Equal(InheritedStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, InheritedStoryId, ExplicitStoryId, PublicStoryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -94,9 +95,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedStory_AsConnectedCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var result = await GetStoryAsync(client, InheritedStoryId);
-
-        Assert.Equal(InheritedStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, InheritedStoryId, ExplicitStoryId, PublicStoryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
@@ -131,9 +130,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task ExplicitStory_AsExplicitReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var result = await GetStoryAsync(client, ExplicitStoryId);
-
-        Assert.Equal(ExplicitStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, ExplicitStoryId, InheritedStoryId, PublicStoryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -141,9 +138,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task ExplicitStory_AsExplicitCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var result = await GetStoryAsync(client, ExplicitStoryId);
-
-        Assert.Equal(ExplicitStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, ExplicitStoryId, InheritedStoryId, PublicStoryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
@@ -161,9 +156,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task PublicStory_AsAnonymous_ReturnsReadPermission()
     {
         var client = factory.CreateAnonymousClient();
-        var result = await GetStoryAsync(client, PublicStoryId);
-
-        Assert.Equal(PublicStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, PublicStoryId, InheritedStoryId, ExplicitStoryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -171,9 +164,7 @@ public class StoryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task PublicStory_AsStranger_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(StrangerUserId, StrangerUserName);
-        var result = await GetStoryAsync(client, PublicStoryId);
-
-        Assert.Equal(PublicStoryId, result.Model.Id);
+        var result = await GetStoryAsync(client, PublicStoryId, InheritedStoryId, ExplicitStoryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 }

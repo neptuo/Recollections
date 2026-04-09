@@ -24,6 +24,7 @@ public class TimelineFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     // UserB's entry
     private const string EntryOwnedByB = "tl-entry-b";
+    private const string EntryOwnedByC = "tl-entry-c";
 
     public TimelineFilterTests(ApiFactory factory)
     {
@@ -56,25 +57,28 @@ public class TimelineFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
             // B's own entry
             await DatabaseSeeder.SeedEntry(entriesDb, EntryOwnedByB, UserBId, isSharingInherited: true);
+
+            // C's own entry
+            await DatabaseSeeder.SeedEntry(entriesDb, EntryOwnedByC, UserCId, isSharingInherited: true);
         });
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private async Task<List<string>> GetTimelineEntryIdsAsync(HttpClient client)
+    private async Task<PageableList<EntryListModel>> GetTimelineAsync(HttpClient client)
     {
         var response = await client.GetAsync("/api/timeline/list");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var page = await response.ReadJsonAsync<PageableList<EntryListModel>>();
-        return page.Models.Select(e => e.Id).ToList();
+        return await response.ReadJsonAsync<PageableList<EntryListModel>>();
     }
 
     [Fact]
     public async Task Timeline_UserA_SeesOwnAndConnectedEntries()
     {
         var client = factory.CreateClientForUser(UserAId, UserAName);
-        var entryIds = await GetTimelineEntryIdsAsync(client);
+        var page = await GetTimelineAsync(client);
+        var entryIds = page.Models.Select(e => e.Id).ToList();
 
         // A sees own entries
         Assert.Contains(EntryOwnedByA, entryIds);
@@ -83,13 +87,19 @@ public class TimelineFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
         // A also sees B's inherited entry (bidirectional connection, B grants Read to A)
         Assert.Contains(EntryOwnedByB, entryIds);
+
+        // A does not see C's private entry
+        Assert.DoesNotContain(EntryOwnedByC, entryIds);
+        Assert.Equal(4, entryIds.Count);
+        Assert.True(page.HasMore is false);
     }
 
     [Fact]
     public async Task Timeline_UserB_SeesOwnAndSharedEntries()
     {
         var client = factory.CreateClientForUser(UserBId, UserBName);
-        var entryIds = await GetTimelineEntryIdsAsync(client);
+        var page = await GetTimelineAsync(client);
+        var entryIds = page.Models.Select(e => e.Id).ToList();
 
         // B sees own entries
         Assert.Contains(EntryOwnedByB, entryIds);
@@ -102,19 +112,30 @@ public class TimelineFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
         // B does NOT see A's private entry
         Assert.DoesNotContain(EntryPrivateA, entryIds);
+
+        // B does NOT see C's private entry
+        Assert.DoesNotContain(EntryOwnedByC, entryIds);
+        Assert.Equal(3, entryIds.Count);
+        Assert.True(page.HasMore is false);
     }
 
     [Fact]
     public async Task Timeline_UserC_SeesOnlyOwnEntries()
     {
         var client = factory.CreateClientForUser(UserCId, UserCName);
-        var entryIds = await GetTimelineEntryIdsAsync(client);
+        var page = await GetTimelineAsync(client);
+        var entryIds = page.Models.Select(e => e.Id).ToList();
+
+        // C sees own entry
+        Assert.Contains(EntryOwnedByC, entryIds);
 
         // C sees nothing from A or B
         Assert.DoesNotContain(EntryOwnedByA, entryIds);
         Assert.DoesNotContain(EntrySharedWithB, entryIds);
         Assert.DoesNotContain(EntryPrivateA, entryIds);
         Assert.DoesNotContain(EntryOwnedByB, entryIds);
+        Assert.Single(entryIds);
+        Assert.True(page.HasMore is false);
     }
 
     [Fact]

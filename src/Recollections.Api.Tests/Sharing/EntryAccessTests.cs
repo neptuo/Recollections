@@ -26,6 +26,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     private const string InheritedEntryId = "entry-inherited";
     private const string ExplicitEntryId = "entry-explicit";
     private const string PublicEntryId = "entry-public";
+    private const string UpdatableInheritedEntryId = "entry-inherited-updatable";
     private const string StoryInheritedEntryId = "entry-story-inherited";
     private const string StoryCascadeEntryId = "entry-story-cascade";
     private const string StoryExplicitEntryId = "entry-story-explicit";
@@ -66,6 +67,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
             // 1. Entry with inherited sharing (uses connections)
             await DatabaseSeeder.SeedEntry(entriesDb, InheritedEntryId, OwnerUserId, isSharingInherited: true);
+            await DatabaseSeeder.SeedEntry(entriesDb, UpdatableInheritedEntryId, OwnerUserId, isSharingInherited: true);
 
             // 2. Entry with explicit sharing
             await DatabaseSeeder.SeedEntry(entriesDb, ExplicitEntryId, OwnerUserId, isSharingInherited: false);
@@ -93,11 +95,16 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private async Task<AuthorizedModel<EntryModel>> GetEntryAsync(HttpClient client, string entryId)
+    private async Task<AuthorizedModel<EntryModel>> GetEntryAsync(HttpClient client, string entryId, params string[] forbiddenEntryIds)
     {
         var response = await client.GetAsync($"/api/entries/{entryId}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return await response.ReadJsonAsync<AuthorizedModel<EntryModel>>();
+        var result = await response.ReadJsonAsync<AuthorizedModel<EntryModel>>();
+        Assert.Equal(entryId, result.Model.Id);
+        foreach (var forbiddenEntryId in forbiddenEntryIds)
+            Assert.NotEqual(forbiddenEntryId, result.Model.Id);
+
+        return result;
     }
 
     // ===== Inherited entry (uses connections) =====
@@ -106,9 +113,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedEntry_AsOwner_ReturnsOkWithCorrectId()
     {
         var client = factory.CreateClientForUser(OwnerUserId, OwnerUserName);
-        var result = await GetEntryAsync(client, InheritedEntryId);
-
-        Assert.Equal(InheritedEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, InheritedEntryId, ExplicitEntryId, PublicEntryId);
         Assert.Equal(OwnerUserId, result.OwnerId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
@@ -117,9 +122,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedEntry_AsConnectedReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var result = await GetEntryAsync(client, InheritedEntryId);
-
-        Assert.Equal(InheritedEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, InheritedEntryId, ExplicitEntryId, PublicEntryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -127,9 +130,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedEntry_AsConnectedCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var result = await GetEntryAsync(client, InheritedEntryId);
-
-        Assert.Equal(InheritedEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, InheritedEntryId, ExplicitEntryId, PublicEntryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
@@ -154,7 +155,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
         var content = new StringContent("{}", System.Text.Encoding.UTF8, "application/json");
-        var response = await client.PutAsync($"/api/entries/{InheritedEntryId}", content);
+        var response = await client.PutAsync($"/api/entries/{UpdatableInheritedEntryId}", content);
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
@@ -162,9 +163,9 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task InheritedEntry_UpdateAsCoOwner_Succeeds()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var json = $"{{\"Id\":\"{InheritedEntryId}\",\"Title\":\"Updated\",\"When\":\"2025-01-01T00:00:00\",\"Locations\":[]}}";
+        var json = $"{{\"Id\":\"{UpdatableInheritedEntryId}\",\"Title\":\"Updated\",\"When\":\"2025-01-01T00:00:00\",\"Locations\":[]}}";
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await client.PutAsync($"/api/entries/{InheritedEntryId}", content);
+        var response = await client.PutAsync($"/api/entries/{UpdatableInheritedEntryId}", content);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
@@ -174,9 +175,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task ExplicitEntry_AsExplicitReader_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var result = await GetEntryAsync(client, ExplicitEntryId);
-
-        Assert.Equal(ExplicitEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, ExplicitEntryId, InheritedEntryId, PublicEntryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -184,9 +183,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task ExplicitEntry_AsExplicitCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var result = await GetEntryAsync(client, ExplicitEntryId);
-
-        Assert.Equal(ExplicitEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, ExplicitEntryId, InheritedEntryId, PublicEntryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
@@ -213,9 +210,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task PublicEntry_AsAnonymous_ReturnsReadPermission()
     {
         var client = factory.CreateAnonymousClient();
-        var result = await GetEntryAsync(client, PublicEntryId);
-
-        Assert.Equal(PublicEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, PublicEntryId, InheritedEntryId, ExplicitEntryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -223,9 +218,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task PublicEntry_AsStranger_ReturnsReadPermission()
     {
         var client = factory.CreateClientForUser(StrangerUserId, StrangerUserName);
-        var result = await GetEntryAsync(client, PublicEntryId);
-
-        Assert.Equal(PublicEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, PublicEntryId, InheritedEntryId, ExplicitEntryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -235,9 +228,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task StoryCascadeEntry_AsStoryOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(StoryOwnerUserId, StoryOwnerUserName);
-        var result = await GetEntryAsync(client, StoryCascadeEntryId);
-
-        Assert.Equal(StoryCascadeEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, StoryCascadeEntryId, StoryExplicitEntryId, StoryInheritedEntryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
@@ -246,9 +237,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     {
         // Reader has explicit StoryShare on the explicit story
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var result = await GetEntryAsync(client, StoryCascadeEntryId);
-
-        Assert.Equal(StoryCascadeEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, StoryCascadeEntryId, StoryExplicitEntryId, StoryInheritedEntryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -265,9 +254,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     {
         // Reader is connected to storyowner with Read permission
         var client = factory.CreateClientForUser(ReaderUserId, ReaderUserName);
-        var result = await GetEntryAsync(client, StoryInheritedEntryId);
-
-        Assert.Equal(StoryInheritedEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, StoryInheritedEntryId, StoryCascadeEntryId, StoryExplicitEntryId);
         Assert.Equal(Permission.Read, result.UserPermission);
     }
 
@@ -285,9 +272,7 @@ public class EntryAccessTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task StoryExplicitEntry_AsExplicitCoOwner_ReturnsCoOwnerPermission()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
-        var result = await GetEntryAsync(client, StoryExplicitEntryId);
-
-        Assert.Equal(StoryExplicitEntryId, result.Model.Id);
+        var result = await GetEntryAsync(client, StoryExplicitEntryId, StoryCascadeEntryId, StoryInheritedEntryId);
         Assert.Equal(Permission.CoOwner, result.UserPermission);
     }
 
