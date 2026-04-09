@@ -23,6 +23,14 @@ public static class ApiClientExtensions
     public static async Task<T> ReadJsonAsync<T>(this HttpResponseMessage response)
     {
         var json = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<T>(json);
+        var result = JsonConvert.DeserializeObject<T>(json);
+        if (result is null)
+        {
+            throw new InvalidOperationException(
+                $"Failed to deserialize response body to '{typeof(T).FullName}'. Response body: {json}"
+            );
+        }
+
+        return result;
     }
 }

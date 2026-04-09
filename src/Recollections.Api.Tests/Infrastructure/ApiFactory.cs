@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Neptuo.Recollections.Entries;
 using AccountsDataContext = Neptuo.Recollections.Accounts.DataContext;
 using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
@@ -83,16 +84,25 @@ public class ApiFactory : WebApplicationFactory<Program>
             {
                 options.PathTemplate = Path.Combine(Path.GetTempPath(), "recollections-tests", Guid.NewGuid().ToString("N"), "{UserId}", "{EntryId}");
             });
-
-            // Apply migrations
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            var accountsDb = scope.ServiceProvider.GetRequiredService<AccountsDataContext>();
-            accountsDb.Database.EnsureCreated();
-
-            var entriesDb = scope.ServiceProvider.GetRequiredService<EntriesDataContext>();
-            entriesDb.Database.EnsureCreated();
         });
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+
+        using var scope = host.Services.CreateScope();
+        ApplyMigrations<AccountsDataContext>(scope.ServiceProvider);
+        ApplyMigrations<EntriesDataContext>(scope.ServiceProvider);
+
+        return host;
+    }
+
+    private static void ApplyMigrations<TContext>(IServiceProvider serviceProvider)
+        where TContext : DbContext
+    {
+        var dbContext = serviceProvider.GetRequiredService<TContext>();
+        dbContext.Database.Migrate();
     }
 
     /// <summary>
