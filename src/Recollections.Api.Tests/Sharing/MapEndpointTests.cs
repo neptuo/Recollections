@@ -1,4 +1,5 @@
 using System.Net;
+using Newtonsoft.Json.Linq;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
 using Neptuo.Recollections.Tests.Infrastructure;
@@ -70,6 +71,22 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.DoesNotContain(NoLocationEntryId, entryIds);
         Assert.Equal(3, models.Count);
         Assert.All(models, model => Assert.True(model.Location?.HasValue() == true));
+    }
+
+    [Fact]
+    public async Task MapCountries_UserB_ReturnsOnlyCountriesVisitedByAccessibleEntries()
+    {
+        var client = factory.CreateClientForUser(UserBId, UserBName);
+        var response = await client.GetAsync("/api/map/countries");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("application/json", response.Content.Headers.ContentType?.MediaType);
+
+        var json = await response.Content.ReadAsStringAsync();
+        var features = (JArray)JObject.Parse(json)["features"]!;
+
+        Assert.NotNull(features);
+        Assert.Equal(2, features.Count);
     }
 }
 

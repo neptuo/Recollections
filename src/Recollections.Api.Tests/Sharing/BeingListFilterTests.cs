@@ -22,6 +22,7 @@ public class BeingListFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
     private const string BeingPrivateA = "bl-being-a-private";
     private const string BeingOwnedByBInherited = "bl-being-b-inherited";
     private const string BeingOwnedByCPrivate = "bl-being-c-private";
+    private const string EntrySharedWithBVisible = "bl-entry-a-shared-visible";
 
     public BeingListFilterTests(ApiFactory factory)
     {
@@ -51,6 +52,9 @@ public class BeingListFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
             var entrySharedWithBHidden = await DatabaseSeeder.SeedEntry(entriesDb, "bl-entry-a-shared-hidden", UserAId, isSharingInherited: false);
             entrySharedWithBHidden.Beings.Add(beingSharedWithB);
+
+            var entrySharedWithBVisible = await DatabaseSeeder.SeedEntry(entriesDb, EntrySharedWithBVisible, UserAId, isSharingInherited: true);
+            entrySharedWithBVisible.Beings.Add(beingSharedWithB);
 
             var entryPrivateA = await DatabaseSeeder.SeedEntry(entriesDb, "bl-entry-a-private", UserAId, isSharingInherited: false);
             entryPrivateA.Beings.Add(beingPrivateA);
@@ -90,7 +94,7 @@ public class BeingListFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.DoesNotContain(BeingOwnedByCPrivate, beingIds);
         Assert.Equal(4, models.Count);
         Assert.Equal(1, modelById[BeingOwnedByAInherited].Entries);
-        Assert.Equal(1, modelById[BeingSharedWithB].Entries);
+        Assert.Equal(2, modelById[BeingSharedWithB].Entries);
         Assert.Equal(1, modelById[BeingPrivateA].Entries);
         Assert.Equal(1, modelById[BeingOwnedByBInherited].Entries);
     }
@@ -112,7 +116,7 @@ public class BeingListFilterTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(3, models.Count);
         Assert.Equal(1, modelById[BeingOwnedByBInherited].Entries);
         Assert.Equal(1, modelById[BeingOwnedByAInherited].Entries);
-        Assert.Equal(0, modelById[BeingSharedWithB].Entries);
+        Assert.Equal(1, modelById[BeingSharedWithB].Entries);
     }
 
     [Fact]

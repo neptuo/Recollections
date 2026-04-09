@@ -15,6 +15,7 @@ namespace Neptuo.Recollections.Tests.Infrastructure;
 
 public class ApiFactory : WebApplicationFactory<Program>
 {
+    private static readonly object HostCreationLock = new();
     private readonly SqliteConnection accountsConnection;
     private readonly SqliteConnection entriesConnection;
 
@@ -89,13 +90,16 @@ public class ApiFactory : WebApplicationFactory<Program>
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        var host = base.CreateHost(builder);
+        lock (HostCreationLock)
+        {
+            var host = base.CreateHost(builder);
 
-        using var scope = host.Services.CreateScope();
-        ApplyMigrations<AccountsDataContext>(scope.ServiceProvider);
-        ApplyMigrations<EntriesDataContext>(scope.ServiceProvider);
+            using var scope = host.Services.CreateScope();
+            ApplyMigrations<AccountsDataContext>(scope.ServiceProvider);
+            ApplyMigrations<EntriesDataContext>(scope.ServiceProvider);
 
-        return host;
+            return host;
+        }
     }
 
     private static void ApplyMigrations<TContext>(IServiceProvider serviceProvider)
