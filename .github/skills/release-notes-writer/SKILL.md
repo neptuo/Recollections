@@ -73,10 +73,10 @@ git --no-pager show <commit>:src/Recollections.Blazor.UI/wwwroot/release-notes.h
 
 ### 3. Collect Delivered Work
 
-- List all milestone items with:
+- List all delivered milestone items with:
 
 ```bash
-gh api 'repos/neptuo/Recollections/issues?milestone={number}&state=all&per_page=100'
+gh api --paginate 'repos/neptuo/Recollections/issues?milestone={number}&state=closed&per_page=100'
 ```
 
 - Read issue or PR bodies for items whose titles are ambiguous.
