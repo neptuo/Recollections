@@ -50,7 +50,7 @@ Examples:
 
 ```bash
 gh api repos/neptuo/Recollections/milestones --paginate --jq '.[] | [.number, .title, .state] | @tsv'
-gh api 'repos/neptuo/Recollections/issues?milestone={number}&state=all&per_page=100'
+gh api --paginate 'repos/neptuo/Recollections/issues?milestone={number}&state=closed&per_page=100'
 git --no-pager log --follow --oneline -- src/Recollections.Blazor.UI/wwwroot/release-notes.html
 git --no-pager show <commit>:src/Recollections.Blazor.UI/wwwroot/release-notes.html
 ```
