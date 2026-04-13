@@ -313,9 +313,57 @@ function escapeCssSelectorValue(value) {
     return stringValue.replace(/["\\]/g, "\\$&");
 }
 
+function canReplacePageHistoryState() {
+    return window.history && typeof window.history.replaceState === "function";
+}
+
+function readPageHistoryUserState() {
+    var historyState = window.history.state;
+    var userState = {};
+    var serializedUserState = historyState && typeof historyState === "object" ? historyState.userState : null;
+    if (typeof serializedUserState === "string" && serializedUserState.length > 0) {
+        try {
+            userState = JSON.parse(serializedUserState);
+        } catch {
+            userState = {};
+        }
+    }
+
+    if (userState && typeof userState === "object") {
+        if (!userState.Map && typeof userState.Latitude === "number" && typeof userState.Longitude === "number") {
+            userState = { Map: userState };
+        } else if (!userState.Timeline && typeof userState.Offset === "number" && typeof userState.EntryId === "string") {
+            userState = { Timeline: userState };
+        }
+    } else {
+        userState = {};
+    }
+
+    return {
+        historyState: historyState,
+        userState: userState
+    };
+}
+
+function updatePageHistoryUserState(update) {
+    if (!canReplacePageHistoryState() || typeof update !== "function") {
+        return;
+    }
+
+    var current = readPageHistoryUserState();
+    update(current.userState);
+
+    var nextHistoryState = current.historyState && typeof current.historyState === "object"
+        ? Object.assign({}, current.historyState)
+        : {};
+
+    nextHistoryState.userState = JSON.stringify(current.userState);
+    window.history.replaceState(nextHistoryState, "", window.location.href);
+}
+
 window.Timeline = {
     StorePosition: function (element) {
-        if (!element || !window.history || typeof window.history.replaceState !== "function") {
+        if (!element) {
             return;
         }
 
@@ -325,43 +373,22 @@ window.Timeline = {
             return;
         }
 
-        var userState = {};
-        var historyState = window.history.state;
-        var serializedUserState = historyState && typeof historyState === "object" ? historyState.userState : null;
-        if (typeof serializedUserState === "string" && serializedUserState.length > 0) {
-            try {
-                userState = JSON.parse(serializedUserState);
-            } catch {
-                userState = {};
-            }
-        }
-
-        if (userState && typeof userState === "object") {
-            if (!userState.Map && typeof userState.Latitude === "number" && typeof userState.Longitude === "number") {
-                userState = { Map: userState };
-            } else if (!userState.Timeline && typeof userState.Offset === "number" && typeof userState.EntryId === "string") {
-                userState = { Timeline: userState };
-            }
-        } else {
-            userState = {};
-        }
-
-        userState.Timeline = {
-            Offset: offset,
-            EntryId: entryId
-        };
-
-        var nextHistoryState = historyState && typeof historyState === "object"
-            ? Object.assign({}, historyState)
-            : {};
-
-        nextHistoryState.userState = JSON.stringify(userState);
-        window.history.replaceState(nextHistoryState, "", window.location.href);
+        updatePageHistoryUserState(function (userState) {
+            userState.Timeline = {
+                Offset: offset,
+                EntryId: entryId
+            };
+        });
     },
     StorePositionOnKeyDown: function (element, event) {
         if (event && (event.key === "Enter" || event.key === " ")) {
             window.Timeline.StorePosition(element);
         }
+    },
+    ClearPosition: function () {
+        updatePageHistoryUserState(function (userState) {
+            delete userState.Timeline;
+        });
     },
     ScrollToEntry: function (entryId) {
         var escapedEntryId = escapeCssSelectorValue(entryId);
