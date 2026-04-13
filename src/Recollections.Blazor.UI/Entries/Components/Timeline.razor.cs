@@ -47,6 +47,7 @@ namespace Neptuo.Recollections.Entries.Components
         private int offset;
         private Task loadAsyncFromParametersSet;
         private string scrollToEntryId;
+        private bool clearRestoredPositionAfterRender;
         private string currentGalleryEntryId;
 
         protected List<EntryListModel> Entries { get; } = [];
@@ -69,6 +70,15 @@ namespace Neptuo.Recollections.Entries.Components
             return PageHistoryState.Parse(NavigationManager.HistoryEntryState).Timeline;
         }
 
+        private void QueuePositionRestore(TimelinePosition position)
+        {
+            if (position == null)
+                return;
+
+            clearRestoredPositionAfterRender = true;
+            scrollToEntryId = position.EntryId;
+        }
+
         protected async override Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();
@@ -81,8 +91,7 @@ namespace Neptuo.Recollections.Entries.Components
                 Log.Debug($"Got parameter Data '{Data.Count}'");
 
                 var position = FindPositionFromHistoryEntry();
-                if (position != null)
-                    scrollToEntryId = position.EntryId;
+                QueuePositionRestore(position);
             }
             else if (Entries.Count == 0)
             {
@@ -102,12 +111,24 @@ namespace Neptuo.Recollections.Entries.Components
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (loadAsyncFromParametersSet == null && scrollToEntryId != null)
+            if (loadAsyncFromParametersSet == null && (scrollToEntryId != null || clearRestoredPositionAfterRender))
             {
                 var entryId = scrollToEntryId;
+                var shouldClearPosition = clearRestoredPositionAfterRender;
                 scrollToEntryId = null;
-                Log.Debug($"Scrolling to entry '{entryId}'");
-                await JSRuntime.InvokeVoidAsync("Timeline.ScrollToEntry", entryId);
+                clearRestoredPositionAfterRender = false;
+
+                if (!string.IsNullOrEmpty(entryId))
+                {
+                    Log.Debug($"Scrolling to entry '{entryId}'");
+                    await JSRuntime.InvokeVoidAsync("Timeline.ScrollToEntry", entryId);
+                }
+
+                if (shouldClearPosition)
+                {
+                    Log.Debug("Clearing consumed timeline position from history state");
+                    await JSRuntime.InvokeVoidAsync("Timeline.ClearPosition");
+                }
             }
         }
 
@@ -125,10 +146,12 @@ namespace Neptuo.Recollections.Entries.Components
                 if (Entries.Count == 0)
                 {
                     var position = FindPositionFromHistoryEntry();
-                    if (position != null && position.Offset > 0)
+                    if (position != null)
                     {
-                        count = position.Offset;
-                        scrollToEntryId = position.EntryId;
+                        if (position.Offset > 0)
+                            count = position.Offset;
+
+                        QueuePositionRestore(position);
                         Log.Debug($"Restoring timeline position: offset={position.Offset}, entryId={position.EntryId}");
                     }
                 }
