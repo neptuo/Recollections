@@ -72,7 +72,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userId = User.FindUserId();
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            var stories = await shareStatus.OwnedByOrExplicitlySharedWithUser(
+            var storyIds = await shareStatus.OwnedByOrExplicitlySharedWithUser(
                     db,
                     db.Entries
                         .Where(e => e.Beings.Any(b => b.Id == beingId))
@@ -80,8 +80,12 @@ namespace Neptuo.Recollections.Entries.Controllers
                     [userId, ShareStatusService.PublicUserId],
                     connectedUsers
                 )
-                .Select(e => e.Story ?? e.Chapter.Story)
+                .Select(e => e.Story != null ? e.Story.Id : e.Chapter.Story.Id)
                 .Distinct()
+                .ToListAsync();
+
+            var stories = await db.Stories
+                .Where(s => storyIds.Contains(s.Id))
                 .ToListAsync();
 
             var models = await storyMapper.MapAsync(stories, userId, connectedUsers);

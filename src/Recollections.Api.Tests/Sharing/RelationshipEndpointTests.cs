@@ -201,8 +201,10 @@ public class BeingRelationshipTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     private const string BeingId = "rt-being-id";
     private const string VisibleStoryId = "rt-being-story-visible";
+    private const string VisibleStoryChapterId = "rt-being-story-visible-chapter";
     private const string HiddenStoryId = "rt-being-story-hidden";
     private const string VisibleEntryId = "rt-being-entry-visible";
+    private const string VisibleChapterEntryId = "rt-being-entry-visible-chapter";
     private const string HiddenEntryInVisibleStoryId = "rt-being-entry-hidden-visible-story";
     private const string HiddenEntryInHiddenStoryId = "rt-being-entry-hidden-hidden-story";
 
@@ -223,6 +225,7 @@ public class BeingRelationshipTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
             var visibleStory = await DatabaseSeeder.SeedStory(entriesDb, VisibleStoryId, UserAId, isSharingInherited: false);
             await DatabaseSeeder.SeedStoryShare(entriesDb, VisibleStoryId, UserBId, Permission.Read);
+            var visibleStoryChapter = await DatabaseSeeder.SeedChapter(entriesDb, VisibleStoryChapterId, visibleStory);
 
             var hiddenStory = await DatabaseSeeder.SeedStory(entriesDb, HiddenStoryId, UserAId, isSharingInherited: false);
 
@@ -233,6 +236,14 @@ public class BeingRelationshipTests : IClassFixture<ApiFactory>, IAsyncLifetime
                 isSharingInherited: true,
                 story: visibleStory,
                 when: new DateTime(2024, 8, 1, 10, 0, 0, DateTimeKind.Utc));
+
+            var visibleChapterEntry = await DatabaseSeeder.SeedEntry(
+                entriesDb,
+                VisibleChapterEntryId,
+                UserAId,
+                isSharingInherited: true,
+                chapter: visibleStoryChapter,
+                when: new DateTime(2024, 8, 1, 11, 0, 0, DateTimeKind.Utc));
 
             var hiddenEntryInVisibleStory = await DatabaseSeeder.SeedEntry(
                 entriesDb,
@@ -251,6 +262,7 @@ public class BeingRelationshipTests : IClassFixture<ApiFactory>, IAsyncLifetime
                 when: new DateTime(2024, 8, 3, 10, 0, 0, DateTimeKind.Utc));
 
             visibleEntry.Beings.Add(being);
+            visibleChapterEntry.Beings.Add(being);
             hiddenEntryInVisibleStory.Beings.Add(being);
             hiddenEntryInHiddenStory.Beings.Add(being);
 
@@ -272,14 +284,15 @@ public class BeingRelationshipTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var entryIds = page.Models.Select(e => e.Id).ToList();
 
         Assert.Contains(VisibleEntryId, entryIds);
+        Assert.Contains(VisibleChapterEntryId, entryIds);
         Assert.Contains(HiddenEntryInHiddenStoryId, entryIds);
         Assert.DoesNotContain(HiddenEntryInVisibleStoryId, entryIds);
-        Assert.Equal(2, page.Models.Count);
+        Assert.Equal(3, page.Models.Count);
         Assert.False(page.HasMore);
     }
 
     [Fact]
-    public async Task BeingStories_UserB_UsesTheAccessibleEntriesReturnedForThatBeing()
+    public async Task BeingStories_UserB_DeduplicatesAccessibleEntriesThatBelongToTheSameStory()
     {
         var client = factory.CreateClientForUser(UserBId, UserBName);
         var response = await client.GetAsync($"/api/beings/{BeingId}/stories");
@@ -293,7 +306,7 @@ public class BeingRelationshipTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Contains(VisibleStoryId, storyIds);
         Assert.Contains(HiddenStoryId, storyIds);
         Assert.Equal(2, models.Count);
-        Assert.Equal(1, modelById[VisibleStoryId].Entries);
+        Assert.Equal(2, modelById[VisibleStoryId].Entries);
         Assert.Equal(1, modelById[HiddenStoryId].Entries);
     }
 }
