@@ -95,6 +95,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<FileUploadProgress> UploadProgress { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
+        protected FileUpload TrackUpload { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
 
         public override Task SetParametersAsync(ParameterView parameters)
@@ -285,6 +286,9 @@ namespace Neptuo.Recollections.Entries.Pages
             else if (item.Video != null)
                 Navigator.OpenVideoDetail(EntryId, item.Video.Id);
         }
+
+        protected Task OpenTrackImportAsync()
+            => TrackUpload?.OpenAsync() ?? Task.CompletedTask;
 
         protected async Task SaveTitleAsync(string value)
         {

@@ -46,6 +46,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool IsMultiple { get; set; } = true;
 
+        [Parameter]
+        public string CssClass { get; set; }
+
         internal ElementReference FormElement { get; private set; }
 
         protected Modal UploadError { get; set; }
@@ -73,5 +76,8 @@ namespace Neptuo.Recollections.Components
             if (formBinding != null)
                 await formBinding.DisposeAsync();
         }
+
+        public Task OpenAsync()
+            => FileUploader.OpenAsync(FormElement);
     }
 }
