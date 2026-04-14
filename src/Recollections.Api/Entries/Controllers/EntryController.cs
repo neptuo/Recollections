@@ -29,8 +29,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareDeleter shareDeleter;
         private readonly IUserNameProvider userNames;
         private readonly FreeLimitsChecker freeLimits;
+        private readonly GpxImportService gpxImportService;
 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits)
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits, GpxImportService gpxImportService)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
@@ -39,12 +40,14 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(shareDeleter, "shareDeleter");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(freeLimits, "freeLimits");
+            Ensure.NotNull(gpxImportService, "gpxImportService");
             this.db = db;
             this.imageService = imageService;
             this.shareStatus = shareStatus;
             this.shareDeleter = shareDeleter;
             this.userNames = userNames;
             this.freeLimits = freeLimits;
+            this.gpxImportService = gpxImportService;
         }
 
         [HttpGet("{id}")]
@@ -133,6 +136,49 @@ namespace Neptuo.Recollections.Entries.Controllers
             return NoContent();
         });
 
+        [HttpPost("{id}/track")]
+        [Consumes("multipart/form-data")]
+        [ProducesDefaultResponseType(typeof(EntryModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status402PaymentRequired)]
+        public Task<IActionResult> ImportTrack(string id, [FromForm] IFormFile file) => RunEntryAsync(id, Permission.CoOwner, async entity =>
+        {
+            if (file == null)
+                return BadRequest();
+
+            string userId = User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            EntryTrackModel track;
+            try
+            {
+                track = gpxImportService.Parse(new FormFileInput(file));
+            }
+            catch (TrackImportValidationException)
+            {
+                return BadRequest();
+            }
+
+            if (!await freeLimits.CanSetGpsAsync(userId, track.HasValue() ? 1 : 0))
+                return PremiumRequired();
+
+            entity.TrackData = track.Data;
+            entity.TrackPointCount = track.PointCount;
+            entity.TrackLatitude = track.Location?.Latitude;
+            entity.TrackLongitude = track.Location?.Longitude;
+            entity.TrackAltitude = track.Location?.Altitude;
+
+            db.Entries.Update(entity);
+            await db.SaveChangesAsync();
+
+            EntryModel model = new EntryModel();
+            MapEntityToModel(entity, model);
+            return Ok(model);
+        });
+
         [HttpDelete("{id}")]
         public Task<IActionResult> Delete(string id) => RunEntryAsync(id, Permission.CoOwner, async entity => 
         {
@@ -151,12 +197,26 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Title = entity.Title;
             model.When = entity.When;
             model.Text = entity.Text;
+            model.Locations.Clear();
             model.Locations.AddRange(entity.Locations.OrderBy(l => l.Order).Select(l => new LocationModel()
             {
                 Longitude = l.Longitude,
                 Latitude = l.Latitude,
                 Altitude = l.Altitude
             }));
+            model.Track = new EntryTrackModel()
+            {
+                Data = entity.TrackData,
+                PointCount = entity.TrackPointCount ?? 0,
+                Location = entity.TrackLatitude != null && entity.TrackLongitude != null
+                    ? new LocationModel()
+                    {
+                        Latitude = entity.TrackLatitude,
+                        Longitude = entity.TrackLongitude,
+                        Altitude = entity.TrackAltitude
+                    }
+                    : null
+            };
         }
 
         private void MapModelToEntity(EntryModel model, Entry entity)
@@ -165,6 +225,22 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Title = model.Title;
             entity.When = model.When;
             entity.Text = model.Text;
+            if (model.Track != null && model.Track.HasValue())
+            {
+                entity.TrackData = model.Track.Data;
+                entity.TrackPointCount = model.Track.PointCount;
+                entity.TrackLatitude = model.Track.Location?.Latitude;
+                entity.TrackLongitude = model.Track.Location?.Longitude;
+                entity.TrackAltitude = model.Track.Location?.Altitude;
+            }
+            else
+            {
+                entity.TrackData = null;
+                entity.TrackPointCount = null;
+                entity.TrackLatitude = null;
+                entity.TrackLongitude = null;
+                entity.TrackAltitude = null;
+            }
 
             for (int i = 0; i < model.Locations.Count; i++)
             {
@@ -184,7 +260,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 locationEntity.Altitude = location.Altitude;
             }
 
-            if (entity.Locations.Count > model.Locations.Count)
+            while (entity.Locations.Count > model.Locations.Count)
                 entity.Locations.RemoveAt(entity.Locations.Count - 1);
         }
 

@@ -123,6 +123,8 @@ namespace Neptuo.Recollections.Entries
 
         public string MediaUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/media";
 
+        public string TrackUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/track";
+
         public Task<List<StoryListModel>> GetStoryListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryListModel>>("stories"));
 

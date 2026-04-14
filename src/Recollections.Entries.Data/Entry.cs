@@ -24,6 +24,11 @@ namespace Neptuo.Recollections.Entries
         public StoryChapter Chapter { get; set; }
 
         public IList<OrderedLocation> Locations { get; set; } = new List<OrderedLocation>();
+        public string TrackData { get; set; }
+        public int? TrackPointCount { get; set; }
+        public double? TrackLatitude { get; set; }
+        public double? TrackLongitude { get; set; }
+        public double? TrackAltitude { get; set; }
         public IList<Being> Beings { get; set; } = new List<Being>();
 
         public DateTime When { get; set; }

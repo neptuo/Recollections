@@ -34,6 +34,8 @@ namespace Neptuo.Recollections.Components
                     hashCode.Add(marker);
             }
 
+            hashCode.Add(editor.Path);
+
             return hashCode.ToHashCode();
         }
 
@@ -98,6 +100,7 @@ namespace Neptuo.Recollections.Components
                     "updateMarkers", 
                     editor.Container, 
                     editor.Markers,
+                    editor.Path,
                     editor.IsEditable
                 );
             }
@@ -140,6 +143,10 @@ namespace Neptuo.Recollections.Components
 
         [JSInvokable("MapInterop.MarkerSelected")]
         public async void MarkerSelected(int index) => await editor.MarkerSelected.InvokeAsync(index);
+
+        [JSInvokable("MapInterop.PathSelected")]
+        public async Task PathSelected()
+            => await editor.SelectPathAsync();
 
         [JSInvokable("MapInterop.MoveEnd")]
         public void MoveEnd(double latitude, double longitude, int zoom)

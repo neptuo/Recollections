@@ -1,0 +1,25 @@
+<Modal @ref="Modal" Title="Track">
+    <ChildContent>
+        @if (Track != null && Track.HasValue())
+        {
+            <div class="mb-3">
+                <strong>Points:</strong> @Track.PointCount
+            </div>
+            @if (Track.Location != null)
+            {
+                <div class="mb-3">
+                    <strong>Representative location:</strong> @Track.Location.ToRoundedString()
+                </div>
+            }
+        }
+    </ChildContent>
+    <Buttons>
+        @if (IsEditable)
+        {
+            <button type="button" class="btn btn-secondary" @onclick="@Delete" title="Delete track">
+                <Icon Identifier="trash-alt" />
+                Delete
+            </button>
+        }
+    </Buttons>
+</Modal>

@@ -22,9 +22,9 @@ public class MapService
 
     public async Task<List<MapEntryModel>> GetAsync(IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers)
     {
-        List<MapEntryModel> results = await shareStatus
+        var items = await shareStatus
             .OwnedByOrExplicitlySharedWithUser(dataContext, query, userIds, connectedUsers)
-            .Select(e => new MapEntryModel()
+            .Select(e => new
             {
                 Id = e.Id,
                 Title = e.Title,
@@ -33,13 +33,24 @@ public class MapService
                     Latitude = l.Latitude,
                     Longitude = l.Longitude,
                     Altitude = l.Altitude
-                }).FirstOrDefault()
+                }).FirstOrDefault(),
+                TrackLatitude = e.TrackLatitude,
+                TrackLongitude = e.TrackLongitude,
+                TrackAltitude = e.TrackAltitude
             })
             .ToListAsync();
 
-        List<MapEntryModel> toRemove = new List<MapEntryModel>();
-        foreach (var item in results)
+        List<MapEntryModel> results = items.Select(i => new MapEntryModel()
         {
+            Id = i.Id,
+            Title = i.Title,
+            Location = i.Location
+        }).ToList();
+
+        List<MapEntryModel> toRemove = new List<MapEntryModel>();
+        for (int i = 0; i < results.Count; i++)
+        {
+            var item = results[i];
             if (HasNotLocationValue(item))
             {
                 var location = await dataContext.Images
@@ -68,6 +79,20 @@ public class MapService
                     .FirstOrDefaultAsync();
 
                 item.Location = location;
+            }
+
+            if (HasNotLocationValue(item))
+            {
+                var source = items[i];
+                if (source.TrackLatitude != null && source.TrackLongitude != null)
+                {
+                    item.Location = new LocationModel()
+                    {
+                        Latitude = source.TrackLatitude,
+                        Longitude = source.TrackLongitude,
+                        Altitude = source.TrackAltitude
+                    };
+                }
             }
 
             if (HasNotLocationValue(item))

@@ -21,6 +21,7 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
     private const string HiddenEntryId = "mp-list-entry-hidden";
     private const string OwnEntryId = "mp-list-entry-own";
     private const string NoLocationEntryId = "mp-list-entry-no-location";
+    private const string TrackFallbackEntryId = "mp-list-entry-track-fallback";
 
     public MapListEndpointTests(ApiFactory factory)
     {
@@ -47,6 +48,12 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
             var ownEntry = await DatabaseSeeder.SeedEntry(entriesDb, OwnEntryId, UserBId, isSharingInherited: true);
             await DatabaseSeeder.SeedEntryLocation(entriesDb, ownEntry, 51.507, -0.128);
 
+            var trackFallbackEntry = await DatabaseSeeder.SeedEntry(entriesDb, TrackFallbackEntryId, UserAId, isSharingInherited: true);
+            await DatabaseSeeder.SeedEntryTrack(entriesDb, trackFallbackEntry,
+                (50.010, 14.010, null),
+                (50.020, 14.020, null),
+                (50.030, 14.030, null));
+
             await DatabaseSeeder.SeedEntry(entriesDb, NoLocationEntryId, UserAId, isSharingInherited: true);
         });
     }
@@ -67,10 +74,15 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Contains(VisibleEntryId, entryIds);
         Assert.Contains(ImageFallbackEntryId, entryIds);
         Assert.Contains(OwnEntryId, entryIds);
+        Assert.Contains(TrackFallbackEntryId, entryIds);
         Assert.DoesNotContain(HiddenEntryId, entryIds);
         Assert.DoesNotContain(NoLocationEntryId, entryIds);
-        Assert.Equal(3, models.Count);
+        Assert.Equal(4, models.Count);
         Assert.All(models, model => Assert.True(model.Location?.HasValue() == true));
+
+        var trackFallback = models.Single(model => model.Id == TrackFallbackEntryId);
+        Assert.Equal(50.02, trackFallback.Location.Latitude);
+        Assert.Equal(14.02, trackFallback.Location.Longitude);
     }
 
     [Fact]

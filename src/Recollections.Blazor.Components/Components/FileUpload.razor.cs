@@ -40,6 +40,12 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
 
+        [Parameter]
+        public string Accept { get; set; }
+
+        [Parameter]
+        public bool IsMultiple { get; set; } = true;
+
         internal ElementReference FormElement { get; private set; }
 
         protected Modal UploadError { get; set; }
