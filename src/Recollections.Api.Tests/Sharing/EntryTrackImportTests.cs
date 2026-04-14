@@ -108,6 +108,25 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
     }
 
     [Fact]
+    public void TrackImport_InvalidStream_ThrowsValidationException()
+    {
+        var service = new GpxImportService();
+
+        Assert.Throws<TrackImportValidationException>(() => service.Parse(new ThrowingFileInput(new IOException("Broken upload stream."))));
+    }
+
+    [Fact]
+    public void TrackImport_MissingCoordinates_ThrowsValidationException()
+    {
+        var service = new GpxImportService();
+
+        Assert.Throws<TrackImportValidationException>(() => service.Create([
+            new LocationModel() { Latitude = 50.087, Longitude = 14.421 },
+            new LocationModel() { Latitude = 50.095 }
+        ]));
+    }
+
+    [Fact]
     public async Task TrackImport_LargeTrack_IsSimplified()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
@@ -192,5 +211,14 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
               </trk>
             </gpx>
             """;
+    }
+
+    private sealed class ThrowingFileInput(Exception exception) : IFileInput
+    {
+        public string ContentType => "application/gpx+xml";
+        public string FileName => "track.gpx";
+        public long Length => 0;
+
+        public Stream OpenReadStream() => throw exception;
     }
 }

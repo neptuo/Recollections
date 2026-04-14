@@ -38,7 +38,11 @@ namespace Neptuo.Recollections.Entries
 
                 return Create(result);
             }
-            catch (XmlException)
+            catch (TrackImportValidationException)
+            {
+                throw;
+            }
+            catch (Exception ex) when (ex is XmlException || ex is IOException || ex is InvalidOperationException)
             {
                 throw new TrackImportValidationException();
             }
@@ -47,6 +51,7 @@ namespace Neptuo.Recollections.Entries
         public EntryTrackModel Create(IReadOnlyList<LocationModel> locations)
         {
             Ensure.NotNull(locations, "locations");
+            EnsureHasCoordinates(locations);
 
             IReadOnlyList<LocationModel> simplified = Simplify(locations);
             if (simplified.Count == 0)
@@ -108,6 +113,12 @@ namespace Neptuo.Recollections.Entries
 
         private static bool TryParseDouble(string value, out double result)
             => Double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
+
+        private static void EnsureHasCoordinates(IReadOnlyList<LocationModel> locations)
+        {
+            if (locations.Any(l => l == null || !l.HasValue()))
+                throw new TrackImportValidationException();
+        }
 
         private static string Encode(IReadOnlyList<LocationModel> locations)
         {
