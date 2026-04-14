@@ -1,0 +1,22 @@
+@page "/highest-altitude"
+@inherits UserStateAuthenticatedComponentBase
+
+<DocumentTitle Value="Highest altitude" />
+<TemplateContent Name="MobileTitle">Highest altitude</TemplateContent>
+
+<div class="card-list">
+    <div class="row">
+        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="No entries with altitude yet..." Context="entry">
+            <EmptyContent>
+                <div class="col-12">
+                    <Alert Mode="@AlertMode.Warning" Message="No entries with altitude yet..." />
+                </div>
+            </EmptyContent>
+            <ChildContent>
+                <div class="col-sm-12 mb-4">
+                    <EntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
+                </div>
+            </ChildContent>
+        </ListView>
+    </div>
+</div>

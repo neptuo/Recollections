@@ -86,6 +86,7 @@ namespace Neptuo.Recollections.Entries
                 .AddTransient<ImageResizeService>()
                 .AddTransient<EntryMediaMapper>()
                 .AddTransient<EntryListMapper>()
+                .AddTransient<HighestAltitudeService>()
                 .AddTransient<StoryListMapper>()
                 .AddTransient<MapService>()
                 .AddSingleton<CountryService>()

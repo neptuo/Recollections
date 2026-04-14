@@ -16,6 +16,14 @@
                 @Model.When.ToString(UiOptions.DateFormat)
             </div>
 
+            @if (Model.Altitude != null)
+            {
+                <div class="information">
+                    <Icon Identifier="sort-amount-down" />
+                    @($"{Math.Round(Model.Altitude.Value):N0} m")
+                </div>
+            }
+
             @if (!String.IsNullOrEmpty(Model.StoryTitle) || !String.IsNullOrEmpty(Model.ChapterTitle))
             {
                 <div class="information">
