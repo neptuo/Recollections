@@ -130,6 +130,12 @@ namespace Neptuo.Recollections
         public void OpenMap()
             => uri.NavigateTo(UrlMap());
 
+        public string UrlHighestAltitude()
+            => "/highest-altitude";
+
+        public void OpenHighestAltitude()
+            => uri.NavigateTo(UrlHighestAltitude());
+
         public string UrlCalendar(int? year = null, int? month = null)
         {
             string url = "/calendar";

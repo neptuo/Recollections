@@ -76,6 +76,13 @@ namespace Neptuo.Recollections.Components
             uploader.OnProgress(index, total, loaded);
         }
 
+        [JSInvokable("FileUpload.OnStoredFilesChanged")]
+        public void OnStoredFilesChanged()
+        {
+            log.Debug("FileUploadInterop.OnStoredFilesChanged");
+            uploader.OnStoredFilesChanged();
+        }
+
         public async Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync()
         {
             await EnsureModuleAsync();
@@ -125,10 +132,22 @@ namespace Neptuo.Recollections.Components
             }
         }
 
+        public async Task SetCurrentEntityAsync(string entityType, string entityId, string url)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("setCurrentEntity", entityType, entityId, url);
+        }
+
         public async Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
         {
             await EnsureModuleAsync();
             await module.InvokeVoidAsync("uploadUnassignedFilesTo", entityType, entityId, url);
+        }
+
+        public async Task OpenAsync(ElementReference formElement)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("openFileDialog", formElement);
         }
     }
 }

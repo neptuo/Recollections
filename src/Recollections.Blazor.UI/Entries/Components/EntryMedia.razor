@@ -3,7 +3,7 @@
 <div class="image justify-content-center @(!IsLoadingNotFound && Content == null && PlaceHolder == null ? "placeholder-glow" : "")">
     @if (OnClick.HasDelegate)
     {
-        <a href="@GetLinkUrl()" class="position-relative w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
+        <a href="@GetLinkUrl()" class="position-relative d-block w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
             @if (Type == MediaType.Thumbnail) 
             {
                 @ThumbnailContent

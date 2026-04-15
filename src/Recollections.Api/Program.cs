@@ -76,3 +76,5 @@ app.MapReverseProxy().RequireAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }

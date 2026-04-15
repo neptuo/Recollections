@@ -44,7 +44,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesDefaultResponseType(typeof(PageableList<EntryListModel>))]
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
-        public Task<IActionResult> List(string beingId, int offset) => RunBeingAsync(beingId, Permission.Read, async being =>
+        public Task<IActionResult> List(string beingId, int offset, int? count = null) => RunBeingAsync(beingId, Permission.Read, async being =>
         {
             var userId = User.FindUserId();
 
@@ -58,7 +58,8 @@ namespace Neptuo.Recollections.Entries.Controllers
                 connectedUsers
             );
 
-            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset);
+            int pageSize = EntryListMapper.NormalizePageSize(count);
+            var (models, hasMore) = await entryMapper.MapAsync(query, userId, connectedUsers, offset, pageSize, includePreviewMedia: true);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
         });
 
@@ -71,7 +72,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userId = User.FindUserId();
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            var stories = await shareStatus.OwnedByOrExplicitlySharedWithUser(
+            var storyIds = shareStatus.OwnedByOrExplicitlySharedWithUser(
                     db,
                     db.Entries
                         .Where(e => e.Beings.Any(b => b.Id == beingId))
@@ -79,8 +80,11 @@ namespace Neptuo.Recollections.Entries.Controllers
                     [userId, ShareStatusService.PublicUserId],
                     connectedUsers
                 )
-                .Select(e => e.Story ?? e.Chapter.Story)
-                .Distinct()
+                .Select(e => e.Story != null ? e.Story.Id : e.Chapter.Story.Id)
+                .Distinct();
+
+            var stories = await db.Stories
+                .Where(s => storyIds.Contains(s.Id))
                 .ToListAsync();
 
             var models = await storyMapper.MapAsync(stories, userId, connectedUsers);

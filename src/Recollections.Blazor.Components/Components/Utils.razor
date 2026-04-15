@@ -1,11 +1,11 @@
 ﻿@code
 {
-    public static RenderFragment FileSize(int? size)
+    public static RenderFragment FileSize(long? size)
     {
-        return @<span class="text-nowrap">@GetFileSize(size)</span>;
+        return @<span class="text-nowrap">@FileSizeText(size)</span>;
     }
 
-    private static string GetFileSize(long? bytes)
+    public static string FileSizeText(long? bytes)
     {
         if (bytes == null)
             return null;

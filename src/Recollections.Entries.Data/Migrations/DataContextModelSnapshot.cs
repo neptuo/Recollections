@@ -100,6 +100,27 @@ namespace Neptuo.Recollections.Entries.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
+                    b.Property<double?>("TrackAltitude")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("TrackData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double?>("TrackLatitude")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("TrackLongitude")
+                        .HasColumnType("REAL");
+
+                    b.Property<int?>("TrackPointCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double?>("TrackTotalDistance")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("TrackTotalElevation")
+                        .HasColumnType("REAL");
+
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
 
@@ -263,6 +284,9 @@ namespace Neptuo.Recollections.Entries.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("OriginalHeight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("OriginalSize")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("OriginalWidth")

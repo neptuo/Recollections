@@ -122,6 +122,7 @@ namespace Neptuo.Recollections.Entries.Pages
                         {
                             Type = "video",
                             Title = item.Video.Name,
+                            SizeText = Utils.FileSizeText(item.Video.OriginalSize),
                             Width = item.Video.Preview.Width,
                             Height = item.Video.Preview.Height,
                             ContentType = item.Video.ContentType,

@@ -7,9 +7,18 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries
 {
+    public enum EntryFileType
+    {
+        Track
+    }
+
     public interface IFileStorage
     {
         bool CanStreamSeek { get; }
+
+        Task<Stream> FindAsync(Entry entry, EntryFileType type);
+        Task SaveAsync(Entry entry, Stream content, EntryFileType type);
+        Task DeleteAsync(Entry entry, EntryFileType type);
 
         Task<Stream> FindAsync(Entry entry, Image image, ImageType type);
         Task SaveAsync(Entry entry, Image image, Stream content, ImageType type);

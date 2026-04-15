@@ -1,24 +1,25 @@
-﻿@inherits UserStateComponentBase
+@inherits UserStateComponentBase
 
 @if (BeforeContent != null || Entries.Count > 0)
 {
     var index = 0;
     var lastYear = 0;
-    <div class="timeline">
+    <div class="timeline @CssClass">
         @if (ShowYearSeparators)
         {
-            <div class="separator sticky-top mb-4 d-inline-block">
+            <div class="separator sticky-top mb-3 d-inline-block">
                 <div class="badge p-2 d-inline-block bg-secondary">
                     Now
                 </div>
             </div>
         }
 
+        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="OnGalleryOpenInfoAsync" />
         @BeforeContent
 
         @if(Collapsible && Entries.Count > 5)
         {
-            <div class="separator @(!IsCollapsed ? "mb-4" : "") badge p-2 d-inline-block bg-body-secondary position-relative top-0 z-1 cursor-pointer" style="margin-left: -6px;" @onclick="@(e => IsCollapsed = !IsCollapsed)">
+            <div class="separator @(!IsCollapsed ? "mb-3" : "") badge p-2 d-inline-block bg-body-secondary position-relative top-0 z-1 cursor-pointer" style="margin-left: -6px;" @onclick="@(e => IsCollapsed = !IsCollapsed)">
                 <Icon Identifier="comment-alt" CssClass="me-1" />
                 @Entries.Count
 @(Entries.Count > 1 ? "entries" : "entry")
@@ -32,18 +33,18 @@
                 if (ShowYearSeparators && entry.When.Year != lastYear)
                 {
                     lastYear = entry.When.Year;
-                    <div class="separator sticky-top mb-4 badge p-2 d-inline-block bg-secondary">
+                    <div class="separator sticky-top mb-3 badge p-2 d-inline-block bg-secondary">
                         @lastYear
                     </div>
                 }
 
-                <div class="entry">
+                <div class="entry" data-entry-id="@entry.Id">
                     <div class="title">
-                        <h3>@entry.When.ToString(ShowYearSeparators ? UiOptions.ShortDateFormat : UiOptions.DateFormat)</h3>
+                        <h3>@FormatEntryTitle(entry)</h3>
                     </div>
                     <div class="body">
                         <h2>
-                            <a href="@Navigator.UrlEntryDetail(entry.Id)" @onclick="@(e => OnClick.InvokeAsync(entry))" @onclick:preventDefault="@OnClick.HasDelegate">
+                            <a href="@Navigator.UrlEntryDetail(entry.Id)" data-entry-id="@entry.Id" data-entry-offset="@offset" onpointerdown="@(OnClick.HasDelegate ? null : "window.Timeline.StorePosition(this)")" onkeydown="@(OnClick.HasDelegate ? null : "window.Timeline.StorePositionOnKeyDown(this, event)")" @onclick="(() => OnEntryClicked(entry))" @onclick:preventDefault="@OnClick.HasDelegate">
                                 @entry.Title
                             </a>
                         </h2>
@@ -114,6 +115,27 @@
                                 </span>
                             }
                         </p>
+
+                        @if (entry.PreviewMedia?.Count > 0)
+                        {
+                            <div class="row row-cols-3 row-cols-sm-4 row-cols-lg-6 g-2 mt-2 timeline-preview-media">
+                                @for (var mediaIndex = 0; mediaIndex < entry.PreviewMedia.Count; mediaIndex++)
+                                {
+                                    var previewIndex = mediaIndex;
+                                    var media = entry.PreviewMedia[previewIndex];
+
+                                    <div class="col mt-0">
+                                        <EntryMedia EntryId="@entry.Id" Image="@media.Image" Video="@media.Video" OnClick="@(() => OpenGalleryAsync(entry, previewIndex))">
+                                            <ThumbnailContent>
+                                                <span class="badge text-bg-dark position-absolute bottom-0 start-0 m-1 opacity-75">
+                                                    <Icon Identifier="@(media.Video != null ? "film" : "image")" Prefix="fas" />
+                                                </span>
+                                            </ThumbnailContent>
+                                        </EntryMedia>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
 
@@ -126,4 +148,3 @@
         }
     </div>
 }
-

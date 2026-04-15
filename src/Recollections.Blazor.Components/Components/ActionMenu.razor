@@ -28,6 +28,9 @@
             Offcanvas.Show();
     }
 
+    void IItemContainer.Close()
+        => Offcanvas.Hide();
+
     RenderFragment<Item> IItemContainer.GetItemTemplate()
     {
         Log.Debug("Getting item template for EditButton.");

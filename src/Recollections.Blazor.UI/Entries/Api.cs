@@ -54,17 +54,34 @@ namespace Neptuo.Recollections.Entries
             return false;
         }
 
-        public Task<PageableList<EntryListModel>> GetTimelineListAsync(int? offset)
-            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+        public Task<PageableList<EntryListModel>> GetTimelineListAsync(int? offset, int? count = null)
+        {
+            var url = "timeline/list";
+            if (offset != null && offset > 0)
+                url = QueryHelpers.AddQueryString(url, "offset", offset.Value.ToString());
+            if (count != null && count > 0)
+                url = QueryHelpers.AddQueryString(url, "count", count.Value.ToString());
+            return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
+        }
 
         public Task<TimelineVisitResponse> VisitTimelineAsync()
             => faultHandler.Wrap(http.PostAsJsonAsync<object, TimelineVisitResponse>("timeline/visit", null));
 
-        public Task<PageableList<EntryListModel>> GetTimelineListAsync(string userId, int? offset)
-            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"profiles/{userId}/timeline/list{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+        public Task<PageableList<EntryListModel>> GetTimelineListAsync(string userId, int? offset, int? count = null)
+        {
+            var url = $"profiles/{userId}/timeline/list";
+            if (offset != null && offset > 0)
+                url = QueryHelpers.AddQueryString(url, "offset", offset.Value.ToString());
+            if (count != null && count > 0)
+                url = QueryHelpers.AddQueryString(url, "count", count.Value.ToString());
+            return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
+        }
         
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
+
+        public Task<List<EntryListModel>> GetHighestAltitudeListAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>("highest-altitude"));
 
         public async Task<string> GetMapCountriesAsync()
             => await faultHandler.Wrap(http.GetStringAsync("map/countries"));
@@ -108,6 +125,8 @@ namespace Neptuo.Recollections.Entries
         public string ImageUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/images";
 
         public string MediaUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/media";
+
+        public string TrackUploadUrl(string entryId) => $"{settings.BaseUrl}entries/{entryId}/track";
 
         public Task<List<StoryListModel>> GetStoryListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryListModel>>("stories"));
@@ -169,8 +188,15 @@ namespace Neptuo.Recollections.Entries
         public Task UpdateEntryBeingsAsync(string entryId, List<string> beingIds)
             => faultHandler.Wrap(http.PutAsJsonAsync($"entries/{entryId}/beings", beingIds));
 
-        public Task<PageableList<EntryListModel>> GetBeingTimelineAsync(string beingId, int? offset)
-            => faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>($"beings/{beingId}/timeline{(offset != null && offset > 0 ? $"?offset={offset}" : null)}"));
+        public Task<PageableList<EntryListModel>> GetBeingTimelineAsync(string beingId, int? offset, int? count = null)
+        {
+            var url = $"beings/{beingId}/timeline";
+            if (offset != null && offset > 0)
+                url = QueryHelpers.AddQueryString(url, "offset", offset.Value.ToString());
+            if (count != null && count > 0)
+                url = QueryHelpers.AddQueryString(url, "count", count.Value.ToString());
+            return faultHandler.Wrap(http.GetFromJsonAsync<PageableList<EntryListModel>>(url));
+        }
 
         public Task<List<MapEntryModel>> GetBeingMapAsync(string beingId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>($"beings/{beingId}/map"));

@@ -12,10 +12,29 @@ Here are some tips and tricks.
 
 ### Run dev mode
 
-We have Aspire app host.
+We have an Aspire app host.
 
-- `dotnet watch build src/Recollections.Blazor.UI` to make blazor recompile on change,
-- `dotnet run --project src/Recollections.AppHost` to run apire app host
+- `dotnet tool restore`
+- `dotnet watch build src/Recollections.Blazor.UI` to make Blazor recompile on change
+- `dotnet run ./src/AppHost.cs` to run the app host
+
+### Sample data and screenshots
+
+To seed the local development databases and media with the sample users/stories used for screenshots:
+
+```sh
+dotnet run ./src/SampleDataSeeder.cs
+```
+
+Sample credentials:
+
+- `jondoe / demo1234` (premium)
+- `janedoe / demo1234`
+- `billdoe / demo1234`
+
+Drop optimized photos into `assets/sample-data/media/` and rerun the seeder to refresh the media used in the demo dataset. If the folder is empty, the seeder falls back to bundled repo images so the structure still comes up populated.
+
+The PWA manifest screenshot assets live in `src/Recollections.Blazor.UI/wwwroot/img/screenshots/`; replace those files in place when you have final curated captures.
 
 ### VS code tasks
 

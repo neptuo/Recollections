@@ -42,6 +42,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected FileUploader FileUploader { get; set; }
 
         private IDisposable previousUploadListener;
+        private IDisposable previousTrackUploadListener;
         private string previousEntryId;
 
         [Parameter]
@@ -74,9 +75,27 @@ namespace Neptuo.Recollections.Entries.Pages
         }
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
         protected int MarkerCount => Markers.Count(m => m.Longitude != null && m.Latitude != null);
+        protected int TrackPointCount => Model?.Track?.PointCount ?? 0;
+        protected bool HasTrack => Model?.Track?.HasValue() == true;
+        protected bool HasMapContent => MarkerCount > 0 || HasTrack;
+        protected string MapTitle
+        {
+            get
+            {
+                if (HasTrack && MarkerCount > 0)
+                    return $"Track and {MarkerCount} locations";
+                else if (HasTrack)
+                    return $"Track ({TrackPointCount} points)";
+                else if (MarkerCount > 0)
+                    return $"{MarkerCount} locations";
+                else
+                    return "No locations...";
+            }
+        }
         protected List<FileUploadProgress> UploadProgress { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
+        protected FileUpload TrackUpload { get; set; }
         protected List<GalleryModel> GalleryItems { get; } = new List<GalleryModel>();
 
         public override Task SetParametersAsync(ParameterView parameters)
@@ -96,12 +115,15 @@ namespace Neptuo.Recollections.Entries.Pages
 
                 previousUploadListener?.Dispose();
                 previousUploadListener = FileUploader.AddProgressListener("entry", EntryId, (progresses) => _ = OnUploadProgressAsync(progresses));
+                previousTrackUploadListener?.Dispose();
+                previousTrackUploadListener = FileUploader.AddProgressListener("entry-track", EntryId, (progresses) => _ = OnTrackUploadProgressAsync(progresses));
             }
         }
         
         public void Dispose()
         {
             previousUploadListener?.Dispose();
+            previousTrackUploadListener?.Dispose();
         }
 
         private async Task LoadStoryAsync()
@@ -218,6 +240,7 @@ namespace Neptuo.Recollections.Entries.Pages
                     {
                         Type = "video",
                         Title = item.Video.Name,
+                        SizeText = Utils.FileSizeText(item.Video.OriginalSize),
                         Width = item.Video.Preview.Width,
                         Height = item.Video.Preview.Height,
                         ContentType = item.Video.ContentType,
@@ -263,6 +286,9 @@ namespace Neptuo.Recollections.Entries.Pages
             else if (item.Video != null)
                 Navigator.OpenVideoDetail(EntryId, item.Video.Id);
         }
+
+        protected Task OpenTrackImportAsync()
+            => TrackUpload?.OpenAsync() ?? Task.CompletedTask;
 
         protected async Task SaveTitleAsync(string value)
         {
@@ -373,6 +399,17 @@ namespace Neptuo.Recollections.Entries.Pages
             StateHasChanged();
         }
 
+        protected async Task OnTrackUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
+        {
+            if (progresses.All(p => p.Status == "done" || p.Status == "error"))
+            {
+                if (progresses.Any(p => p.IsDone))
+                    await LoadAsync();
+
+                StateHasChanged();
+            }
+        }
+
         public async Task DeleteAsync()
         {
             if (await Navigator.AskAsync($"Do you really want to delete entry '{Model.Title}'?"))
@@ -385,6 +422,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected int SelectedLocationIndex { get; set; }
         protected LocationModel SelectedLocation { get; set; }
         protected LocationEdit LocationEdit { get; set; }
+        protected TrackEdit TrackEdit { get; set; }
 
         protected void OnLocationSelected(int index)
         {
@@ -429,6 +467,23 @@ namespace Neptuo.Recollections.Entries.Pages
             Markers.RemoveAt(SelectedLocationIndex + Media.Count);
             LocationEdit.Hide();
             await SaveAsync();
+        }
+
+        protected void OnTrackSelected()
+        {
+            if (Model?.Track?.HasValue() == true)
+            {
+                TrackEdit.Show();
+                StateHasChanged();
+            }
+        }
+
+        protected async Task DeleteTrackAsync()
+        {
+            Model.Track = new EntryTrackModel();
+            TrackEdit.Hide();
+            await SaveAsync();
+            await LoadAsync();
         }
 
         protected Task SaveSelectedLocationAsync(LocationModel model)

@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Components
@@ -34,6 +33,8 @@ namespace Neptuo.Recollections.Components
                 foreach (var marker in editor.Markers)
                     hashCode.Add(marker);
             }
+
+            hashCode.Add(editor.Path);
 
             return hashCode.ToHashCode();
         }
@@ -99,6 +100,7 @@ namespace Neptuo.Recollections.Components
                     "updateMarkers", 
                     editor.Container, 
                     editor.Markers,
+                    editor.Path,
                     editor.IsEditable
                 );
             }
@@ -129,7 +131,7 @@ namespace Neptuo.Recollections.Components
             if (!string.IsNullOrEmpty(navigationManager.HistoryEntryState))
             {
                 log.Debug($"Reading map position from history state '{navigationManager.HistoryEntryState}'");
-                position = JsonSerializer.Deserialize<MapPosition>(navigationManager.HistoryEntryState);
+                position = PageHistoryState.Parse(navigationManager.HistoryEntryState).Map;
             }
 
             return position;
@@ -142,6 +144,10 @@ namespace Neptuo.Recollections.Components
         [JSInvokable("MapInterop.MarkerSelected")]
         public async void MarkerSelected(int index) => await editor.MarkerSelected.InvokeAsync(index);
 
+        [JSInvokable("MapInterop.PathSelected")]
+        public async Task PathSelected()
+            => await editor.SelectPathAsync();
+
         [JSInvokable("MapInterop.MoveEnd")]
         public void MoveEnd(double latitude, double longitude, int zoom)
         {
@@ -149,20 +155,23 @@ namespace Neptuo.Recollections.Components
             var position = new MapPosition(latitude, longitude, zoom);
             previousMapPositionHashCode = position.GetHashCode();
 
-            var userState = JsonSerializer.Serialize(position);
-            if (navigationManager.HistoryEntryState == userState)
+            var userState = PageHistoryState.Parse(navigationManager.HistoryEntryState);
+            if (userState.Map == position)
             {
                 log.Debug("Map position unchanged in history state.");
                 return;
             }
 
-            log.Debug($"Replacing history entry with new map position '{userState}'");
+            userState.Map = position;
+            var serializedState = userState.ToJson();
+
+            log.Debug($"Replacing history entry with new map position '{serializedState}'");
             navigationManager.NavigateTo(
                 navigationManager.Uri, 
                 new NavigationOptions()
                 {
                     ReplaceHistoryEntry = true, 
-                    HistoryEntryState = userState
+                    HistoryEntryState = serializedState
                 }
             );
         }

@@ -10,6 +10,17 @@
         <PermissionContainer State="@Permissions">
             <ActionMenu>
                 <ItemGroup Text="@Model.Title">
+                    <PermissionView Request="@PermissionRequest.Write">
+                        <FileUpload
+                            Text="Upload media"
+                            EntityType="entry"
+                            EntityId="@EntryId"
+                            Url="@Api.MediaUploadUrl(Model.Id)"
+                            ButtonCssClass="list-group-item list-group-item-action border-0 rounded-0 w-100 text-start"
+                            FormCssClass="d-block"
+                        />
+                        <Item Icon="location-arrow" Text="Import GPX track" OnClick="OpenTrackImportAsync" />
+                    </PermissionView>
                     @if (Gallery != null)
                     {
                         <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.OpenAsync(0))" />
@@ -72,8 +83,8 @@
                 @if (UserState.IsAuthenticated)
                 {
                     <div class="gps">
-                        <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(MarkerCount == 0 ? "No locations..." : $"{MarkerCount} locations")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
-                            <Map Markers="@Markers" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" />
+                        <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@MapTitle" IsPlaceHolder="@(!HasMapContent)" IsEnabled="@(HasMapContent || Permissions.IsEditable)">
+                            <Map Markers="@Markers" Path="@Model.Track?.Data" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" PathSelected="OnTrackSelected" />
                         </MapToggle>
                     </div>
                 }
@@ -108,7 +119,7 @@
                                         <span class="media-type-badge">
                                             <Icon Identifier="@(item.Video != null ? "film" : "image")" Prefix="fas" />
                                         </span>
-                                        <button class="btn btn-outline-primary border-0 p-0" @onclick="@onClick" @onclick:stopPropagation="true">
+                                        <button class="btn btn-outline-primary border-0 p-0 position-absolute top-0 end-0 m-1 z-1" @onclick="@onClick" @onclick:stopPropagation="true">
                                             <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
                                         </button>
                                     </ThumbnailContent>
@@ -141,21 +152,29 @@
                     </div>
                 }
 
-                <ActionPanel>
-                    <PermissionView Request="@PermissionRequest.Write">
-                        <FileUpload 
-                            EntityType="entry"
-                            EntityId="@EntryId"
-                            Url="@Api.MediaUploadUrl(Model.Id)"
-                            DragAndDropContainer="Container"
-                        />
-                    </PermissionView>
-                </ActionPanel>
+                <PermissionView Request="@PermissionRequest.Write">
+                    <FileUploadCurrentEntity
+                        EntityType="entry"
+                        EntityId="@EntryId"
+                        Url="@Api.MediaUploadUrl(Model.Id)"
+                    />
+                    <FileUpload
+                        @ref="TrackUpload"
+                        Text="Import GPX"
+                        EntityType="entry-track"
+                        EntityId="@EntryId"
+                        Url="@Api.TrackUploadUrl(Model.Id)"
+                        Accept=".gpx,application/gpx+xml"
+                        IsMultiple="false"
+                        CssClass="d-none"
+                    />
+                </PermissionView>
             </div>
         </PermissionContainer>
     </CascadingValue>
 
     <LocationEdit @ref="LocationEdit" Save="@SaveSelectedLocationAsync" Delete="@DeleteSelectedLocationAsync" />
+    <TrackEdit @ref="TrackEdit" Track="@Model?.Track" IsEditable="@Permissions.IsEditable" Delete="@DeleteTrackAsync" />
 
     <StoryPicker @ref="StoryPicker" Selected="StorySelectedAsync" />
     <BeingPicker @ref="BeingPicker" Selected="BeingSelectedAsync" />

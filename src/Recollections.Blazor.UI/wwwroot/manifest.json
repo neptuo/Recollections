@@ -29,6 +29,29 @@
       "purpose":"maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/img/screenshots/timeline-sample.png",
+      "type": "image/png",
+      "sizes": "430x932",
+      "label": "Timeline with sample recollections",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/img/screenshots/entry-detail-sample.png",
+      "type": "image/png",
+      "sizes": "430x932",
+      "label": "Entry detail with sample photos and map",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/img/screenshots/map-sample.png",
+      "type": "image/png",
+      "sizes": "1440x900",
+      "label": "Map view with sample locations",
+      "form_factor": "wide"
+    }
+  ],
   "share_target": {
     "action": "/",
     "method":"POST",

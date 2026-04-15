@@ -4,7 +4,7 @@
 
 <DocumentTitle Value="Timeline" />
 
-<Timeline DataGetter="@(offset => Api.GetTimelineListAsync(offset))" ShowYearSeparators="true">
+<Timeline DataGetter="@((offset, count) => Api.GetTimelineListAsync(offset, count))" ShowYearSeparators="true">
     <BeforeContent>
         <EntryCreate />
         <OnThisDayBanner />
@@ -12,8 +12,8 @@
         @if (newEntriesCount > 0 && !isNewEntriesBannerDismissed)
         {
             <div class="entry">
-                <div class="body">
-                    <div class="alert alert-info alert-dismissible d-flex align-items-center" role="alert">
+                <div class="body mb-4">
+                    <div class="alert alert-info alert-dismissible d-flex align-items-center mb-0" role="alert">
                         <Icon Identifier="bell" CssClass="me-1" />
                         @newEntriesCount new @(newEntriesCount == 1 ? "entry" : "entries") since your last visit
                         <button type="button" class="btn-close" @onclick="@(() => isNewEntriesBannerDismissed = true)"></button>

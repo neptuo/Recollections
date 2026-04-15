@@ -19,6 +19,7 @@ namespace Neptuo.Recollections.Entries
         
         public LocationModel Location { get; set; } = new();
         public double? Duration { get; set; }
+        public long? OriginalSize { get; set; }
 
         public VideoModel Clone() => new VideoModel()
         {
@@ -32,7 +33,8 @@ namespace Neptuo.Recollections.Entries
             Description = Description,
             When = When,
             Location = Location.Clone(),
-            Duration = Duration
+            Duration = Duration,
+            OriginalSize = OriginalSize
         };
 
         public override bool Equals(object obj)
@@ -49,7 +51,8 @@ namespace Neptuo.Recollections.Entries
             Description == other.Description &&
             When == other.When &&
             Location.Equals(other.Location) &&
-            Duration == other.Duration;
+            Duration == other.Duration &&
+            OriginalSize == other.OriginalSize;
 
         public override int GetHashCode()
         {
@@ -65,6 +68,7 @@ namespace Neptuo.Recollections.Entries
             hash.Add(When);
             hash.Add(Location);
             hash.Add(Duration);
+            hash.Add(OriginalSize);
             return hash.ToHashCode();
         }
     }

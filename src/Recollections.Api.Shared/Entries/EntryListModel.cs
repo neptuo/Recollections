@@ -21,4 +21,8 @@ public record EntryListModel
     int ImageCount,
     int VideoCount,
     int GpsCount
-);
+)
+{
+    public double? Altitude { get; init; }
+    public List<MediaModel> PreviewMedia { get; init; } = [];
+}

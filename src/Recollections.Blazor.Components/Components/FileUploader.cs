@@ -13,9 +13,13 @@ public class FileUploader
     private readonly ILog<FileUploader> log;
     
     private FileUploadProgress[] lastProgresses;
-    private List<Action<FileUploadProgress[]>> progressNotifications = [];
-    private Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotificationsPerEntity = [];
-    private List<Action<string, string, string>> currentEntityListeners = [];
+    private readonly List<Action<FileUploadProgress[]>> progressNotifications = [];
+    private readonly Dictionary<string, List<Action<FileUploadProgress[]>>> progressNotificationsPerEntity = [];
+    private readonly List<Action<string, string, string>> currentEntityListeners = [];
+    private readonly List<Action> storedFilesChangedListeners = [];
+    private string currentEntityType;
+    private string currentEntityId;
+    private string currentEntityUrl;
 
     public FileUploader(FileUploadInterop interop, ILog<FileUploader> log)
     {
@@ -37,14 +41,8 @@ public class FileUploader
             dragAndDropContainer
         );
 
-        currentEntityListeners.ForEach(l => l(entityType, entityId, url));
-
         // TODO: Create disposable to unbind the form.
-        return new AsyncDisposableAction(() => 
-        {
-            currentEntityListeners.ForEach(l => l(null, null, null));
-            return Task.CompletedTask;
-        });
+        return new AsyncDisposableAction(() => Task.CompletedTask);
     }
 
     private void RaiseProgressNotification(FileUploadProgress[] progresses)
@@ -81,6 +79,12 @@ public class FileUploader
         RaiseProgressNotification(lastProgresses);
     }
 
+    internal void OnStoredFilesChanged()
+    {
+        foreach (var listener in storedFilesChangedListeners.ToArray())
+            listener();
+    }
+
     public IDisposable AddProgressListener(Action<FileUploadProgress[]> listener)
     {
         progressNotifications.Add(listener);
@@ -108,15 +112,49 @@ public class FileUploader
         });
     }
 
+    public IDisposable AddStoredFilesChangedListener(Action listener)
+    {
+        storedFilesChangedListeners.Add(listener);
+        log.Debug($"AddStoredFilesChangedListener contains '{storedFilesChangedListeners.Count}' listeners");
+        return new DisposableAction(() =>
+        {
+            storedFilesChangedListeners.Remove(listener);
+            log.Debug($"RemoveStoredFilesChangedListener remaining '{storedFilesChangedListeners.Count}' listeners");
+        });
+    }
+
     public IDisposable AddCurrentEntityListener(Action<string, string, string> listener)
     {
         currentEntityListeners.Add(listener);
         log.Debug($"AddCurrentEntityListener contains '{currentEntityListeners.Count}' listeners");
+        if (currentEntityType != null || currentEntityId != null || currentEntityUrl != null)
+            listener(currentEntityType, currentEntityId, currentEntityUrl);
+
         return new DisposableAction(() =>
         {
             currentEntityListeners.Remove(listener);
             log.Debug($"RemoveCurrentEntityListener remaining '{currentEntityListeners.Count}' listeners");
         });
+    }
+
+    public IDisposable RegisterCurrentEntity(string entityType, string entityId, string url)
+    {
+        SetCurrentEntity(entityType, entityId, url);
+        log.Debug($"RegisterCurrentEntity '{entityType}_{entityId}'");
+        return new DisposableAction(() =>
+        {
+            if (currentEntityType == entityType && currentEntityId == entityId && currentEntityUrl == url)
+                SetCurrentEntity(null, null, null);
+        });
+    }
+
+    private void SetCurrentEntity(string entityType, string entityId, string url)
+    {
+        currentEntityType = entityType;
+        currentEntityId = entityId;
+        currentEntityUrl = url;
+        _ = interop.SetCurrentEntityAsync(entityType, entityId, url);
+        currentEntityListeners.ForEach(l => l(entityType, entityId, url));
     }
 
     public Task<FileUploadToRetry[]> GetStoredFilesToRetryAsync()
@@ -131,12 +169,19 @@ public class FileUploader
     public Task ClearStoredFilesAsync(IEnumerable<string> ids)
         => interop.ClearStoredFilesAsync(ids);
 
-    public Task RemoveStoredFileAsync(string id)
-        => interop.RemoveStoredFileAsync(id);
+    public async Task RemoveStoredFileAsync(string id)
+    {
+        await interop.RemoveStoredFileAsync(id);
+    }
 
     public Task SetBearerTokenAsync(string userId, string bearerToken)
         => interop.SetBearerTokenAsync(userId, bearerToken);
 
-    public Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
-        => interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
+    public async Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
+    {
+        await interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
+    }
+
+    public Task OpenAsync(ElementReference formElement)
+        => interop.OpenAsync(formElement);
 }

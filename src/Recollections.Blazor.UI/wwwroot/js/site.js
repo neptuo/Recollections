@@ -395,3 +395,99 @@ window.ImageSource = {
         element.src = url;
     }
 }
+
+function escapeCssSelectorValue(value) {
+    var stringValue = String(value);
+
+    if (window.CSS && typeof window.CSS.escape === "function") {
+        return window.CSS.escape(stringValue);
+    }
+
+    return stringValue.replace(/["\\]/g, "\\$&");
+}
+
+function canReplacePageHistoryState() {
+    return window.history && typeof window.history.replaceState === "function";
+}
+
+function readPageHistoryUserState() {
+    var historyState = window.history.state;
+    var userState = {};
+    var serializedUserState = historyState && typeof historyState === "object" ? historyState.userState : null;
+    if (typeof serializedUserState === "string" && serializedUserState.length > 0) {
+        try {
+            userState = JSON.parse(serializedUserState);
+        } catch {
+            userState = {};
+        }
+    }
+
+    if (userState && typeof userState === "object") {
+        if (!userState.Map && typeof userState.Latitude === "number" && typeof userState.Longitude === "number") {
+            userState = { Map: userState };
+        } else if (!userState.Timeline && typeof userState.Offset === "number" && typeof userState.EntryId === "string") {
+            userState = { Timeline: userState };
+        }
+    } else {
+        userState = {};
+    }
+
+    return {
+        historyState: historyState,
+        userState: userState
+    };
+}
+
+function updatePageHistoryUserState(update) {
+    if (!canReplacePageHistoryState() || typeof update !== "function") {
+        return;
+    }
+
+    var current = readPageHistoryUserState();
+    update(current.userState);
+
+    var nextHistoryState = current.historyState && typeof current.historyState === "object"
+        ? Object.assign({}, current.historyState)
+        : {};
+
+    nextHistoryState.userState = JSON.stringify(current.userState);
+    window.history.replaceState(nextHistoryState, "", window.location.href);
+}
+
+window.Timeline = {
+    StorePosition: function (element) {
+        if (!element) {
+            return;
+        }
+
+        var entryId = element.getAttribute("data-entry-id");
+        var offset = Number.parseInt(element.getAttribute("data-entry-offset"), 10);
+        if (!entryId || Number.isNaN(offset)) {
+            return;
+        }
+
+        updatePageHistoryUserState(function (userState) {
+            userState.Timeline = {
+                Offset: offset,
+                EntryId: entryId
+            };
+        });
+    },
+    StorePositionOnKeyDown: function (element, event) {
+        if (event && (event.key === "Enter" || event.key === " ")) {
+            window.Timeline.StorePosition(element);
+        }
+    },
+    ClearPosition: function () {
+        updatePageHistoryUserState(function (userState) {
+            delete userState.Timeline;
+        });
+    },
+    ScrollToEntry: function (entryId) {
+        var escapedEntryId = escapeCssSelectorValue(entryId);
+        var element = document.querySelector('[data-entry-id="' + escapedEntryId + '"]');
+        if (element) {
+            element.scrollIntoView({ block: "center" });
+        }
+    }
+};

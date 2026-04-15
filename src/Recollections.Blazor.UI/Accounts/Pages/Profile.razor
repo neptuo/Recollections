@@ -25,7 +25,7 @@
                     <ShareLinkButton />
                 </ActionPanel>
 
-                <Timeline DataGetter="@(offset => EntriesApi.GetTimelineListAsync(UserId, offset))" NoMoreText="Here the user started..." />
+                <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" NoMoreText="Here the user started..." />
             </div>
         </PermissionContainer>
     </CascadingValue>

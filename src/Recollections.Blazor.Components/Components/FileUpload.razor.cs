@@ -22,11 +22,17 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected ILog<FileUpload> Log { get; set; }
 
-        private string previousEntityType;
-        private string previousEntityId;
+        [CascadingParameter]
+        protected IItemContainer Container { get; set; }
 
         [Parameter]
         public string Text { get; set; } = DefaultText;
+
+        [Parameter]
+        public string ButtonCssClass { get; set; } = "btn btn-sm btn-primary";
+
+        [Parameter]
+        public string FormCssClass { get; set; }
 
         [Parameter]
         public string EntityType { get; set; }
@@ -40,17 +46,19 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
 
+        [Parameter]
+        public string Accept { get; set; }
+
+        [Parameter]
+        public bool IsMultiple { get; set; } = true;
+
+        [Parameter]
+        public string CssClass { get; set; }
+
         internal ElementReference FormElement { get; private set; }
 
         protected Modal UploadError { get; set; }
         protected List<FileUploadProgress> UploadErrors { get; } = [];
-
-        public override Task SetParametersAsync(ParameterView parameters)
-        {
-            previousEntityType = EntityType;
-            previousEntityId = EntityId;
-            return base.SetParametersAsync(parameters);
-        }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
@@ -66,6 +74,15 @@ namespace Neptuo.Recollections.Components
         {
             if (formBinding != null)
                 await formBinding.DisposeAsync();
+        }
+
+        public Task OpenAsync()
+            => FileUploader.OpenAsync(FormElement);
+
+        private async Task OnClick()
+        {
+            Container?.Close();
+            await OpenAsync();
         }
     }
 }

@@ -28,6 +28,7 @@ public partial class HeadLayout : IDisposable
     protected ExceptionPanel ExceptionPanel { get; set; }
     protected ChangePasswordModal ChangePasswordModal { get; set; }
     protected Toast ThemeToast { get; set; }
+    protected ElementReference PageContainer { get; set; }
 
     protected override void OnInitialized()
     {
@@ -82,6 +83,7 @@ public class MenuList
         Add(new MenuItem("Main menu", "bars"), Bottom);
         Add(new MenuItem("Timeline", "timeline", CssClass: "fa-rotate-270", Url: navigator.UrlTimeline(), PageType: typeof(TimelineList), Match: NavLinkMatch.All), Main, Bottom);
         Add(new MenuItem("Map", "map-marked-alt", Url: navigator.UrlMap()), Main);
+        Add(new MenuItem("Altitude", "arrow-up-short-wide", Url: navigator.UrlHighestAltitude()), Main);
         Add(new MenuItem("Calendar", "calendar-alt", Url: navigator.UrlCalendar()), Main);
         Add(new MenuItem("Search", "search", Url: navigator.UrlSearch()), Main, Bottom);
         Add(new MenuItem("Stories", "book", Url: navigator.UrlStories()), Main, Bottom);

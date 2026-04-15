@@ -12,19 +12,21 @@ namespace Neptuo.Recollections
         static void Main(string[] args)
         {
             string connectionString = null;
-
-            if (args.Length == 0)
+            if (connectionString == null)
             {
-                connectionString = Console.ReadLine();
-            }
-            else if (args.Length != 1)
-            {
-                Console.WriteLine("Pass one argument with connection string to database to migrate.");
-                return;
-            }
-            else
-            {
-                connectionString = args[0];
+                if (args.Length == 0)
+                {
+                    connectionString = Console.ReadLine();
+                }
+                else if (args.Length != 1)
+                {
+                    Console.WriteLine("Pass one argument with connection string to database to migrate.");
+                    return;
+                }
+                else
+                {
+                    connectionString = args[0];
+                }
             }
 
             Console.WriteLine("Creating contexts.");

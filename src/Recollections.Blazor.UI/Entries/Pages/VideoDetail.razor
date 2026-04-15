@@ -33,6 +33,12 @@
                     <InlineLink Value="@TimeSpan.FromSeconds(Model.Duration.Value).ToString(@"hh\:mm\:ss")" Icon="stopwatch" />
                 </div>
             }
+            @if (Model.OriginalSize != null)
+            {
+                <div class="size">
+                    <InlineLink Value="@($"Original size: {Utils.FileSizeText(Model.OriginalSize)}")" Icon="download" />
+                </div>
+            }
             <UserInformation Owner="@Owner" />
             @if (UserState.IsAuthenticated)
             {

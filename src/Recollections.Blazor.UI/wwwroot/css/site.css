@@ -25368,8 +25368,6 @@ input.input-number-noarrows[type=number] {
 }
 .main-navbar.block-icons .nav-link {
   text-align: center;
-  padding-right: 1.1rem;
-  padding-left: 1.1rem;
 }
 @media (max-width: 767.98px) {
   .main-navbar.block-icons .nav-link {
@@ -25783,6 +25781,20 @@ input.input-number-noarrows[type=number] {
   }
 }
 
+@media (min-width: 520px) {
+  .timeline-preview-media .image img, .timeline-preview-media .image .img {
+    -webkit-transition: -webkit-transform 0.5s;
+    transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+    transition: transform 0.5s, -webkit-transform 0.5s;
+  }
+  .timeline-preview-media .image img:hover, .timeline-preview-media .image .img:hover {
+    -webkit-transform: scale(1.05);
+        -ms-transform: scale(1.05);
+            transform: scale(1.05);
+  }
+}
+
 .pswp__title {
   position: absolute;
   bottom: 20px;
@@ -25809,19 +25821,6 @@ img.pswp__video {
 
 video.pswp__video {
   cursor: auto !important;
-}
-
-.pswp__media-type-badge {
-  position: absolute;
-  bottom: 60px;
-  left: 20px;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 1rem;
-  z-index: 10;
-  pointer-events: none;
 }
 
 .entry-picker .modal-body {
@@ -26039,4 +26038,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/worktrees/Recollections/maraf/kenspeckle-sharan/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=site.css.map */

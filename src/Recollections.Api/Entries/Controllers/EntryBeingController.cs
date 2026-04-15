@@ -45,18 +45,24 @@ namespace Neptuo.Recollections.Entries.Controllers
         [ProducesResponseType(Status200OK)]
         [ProducesResponseType(Status401Unauthorized)]
         [ProducesResponseType(Status404NotFound)]
-        public Task<IActionResult> Get(string entryId) => RunEntryAsync(entryId, Permission.Read, entry =>
+        public Task<IActionResult> Get(string entryId) => RunEntryAsync(entryId, Permission.Read, async entry =>
         {
-            var models = entry.Beings
+            string userId = User.FindUserId();
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            var beingIds = entry.Beings.Select(b => b.Id).ToList();
+
+            var models = await shareStatus
+                .OwnedByOrExplicitlySharedWithUser(db, db.Beings.Where(b => beingIds.Contains(b.Id)), userId, connectedUsers)
                 .OrderBy(b => b.Name)
                 .Select(b => new EntryBeingModel
                 (
                     Id: b.Id,
                     Name: b.Name,
                     Icon: b.Icon
-                ));
+                ))
+                .ToListAsync();
 
-            return Task.FromResult<IActionResult>(Ok(models));
+            return Ok(models);
         });
 
         [HttpPut]

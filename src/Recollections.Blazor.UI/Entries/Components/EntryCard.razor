@@ -16,6 +16,14 @@
                 @Model.When.ToString(UiOptions.DateFormat)
             </div>
 
+            @if (Model.Altitude != null)
+            {
+                <div class="information">
+                    <Icon Identifier="arrow-up-short-wide" />
+                    @($"{UiOptions.FormatWholeNumber(Model.Altitude.Value)} m")
+                </div>
+            }
+
             @if (!String.IsNullOrEmpty(Model.StoryTitle) || !String.IsNullOrEmpty(Model.ChapterTitle))
             {
                 <div class="information">

@@ -48,12 +48,12 @@ namespace Neptuo.Recollections.Entries
                 .Configure<MapOptions>(configuration.GetSection("Map"));
 
             services
-                .AddHttpClient("mapy.cz", (services, http) => 
+                .AddHttpClient("mapy.cz", (services, http) =>
                 {
                     string apiKey = services.GetService<IOptions<MapOptions>>().Value.ApiKey;
                     if (!string.IsNullOrEmpty(apiKey))
                         http.DefaultRequestHeaders.Add("X-Mapy-Api-Key", apiKey);
-                    
+
                     http.BaseAddress = new Uri("https://api.mapy.cz/", UriKind.Absolute);
                 });
 
@@ -83,8 +83,11 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddTransient<ImageService>()
                 .AddTransient<VideoService>()
+                .AddTransient<GpxImportService>()
                 .AddTransient<ImageResizeService>()
+                .AddTransient<EntryMediaMapper>()
                 .AddTransient<EntryListMapper>()
+                .AddTransient<HighestAltitudeService>()
                 .AddTransient<StoryListMapper>()
                 .AddTransient<MapService>()
                 .AddSingleton<CountryService>()
