@@ -79,8 +79,14 @@ namespace Neptuo.Recollections.Entries
 
             while (index < data.Length)
             {
-                latitude += DecodeNextCoordinate(data, ref index);
-                longitude += DecodeNextCoordinate(data, ref index);
+                if (!TryDecodeNextCoordinate(data, ref index, out int latitudeDelta))
+                    return [];
+
+                if (!TryDecodeNextCoordinate(data, ref index, out int longitudeDelta))
+                    return [];
+
+                latitude += latitudeDelta;
+                longitude += longitudeDelta;
 
                 result.Add(new LocationModel()
                 {
@@ -156,21 +162,32 @@ namespace Neptuo.Recollections.Entries
             builder.Append((char)(value + 63));
         }
 
-        private static int DecodeNextCoordinate(string data, ref int index)
+        private static bool TryDecodeNextCoordinate(string data, ref int index, out int coordinate)
         {
+            coordinate = 0;
+            if (index >= data.Length)
+                return false;
+
             int result = 0;
             int shift = 0;
-            int value;
-
-            do
+            while (true)
             {
-                value = data[index++] - 63;
+                if (index >= data.Length)
+                    return false;
+
+                int value = data[index++] - 63;
+                if (value < 0)
+                    return false;
+
                 result |= (value & 0x1f) << shift;
                 shift += 5;
-            }
-            while (value >= 0x20 && index < data.Length);
 
-            return (result & 1) == 1 ? ~(result >> 1) : (result >> 1);
+                if (value < 0x20)
+                    break;
+            }
+
+            coordinate = (result & 1) == 1 ? ~(result >> 1) : (result >> 1);
+            return true;
         }
 
         private static IReadOnlyList<LocationModel> Simplify(IReadOnlyList<LocationModel> locations)

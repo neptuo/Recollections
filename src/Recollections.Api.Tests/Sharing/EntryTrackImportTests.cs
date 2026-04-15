@@ -129,6 +129,20 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
     }
 
     [Fact]
+    public void TrackImport_DecodeTruncatedData_ReturnsEmptyList()
+    {
+        var service = new GpxImportService();
+        var track = service.Create([
+            new LocationModel() { Latitude = 50.087, Longitude = 14.421 },
+            new LocationModel() { Latitude = 50.095, Longitude = 14.430 }
+        ]);
+
+        var decoded = service.Decode(track.Data[..^1]);
+
+        Assert.Empty(decoded);
+    }
+
+    [Fact]
     public void TrackImport_ComputesTotalElevationGain()
     {
         var service = new GpxImportService();
