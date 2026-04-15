@@ -45,11 +45,11 @@ async function getStoredFilesByFlag(assigned) {
         const uId = response.headers.get('X-User-Id');
         let isPassed = false;
         if (assigned) {
-            if (entityType != null && entityId != null && uId == userId) {
+            if (entityType && entityId && uId == userId) {
                 isPassed = true;
             }
         } else {
-            if (entityType == '' && entityId == '' && uId == '') {
+            if (!entityType && !entityId && (!uId || uId == userId)) {
                 isPassed = true;
             }
         }
@@ -72,11 +72,6 @@ async function getStoredFilesByFlag(assigned) {
     }
 
     return storedFiles;
-}
-
-export async function removeStoredFile(id) {
-    const mediaCache = await caches.open('media');
-    mediaCache.delete(id);
 }
 
 class EntityUploadQueue {
@@ -141,7 +136,7 @@ class EntityUploadQueue {
                 (response) => {
                     // Remove successfully uploaded file from IndexedDB
                     if (storedFile.id) {
-                        removeStoredFile(storedFile.id);
+                        removeStoredFileInternal(storedFile.id, false);
                     }
 
                     this.uploadStep(response);
@@ -196,6 +191,11 @@ class EntityUploadQueue {
 
     async storeAndQueueFiles(items, actionUrl, entityType, entityId) {
         const storedItems = await storeFiles(items, actionUrl, entityType, entityId, userId);
+        if (!actionUrl || !entityType || !entityId) {
+            raiseStoredFilesChanged();
+            return;
+        }
+
         this.addStoredFilesToQueue(storedItems);
     }
 
@@ -226,9 +226,67 @@ class EntityUploadQueue {
 }
 
 const queue = new EntityUploadQueue();
+const previewUrlCache = new Map();
 let interop;
 let userId;
 let bearerToken;
+let currentEntityType;
+let currentEntityId;
+let currentActionUrl;
+let isDropTargetBound = false;
+
+function hasFiles(dataTransfer) {
+    return dataTransfer && Array.from(dataTransfer.types || []).includes('Files');
+}
+
+function raiseStoredFilesChanged() {
+    if (interop) {
+        interop.invokeMethodAsync("FileUpload.OnStoredFilesChanged");
+    }
+}
+
+function ensureDropTargetBinding() {
+    if (isDropTargetBound) {
+        return;
+    }
+
+    const dropTarget = document.body || document.documentElement;
+    if (!dropTarget) {
+        return;
+    }
+
+    const preventDefault = function (e) {
+        if (hasFiles(e.dataTransfer)) {
+            e.preventDefault();
+        }
+    };
+
+    dropTarget.addEventListener('drag', preventDefault);
+    dropTarget.addEventListener('dragstart', preventDefault);
+    dropTarget.addEventListener('dragend', preventDefault);
+    dropTarget.addEventListener('dragover', preventDefault);
+    dropTarget.addEventListener('dragenter', preventDefault);
+    dropTarget.addEventListener('dragleave', preventDefault);
+    dropTarget.addEventListener('drop', function (e) {
+        if (!hasFiles(e.dataTransfer)) {
+            return;
+        }
+
+        if (!bearerToken) {
+            return;
+        }
+
+        queue.storeAndQueueFiles(
+            e.dataTransfer.files,
+            currentActionUrl,
+            currentEntityType,
+            currentEntityId
+        );
+        e.preventDefault();
+    });
+
+    isDropTargetBound = true;
+}
 
 export function initialize(interopValue) {
     interop = interopValue;
@@ -237,6 +295,12 @@ export function initialize(interopValue) {
 export function setBearerToken(userIdValue, bearerTokenValue) {
     userId = userIdValue;
     bearerToken = bearerTokenValue;
+}
+
+export function setCurrentEntity(entityTypeValue, entityIdValue, actionUrlValue) {
+    currentEntityType = entityTypeValue;
+    currentEntityId = entityIdValue;
+    currentActionUrl = actionUrlValue;
 }
 
 const _formData = new WeakMap();
@@ -249,41 +313,18 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
 
     var input = form.querySelector("input[type=file]");
 
-    var button = form.querySelector("button");
-    if (button) {
-        button.addEventListener('click', function (e) {
-            input.click();
-            e.preventDefault();
-        });
-    }
     input.addEventListener('change', async () => {
-        await queue.storeAndQueueFiles(input.files, url, entityType, entityId);
+        await queue.storeAndQueueFiles(
+            input.files,
+            url || currentActionUrl,
+            entityType || currentEntityType,
+            entityId || currentEntityId
+        );
         form.reset();
     });
 
     if (dragAndDropContainer) {
-        dragAndDropContainer.addEventListener('drag', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragstart', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragend', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragover', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragenter', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('drop', function (e) {
-            queue.storeAndQueueFiles(e.dataTransfer.files, url, entityType, entityId);
-            e.preventDefault();
-        });
+        ensureDropTargetBinding();
     }
 }
 
@@ -307,7 +348,34 @@ export async function getStoredFiles() {
 
 export async function getUnassignedSharedFiles() {
     const storedFiles = await getStoredFilesByFlag(false);
-    return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
+    const currentFileIds = new Set(storedFiles.map(f => `${f.id}`));
+
+    // Revoke cached preview URLs for files that no longer exist
+    for (const [cachedId, cachedUrl] of previewUrlCache) {
+        if (!currentFileIds.has(cachedId)) {
+            URL.revokeObjectURL(cachedUrl);
+            previewUrlCache.delete(cachedId);
+        }
+    }
+
+    return storedFiles.map(f => {
+        const fileId = `${f.id}`;
+        const contentType = f.file.type || '';
+        let previewUrl = previewUrlCache.get(fileId) || null;
+
+        if (!previewUrl && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
+            previewUrl = URL.createObjectURL(f.file);
+            previewUrlCache.set(fileId, previewUrl);
+        }
+
+        return {
+            name: f.file.name,
+            size: f.file.size,
+            id: fileId,
+            contentType: contentType,
+            previewUrl: previewUrl
+        };
+    });
 }
 
 export async function retryStoredFiles(ids) {
@@ -326,7 +394,8 @@ export async function clearStoredFiles(ids) {
         storedFiles = storedFiles.filter(f => ids.includes(`${f.id}`));
     }
     if (storedFiles.length > 0) {
-        await Promise.all(storedFiles.map(f => removeStoredFile(f.id)));
+        await Promise.all(storedFiles.map(f => removeStoredFileInternal(f.id, false)));
+        raiseStoredFilesChanged();
     }
 }
 
@@ -337,11 +406,31 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
     }
 
     const items = unassignedFiles.map(f => f.file);
-    queue.storeAndQueueFiles(items, url, entityType, entityId);
+    await queue.storeAndQueueFiles(items, url, entityType, entityId);
 
-    await Promise.all(unassignedFiles.map(f => removeStoredFile(f.id)));
+    await Promise.all(unassignedFiles.map(f => removeStoredFileInternal(f.id, false)));
+    raiseStoredFilesChanged();
 }
 
 export function destroy() {
 
+}
+
+async function removeStoredFileInternal(id, shouldNotify) {
+    const mediaCache = await caches.open('media');
+    await mediaCache.delete(id);
+
+    const cachedUrl = previewUrlCache.get(`${id}`);
+    if (cachedUrl) {
+        URL.revokeObjectURL(cachedUrl);
+        previewUrlCache.delete(`${id}`);
+    }
+
+    if (shouldNotify) {
+        raiseStoredFilesChanged();
+    }
+}
+
+export async function removeStoredFile(id) {
+    await removeStoredFileInternal(id, true);
 }

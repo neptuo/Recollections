@@ -28,6 +28,7 @@ public partial class HeadLayout : IDisposable
     protected ExceptionPanel ExceptionPanel { get; set; }
     protected ChangePasswordModal ChangePasswordModal { get; set; }
     protected Toast ThemeToast { get; set; }
+    protected ElementReference PageContainer { get; set; }
 
     protected override void OnInitialized()
     {

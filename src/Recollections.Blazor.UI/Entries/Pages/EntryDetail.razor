@@ -10,13 +10,21 @@
         <PermissionContainer State="@Permissions">
             <ActionMenu>
                 <ItemGroup Text="@Model.Title">
+                    <PermissionView Request="@PermissionRequest.Write">
+                        <FileUpload
+                            Text="Upload media"
+                            EntityType="entry"
+                            EntityId="@EntryId"
+                            Url="@Api.MediaUploadUrl(Model.Id)"
+                            ButtonCssClass="list-group-item list-group-item-action border-0 rounded-0 w-100 text-start"
+                            FormCssClass="d-block"
+                        />
+                        <Item Icon="location-arrow" Text="Import GPX track" OnClick="OpenTrackImportAsync" />
+                    </PermissionView>
                     @if (Gallery != null)
                     {
                         <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.OpenAsync(0))" />
                     }
-                    <PermissionView Request="@PermissionRequest.Write">
-                        <Item Icon="location-arrow" Text="Import GPX Track" OnClick="OpenTrackImportAsync" />
-                    </PermissionView>
                     <PermissionView Request="PermissionRequest.Owner">
                         <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
                     </PermissionView>
@@ -144,26 +152,23 @@
                     </div>
                 }
 
-                <ActionPanel>
-                    <PermissionView Request="@PermissionRequest.Write">
-                        <FileUpload 
-                            EntityType="entry"
-                            EntityId="@EntryId"
-                            Url="@Api.MediaUploadUrl(Model.Id)"
-                            DragAndDropContainer="Container"
-                        />
-                        <FileUpload
-                            @ref="TrackUpload"
-                            Text="Import GPX"
-                            EntityType="entry-track"
-                            EntityId="@EntryId"
-                            Url="@Api.TrackUploadUrl(Model.Id)"
-                            Accept=".gpx,application/gpx+xml"
-                            IsMultiple="false"
-                            CssClass="d-none"
-                        />
-                    </PermissionView>
-                </ActionPanel>
+                <PermissionView Request="@PermissionRequest.Write">
+                    <FileUploadCurrentEntity
+                        EntityType="entry"
+                        EntityId="@EntryId"
+                        Url="@Api.MediaUploadUrl(Model.Id)"
+                    />
+                    <FileUpload
+                        @ref="TrackUpload"
+                        Text="Import GPX"
+                        EntityType="entry-track"
+                        EntityId="@EntryId"
+                        Url="@Api.TrackUploadUrl(Model.Id)"
+                        Accept=".gpx,application/gpx+xml"
+                        IsMultiple="false"
+                        CssClass="d-none"
+                    />
+                </PermissionView>
             </div>
         </PermissionContainer>
     </CascadingValue>
