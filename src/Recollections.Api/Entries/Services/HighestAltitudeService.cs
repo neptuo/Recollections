@@ -74,6 +74,14 @@ public class HighestAltitudeService(DataContext dataContext, EntryListMapper ent
                     EntryId = v.Entry.Id,
                     When = v.Entry.When,
                     Altitude = v.Location.Altitude!.Value
+                }))
+            .Concat(accessibleEntries
+                .Where(e => e.TrackAltitude != null)
+                .Select(e => new
+                {
+                    EntryId = e.Id,
+                    e.When,
+                    Altitude = e.TrackAltitude!.Value
                 }));
 
         var rankedEntries = await altitudeSources

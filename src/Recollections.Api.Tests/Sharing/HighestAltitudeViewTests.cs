@@ -22,6 +22,7 @@ public class HighestAltitudeViewTests : IClassFixture<ApiFactory>, IAsyncLifetim
     private const string MultiSourceEntryId = "ha-entry-multi-source";
     private const string OwnedByBEntryId = "ha-entry-owned-by-b";
     private const string HiddenPrivateEntryId = "ha-entry-private-hidden";
+    private const string TrackOnlyEntryId = "ha-entry-track-only";
 
     public HighestAltitudeViewTests(ApiFactory factory)
     {
@@ -80,6 +81,15 @@ public class HighestAltitudeViewTests : IClassFixture<ApiFactory>, IAsyncLifetim
                 when: new DateTime(2024, 1, 5, 8, 0, 0, DateTimeKind.Utc));
             await DatabaseSeeder.SeedEntryLocation(entriesDb, hiddenPrivate, 48.149, 17.107, altitude: 3000);
 
+            var trackOnly = await DatabaseSeeder.SeedEntry(
+                entriesDb,
+                TrackOnlyEntryId,
+                UserAId,
+                isSharingInherited: true,
+                when: new DateTime(2024, 1, 6, 8, 0, 0, DateTimeKind.Utc));
+            trackOnly.TrackAltitude = 1500;
+            await entriesDb.SaveChangesAsync();
+
             for (int i = 1; i <= 25; i++)
             {
                 var extra = await DatabaseSeeder.SeedEntry(
@@ -109,14 +119,16 @@ public class HighestAltitudeViewTests : IClassFixture<ApiFactory>, IAsyncLifetim
         var models = await GetHighestAltitudeAsync(client);
 
         Assert.Equal(20, models.Count);
-        Assert.Equal(MultiSourceEntryId, models[0].Id);
-        Assert.Equal(1200, models[0].Altitude);
-        Assert.Equal(ExplicitSharedEntryId, models[1].Id);
-        Assert.Equal(900, models[1].Altitude);
-        Assert.Equal(OwnedByBEntryId, models[2].Id);
-        Assert.Equal(700, models[2].Altitude);
-        Assert.Equal(HighestSharedEntryId, models[3].Id);
-        Assert.Equal(500, models[3].Altitude);
+        Assert.Equal(TrackOnlyEntryId, models[0].Id);
+        Assert.Equal(1500, models[0].Altitude);
+        Assert.Equal(MultiSourceEntryId, models[1].Id);
+        Assert.Equal(1200, models[1].Altitude);
+        Assert.Equal(ExplicitSharedEntryId, models[2].Id);
+        Assert.Equal(900, models[2].Altitude);
+        Assert.Equal(OwnedByBEntryId, models[3].Id);
+        Assert.Equal(700, models[3].Altitude);
+        Assert.Equal(HighestSharedEntryId, models[4].Id);
+        Assert.Equal(500, models[4].Altitude);
     }
 
     [Fact]
@@ -139,8 +151,8 @@ public class HighestAltitudeViewTests : IClassFixture<ApiFactory>, IAsyncLifetim
         Assert.Equal(20, entryIds.Count);
         Assert.DoesNotContain(HiddenPrivateEntryId, entryIds);
         Assert.Contains("ha-extra-25", entryIds);
-        Assert.Contains("ha-extra-10", entryIds);
-        Assert.DoesNotContain("ha-extra-09", entryIds);
+        Assert.Contains("ha-extra-11", entryIds);
+        Assert.DoesNotContain("ha-extra-10", entryIds);
         Assert.DoesNotContain("ha-extra-01", entryIds);
     }
 
