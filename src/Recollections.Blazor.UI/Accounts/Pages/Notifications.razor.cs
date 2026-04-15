@@ -14,6 +14,9 @@ public partial class Notifications
     [Inject]
     protected PushNotificationInterop PushInterop { get; set; }
 
+    [Inject]
+    protected NotificationSubscriptionSynchronizer NotificationSynchronizer { get; set; }
+
     protected List<string> ErrorMessages { get; } = new();
 
     protected UserNotificationSettingsModel Model { get; set; } = new();
@@ -105,16 +108,14 @@ public partial class Notifications
 
     private async Task RefreshBrowserStateAsync()
     {
-        IsPushSupported = await PushInterop.IsSupportedAsync();
-        BrowserPermission = IsPushSupported
-            ? await PushInterop.GetPermissionAsync()
-            : "unsupported";
+        NotificationSubscriptionState state = await NotificationSynchronizer.RefreshAsync(Model);
+        IsPushSupported = state.IsPushSupported;
+        BrowserPermission = state.BrowserPermission;
+        CurrentBrowserSubscription = state.CurrentBrowserSubscription;
+        HasBrowserSubscription = state.HasBrowserSubscription;
 
-        CurrentBrowserSubscription = IsPushSupported
-            ? await PushInterop.GetSubscriptionAsync()
-            : null;
-
-        HasBrowserSubscription = CurrentBrowserSubscription != null;
+        if (state.WasRestored && String.IsNullOrEmpty(StatusMessage))
+            StatusMessage = "Push notifications were restored on this browser.";
     }
 
     private async Task RunBusyAsync(Func<Task> action)

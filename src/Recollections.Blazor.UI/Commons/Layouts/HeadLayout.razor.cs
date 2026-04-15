@@ -21,6 +21,9 @@ public partial class HeadLayout : IDisposable
     [Inject]
     internal PropertyCollection Properties { get; set; }
 
+    [Inject]
+    internal NotificationSubscriptionSynchronizer NotificationSynchronizer { get; set; }
+
     [CascadingParameter]
     protected UserState UserState { get; set; }
 
@@ -36,6 +39,14 @@ public partial class HeadLayout : IDisposable
         base.OnInitialized();
 
         Navigator.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender && UserState?.IsAuthenticated == true)
+            await NotificationSynchronizer.EnsureCurrentBrowserAsync();
     }
 
     public void Dispose()
