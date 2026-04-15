@@ -1,4 +1,5 @@
 using Neptuo.Recollections;
+using Neptuo.Recollections.Entries;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -25,6 +26,11 @@ namespace Neptuo.Recollections
             numberFormat.NumberGroupSeparator = NumberGroupSeparator;
             return Math.Round(value).ToString(NumberFormat, numberFormat);
         }
+
+        public string FormatAltitudeEntryTitle(EntryListModel entry)
+            => entry.Altitude != null
+                ? $"{FormatWholeNumber(entry.Altitude.Value)} m"
+                : entry.When.ToString(ShortDateFormat);
     }
 }
 
