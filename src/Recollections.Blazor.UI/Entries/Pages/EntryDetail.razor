@@ -10,6 +10,16 @@
         <PermissionContainer State="@Permissions">
             <ActionMenu>
                 <ItemGroup Text="@Model.Title">
+                    <PermissionView Request="@PermissionRequest.Write">
+                        <FileUpload
+                            Text="Upload media"
+                            EntityType="entry"
+                            EntityId="@EntryId"
+                            Url="@Api.MediaUploadUrl(Model.Id)"
+                            ButtonCssClass="list-group-item list-group-item-action border-0 rounded-0 w-100 text-start"
+                            FormCssClass="d-block"
+                        />
+                    </PermissionView>
                     @if (Gallery != null)
                     {
                         <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.OpenAsync(0))" />
@@ -141,16 +151,13 @@
                     </div>
                 }
 
-                <ActionPanel>
-                    <PermissionView Request="@PermissionRequest.Write">
-                        <FileUpload 
-                            EntityType="entry"
-                            EntityId="@EntryId"
-                            Url="@Api.MediaUploadUrl(Model.Id)"
-                            DragAndDropContainer="Container"
-                        />
-                    </PermissionView>
-                </ActionPanel>
+                <PermissionView Request="@PermissionRequest.Write">
+                    <FileUploadCurrentEntity
+                        EntityType="entry"
+                        EntityId="@EntryId"
+                        Url="@Api.MediaUploadUrl(Model.Id)"
+                    />
+                </PermissionView>
             </div>
         </PermissionContainer>
     </CascadingValue>

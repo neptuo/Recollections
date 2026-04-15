@@ -1,6 +1,6 @@
-﻿<form @ref="FormElement" class="inline-form" action="@Url">
+﻿<form @ref="FormElement" class="inline-form @FormCssClass" action="@Url">
     <input type="file" multiple class="d-none" />
-    <button type="button" class="btn btn-sm btn-primary">
+    <button type="button" class="@ButtonCssClass" @onclick="OnClick">
         <Icon Identifier="image" />
         @Text
     </button>

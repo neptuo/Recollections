@@ -25,6 +25,10 @@
     [Parameter]
     public bool IsEnd { get; set; }
 
+    void IItemContainer.Close()
+    {
+    }
+
     RenderFragment<Item> IItemContainer.GetItemTemplate()
     {
         return item => @<li>

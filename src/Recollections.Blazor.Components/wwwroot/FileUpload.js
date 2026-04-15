@@ -45,11 +45,11 @@ async function getStoredFilesByFlag(assigned) {
         const uId = response.headers.get('X-User-Id');
         let isPassed = false;
         if (assigned) {
-            if (entityType != null && entityId != null && uId == userId) {
+            if (entityType && entityId && uId == userId) {
                 isPassed = true;
             }
         } else {
-            if (entityType == '' && entityId == '' && uId == '') {
+            if (!entityType && !entityId && (!uId || uId == userId)) {
                 isPassed = true;
             }
         }
@@ -72,11 +72,6 @@ async function getStoredFilesByFlag(assigned) {
     }
 
     return storedFiles;
-}
-
-export async function removeStoredFile(id) {
-    const mediaCache = await caches.open('media');
-    mediaCache.delete(id);
 }
 
 class EntityUploadQueue {
@@ -141,7 +136,7 @@ class EntityUploadQueue {
                 (response) => {
                     // Remove successfully uploaded file from IndexedDB
                     if (storedFile.id) {
-                        removeStoredFile(storedFile.id);
+                        removeStoredFileInternal(storedFile.id, false);
                     }
 
                     this.uploadStep(response);
@@ -196,6 +191,11 @@ class EntityUploadQueue {
 
     async storeAndQueueFiles(items, actionUrl, entityType, entityId) {
         const storedItems = await storeFiles(items, actionUrl, entityType, entityId, userId);
+        if (!actionUrl || !entityType || !entityId) {
+            raiseStoredFilesChanged();
+            return;
+        }
+
         this.addStoredFilesToQueue(storedItems);
     }
 
@@ -229,6 +229,19 @@ const queue = new EntityUploadQueue();
 let interop;
 let userId;
 let bearerToken;
+let currentEntityType;
+let currentEntityId;
+let currentActionUrl;
+
+function hasFiles(dataTransfer) {
+    return dataTransfer && Array.from(dataTransfer.types || []).includes('Files');
+}
+
+function raiseStoredFilesChanged() {
+    if (interop) {
+        interop.invokeMethodAsync("FileUpload.OnStoredFilesChanged");
+    }
+}
 
 export function initialize(interopValue) {
     interop = interopValue;
@@ -237,6 +250,12 @@ export function initialize(interopValue) {
 export function setBearerToken(userIdValue, bearerTokenValue) {
     userId = userIdValue;
     bearerToken = bearerTokenValue;
+}
+
+export function setCurrentEntity(entityTypeValue, entityIdValue, actionUrlValue) {
+    currentEntityType = entityTypeValue;
+    currentEntityId = entityIdValue;
+    currentActionUrl = actionUrlValue;
 }
 
 const _formData = new WeakMap();
@@ -257,31 +276,39 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
         });
     }
     input.addEventListener('change', async () => {
-        await queue.storeAndQueueFiles(input.files, url, entityType, entityId);
+        await queue.storeAndQueueFiles(
+            input.files,
+            url || currentActionUrl,
+            entityType || currentEntityType,
+            entityId || currentEntityId
+        );
         form.reset();
     });
 
     if (dragAndDropContainer) {
-        dragAndDropContainer.addEventListener('drag', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragstart', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragend', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragover', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragenter', function (e) {
-            e.preventDefault();
-        });
-        dragAndDropContainer.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-        });
+        const preventDefault = function (e) {
+            if (hasFiles(e.dataTransfer)) {
+                e.preventDefault();
+            }
+        };
+
+        dragAndDropContainer.addEventListener('drag', preventDefault);
+        dragAndDropContainer.addEventListener('dragstart', preventDefault);
+        dragAndDropContainer.addEventListener('dragend', preventDefault);
+        dragAndDropContainer.addEventListener('dragover', preventDefault);
+        dragAndDropContainer.addEventListener('dragenter', preventDefault);
+        dragAndDropContainer.addEventListener('dragleave', preventDefault);
         dragAndDropContainer.addEventListener('drop', function (e) {
-            queue.storeAndQueueFiles(e.dataTransfer.files, url, entityType, entityId);
+            if (!hasFiles(e.dataTransfer)) {
+                return;
+            }
+
+            queue.storeAndQueueFiles(
+                e.dataTransfer.files,
+                url || currentActionUrl,
+                entityType || currentEntityType,
+                entityId || currentEntityId
+            );
             e.preventDefault();
         });
     }
@@ -300,7 +327,20 @@ export async function getStoredFiles() {
 
 export async function getUnassignedSharedFiles() {
     const storedFiles = await getStoredFilesByFlag(false);
-    return storedFiles.map(f => { return { name: f.file.name, size: f.file.size, id: `${f.id}` }; });
+    return storedFiles.map(f => {
+        const contentType = f.file.type || '';
+        const previewUrl = contentType.startsWith('image/') || contentType.startsWith('video/')
+            ? URL.createObjectURL(f.file)
+            : null;
+
+        return {
+            name: f.file.name,
+            size: f.file.size,
+            id: `${f.id}`,
+            contentType: contentType,
+            previewUrl: previewUrl
+        };
+    });
 }
 
 export async function retryStoredFiles(ids) {
@@ -319,7 +359,8 @@ export async function clearStoredFiles(ids) {
         storedFiles = storedFiles.filter(f => ids.includes(`${f.id}`));
     }
     if (storedFiles.length > 0) {
-        await Promise.all(storedFiles.map(f => removeStoredFile(f.id)));
+        await Promise.all(storedFiles.map(f => removeStoredFileInternal(f.id, false)));
+        raiseStoredFilesChanged();
     }
 }
 
@@ -332,9 +373,23 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
     const items = unassignedFiles.map(f => f.file);
     queue.storeAndQueueFiles(items, url, entityType, entityId);
 
-    await Promise.all(unassignedFiles.map(f => removeStoredFile(f.id)));
+    await Promise.all(unassignedFiles.map(f => removeStoredFileInternal(f.id, false)));
+    raiseStoredFilesChanged();
 }
 
 export function destroy() {
 
+}
+
+async function removeStoredFileInternal(id, shouldNotify) {
+    const mediaCache = await caches.open('media');
+    await mediaCache.delete(id);
+
+    if (shouldNotify) {
+        raiseStoredFilesChanged();
+    }
+}
+
+export async function removeStoredFile(id) {
+    await removeStoredFileInternal(id, true);
 }

@@ -22,11 +22,17 @@ namespace Neptuo.Recollections.Components
         [Inject]
         protected ILog<FileUpload> Log { get; set; }
 
-        private string previousEntityType;
-        private string previousEntityId;
+        [CascadingParameter]
+        protected IItemContainer Container { get; set; }
 
         [Parameter]
         public string Text { get; set; } = DefaultText;
+
+        [Parameter]
+        public string ButtonCssClass { get; set; } = "btn btn-sm btn-primary";
+
+        [Parameter]
+        public string FormCssClass { get; set; }
 
         [Parameter]
         public string EntityType { get; set; }
@@ -45,13 +51,6 @@ namespace Neptuo.Recollections.Components
         protected Modal UploadError { get; set; }
         protected List<FileUploadProgress> UploadErrors { get; } = [];
 
-        public override Task SetParametersAsync(ParameterView parameters)
-        {
-            previousEntityType = EntityType;
-            previousEntityId = EntityId;
-            return base.SetParametersAsync(parameters);
-        }
-
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             Log.Debug("OnAfterRenderAsync");
@@ -67,5 +66,8 @@ namespace Neptuo.Recollections.Components
             if (formBinding != null)
                 await formBinding.DisposeAsync();
         }
+
+        private void OnClick()
+            => Container?.Close();
     }
 }

@@ -22,7 +22,6 @@
                 </span>
             </EmptyContent>
         </TemplatePlaceholder>
-
         <div class="d-none d-sm-flex navbar-collapse menu-collapse">
             <ul class="navbar-nav justify-content-between w-100">
                 @for (int i = 0; i < Menu.Main.Count; i++)
@@ -42,21 +41,33 @@
     </div>
 </nav>
 
-<FileUploadNotification />
-<FileUploadUnfinishedNotification />
-<FileUploadErrorNotification />
-<FileUploadUnassignedNotification />
+<div @ref="PageContainer">
+    @if (UserState?.IsAuthenticated == true)
+    {
+        <FileUpload
+            Text="Upload"
+            ButtonCssClass="d-none"
+            FormCssClass="d-none"
+            DragAndDropContainer="PageContainer"
+        />
+    }
 
-<ExceptionPanel @ref="ExceptionPanel" OnReadOnlyClick="OnReadOnlyClickAsync">
-    <UnauthorizedContent>
-        <Unauthorized />
-    </UnauthorizedContent>
-    <NotFoundContent>
-        <NotFound />
-    </NotFoundContent>
-</ExceptionPanel>
+    <FileUploadNotification />
+    <FileUploadUnfinishedNotification />
+    <FileUploadErrorNotification />
+    <FileUploadUnassignedNotification />
 
-@Body
+    <ExceptionPanel @ref="ExceptionPanel" OnReadOnlyClick="OnReadOnlyClickAsync">
+        <UnauthorizedContent>
+            <Unauthorized />
+        </UnauthorizedContent>
+        <NotFoundContent>
+            <NotFound />
+        </NotFoundContent>
+    </ExceptionPanel>
+
+    @Body
+</div>
 
 <BottomMenu Menu="@Menu" />
 
