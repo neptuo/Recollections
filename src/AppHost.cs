@@ -1,4 +1,4 @@
-#:sdk Aspire.AppHost.Sdk@13.2.1
+#:sdk Aspire.AppHost.Sdk@13.2.2
 #:project .\Recollections.Api\Recollections.Api.csproj
 #:project .\Recollections.Blazor.UI\Recollections.Blazor.UI.csproj
 
