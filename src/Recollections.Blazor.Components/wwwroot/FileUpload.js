@@ -226,6 +226,7 @@ class EntityUploadQueue {
 }
 
 const queue = new EntityUploadQueue();
+const previewUrlCache = new Map();
 let interop;
 let userId;
 let bearerToken;
@@ -268,6 +269,10 @@ function ensureDropTargetBinding() {
     dropTarget.addEventListener('dragleave', preventDefault);
     dropTarget.addEventListener('drop', function (e) {
         if (!hasFiles(e.dataTransfer)) {
+            return;
+        }
+
+        if (!bearerToken) {
             return;
         }
 
@@ -343,16 +348,30 @@ export async function getStoredFiles() {
 
 export async function getUnassignedSharedFiles() {
     const storedFiles = await getStoredFilesByFlag(false);
+    const currentFileIds = new Set(storedFiles.map(f => `${f.id}`));
+
+    // Revoke cached preview URLs for files that no longer exist
+    for (const [cachedId, cachedUrl] of previewUrlCache) {
+        if (!currentFileIds.has(cachedId)) {
+            URL.revokeObjectURL(cachedUrl);
+            previewUrlCache.delete(cachedId);
+        }
+    }
+
     return storedFiles.map(f => {
+        const fileId = `${f.id}`;
         const contentType = f.file.type || '';
-        const previewUrl = contentType.startsWith('image/') || contentType.startsWith('video/')
-            ? URL.createObjectURL(f.file)
-            : null;
+        let previewUrl = previewUrlCache.get(fileId) || null;
+
+        if (!previewUrl && (contentType.startsWith('image/') || contentType.startsWith('video/'))) {
+            previewUrl = URL.createObjectURL(f.file);
+            previewUrlCache.set(fileId, previewUrl);
+        }
 
         return {
             name: f.file.name,
             size: f.file.size,
-            id: `${f.id}`,
+            id: fileId,
             contentType: contentType,
             previewUrl: previewUrl
         };
@@ -400,6 +419,12 @@ export function destroy() {
 async function removeStoredFileInternal(id, shouldNotify) {
     const mediaCache = await caches.open('media');
     await mediaCache.delete(id);
+
+    const cachedUrl = previewUrlCache.get(`${id}`);
+    if (cachedUrl) {
+        URL.revokeObjectURL(cachedUrl);
+        previewUrlCache.delete(`${id}`);
+    }
 
     if (shouldNotify) {
         raiseStoredFilesChanged();

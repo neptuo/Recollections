@@ -81,7 +81,7 @@ public class FileUploader
 
     internal void OnStoredFilesChanged()
     {
-        foreach (var listener in storedFilesChangedListeners)
+        foreach (var listener in storedFilesChangedListeners.ToArray())
             listener();
     }
 
@@ -172,7 +172,6 @@ public class FileUploader
     public async Task RemoveStoredFileAsync(string id)
     {
         await interop.RemoveStoredFileAsync(id);
-        OnStoredFilesChanged();
     }
 
     public Task SetBearerTokenAsync(string userId, string bearerToken)
@@ -181,7 +180,6 @@ public class FileUploader
     public async Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
     {
         await interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
-        OnStoredFilesChanged();
     }
 
     public Task OpenAsync(ElementReference formElement)
