@@ -91,63 +91,37 @@
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
-                @if (Media?.Count > 0 || UploadProgress?.Count > 0)
+                @if (Media?.Count > 0)
                 {
                     <div class="images my-3">
-                        @if (Media != null)
-                        {
-                            <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="@OnGalleryOpenInfoAsync" />
+                        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="@OnGalleryOpenInfoAsync" />
 
-                            @foreach (var item in Media)
-                            {
-                                string key = null;
-                                Action onClick = null;
-                                
-                                if (item.Image != null)
-                                {
-                                    key = item.Image.Id;
-                                    onClick = () => { Navigator.OpenImageDetail(EntryId, item.Image.Id); };
-                                }
-                                else if (item.Video != null)
-                                {
-                                    key = item.Video.Id;
-                                    onClick = () => { Navigator.OpenVideoDetail(EntryId, item.Video.Id); };
-                                }
-                                
-                                <EntryMedia @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.OpenAsync(Media.IndexOf(item)))">
-                                    <ThumbnailContent>
-                                        <span class="media-type-badge">
-                                            <Icon Identifier="@(item.Video != null ? "film" : "image")" Prefix="fas" />
-                                        </span>
-                                        <button class="btn btn-outline-primary border-0 p-0 position-absolute top-0 end-0 m-1 z-1" @onclick="@onClick" @onclick:stopPropagation="true">
-                                            <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
-                                        </button>
-                                    </ThumbnailContent>
-                                </EntryMedia>
-                            }
-                        }
-
-                        @if (UploadProgress != null)
+                        @foreach (var item in Media)
                         {
-                            foreach (var upload in UploadProgress)
+                            string key = null;
+                            Action onClick = null;
+                            
+                            if (item.Image != null)
                             {
-                                @if (upload.IsDone && upload.Tag != null)
-                                {
-                                    var uploadMedia = upload.Tag as MediaModel;
-                                    if (uploadMedia.Image != null || uploadMedia.Video != null)
-                                    {
-                                        <EntryMedia Image="@uploadMedia.Image" Video="@uploadMedia.Video" />
-                                    }
-                                }
-                                else
-                                {
-                                    <EntryMedia
-                                        PlaceHolder="@upload.StatusDescription"
-                                        PlaceHolderCssClass="@(upload.IsCurrent ? (upload.Percentual == 0 ? "loading-circle" : $"text-primary") : "")"
-                                        PlaceHolderState="@GetImagePlaceHolderState(upload)"
-                                    />
-                                }
+                                key = item.Image.Id;
+                                onClick = () => { Navigator.OpenImageDetail(EntryId, item.Image.Id); };
                             }
+                            else if (item.Video != null)
+                            {
+                                key = item.Video.Id;
+                                onClick = () => { Navigator.OpenVideoDetail(EntryId, item.Video.Id); };
+                            }
+                            
+                            <EntryMedia @key="key" Image="@item.Image" Video="@item.Video" OnClick="(() => Gallery.OpenAsync(Media.IndexOf(item)))">
+                                <ThumbnailContent>
+                                    <span class="media-type-badge">
+                                        <Icon Identifier="@(item.Video != null ? "film" : "image")" Prefix="fas" />
+                                    </span>
+                                    <button class="btn btn-outline-primary border-0 p-0 position-absolute top-0 end-0 m-1 z-1" @onclick="@onClick" @onclick:stopPropagation="true">
+                                        <Icon Identifier="info-circle" Prefix="fas" CssClass="p-1" />
+                                    </button>
+                                </ThumbnailContent>
+                            </EntryMedia>
                         }
                     </div>
                 }

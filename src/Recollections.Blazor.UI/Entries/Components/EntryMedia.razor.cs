@@ -55,15 +55,6 @@ namespace Neptuo.Recollections.Entries.Components
         public MediaType Type { get; set; } = MediaType.Thumbnail;
 
         [Parameter]
-        public string PlaceHolder { get; set; }
-
-        [Parameter]
-        public string PlaceHolderCssClass { get; set; }
-
-        [Parameter]
-        public EntryMediaPlaceHolderState PlaceHolderState { get; set; }
-
-        [Parameter]
         public RenderFragment ThumbnailContent { get; set; }
 
         [Parameter]

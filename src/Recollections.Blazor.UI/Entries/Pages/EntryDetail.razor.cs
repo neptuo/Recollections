@@ -92,7 +92,6 @@ namespace Neptuo.Recollections.Entries.Pages
                     return "No locations...";
             }
         }
-        protected List<FileUploadProgress> UploadProgress { get; } = [];
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
         protected Gallery Gallery { get; set; }
         protected FileUpload TrackUpload { get; set; }
@@ -373,30 +372,12 @@ namespace Neptuo.Recollections.Entries.Pages
             if (Log.IsDebugEnabled())
                 Log.Debug($"{EntryId}: OnUploadProgressAsync: " + Json.Serialize(progresses));
 
-            UploadProgress.Clear();
             if (progresses.All(p => p.Status == "done" || p.Status == "error"))
             {
                 Log.Debug($"{EntryId}: All uploads done, reloading media.");
                 await LoadMediaAsync();
+                StateHasChanged();
             }
-            else
-            {
-                foreach (var progress in progresses)
-                {
-                    if (progress.Status == "done" && progress.ResponseText != null)
-                    {
-                        var media = progress.Tag as MediaModel;
-                        if (media == null)
-                            media = Json.Deserialize<MediaModel>(progress.ResponseText);
-
-                        progress.Tag = media;
-                    }
-
-                    UploadProgress.Add(progress);
-                }
-            }
-
-            StateHasChanged();
         }
 
         protected async Task OnTrackUploadProgressAsync(IReadOnlyCollection<FileUploadProgress> progresses)
@@ -520,24 +501,5 @@ namespace Neptuo.Recollections.Entries.Pages
             await LoadBeingsAsync();
         }
 
-        private EntryMediaPlaceHolderState GetImagePlaceHolderState(FileUploadProgress progress)
-        {
-            if (progress.IsError)
-                return EntryMediaPlaceHolderState.Error;
-
-            if (progress.IsPending)
-                return EntryMediaPlaceHolderState.Pending;
-
-            if (progress.IsCurrent && progress.Percentual > 0 && progress.Percentual < 100)
-                return EntryMediaPlaceHolderState.Progress;
-
-            if (progress.IsCurrent && progress.Percentual == 100)
-                return EntryMediaPlaceHolderState.Finished;
-
-            if (progress.IsDone)
-                return EntryMediaPlaceHolderState.Success;
-
-            return EntryMediaPlaceHolderState.None;
-        }
     }
 }
