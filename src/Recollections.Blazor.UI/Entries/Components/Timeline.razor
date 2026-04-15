@@ -4,7 +4,7 @@
 {
     var index = 0;
     var lastYear = 0;
-    <div class="timeline">
+    <div class="timeline @CssClass">
         @if (ShowYearSeparators)
         {
             <div class="separator sticky-top mb-3 d-inline-block">
@@ -40,7 +40,7 @@
 
                 <div class="entry" data-entry-id="@entry.Id">
                     <div class="title">
-                        <h3>@entry.When.ToString(ShowYearSeparators ? UiOptions.ShortDateFormat : UiOptions.DateFormat)</h3>
+                        <h3>@FormatEntryTitle(entry)</h3>
                     </div>
                     <div class="body">
                         <h2>

@@ -25368,8 +25368,6 @@ input.input-number-noarrows[type=number] {
 }
 .main-navbar.block-icons .nav-link {
   text-align: center;
-  padding-right: 1.1rem;
-  padding-left: 1.1rem;
 }
 @media (max-width: 767.98px) {
   .main-navbar.block-icons .nav-link {
