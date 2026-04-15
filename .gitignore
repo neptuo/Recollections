@@ -338,3 +338,4 @@ ASALocalRun/
 .squad-workstream
 
 # Local-only Copilot/Squad workspace scaffolding
+*.lscache
