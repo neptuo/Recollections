@@ -29,9 +29,10 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareDeleter shareDeleter;
         private readonly IUserNameProvider userNames;
         private readonly FreeLimitsChecker freeLimits;
+        private readonly IFileStorage fileStorage;
         private readonly GpxImportService gpxImportService;
-
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits, GpxImportService gpxImportService)
+ 
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits, IFileStorage fileStorage, GpxImportService gpxImportService)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
@@ -40,6 +41,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(shareDeleter, "shareDeleter");
             Ensure.NotNull(userNames, "userNames");
             Ensure.NotNull(freeLimits, "freeLimits");
+            Ensure.NotNull(fileStorage, "fileStorage");
             Ensure.NotNull(gpxImportService, "gpxImportService");
             this.db = db;
             this.imageService = imageService;
@@ -47,6 +49,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             this.shareDeleter = shareDeleter;
             this.userNames = userNames;
             this.freeLimits = freeLimits;
+            this.fileStorage = fileStorage;
             this.gpxImportService = gpxImportService;
         }
 
@@ -127,12 +130,16 @@ namespace Neptuo.Recollections.Entries.Controllers
                     }
                 }
             }
-
+ 
+            bool shouldDeleteTrackFile = !String.IsNullOrEmpty(entity.TrackData) && (model.Track == null || !model.Track.HasValue());
             MapModelToEntity(model, entity);
-
+ 
             db.Entries.Update(entity);
             await db.SaveChangesAsync();
 
+            if (shouldDeleteTrackFile)
+                await fileStorage.DeleteAsync(entity, EntryFileType.Track);
+ 
             return NoContent();
         });
 
@@ -165,6 +172,9 @@ namespace Neptuo.Recollections.Entries.Controllers
             if (!await freeLimits.CanSetGpsAsync(userId, track.HasValue() ? 1 : 0))
                 return PremiumRequired();
 
+            using (Stream source = file.OpenReadStream())
+                await fileStorage.SaveAsync(entity, source, EntryFileType.Track);
+ 
             entity.TrackData = track.Data;
             entity.TrackPointCount = track.PointCount;
             entity.TrackTotalElevation = track.TotalElevation;
@@ -186,10 +196,12 @@ namespace Neptuo.Recollections.Entries.Controllers
         {
             await imageService.DeleteAllAsync(entity);
             await shareDeleter.DeleteEntrySharesAsync(id);
-
+ 
             db.Entries.Remove(entity);
             await db.SaveChangesAsync();
 
+            await fileStorage.DeleteAsync(entity, EntryFileType.Track);
+ 
             return Ok();
         });
 

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -5,6 +7,7 @@ using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
 using Neptuo.Recollections.Tests.Infrastructure;
 using Xunit;
+using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
 
 namespace Neptuo.Recollections.Tests.Sharing;
 
@@ -90,6 +93,11 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(10d, entry.Model.Track.TotalElevation);
         Assert.NotNull(entry.Model.Track.TotalDistance);
         Assert.True(entry.Model.Track.TotalDistance > 0);
+
+        var storedTrack = await GetStoredTrackAsync();
+        Assert.NotNull(storedTrack);
+        Assert.Contains("49.195", storedTrack);
+        Assert.DoesNotContain("50.111", storedTrack);
     }
 
     [Fact]
@@ -219,6 +227,7 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         getResponse = await client.GetAsync($"/api/entries/{EntryId}");
         entry = await getResponse.ReadJsonAsync<AuthorizedModel<EntryModel>>();
         Assert.False(entry.Model.Track.HasValue());
+        Assert.Null(await GetStoredTrackAsync());
     }
 
     private static MultipartFormDataContent CreateTrackUpload(string gpx, string fileName = "track.gpx")
@@ -269,5 +278,20 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         public long Length => 0;
 
         public Stream OpenReadStream() => throw exception;
+    }
+
+    private async Task<string> GetStoredTrackAsync()
+    {
+        using var scope = factory.Services.CreateScope();
+        var entriesDb = scope.ServiceProvider.GetRequiredService<EntriesDataContext>();
+        var fileStorage = scope.ServiceProvider.GetRequiredService<IFileStorage>();
+
+        var entry = await entriesDb.Entries.SingleAsync(e => e.Id == EntryId);
+        await using var stream = await fileStorage.FindAsync(entry, EntryFileType.Track);
+        if (stream == null)
+            return null;
+
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync();
     }
 }
