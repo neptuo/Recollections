@@ -33,13 +33,25 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 && !String.IsNullOrWhiteSpace(options.PublicKey)
                 && !String.IsNullOrWhiteSpace(options.PrivateKey);
 
-        public Task<int> SendNewEntriesAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, int newEntriesCount)
+        public Task<int> SendNewEntriesAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, IReadOnlyCollection<NewEntryNotificationItem> entries)
         {
             Ensure.NotNull(subscriptions, "subscriptions");
+            Ensure.NotNull(entries, "entries");
 
-            string body = newEntriesCount == 1
-                ? "You have 1 new entry waiting in your timeline."
-                : $"You have {newEntriesCount} new entries waiting in your timeline.";
+            if (entries.Count == 1)
+            {
+                NewEntryNotificationItem entry = entries.First();
+                string title = String.IsNullOrWhiteSpace(entry.Title)
+                    ? "New entry from your connections"
+                    : entry.Title;
+
+                return SendAsync(
+                    subscriptions,
+                    new NotificationPayload(title, "A new shared entry is waiting for you.", $"/entries/{entry.Id}", "new-entries")
+                );
+            }
+
+            string body = $"You have {entries.Count} new entries waiting in your timeline.";
 
             return SendAsync(
                 subscriptions,
@@ -130,6 +142,8 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
             return endpoint;
         }
+
+        public record NewEntryNotificationItem(string Id, string Title);
 
         private record NotificationPayload(string Title, string Body, string Url, string Tag);
     }

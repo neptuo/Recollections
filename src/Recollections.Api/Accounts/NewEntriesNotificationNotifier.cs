@@ -134,6 +134,13 @@ namespace Neptuo.Recollections.Accounts.Notifications
             }
 
             List<string> targetUserIds = newEntryIdsByUserId.Keys.ToList();
+            Dictionary<string, PushNotificationSender.NewEntryNotificationItem> notificationEntriesById = (await entriesDb.Entries
+                .AsNoTracking()
+                .Where(e => normalizedEntryIds.Contains(e.Id))
+                .Select(e => new PushNotificationSender.NewEntryNotificationItem(e.Id, e.Title))
+                .ToListAsync())
+                .ToDictionary(e => e.Id, e => e, StringComparer.Ordinal);
+
             List<UserNotificationPushSubscription> activeSubscriptions = await accountsDb.PushSubscriptions
                 .Where(s => s.RevokedAt == null && targetUserIds.Contains(s.UserId))
                 .ToListAsync();
@@ -157,7 +164,13 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 }
 
                 log.LogDebug("Sending immediate new entry notification to user '{UserId}' for {EntryCount} newly available entrie(s) after '{Trigger}'.", pair.Key, reservedDispatches.Count, trigger);
-                int deliveredCount = await sender.SendNewEntriesAsync(userSubscriptions, reservedDispatches.Count);
+                List<PushNotificationSender.NewEntryNotificationItem> notificationEntries = reservedDispatches
+                    .Select(d => notificationEntriesById.TryGetValue(d.EntryId, out PushNotificationSender.NewEntryNotificationItem entry)
+                        ? entry
+                        : new PushNotificationSender.NewEntryNotificationItem(d.EntryId, null))
+                    .ToList();
+
+                int deliveredCount = await sender.SendNewEntriesAsync(userSubscriptions, notificationEntries);
                 if (deliveredCount < 1)
                 {
                     accountsDb.NotificationNewEntriesDispatches.RemoveRange(reservedDispatches);
