@@ -13,7 +13,9 @@ namespace Neptuo.Recollections.Commons
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<PwaInstallInterop>();
+            services
+                .AddSingleton<PwaInstallInterop>()
+                .AddSingleton<AppUpdateState>();
         }
     }
 }

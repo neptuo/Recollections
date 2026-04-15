@@ -19,6 +19,20 @@ window.Pwa = {
             }
         });
     },
+    Version: async function () {
+        try {
+            const response = await fetch('service-worker-assets.js', { cache: 'no-store' });
+            if (!response.ok) {
+                return 'development';
+            }
+
+            const content = await response.text();
+            const match = content.match(/"version":"([^"]+)"/);
+            return match && match[1] ? match[1] : 'development';
+        } catch {
+            return 'development';
+        }
+    },
     installable: async () => {
         await Recollections.WaitForDotNet();
         DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Installable');

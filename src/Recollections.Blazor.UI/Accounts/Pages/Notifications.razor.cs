@@ -82,6 +82,7 @@ public partial class Notifications
 
             CurrentBrowserSubscription = await PushInterop.SubscribeAsync(Model.PushPublicKey);
             await Api.CreateNotificationSubscriptionAsync(CurrentBrowserSubscription);
+            await NotificationSynchronizer.MarkEnabledAsync(CurrentBrowserSubscription);
 
             StatusMessage = "Push notifications are enabled on this browser.";
             await LoadAsync();
@@ -98,6 +99,8 @@ public partial class Notifications
                 await Api.DeleteNotificationSubscriptionAsync(CurrentBrowserSubscription);
                 await PushInterop.UnsubscribeAsync();
             }
+
+            await NotificationSynchronizer.MarkDisabledAsync();
 
             StatusMessage = "Push notifications are disabled on this browser.";
             await LoadAsync();
