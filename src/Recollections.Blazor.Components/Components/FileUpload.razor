@@ -1,5 +1,5 @@
-﻿<form @ref="FormElement" class="inline-form @FormCssClass" action="@Url">
-    <input type="file" multiple class="d-none" />
+﻿<form @ref="FormElement" class="inline-form @CssClass @FormCssClass" action="@Url">
+    <input type="file" multiple="@IsMultiple" accept="@Accept" class="d-none" />
     <button type="button" class="@ButtonCssClass" @onclick="OnClick">
         <Icon Identifier="image" />
         @Text

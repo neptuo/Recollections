@@ -46,6 +46,15 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public ElementReference DragAndDropContainer { get; set; }
 
+        [Parameter]
+        public string Accept { get; set; }
+
+        [Parameter]
+        public bool IsMultiple { get; set; } = true;
+
+        [Parameter]
+        public string CssClass { get; set; }
+
         internal ElementReference FormElement { get; private set; }
 
         protected Modal UploadError { get; set; }
@@ -67,7 +76,13 @@ namespace Neptuo.Recollections.Components
                 await formBinding.DisposeAsync();
         }
 
-        private void OnClick()
-            => Container?.Close();
+        public Task OpenAsync()
+            => FileUploader.OpenAsync(FormElement);
+
+        private async Task OnClick()
+        {
+            Container?.Close();
+            await OpenAsync();
+        }
     }
 }

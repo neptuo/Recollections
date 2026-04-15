@@ -183,4 +183,7 @@ public class FileUploader
         await interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
         OnStoredFilesChanged();
     }
+
+    public Task OpenAsync(ElementReference formElement)
+        => interop.OpenAsync(formElement);
 }

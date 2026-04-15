@@ -330,6 +330,13 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
     }
 }
 
+export function openFileDialog(form) {
+    var input = form?.querySelector("input[type=file]");
+    if (input) {
+        input.click();
+    }
+}
+
 export async function getStoredFiles() {
     const storedFiles = await getStoredFilesByFlag(true);
     queue.progress.forEach(p => {
@@ -387,7 +394,7 @@ export async function uploadUnassignedFilesTo(entityType, entityId, url) {
     }
 
     const items = unassignedFiles.map(f => f.file);
-    queue.storeAndQueueFiles(items, url, entityType, entityId);
+    await queue.storeAndQueueFiles(items, url, entityType, entityId);
 
     await Promise.all(unassignedFiles.map(f => removeStoredFileInternal(f.id, false)));
     raiseStoredFilesChanged();

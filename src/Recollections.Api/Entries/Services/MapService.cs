@@ -22,24 +22,51 @@ public class MapService
 
     public async Task<List<MapEntryModel>> GetAsync(IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers)
     {
-        List<MapEntryModel> results = await shareStatus
+        var items = await shareStatus
             .OwnedByOrExplicitlySharedWithUser(dataContext, query, userIds, connectedUsers)
-            .Select(e => new MapEntryModel()
+            .Select(e => new
             {
                 Id = e.Id,
                 Title = e.Title,
-                Location = e.Locations.Select(l => new LocationModel()
-                {
-                    Latitude = l.Latitude,
-                    Longitude = l.Longitude,
-                    Altitude = l.Altitude
-                }).FirstOrDefault()
+                Location = e.Locations
+                    .Where(l => l.Latitude != null && l.Longitude != null)
+                    .Select(l => new LocationModel()
+                    {
+                        Latitude = l.Latitude,
+                        Longitude = l.Longitude,
+                        Altitude = l.Altitude
+                    })
+                    .FirstOrDefault(),
+                TrackLocation = e.TrackLatitude != null && e.TrackLongitude != null
+                    ? new LocationModel()
+                    {
+                        Latitude = e.TrackLatitude,
+                        Longitude = e.TrackLongitude,
+                        Altitude = e.TrackAltitude
+                    }
+                    : null
             })
             .ToListAsync();
 
-        List<MapEntryModel> toRemove = new List<MapEntryModel>();
-        foreach (var item in results)
+        List<MapEntryModel> results = items.Select(i => new MapEntryModel()
         {
+            Id = i.Id,
+            Title = i.Title,
+            Location = i.Location
+        }).ToList();
+
+        List<MapEntryModel> toRemove = new List<MapEntryModel>();
+        for (int i = 0; i < results.Count; i++)
+        {
+            var item = results[i];
+            if (HasNotLocationValue(item))
+            {
+                // When an entry has an imported track, its representative location is the
+                // authoritative entry-level pin and intentionally wins over media fallbacks.
+                var source = items[i];
+                item.Location = source.TrackLocation;
+            }
+
             if (HasNotLocationValue(item))
             {
                 var location = await dataContext.Images
