@@ -7,6 +7,7 @@ namespace Neptuo.Recollections.Entries
     {
         public string Data { get; set; }
         public int PointCount { get; set; }
+        public double? TotalElevation { get; set; }
         public LocationModel Location { get; set; }
 
         public bool HasValue()
@@ -17,6 +18,7 @@ namespace Neptuo.Recollections.Entries
             {
                 Data = Data,
                 PointCount = PointCount,
+                TotalElevation = TotalElevation,
                 Location = Location?.Clone()
             };
 
@@ -27,9 +29,10 @@ namespace Neptuo.Recollections.Entries
             => other != null
                 && Data == other.Data
                 && PointCount == other.PointCount
+                && TotalElevation == other.TotalElevation
                 && EqualityComparer<LocationModel>.Default.Equals(Location, other.Location);
 
         public override int GetHashCode()
-            => HashCode.Combine(Data, PointCount, Location);
+            => HashCode.Combine(Data, PointCount, TotalElevation, Location);
     }
 }

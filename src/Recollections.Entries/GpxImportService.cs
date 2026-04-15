@@ -53,7 +53,8 @@ namespace Neptuo.Recollections.Entries
             Ensure.NotNull(locations, "locations");
             EnsureHasCoordinates(locations);
 
-            IReadOnlyList<LocationModel> simplified = Simplify(locations);
+            IReadOnlyList<LocationModel> normalized = Normalize(locations);
+            IReadOnlyList<LocationModel> simplified = Simplify(normalized);
             if (simplified.Count == 0)
                 throw new TrackImportValidationException();
 
@@ -61,6 +62,7 @@ namespace Neptuo.Recollections.Entries
             {
                 Data = Encode(simplified),
                 PointCount = simplified.Count,
+                TotalElevation = CalculateTotalElevation(normalized),
                 Location = simplified[simplified.Count / 2].Clone()
             };
         }
@@ -173,12 +175,7 @@ namespace Neptuo.Recollections.Entries
 
         private static IReadOnlyList<LocationModel> Simplify(IReadOnlyList<LocationModel> locations)
         {
-            List<LocationModel> uniqueLocations = new List<LocationModel>(locations.Count);
-            foreach (var location in locations)
-            {
-                if (uniqueLocations.Count == 0 || !uniqueLocations[uniqueLocations.Count - 1].Equals(location))
-                    uniqueLocations.Add(location);
-            }
+            IReadOnlyList<LocationModel> uniqueLocations = Normalize(locations);
 
             if (uniqueLocations.Count <= MaxLocationCount)
                 return uniqueLocations;
@@ -200,6 +197,47 @@ namespace Neptuo.Recollections.Entries
                 result[result.Count - 1] = last.Clone();
 
             return result;
+        }
+
+        private static IReadOnlyList<LocationModel> Normalize(IReadOnlyList<LocationModel> locations)
+        {
+            List<LocationModel> uniqueLocations = new List<LocationModel>(locations.Count);
+            foreach (var location in locations)
+            {
+                if (uniqueLocations.Count == 0 || !uniqueLocations[uniqueLocations.Count - 1].Equals(location))
+                    uniqueLocations.Add(location.Clone());
+            }
+
+            return uniqueLocations;
+        }
+
+        private static double? CalculateTotalElevation(IReadOnlyList<LocationModel> locations)
+        {
+            double total = 0;
+            double? previousAltitude = null;
+            bool hasAltitude = false;
+
+            foreach (var location in locations)
+            {
+                if (location?.Altitude == null)
+                    continue;
+
+                hasAltitude = true;
+                double currentAltitude = location.Altitude.Value;
+                if (previousAltitude != null)
+                {
+                    double delta = currentAltitude - previousAltitude.Value;
+                    if (delta > 0)
+                        total += delta;
+                }
+
+                previousAltitude = currentAltitude;
+            }
+
+            if (!hasAltitude)
+                return null;
+
+            return Math.Round(total, 1, MidpointRounding.AwayFromZero);
         }
     }
 }

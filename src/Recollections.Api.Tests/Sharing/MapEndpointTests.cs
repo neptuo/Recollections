@@ -22,6 +22,7 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
     private const string OwnEntryId = "mp-list-entry-own";
     private const string NoLocationEntryId = "mp-list-entry-no-location";
     private const string TrackFallbackEntryId = "mp-list-entry-track-fallback";
+    private const string TrackPreferredEntryId = "mp-list-entry-track-preferred";
 
     public MapListEndpointTests(ApiFactory factory)
     {
@@ -54,6 +55,13 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
                 (50.020, 14.020, null),
                 (50.030, 14.030, null));
 
+            var trackPreferredEntry = await DatabaseSeeder.SeedEntry(entriesDb, TrackPreferredEntryId, UserAId, isSharingInherited: true);
+            await DatabaseSeeder.SeedImage(entriesDb, "mp-list-image-track-preferred", trackPreferredEntry, latitude: 48.100, longitude: 17.100);
+            await DatabaseSeeder.SeedEntryTrack(entriesDb, trackPreferredEntry,
+                (49.010, 15.010, null),
+                (49.020, 15.020, null),
+                (49.030, 15.030, null));
+
             await DatabaseSeeder.SeedEntry(entriesDb, NoLocationEntryId, UserAId, isSharingInherited: true);
         });
     }
@@ -75,14 +83,19 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Contains(ImageFallbackEntryId, entryIds);
         Assert.Contains(OwnEntryId, entryIds);
         Assert.Contains(TrackFallbackEntryId, entryIds);
+        Assert.Contains(TrackPreferredEntryId, entryIds);
         Assert.DoesNotContain(HiddenEntryId, entryIds);
         Assert.DoesNotContain(NoLocationEntryId, entryIds);
-        Assert.Equal(4, models.Count);
+        Assert.Equal(5, models.Count);
         Assert.All(models, model => Assert.True(model.Location?.HasValue() == true));
 
         var trackFallback = models.Single(model => model.Id == TrackFallbackEntryId);
         Assert.Equal(50.02, trackFallback.Location.Latitude);
         Assert.Equal(14.02, trackFallback.Location.Longitude);
+
+        var trackPreferred = models.Single(model => model.Id == TrackPreferredEntryId);
+        Assert.Equal(49.02, trackPreferred.Location.Latitude);
+        Assert.Equal(15.02, trackPreferred.Location.Longitude);
     }
 
     [Fact]

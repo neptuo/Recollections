@@ -28,15 +28,23 @@ public class MapService
             {
                 Id = e.Id,
                 Title = e.Title,
-                Location = e.Locations.Select(l => new LocationModel()
-                {
-                    Latitude = l.Latitude,
-                    Longitude = l.Longitude,
-                    Altitude = l.Altitude
-                }).FirstOrDefault(),
-                TrackLatitude = e.TrackLatitude,
-                TrackLongitude = e.TrackLongitude,
-                TrackAltitude = e.TrackAltitude
+                Location = e.Locations
+                    .Where(l => l.Latitude != null && l.Longitude != null)
+                    .Select(l => new LocationModel()
+                    {
+                        Latitude = l.Latitude,
+                        Longitude = l.Longitude,
+                        Altitude = l.Altitude
+                    })
+                    .FirstOrDefault(),
+                TrackLocation = e.TrackLatitude != null && e.TrackLongitude != null
+                    ? new LocationModel()
+                    {
+                        Latitude = e.TrackLatitude,
+                        Longitude = e.TrackLongitude,
+                        Altitude = e.TrackAltitude
+                    }
+                    : null
             })
             .ToListAsync();
 
@@ -51,6 +59,12 @@ public class MapService
         for (int i = 0; i < results.Count; i++)
         {
             var item = results[i];
+            if (HasNotLocationValue(item))
+            {
+                var source = items[i];
+                item.Location = source.TrackLocation;
+            }
+
             if (HasNotLocationValue(item))
             {
                 var location = await dataContext.Images
@@ -79,20 +93,6 @@ public class MapService
                     .FirstOrDefaultAsync();
 
                 item.Location = location;
-            }
-
-            if (HasNotLocationValue(item))
-            {
-                var source = items[i];
-                if (source.TrackLatitude != null && source.TrackLongitude != null)
-                {
-                    item.Location = new LocationModel()
-                    {
-                        Latitude = source.TrackLatitude,
-                        Longitude = source.TrackLongitude,
-                        Altitude = source.TrackAltitude
-                    };
-                }
             }
 
             if (HasNotLocationValue(item))

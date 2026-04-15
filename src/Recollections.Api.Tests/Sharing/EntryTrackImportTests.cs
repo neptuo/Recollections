@@ -70,6 +70,7 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(17.100, model.Locations[0].Longitude);
         Assert.True(model.Track.HasValue());
         Assert.Equal(3, model.Track.PointCount);
+        Assert.Equal(10d, model.Track.TotalElevation);
         Assert.Equal(49.205, model.Track.Location.Latitude);
         Assert.Equal(16.618, model.Track.Location.Longitude);
 
@@ -84,6 +85,7 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.True(entry.Model.Track.HasValue());
         Assert.Single(entry.Model.Locations);
         Assert.Equal(3, entry.Model.Track.PointCount);
+        Assert.Equal(10d, entry.Model.Track.TotalElevation);
     }
 
     [Fact]
@@ -127,6 +129,21 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
     }
 
     [Fact]
+    public void TrackImport_ComputesTotalElevationGain()
+    {
+        var service = new GpxImportService();
+
+        var track = service.Create([
+            new LocationModel() { Latitude = 50.087, Longitude = 14.421, Altitude = 100d },
+            new LocationModel() { Latitude = 50.095, Longitude = 14.430, Altitude = 120d },
+            new LocationModel() { Latitude = 50.103, Longitude = 14.438, Altitude = 110d },
+            new LocationModel() { Latitude = 50.111, Longitude = 14.446, Altitude = 150d }
+        ]);
+
+        Assert.Equal(60d, track.TotalElevation);
+    }
+
+    [Fact]
     public async Task TrackImport_LargeTrack_IsSimplified()
     {
         var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
@@ -161,7 +178,7 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var getResponse = await client.GetAsync($"/api/entries/{EntryId}");
         var entry = await getResponse.ReadJsonAsync<AuthorizedModel<EntryModel>>();
 
-        var json = $"{{\"Id\":\"{EntryId}\",\"Title\":\"{entry.Model.Title}\",\"When\":\"{entry.Model.When:O}\",\"Text\":null,\"Locations\":[],\"Track\":{{\"Data\":null,\"PointCount\":0,\"Location\":null}}}}";
+        var json = $"{{\"Id\":\"{EntryId}\",\"Title\":\"{entry.Model.Title}\",\"When\":\"{entry.Model.When:O}\",\"Text\":null,\"Locations\":[],\"Track\":{{\"Data\":null,\"PointCount\":0,\"TotalElevation\":null,\"Location\":null}}}}";
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         var updateResponse = await client.PutAsync($"/api/entries/{EntryId}", content);
 
