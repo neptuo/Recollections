@@ -4,12 +4,9 @@ using Neptuo.Logging;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
@@ -53,15 +50,6 @@ namespace Neptuo.Recollections.Entries.Components
 
         [Parameter]
         public MediaType Type { get; set; } = MediaType.Thumbnail;
-
-        [Parameter]
-        public string PlaceHolder { get; set; }
-
-        [Parameter]
-        public string PlaceHolderCssClass { get; set; }
-
-        [Parameter]
-        public EntryMediaPlaceHolderState PlaceHolderState { get; set; }
 
         [Parameter]
         public RenderFragment ThumbnailContent { get; set; }
