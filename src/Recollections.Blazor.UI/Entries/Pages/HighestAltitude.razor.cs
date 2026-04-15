@@ -13,12 +13,15 @@ public partial class HighestAltitude
     [Inject]
     protected Api Api { get; set; }
 
+    [Inject]
+    protected UiOptions UiOptions { get; set; }
+
     protected List<EntryListModel> Items { get; } = [];
     protected bool IsLoading { get; set; }
 
     protected string FormatEntryTitle(EntryListModel entry)
         => entry.Altitude != null
-            ? $"{Math.Round(entry.Altitude.Value):N0} m"
+            ? $"{UiOptions.FormatWholeNumber(entry.Altitude.Value)} m"
             : entry.When.ToShortDateString();
 
     protected override async Task OnInitializedAsync()
