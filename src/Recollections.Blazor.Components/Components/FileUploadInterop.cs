@@ -130,5 +130,11 @@ namespace Neptuo.Recollections.Components
             await EnsureModuleAsync();
             await module.InvokeVoidAsync("uploadUnassignedFilesTo", entityType, entityId, url);
         }
+
+        public async Task OpenAsync(ElementReference formElement)
+        {
+            await EnsureModuleAsync();
+            await module.InvokeVoidAsync("openFileDialog", formElement);
+        }
     }
 }

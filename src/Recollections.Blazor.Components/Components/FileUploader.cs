@@ -139,4 +139,7 @@ public class FileUploader
 
     public Task UploadUnassignedFilesToAsync(string entityType, string entityId, string url)
         => interop.UploadUnassignedFilesToAsync(entityType, entityId, url);
+
+    public Task OpenAsync(ElementReference formElement)
+        => interop.OpenAsync(formElement);
 }

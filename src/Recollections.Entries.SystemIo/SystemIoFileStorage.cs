@@ -39,6 +39,43 @@ namespace Neptuo.Recollections.Entries
             return storagePath;
         }
 
+        private string GetFilePath(Entry entry, EntryFileType type)
+        {
+            string fileName = type switch
+            {
+                EntryFileType.Track => "track.gpx",
+                _ => throw Ensure.Exception.NotSupported(type)
+            };
+
+            return Path.Combine(GetStoragePath(entry), fileName);
+        }
+
+        public Task<Stream> FindAsync(Entry entry, EntryFileType type)
+        {
+            string filePath = GetFilePath(entry, type);
+            if (!File.Exists(filePath))
+                return Task.FromResult<Stream>(null);
+
+            return Task.FromResult<Stream>(new FileStream(filePath, FileMode.Open, FileAccess.Read));
+        }
+
+        public async Task SaveAsync(Entry entry, Stream content, EntryFileType type)
+        {
+            string filePath = GetFilePath(entry, type);
+            if (content.CanSeek)
+                content.Position = 0;
+
+            using FileStream target = File.Create(filePath);
+            await content.CopyToAsync(target);
+        }
+
+        public Task DeleteAsync(Entry entry, EntryFileType type)
+        {
+            string filePath = GetFilePath(entry, type);
+            File.Delete(filePath);
+            return Task.CompletedTask;
+        }
+
         public Task<Stream> FindAsync(Entry entry, Image image, ImageType type)
         {
             ImagePath path = GetPath(entry, image);

@@ -83,6 +83,7 @@ namespace Neptuo.Recollections.Entries
             services
                 .AddTransient<ImageService>()
                 .AddTransient<VideoService>()
+                .AddTransient<GpxImportService>()
                 .AddTransient<ImageResizeService>()
                 .AddTransient<EntryMediaMapper>()
                 .AddTransient<EntryListMapper>()

@@ -47,6 +47,50 @@ namespace Neptuo.Recollections.Entries
             return entryDirectory;
         }
 
+        private static string GetFileName(EntryFileType type)
+            => type switch
+            {
+                EntryFileType.Track => "track.gpx",
+                _ => throw Ensure.Exception.NotSupported(type)
+            };
+
+        private async Task<ShareFileClient> GetFileAsync(Entry entry, EntryFileType type)
+        {
+            ShareDirectoryClient entryDirectory = await GetDirectoryAsync(entry);
+            string fileName = GetFileName(type);
+            return entryDirectory.GetFileClient(fileName);
+        }
+
+        public async Task<Stream> FindAsync(Entry entry, EntryFileType type)
+        {
+            ShareFileClient file = await GetFileAsync(entry, type);
+            if (await file.ExistsAsync())
+            {
+                ShareFileDownloadInfo download = await file.DownloadAsync();
+                return download.Content;
+            }
+
+            return null;
+        }
+
+        public async Task SaveAsync(Entry entry, Stream content, EntryFileType type)
+        {
+            ShareFileClient file = await GetFileAsync(entry, type);
+            await file.DeleteIfExistsAsync();
+            await file.CreateAsync(content.Length);
+
+            if (content.CanSeek)
+                content.Position = 0;
+
+            await file.UploadAsync(content);
+        }
+
+        public async Task DeleteAsync(Entry entry, EntryFileType type)
+        {
+            ShareFileClient file = await GetFileAsync(entry, type);
+            await file.DeleteIfExistsAsync();
+        }
+
         private string GetImageFileName(Image image, ImageType type)
         {
             string AddSuffix(string name, string suffix)

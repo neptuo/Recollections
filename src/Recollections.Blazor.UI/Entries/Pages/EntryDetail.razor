@@ -14,6 +14,9 @@
                     {
                         <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.OpenAsync(0))" />
                     }
+                    <PermissionView Request="@PermissionRequest.Write">
+                        <Item Icon="location-arrow" Text="Import GPX Track" OnClick="OpenTrackImportAsync" />
+                    </PermissionView>
                     <PermissionView Request="PermissionRequest.Owner">
                         <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
                     </PermissionView>
@@ -72,8 +75,8 @@
                 @if (UserState.IsAuthenticated)
                 {
                     <div class="gps">
-                        <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(MarkerCount == 0 ? "No locations..." : $"{MarkerCount} locations")" IsPlaceHolder="@(MarkerCount == 0)" IsEnabled="@(MarkerCount != 0 || Permissions.IsEditable)">
-                            <Map Markers="@Markers" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" />
+                        <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@MapTitle" IsPlaceHolder="@(!HasMapContent)" IsEnabled="@(HasMapContent || Permissions.IsEditable)">
+                            <Map Markers="@Markers" Path="@Model.Track?.Data" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" PathSelected="OnTrackSelected" />
                         </MapToggle>
                     </div>
                 }
@@ -149,6 +152,16 @@
                             Url="@Api.MediaUploadUrl(Model.Id)"
                             DragAndDropContainer="Container"
                         />
+                        <FileUpload
+                            @ref="TrackUpload"
+                            Text="Import GPX"
+                            EntityType="entry-track"
+                            EntityId="@EntryId"
+                            Url="@Api.TrackUploadUrl(Model.Id)"
+                            Accept=".gpx,application/gpx+xml"
+                            IsMultiple="false"
+                            CssClass="d-none"
+                        />
                     </PermissionView>
                 </ActionPanel>
             </div>
@@ -156,6 +169,7 @@
     </CascadingValue>
 
     <LocationEdit @ref="LocationEdit" Save="@SaveSelectedLocationAsync" Delete="@DeleteSelectedLocationAsync" />
+    <TrackEdit @ref="TrackEdit" Track="@Model?.Track" IsEditable="@Permissions.IsEditable" Delete="@DeleteTrackAsync" />
 
     <StoryPicker @ref="StoryPicker" Selected="StorySelectedAsync" />
     <BeingPicker @ref="BeingPicker" Selected="BeingSelectedAsync" />
