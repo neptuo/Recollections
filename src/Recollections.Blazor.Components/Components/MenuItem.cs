@@ -12,6 +12,7 @@ public record MenuItem(
     Action OnClick = null, 
     NavLinkMatch Match = NavLinkMatch.Prefix, 
     bool IsNewWindow = false,
+    string Prefix = "fa",
     string CssClass = ""
 );
 

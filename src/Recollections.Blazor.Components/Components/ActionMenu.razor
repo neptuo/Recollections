@@ -44,7 +44,7 @@
             var onclick = () => { Offcanvas.Hide(); Log.Debug($"Click '{item.OnClick.HasDelegate}'"); return item.OnClick.InvokeAsync(); };
 
             return @<button type="button" @onclick="@onclick" class="@cssClass" title="@item.Title">
-                <Icon Identifier="@item.Icon" />
+                <Icon Prefix="@item.Prefix" Identifier="@item.Icon" />
                 @item.Text
             </button>;
         };
