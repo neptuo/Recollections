@@ -29,7 +29,7 @@
     {
         return item => @<li>
             <a class="dropdown-item @item.CssClass" @onclick="@item.OnClick" title="@item.Title">
-                <Icon Prefix="@item.Prefix" Identifier="@item.Icon" />
+                <Icon Identifier="@item.Icon" />
                 @item.Text
             </a>
         </li>;

@@ -24,7 +24,7 @@
                 padding-left: 1.5rem;
             }
 
-            .fa, .fas, .far, .bi {
+            .fa, .fas, .far {
                 @include media-breakpoint-down(md) {
                     font-size: 1.3rem;
                 }

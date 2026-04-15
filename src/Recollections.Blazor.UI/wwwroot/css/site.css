@@ -25382,12 +25382,12 @@ input.input-number-noarrows[type=number] {
   }
 }
 @media (max-width: 767.98px) {
-  .main-navbar.block-icons .nav-link .fa, .main-navbar.block-icons .nav-link .fas, .main-navbar.block-icons .nav-link .far, .main-navbar.block-icons .nav-link .bi {
+  .main-navbar.block-icons .nav-link .fa, .main-navbar.block-icons .nav-link .fas, .main-navbar.block-icons .nav-link .far {
     font-size: 1.3rem;
   }
 }
 @media (min-width: 768px) {
-  .main-navbar.block-icons .nav-link .fa, .main-navbar.block-icons .nav-link .fas, .main-navbar.block-icons .nav-link .far, .main-navbar.block-icons .nav-link .bi {
+  .main-navbar.block-icons .nav-link .fa, .main-navbar.block-icons .nav-link .fas, .main-navbar.block-icons .nav-link .far {
     display: block;
     text-align: center;
   }
