@@ -6,11 +6,7 @@
 
 @if (IsLoading)
 {
-    <div class="d-flex justify-content-center mt-4" role="status">
-        <div class="spinner-border">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
+    <Loading IsLoading="true" />
 }
 else if (Items.Count == 0)
 {

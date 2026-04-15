@@ -3,9 +3,7 @@
 
 <DocumentTitle Value="@(Model?.Name ?? "Video...")" />
 
-@if (Model != null)
-{
-
+<LoadingSection IsLoading="@(Model == null)">
     <PermissionContainer State="@Permissions">
         <ActionMenu>
             <ItemGroup Text="@Model.Name">
@@ -56,4 +54,4 @@
 
         <LocationEdit @ref="LocationEdit" Save="@(async location => await SaveLocationAsync(location))" Delete="@OnClearLocationAsync" />
     </PermissionContainer>
-}
+</LoadingSection>

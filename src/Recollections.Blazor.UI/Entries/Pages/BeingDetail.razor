@@ -3,9 +3,7 @@
 
 <DocumentTitle Value="@(Model?.Name ?? "Being...")" />
 
-@if (Model != null)
-{
-
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <ActionMenu>
@@ -68,4 +66,4 @@
             </ListView>
         </div>
     </Offcanvas>
-}
+</LoadingSection>

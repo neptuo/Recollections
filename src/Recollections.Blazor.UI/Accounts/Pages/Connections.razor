@@ -14,8 +14,15 @@
                 <input class="form-control" type="text" placeholder="Username..." @bind="UserName" />
             </div>
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
-                <button class="btn btn-primary d-block w-100">
-                    <Icon Identifier="plus" />
+                <button class="btn btn-primary d-block w-100" disabled="@IsSaving">
+                    @if (IsSaving)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    }
+                    else
+                    {
+                        <Icon Identifier="plus" />
+                    }
                     Send invite
                 </button>
             </div>
@@ -78,7 +85,7 @@
                                 }
                                 @if (connection.State == ConnectionState.Pending && connection.Role == ConnectionRole.Acceptor) 
                                 {
-                                    <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Active))">
+                                    <button type="button" class="btn btn-secondary btn-sm" disabled="@IsSaving" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Active))">
                                         <Icon Prefix="fas" Identifier="check" />
                                         Accept
                                     </button>
@@ -87,14 +94,14 @@
                             <div class="col d-grid">
                                 @if (connection.State != ConnectionState.Rejected)
                                 {
-                                    <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Rejected))">
+                                    <button type="button" class="btn btn-secondary btn-sm" disabled="@IsSaving" @onclick="@(async () => await ChangeStateAsync(connection, ConnectionState.Rejected))">
                                         <Icon Prefix="fas" Identifier="times" />
                                         Reject
                                     </button>
                                 }
                             </div>
                             <div class="col d-grid">
-                                <button type="button" class="btn btn-secondary btn-sm" @onclick="@(async () => await DeleteAsync(connection))">
+                                <button type="button" class="btn btn-secondary btn-sm" disabled="@IsSaving" @onclick="@(async () => await DeleteAsync(connection))">
                                     <Icon Prefix="fas" Identifier="trash-alt" />
                                     Delete
                                 </button>

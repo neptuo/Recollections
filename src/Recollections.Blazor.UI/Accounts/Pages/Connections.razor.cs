@@ -22,6 +22,7 @@ public partial class Connections
     protected ConnectionModel ShareConnection { get; set; }
 
     protected bool IsLoading { get; set; }
+    protected bool IsSaving { get; set; }
 
     public string UserName { get; set; }
     public List<string> ErrorMessages { get; } = new List<string>();
@@ -44,23 +45,39 @@ public partial class Connections
 
     protected async Task CreateAsync()
     {
-        var model = new ConnectionModel()
+        IsSaving = true;
+        try
         {
-            OtherUserName = UserName,
-            Role = ConnectionRole.Initiator,
-            State = ConnectionState.Pending
-        };
+            var model = new ConnectionModel()
+            {
+                OtherUserName = UserName,
+                Role = ConnectionRole.Initiator,
+                State = ConnectionState.Pending
+            };
 
-        await Api.CreateConnectionAsync(model);
-        UserName = null;
+            await Api.CreateConnectionAsync(model);
+            UserName = null;
 
-        await LoadDataAsync();
+            await LoadDataAsync();
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 
-    protected Task ChangeStateAsync(ConnectionModel model, ConnectionState newState)
+    protected async Task ChangeStateAsync(ConnectionModel model, ConnectionState newState)
     {
-        model.State = newState;
-        return SaveAsync(model);
+        IsSaving = true;
+        try
+        {
+            model.State = newState;
+            await SaveAsync(model);
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 
     protected async Task SaveAsync(ConnectionModel model)
@@ -71,7 +88,15 @@ public partial class Connections
 
     protected async Task DeleteAsync(ConnectionModel model)
     {
-        await Api.DeleteConnectionAsync(model.OtherUserName);
-        await LoadDataAsync();
+        IsSaving = true;
+        try
+        {
+            await Api.DeleteConnectionAsync(model.OtherUserName);
+            await LoadDataAsync();
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 }

@@ -30,8 +30,12 @@
     </span>
     <a class="ms-auto btn btn btn-secondary btn-sm" href="@GetNextPeriodUrl()">Next</a>
 </h3>
-
-@if (IsMonthView)
+
+@if (IsLoading)
+{
+    <Loading IsLoading="true" />
+}
+else if (IsMonthView)
 {
     <MonthView Year="@Year.Value" Month="@Month.Value" Context="day">
         <div>
