@@ -7,6 +7,11 @@ namespace Neptuo.Recollections.Entries.Components;
 partial class TrackEdit
 {
     protected Modal Modal { get; set; }
+    protected string TotalDistanceText => Track?.TotalDistance == null
+        ? null
+        : Track.TotalDistance.Value >= 1000d
+            ? $"{(Track.TotalDistance.Value / 1000d).ToString("0.##", CultureInfo.InvariantCulture)} km"
+            : $"{Track.TotalDistance.Value.ToString("0.#", CultureInfo.InvariantCulture)} m";
     protected string TotalElevationText => Track?.TotalElevation == null
         ? null
         : $"{Track.TotalElevation.Value.ToString("0.#", CultureInfo.InvariantCulture)} m";

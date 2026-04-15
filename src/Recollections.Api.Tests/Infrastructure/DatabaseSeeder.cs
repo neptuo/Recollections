@@ -158,6 +158,7 @@ public static class DatabaseSeeder
         entry.TrackData = track.Data;
         entry.TrackPointCount = track.PointCount;
         entry.TrackTotalElevation = track.TotalElevation;
+        entry.TrackTotalDistance = track.TotalDistance;
         entry.TrackLatitude = track.Location?.Latitude;
         entry.TrackLongitude = track.Location?.Longitude;
         entry.TrackAltitude = track.Location?.Altitude;

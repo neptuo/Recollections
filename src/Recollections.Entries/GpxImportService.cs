@@ -12,6 +12,7 @@ namespace Neptuo.Recollections.Entries
     public class GpxImportService
     {
         public const int MaxLocationCount = 250;
+        private const double EarthRadius = 6371000d;
 
         public EntryTrackModel Parse(IFileInput input)
         {
@@ -63,6 +64,7 @@ namespace Neptuo.Recollections.Entries
                 Data = Encode(simplified),
                 PointCount = simplified.Count,
                 TotalElevation = CalculateTotalElevation(normalized),
+                TotalDistance = CalculateTotalDistance(normalized),
                 Location = simplified[simplified.Count / 2].Clone()
             };
         }
@@ -256,5 +258,40 @@ namespace Neptuo.Recollections.Entries
 
             return Math.Round(total, 1, MidpointRounding.AwayFromZero);
         }
+
+        private static double CalculateTotalDistance(IReadOnlyList<LocationModel> locations)
+        {
+            double total = 0;
+            for (int i = 1; i < locations.Count; i++)
+                total += CalculateDistance(locations[i - 1], locations[i]);
+
+            return Math.Round(total, 1, MidpointRounding.AwayFromZero);
+        }
+
+        private static double CalculateDistance(LocationModel previous, LocationModel current)
+        {
+            double latitude1 = ToRadians(previous.Latitude.Value);
+            double latitude2 = ToRadians(current.Latitude.Value);
+            double latitudeDelta = latitude2 - latitude1;
+            double longitudeDelta = ToRadians(current.Longitude.Value - previous.Longitude.Value);
+
+            double a =
+                Math.Pow(Math.Sin(latitudeDelta / 2d), 2d) +
+                Math.Cos(latitude1) * Math.Cos(latitude2) * Math.Pow(Math.Sin(longitudeDelta / 2d), 2d);
+            a = Math.Min(1d, a);
+            double c = 2d * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1d - a));
+            double horizontalDistance = EarthRadius * c;
+
+            if (previous.Altitude != null && current.Altitude != null)
+            {
+                double altitudeDelta = current.Altitude.Value - previous.Altitude.Value;
+                return Math.Sqrt((horizontalDistance * horizontalDistance) + (altitudeDelta * altitudeDelta));
+            }
+
+            return horizontalDistance;
+        }
+
+        private static double ToRadians(double degrees)
+            => degrees * (Math.PI / 180d);
     }
 }

@@ -168,6 +168,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.TrackData = track.Data;
             entity.TrackPointCount = track.PointCount;
             entity.TrackTotalElevation = track.TotalElevation;
+            entity.TrackTotalDistance = track.TotalDistance;
             entity.TrackLatitude = track.Location?.Latitude;
             entity.TrackLongitude = track.Location?.Longitude;
             entity.TrackAltitude = track.Location?.Altitude;
@@ -210,6 +211,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 Data = entity.TrackData,
                 PointCount = entity.TrackPointCount ?? 0,
                 TotalElevation = entity.TrackTotalElevation,
+                TotalDistance = entity.TrackTotalDistance,
                 Location = entity.TrackLatitude != null && entity.TrackLongitude != null
                     ? new LocationModel()
                     {
@@ -232,6 +234,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 entity.TrackData = model.Track.Data;
                 entity.TrackPointCount = model.Track.PointCount;
                 entity.TrackTotalElevation = model.Track.TotalElevation;
+                entity.TrackTotalDistance = model.Track.TotalDistance;
                 entity.TrackLatitude = model.Track.Location?.Latitude;
                 entity.TrackLongitude = model.Track.Location?.Longitude;
                 entity.TrackAltitude = model.Track.Location?.Altitude;
@@ -241,6 +244,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 entity.TrackData = null;
                 entity.TrackPointCount = null;
                 entity.TrackTotalElevation = null;
+                entity.TrackTotalDistance = null;
                 entity.TrackLatitude = null;
                 entity.TrackLongitude = null;
                 entity.TrackAltitude = null;

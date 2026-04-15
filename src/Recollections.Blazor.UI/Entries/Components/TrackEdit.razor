@@ -5,6 +5,12 @@
             <div class="mb-3">
                 <strong>Points:</strong> @Track.PointCount
             </div>
+            @if (Track.TotalDistance != null)
+            {
+                <div class="mb-3">
+                    <strong>Total distance:</strong> @TotalDistanceText
+                </div>
+            }
             @if (Track.TotalElevation != null)
             {
                 <div class="mb-3">
