@@ -19,14 +19,12 @@
                             ButtonCssClass="list-group-item list-group-item-action border-0 rounded-0 w-100 text-start"
                             FormCssClass="d-block"
                         />
+                        <Item Icon="location-arrow" Text="Import GPX track" OnClick="OpenTrackImportAsync" />
                     </PermissionView>
                     @if (Gallery != null)
                     {
                         <Item Icon="image" Text="Open gallery" OnClick="@(() => Gallery.OpenAsync(0))" />
                     }
-                    <PermissionView Request="@PermissionRequest.Write">
-                        <Item Icon="location-arrow" Text="Import GPX Track" OnClick="OpenTrackImportAsync" />
-                    </PermissionView>
                     <PermissionView Request="PermissionRequest.Owner">
                         <ShareButton Owner="@Owner" EntryId="@EntryId" Layout="ButtonLayout.Item" />
                     </PermissionView>

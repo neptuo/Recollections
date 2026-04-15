@@ -308,13 +308,6 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
 
     var input = form.querySelector("input[type=file]");
 
-    var button = form.querySelector("button");
-    if (button) {
-        button.addEventListener('click', function (e) {
-            input.click();
-            e.preventDefault();
-        });
-    }
     input.addEventListener('change', async () => {
         await queue.storeAndQueueFiles(
             input.files,
