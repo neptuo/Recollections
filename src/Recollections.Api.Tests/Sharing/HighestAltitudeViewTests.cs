@@ -95,11 +95,11 @@ public class HighestAltitudeViewTests : IClassFixture<ApiFactory>, IAsyncLifetim
 
     public Task DisposeAsync() => Task.CompletedTask;
 
-    private async Task<List<EntryListModel>> GetHighestAltitudeAsync(HttpClient client)
+    private async Task<List<HighestAltitudeEntryListModel>> GetHighestAltitudeAsync(HttpClient client)
     {
         var response = await client.GetAsync("/api/highest-altitude");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        return await response.ReadJsonAsync<List<EntryListModel>>();
+        return await response.ReadJsonAsync<List<HighestAltitudeEntryListModel>>();
     }
 
     [Fact]

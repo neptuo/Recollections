@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Neptuo.Recollections.Entries;
 
-public record EntryListModel
+public record HighestAltitudeEntryListModel
 (
     string UserId,
     string UserName,
@@ -15,13 +15,12 @@ public record EntryListModel
 
     string StoryTitle,
     string ChapterTitle,
-    
+
     List<EntryBeingModel> Beings,
 
     int ImageCount,
     int VideoCount,
-    int GpsCount
+    int GpsCount,
+    double Altitude
 )
-{
-    public List<MediaModel> PreviewMedia { get; init; } = [];
-}
+    : EntryListModel(UserId, UserName, Id, Title, TextWordCount, When, StoryTitle, ChapterTitle, Beings, ImageCount, VideoCount, GpsCount);
