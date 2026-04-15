@@ -4,12 +4,9 @@ using Neptuo.Logging;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
