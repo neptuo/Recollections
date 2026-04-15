@@ -35,6 +35,15 @@ public partial class Notifications
             && !HasBrowserSubscription
             && !String.IsNullOrWhiteSpace(Model?.PushPublicKey);
 
+    protected string BrowserSubscriptionButtonCssClass
+        => HasBrowserSubscription ? "btn btn-secondary" : "btn btn-primary";
+
+    protected string BrowserSubscriptionButtonIcon
+        => HasBrowserSubscription ? "bell-slash" : "bell";
+
+    protected string BrowserSubscriptionButtonText
+        => HasBrowserSubscription ? "Disable on this browser" : "Enable on this browser";
+
     protected string BrowserPermissionLabel => BrowserPermission switch
     {
         "granted" => "Granted",
@@ -94,6 +103,9 @@ public partial class Notifications
             await LoadAsync();
         });
     }
+
+    protected Task ToggleSubscriptionAsync()
+        => HasBrowserSubscription ? UnsubscribeAsync() : SubscribeAsync();
 
     private async Task LoadAsync()
     {
