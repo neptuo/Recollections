@@ -68,22 +68,22 @@ public partial class Connections
 
     protected async Task ChangeStateAsync(ConnectionModel model, ConnectionState newState)
     {
+        model.State = newState;
+        await SaveAsync(model);
+    }
+
+    protected async Task SaveAsync(ConnectionModel model)
+    {
         IsSaving = true;
         try
         {
-            model.State = newState;
-            await SaveAsync(model);
+            await Api.UpdateConnectionAsync(model);
+            await LoadDataAsync();
         }
         finally
         {
             IsSaving = false;
         }
-    }
-
-    protected async Task SaveAsync(ConnectionModel model)
-    {
-        await Api.UpdateConnectionAsync(model);
-        await LoadDataAsync();
     }
 
     protected async Task DeleteAsync(ConnectionModel model)
