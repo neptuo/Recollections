@@ -46,6 +46,13 @@
                     </div>
                 }
 
+                @if (AltitudeCount > 0)
+                {
+                    <div class="my-2">
+                        <InlineLink Value="@($"{AltitudeCount} {(AltitudeCount == 1 ? "altitude" : "altitudes")}")" Icon="arrow-up-short-wide" OnClick="ShowAltitudeAsync" />
+                    </div>
+                }
+
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
@@ -67,5 +74,24 @@
                 </div>
             </ListView>
         </div>
+    </Offcanvas>
+
+    <Offcanvas @ref="AltitudeOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Highest altitude with {Model.Name}")" IsBodyRenderedLazily="true">
+        @if (IsAltitudeLoading)
+        {
+            <div class="d-flex justify-content-center mt-4" role="status">
+                <div class="spinner-border">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        }
+        else if (AltitudeItems.Count == 0)
+        {
+            <Alert Mode="@AlertMode.Warning" Message="No entries with altitude yet..." />
+        }
+        else
+        {
+            <Timeline Data="@AltitudeItems" EntryTitleSelector="FormatAltitudeEntryTitle" />
+        }
     </Offcanvas>
 }

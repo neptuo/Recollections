@@ -23,20 +23,23 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
         private readonly EntryListMapper entryMapper;
         private readonly StoryListMapper storyMapper;
+        private readonly HighestAltitudeService highestAltitudeService;
         private readonly IConnectionProvider connections;
 
-        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, StoryListMapper storyMapper, IConnectionProvider connections)
+        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, StoryListMapper storyMapper, HighestAltitudeService highestAltitudeService, IConnectionProvider connections)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(entryMapper, "entryMapper");
             Ensure.NotNull(storyMapper, "storyMapper");
+            Ensure.NotNull(highestAltitudeService, "highestAltitudeService");
             Ensure.NotNull(connections, "connections");
             this.db = db;
             this.shareStatus = shareStatus;
             this.entryMapper = entryMapper;
             this.storyMapper = storyMapper;
+            this.highestAltitudeService = highestAltitudeService;
             this.connections = connections;
         }
 
@@ -89,6 +92,19 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var models = await storyMapper.MapAsync(stories, userId, connectedUsers);
 
+            return Ok(models);
+        });
+
+        [HttpGet("highest-altitude")]
+        [ProducesDefaultResponseType(typeof(List<EntryListModel>))]
+        [ProducesResponseType(Status200OK)]
+        [ProducesResponseType(Status401Unauthorized)]
+        public Task<IActionResult> GetHighestAltitude(string beingId) => RunBeingAsync(beingId, Permission.Read, async being =>
+        {
+            var userId = User.FindUserId();
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+
+            var models = await highestAltitudeService.GetListAsync(userId, connectedUsers, beingId);
             return Ok(models);
         });
     }

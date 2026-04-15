@@ -22,6 +22,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected UiOptions UiOptions { get; set; }
+
         private string previousBeingId;
 
         [Parameter]
@@ -41,6 +44,11 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Offcanvas StoriesOffcanvas { get; set; }
         protected bool IsStoriesLoading { get; set; }
         protected List<StoryListModel> StoryItems { get; } = new List<StoryListModel>();
+
+        protected int AltitudeCount { get; set; }
+        protected Offcanvas AltitudeOffcanvas { get; set; }
+        protected bool IsAltitudeLoading { get; set; }
+        protected List<EntryListModel> AltitudeItems { get; } = new List<EntryListModel>();
 
         public override Task SetParametersAsync(ParameterView parameters)
         {
@@ -66,6 +74,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
             var stories = await Api.GetBeingStoriesAsync(BeingId);
             StoriesCount = stories.Count;
+
+            var altitudeEntries = await Api.GetBeingHighestAltitudeAsync(BeingId);
+            AltitudeCount = altitudeEntries.Count;
         }
 
         private async Task LoadMapAsync()
@@ -134,5 +145,22 @@ namespace Neptuo.Recollections.Entries.Pages
             IsStoriesLoading = false;
             StateHasChanged();
         }
+
+        protected async Task ShowAltitudeAsync()
+        {
+            IsAltitudeLoading = true;
+            AltitudeItems.Clear();
+            AltitudeOffcanvas.Show();
+            StateHasChanged();
+
+            AltitudeItems.AddRange(await Api.GetBeingHighestAltitudeAsync(BeingId));
+            IsAltitudeLoading = false;
+            StateHasChanged();
+        }
+
+        protected string FormatAltitudeEntryTitle(EntryListModel entry)
+            => entry.Altitude != null
+                ? $"{UiOptions.FormatWholeNumber(entry.Altitude.Value)} m"
+                : entry.When.ToString(UiOptions.ShortDateFormat);
     }
 }
