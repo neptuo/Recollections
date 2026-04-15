@@ -44,6 +44,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public EventCallback<EntryListModel> OnClick { get; set; }
 
+        [Parameter]
+        public Func<EntryListModel, string> EntryTitleSelector { get; set; }
+
         private int offset;
         private Task loadAsyncFromParametersSet;
         private string scrollToEntryId;
@@ -56,6 +59,9 @@ namespace Neptuo.Recollections.Entries.Components
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; private set; } = true;
         protected bool IsCollapsed { get; set; } = false;
+
+        protected string FormatEntryTitle(EntryListModel entry)
+            => EntryTitleSelector?.Invoke(entry) ?? entry.When.ToString(ShowYearSeparators ? UiOptions.ShortDateFormat : UiOptions.DateFormat);
 
         protected async override Task OnInitializedAsync()
         {

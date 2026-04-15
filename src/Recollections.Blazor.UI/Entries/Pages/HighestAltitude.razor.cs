@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -14,6 +15,11 @@ public partial class HighestAltitude
 
     protected List<EntryListModel> Items { get; } = [];
     protected bool IsLoading { get; set; }
+
+    protected string FormatEntryTitle(EntryListModel entry)
+        => entry.Altitude != null
+            ? $"{Math.Round(entry.Altitude.Value):N0} m"
+            : entry.When.ToShortDateString();
 
     protected override async Task OnInitializedAsync()
     {
