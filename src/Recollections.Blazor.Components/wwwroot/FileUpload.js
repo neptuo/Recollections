@@ -232,6 +232,7 @@ let bearerToken;
 let currentEntityType;
 let currentEntityId;
 let currentActionUrl;
+let isDropTargetBound = false;
 
 function hasFiles(dataTransfer) {
     return dataTransfer && Array.from(dataTransfer.types || []).includes('Files');
@@ -241,6 +242,45 @@ function raiseStoredFilesChanged() {
     if (interop) {
         interop.invokeMethodAsync("FileUpload.OnStoredFilesChanged");
     }
+}
+
+function ensureDropTargetBinding() {
+    if (isDropTargetBound) {
+        return;
+    }
+
+    const dropTarget = document.body || document.documentElement;
+    if (!dropTarget) {
+        return;
+    }
+
+    const preventDefault = function (e) {
+        if (hasFiles(e.dataTransfer)) {
+            e.preventDefault();
+        }
+    };
+
+    dropTarget.addEventListener('drag', preventDefault);
+    dropTarget.addEventListener('dragstart', preventDefault);
+    dropTarget.addEventListener('dragend', preventDefault);
+    dropTarget.addEventListener('dragover', preventDefault);
+    dropTarget.addEventListener('dragenter', preventDefault);
+    dropTarget.addEventListener('dragleave', preventDefault);
+    dropTarget.addEventListener('drop', function (e) {
+        if (!hasFiles(e.dataTransfer)) {
+            return;
+        }
+
+        queue.storeAndQueueFiles(
+            e.dataTransfer.files,
+            currentActionUrl,
+            currentEntityType,
+            currentEntityId
+        );
+        e.preventDefault();
+    });
+
+    isDropTargetBound = true;
 }
 
 export function initialize(interopValue) {
@@ -286,31 +326,7 @@ export function bindForm(entityType, entityId, url, form, dragAndDropContainer) 
     });
 
     if (dragAndDropContainer) {
-        const preventDefault = function (e) {
-            if (hasFiles(e.dataTransfer)) {
-                e.preventDefault();
-            }
-        };
-
-        dragAndDropContainer.addEventListener('drag', preventDefault);
-        dragAndDropContainer.addEventListener('dragstart', preventDefault);
-        dragAndDropContainer.addEventListener('dragend', preventDefault);
-        dragAndDropContainer.addEventListener('dragover', preventDefault);
-        dragAndDropContainer.addEventListener('dragenter', preventDefault);
-        dragAndDropContainer.addEventListener('dragleave', preventDefault);
-        dragAndDropContainer.addEventListener('drop', function (e) {
-            if (!hasFiles(e.dataTransfer)) {
-                return;
-            }
-
-            queue.storeAndQueueFiles(
-                e.dataTransfer.files,
-                url || currentActionUrl,
-                entityType || currentEntityType,
-                entityId || currentEntityId
-            );
-            e.preventDefault();
-        });
+        ensureDropTargetBinding();
     }
 }
 
