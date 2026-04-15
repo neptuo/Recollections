@@ -80,8 +80,8 @@ namespace Neptuo.Recollections.Entries
         public Task<List<MapEntryModel>> GetMapListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<MapEntryModel>>("map/list"));
 
-        public Task<List<HighestAltitudeEntryListModel>> GetHighestAltitudeListAsync()
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<HighestAltitudeEntryListModel>>("highest-altitude"));
+        public Task<List<EntryListModel>> GetHighestAltitudeListAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>("highest-altitude"));
 
         public async Task<string> GetMapCountriesAsync()
             => await faultHandler.Wrap(http.GetStringAsync("map/countries"));

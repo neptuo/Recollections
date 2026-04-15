@@ -12,7 +12,7 @@ public class HighestAltitudeService(DataContext dataContext, EntryListMapper ent
 {
     public const int ItemCount = 20;
 
-    public async Task<List<HighestAltitudeEntryListModel>> GetListAsync(string userId, ConnectedUsersModel connectedUsers)
+    public async Task<List<EntryListModel>> GetListAsync(string userId, ConnectedUsersModel connectedUsers)
     {
         Ensure.NotNullOrEmpty(userId, "userId");
         Ensure.NotNull(connectedUsers, "connectedUsers");
@@ -40,29 +40,9 @@ public class HighestAltitudeService(DataContext dataContext, EntryListMapper ent
 
         return rankedEntries
             .Where(item => modelsById.ContainsKey(item.EntryId))
-            .Select(item => MapModel(modelsById[item.EntryId], item.Altitude))
+            .Select(item => modelsById[item.EntryId] with { Altitude = item.Altitude })
             .ToList();
     }
-
-    private static HighestAltitudeEntryListModel MapModel(EntryListModel model, double altitude)
-        => new(
-            UserId: model.UserId,
-            UserName: model.UserName,
-            Id: model.Id,
-            Title: model.Title,
-            TextWordCount: model.TextWordCount,
-            When: model.When,
-            StoryTitle: model.StoryTitle,
-            ChapterTitle: model.ChapterTitle,
-            Beings: model.Beings,
-            ImageCount: model.ImageCount,
-            VideoCount: model.VideoCount,
-            GpsCount: model.GpsCount,
-            Altitude: altitude
-        )
-        {
-            PreviewMedia = model.PreviewMedia
-        };
 
     private async Task<List<EntryAltitudeInfo>> GetRankedEntriesAsync(IQueryable<Entry> accessibleEntries)
     {

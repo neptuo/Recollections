@@ -14,7 +14,7 @@ public class HighestAltitudeController(DataContext dataContext, HighestAltitudeS
     : ControllerBase(dataContext, shareStatus)
 {
     [HttpGet]
-    [ProducesDefaultResponseType(typeof(List<HighestAltitudeEntryListModel>))]
+    [ProducesDefaultResponseType(typeof(List<EntryListModel>))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetList()

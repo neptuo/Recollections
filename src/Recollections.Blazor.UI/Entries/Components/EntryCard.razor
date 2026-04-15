@@ -16,11 +16,11 @@
                 @Model.When.ToString(UiOptions.DateFormat)
             </div>
 
-            @if (Model is HighestAltitudeEntryListModel altitudeModel)
+            @if (Model.Altitude != null)
             {
                 <div class="information">
                     <Icon Identifier="sort-amount-down" />
-                    @($"{Math.Round(altitudeModel.Altitude):N0} m")
+                    @($"{Math.Round(Model.Altitude.Value):N0} m")
                 </div>
             }
 

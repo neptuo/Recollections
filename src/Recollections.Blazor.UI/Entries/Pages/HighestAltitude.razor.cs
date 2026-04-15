@@ -12,7 +12,7 @@ public partial class HighestAltitude
     [Inject]
     protected Api Api { get; set; }
 
-    protected List<HighestAltitudeEntryListModel> Items { get; } = [];
+    protected List<EntryListModel> Items { get; } = [];
     protected bool IsLoading { get; set; }
 
     protected override async Task OnInitializedAsync()
