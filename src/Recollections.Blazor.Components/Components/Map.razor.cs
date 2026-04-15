@@ -18,10 +18,16 @@ namespace Neptuo.Recollections.Components
         public IList<MapMarkerModel> Markers { get; set; }
 
         [Parameter]
+        public string Path { get; set; }
+
+        [Parameter]
         public EventCallback MarkersChanged { get; set; }
 
         [Parameter]
         public EventCallback<int> MarkerSelected { get; set; }
+
+        [Parameter]
+        public EventCallback PathSelected { get; set; }
 
         [Parameter]
         public EventCallback OnClearLocation { get; set; }
@@ -87,7 +93,7 @@ namespace Neptuo.Recollections.Components
                 await Interop.SetViewModeAsync(ViewMode, geoJson);
             }
 
-            if (Markers.Count > 0)
+            if (Markers.Count > 0 || !String.IsNullOrEmpty(Path))
                 IsZoomed = true;
         }
 
@@ -132,6 +138,9 @@ namespace Neptuo.Recollections.Components
                 await MarkersChanged.InvokeAsync();
             }
         }
+
+        internal async Task SelectPathAsync()
+            => await PathSelected.InvokeAsync();
 
         protected async Task SearchLocationAsync()
         {

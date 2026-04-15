@@ -33,7 +33,9 @@ export function initialize(container, interop, isEditable) {
             interop: interop,
             isAdditive: false,
             isEmptyPoint: false,
-            isAdding: false
+            isAdding: false,
+            trackPath: null,
+            pathPoints: []
         };
         _mapData.set(container, model);
 
@@ -109,21 +111,24 @@ export function initialize(container, interop, isEditable) {
     // }
 }
 
-export function updateMarkers(container, markers, isEditable) {
+export function updateMarkers(container, markers, path, isEditable) {
     const model = _mapData.get(container);
     
     model.lastMarkers = markers;
+    model.lastPath = path;
     model.lastIsEditable = isEditable;
 
     // In countries mode, don't show markers
     if (model.viewMode === "countries") {
+        clearTrackPath(model);
         return;
     }
 
+    setTrackPath(model, path);
     const points = setMarkers(model, markers, isEditable);
 
     model.isAdding = false;
-    model.isEmptyPoint = points.length == 0 && !model.isAdditive;
+    model.isEmptyPoint = points.length == 0 && model.pathPoints.length == 0 && !model.isAdditive;
 
     const mapEl = container.querySelector('.map');
     mapEl.style.cursor = "";
@@ -134,10 +139,11 @@ export function updateMarkers(container, markers, isEditable) {
 
 export function centerAtMarkers(container) {
     const model = _mapData.get(container);
-    if (model.points.length == 0) {
+    const points = (model.points || []).concat(model.pathPoints || []);
+    if (points.length == 0) {
         model.map.setView([0, 0], 1);
     } else {
-        model.map.fitBounds(model.points, { maxZoom: 14 });
+        model.map.fitBounds(points, { maxZoom: 14 });
     }
 }
 
@@ -223,6 +229,70 @@ function setMarkers(model, markers, isEditable) {
     return points;
 }
 
+function clearTrackPath(model) {
+    if (model.trackPath) {
+        model.trackPath.remove();
+        model.trackPath = null;
+    }
+
+    model.pathPoints = [];
+}
+
+function setTrackPath(model, path) {
+    clearTrackPath(model);
+
+    if (!path || path.length === 0) {
+        return;
+    }
+
+    const points = decodePolyline(path);
+
+    model.pathPoints = points;
+    if (points.length < 2) {
+        return;
+    }
+
+    model.trackPath = Leaflet.polyline(points, {
+        color: "#dc3545",
+        weight: 4,
+        opacity: 0.75,
+        bubblingMouseEvents: false
+    }).addTo(model.map);
+
+    model.trackPath.on("click", () => {
+        model.interop.invokeMethodAsync("MapInterop.PathSelected");
+    });
+}
+
+function decodePolyline(data) {
+    const points = [];
+    let index = 0;
+    let latitude = 0;
+    let longitude = 0;
+
+    while (index < data.length) {
+        latitude += decodeNextValue(data, () => index++);
+        longitude += decodeNextValue(data, () => index++);
+        points.push([latitude / 100000, longitude / 100000]);
+    }
+
+    return points;
+}
+
+function decodeNextValue(data, nextIndex) {
+    let result = 0;
+    let shift = 0;
+    let value;
+
+    do {
+        value = data.charCodeAt(nextIndex()) - 63;
+        result |= (value & 0x1f) << shift;
+        shift += 5;
+    } while (value >= 0x20);
+
+    return (result & 1) === 1 ? ~(result >> 1) : (result >> 1);
+}
+
 function moveMarker(model, id, latitude, longitude) {
     model.interop.invokeMethodAsync("MapInterop.MarkerMoved", id, latitude, longitude);
 }
@@ -250,6 +320,7 @@ export function setViewMode(container, mode, countriesGeoJsonString) {
                 m.remove();
             }
         }
+        clearTrackPath(model);
 
         // Remove previous countries layer
         if (model.countriesLayer) {
@@ -303,9 +374,13 @@ export function setViewMode(container, mode, countriesGeoJsonString) {
         if (model.lastMarkers && model.lastIsEditable !== undefined) {
             setMarkers(model, model.lastMarkers, model.lastIsEditable);
         }
+        if (model.lastPath) {
+            setTrackPath(model, model.lastPath);
+        }
 
-        if (model.points && model.points.length > 0) {
-            model.map.fitBounds(model.points, { maxZoom: 14 });
+        const allPoints = (model.points || []).concat(model.pathPoints || []);
+        if (allPoints.length > 0) {
+            model.map.fitBounds(allPoints, { maxZoom: 14 });
         } else {
             model.map.setView([0, 0], 1);
         }

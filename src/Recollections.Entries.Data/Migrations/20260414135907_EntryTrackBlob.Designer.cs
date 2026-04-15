@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neptuo.Recollections.Entries;
 
@@ -10,9 +11,11 @@ using Neptuo.Recollections.Entries;
 namespace Neptuo.Recollections.Entries.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260414135907_EntryTrackBlob")]
+    partial class EntryTrackBlob
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -114,12 +117,6 @@ namespace Neptuo.Recollections.Entries.Migrations
 
                     b.Property<int?>("TrackPointCount")
                         .HasColumnType("INTEGER");
-
-                    b.Property<double?>("TrackTotalDistance")
-                        .HasColumnType("REAL");
-
-                    b.Property<double?>("TrackTotalElevation")
-                        .HasColumnType("REAL");
 
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");

@@ -146,6 +146,27 @@ public static class DatabaseSeeder
         await db.SaveChangesAsync();
     }
 
+    public static async Task SeedEntryTrack(EntriesDataContext db, Entry entry, params (double latitude, double longitude, double? altitude)[] points)
+    {
+        var track = new GpxImportService().Create(points.Select(p => new LocationModel()
+        {
+            Latitude = p.latitude,
+            Longitude = p.longitude,
+            Altitude = p.altitude
+        }).ToList());
+
+        entry.TrackData = track.Data;
+        entry.TrackPointCount = track.PointCount;
+        entry.TrackTotalElevation = track.TotalElevation;
+        entry.TrackTotalDistance = track.TotalDistance;
+        entry.TrackLatitude = track.Location?.Latitude;
+        entry.TrackLongitude = track.Location?.Longitude;
+        entry.TrackAltitude = track.Location?.Altitude;
+        entry.Locations.Clear();
+
+        await db.SaveChangesAsync();
+    }
+
     public static async Task<Image> SeedImage(
         EntriesDataContext db,
         string imageId,

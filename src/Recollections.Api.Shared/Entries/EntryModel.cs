@@ -15,6 +15,7 @@ namespace Neptuo.Recollections.Entries
         public string Text { get; set; }
 
         public List<LocationModel> Locations { get; set; } = new List<LocationModel>();
+        public EntryTrackModel Track { get; set; } = new EntryTrackModel();
 
         public EntryModel()
         { }
@@ -40,7 +41,8 @@ namespace Neptuo.Recollections.Entries
                 Id = Id,
                 Title = Title,
                 When = When,
-                Text = Text
+                Text = Text,
+                Track = Track?.Clone()
             };
 
             clone.Locations.AddRange(Locations.Select(l => l.Clone()));
@@ -54,7 +56,8 @@ namespace Neptuo.Recollections.Entries
             Title == other.Title &&
             When == other.When &&
             Text == other.Text &&
-            EqualsLocations(other.Locations);
+            EqualsLocations(other.Locations) &&
+            EqualityComparer<EntryTrackModel>.Default.Equals(Track, other.Track);
 
         protected bool EqualsLocations(List<LocationModel> other)
         {
@@ -80,6 +83,7 @@ namespace Neptuo.Recollections.Entries
             hashCode = hashCode * -1521134295 + When.GetHashCode();
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Text);
             hashCode = hashCode * -1521134295 + EqualityComparer<ICollection<LocationModel>>.Default.GetHashCode(Locations);
+            hashCode = hashCode * -1521134295 + EqualityComparer<EntryTrackModel>.Default.GetHashCode(Track);
             return hashCode;
         }
     }
