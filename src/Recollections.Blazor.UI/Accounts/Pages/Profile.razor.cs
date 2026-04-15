@@ -42,6 +42,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected Offcanvas StoriesOffcanvas { get; set; }
         protected bool IsStoriesLoading { get; set; }
         protected List<StoryListModel> StoryItems { get; } = new List<StoryListModel>();
+        private List<StoryListModel> cachedStories;
 
         protected Offcanvas AltitudeOffcanvas { get; set; }
         protected List<EntryListModel> AltitudeItems { get; } = new List<EntryListModel>();
@@ -68,8 +69,8 @@ namespace Neptuo.Recollections.Accounts.Pages
 
             await LoadMapAsync();
 
-            var stories = await EntriesApi.GetProfileStoriesAsync(UserId);
-            StoriesCount = stories.Count;
+            cachedStories = await EntriesApi.GetProfileStoriesAsync(UserId);
+            StoriesCount = cachedStories.Count;
 
             AltitudeItems.Clear();
             AltitudeItems.AddRange(await EntriesApi.GetProfileHighestAltitudeAsync(UserId));
@@ -81,9 +82,15 @@ namespace Neptuo.Recollections.Accounts.Pages
         {
             MapEntries = await EntriesApi.GetProfileMapAsync(UserId);
             Markers.Clear();
-            foreach (var entry in MapEntries)
+            Markers.AddRange(CreateMarkers(MapEntries));
+        }
+
+        private static List<MapMarkerModel> CreateMarkers(List<MapEntryModel> entries)
+        {
+            var markers = new List<MapMarkerModel>();
+            foreach (var entry in entries)
             {
-                Markers.Add(new MapMarkerModel()
+                markers.Add(new MapMarkerModel()
                 {
                     Latitude = entry.Location.Latitude,
                     Longitude = entry.Location.Longitude,
@@ -91,6 +98,7 @@ namespace Neptuo.Recollections.Accounts.Pages
                     Title = entry.Title
                 });
             }
+            return markers;
         }
 
         protected void OnMarkerSelected(int index)
@@ -104,16 +112,24 @@ namespace Neptuo.Recollections.Accounts.Pages
                 ? $"{UiOptions.FormatWholeNumber(entry.Altitude.Value)} m"
                 : entry.When.ToString(UiOptions.ShortDateFormat);
 
-        protected async Task ShowStoriesAsync()
+        protected Task ShowStoriesAsync()
         {
             IsStoriesLoading = true;
             StoryItems.Clear();
             StoriesOffcanvas.Show();
             StateHasChanged();
 
-            StoryItems.AddRange(await EntriesApi.GetProfileStoriesAsync(UserId));
-            IsStoriesLoading = false;
-            StateHasChanged();
+            try
+            {
+                StoryItems.AddRange(cachedStories);
+            }
+            finally
+            {
+                IsStoriesLoading = false;
+                StateHasChanged();
+            }
+
+            return Task.CompletedTask;
         }
 
         protected void ShowAltitudeAsync()
