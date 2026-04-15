@@ -82,7 +82,12 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 string endpoint = DescribeEndpoint(subscriptionModel.Endpoint);
                 try
                 {
-                    log.LogDebug("Delivering push notification '{Tag}' to '{Endpoint}'.", payload.Tag, endpoint);
+                    log.LogDebug(
+                        "Delivering push notification '{Tag}' to '{Endpoint}' with payload size {PayloadSize}.",
+                        payload.Tag,
+                        endpoint,
+                        rawPayload.Length
+                    );
 
                     PushSubscription subscription = new PushSubscription(
                         subscriptionModel.Endpoint,

@@ -95,25 +95,7 @@ namespace Neptuo.Recollections.Accounts
         }
 
         private static void EnsureDatabase(IServiceCollection services)
-        {
-            try
-            {
-                using (var scope = services.BuildServiceProvider().CreateScope())
-                {
-                    var provider = scope.ServiceProvider;
-                    var userManager = provider.GetService<UserManager<User>>();
-                    var db = provider.GetService<DataContext>();
-
-                    //db.Database.EnsureCreated();
-                    db.Database.Migrate();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
+            => DevelopmentDatabaseMigrator.EnsureMigrated<DataContext>(services);
 
         public void ConfigureAuthentication(IApplicationBuilder app, IWebHostEnvironment env)
         {

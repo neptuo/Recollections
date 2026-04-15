@@ -28,7 +28,7 @@ function onMessage(event) {
     }
 }
 
-function onPush(event) {
+async function onPush(event) {
     let data = {};
     try {
         data = event.data?.json() || {};
@@ -38,15 +38,35 @@ function onPush(event) {
         };
     }
 
-    return self.registration.showNotification(data.title || 'Recollections', {
-        body: data.body || 'You have an update waiting in Recollections.',
+    console.info('Service worker: Push received', data);
+    const title = data.title || 'Recollections';
+    const options = {
+        body: data.body || 'You have a new entry waiting in your timeline.',
         icon: '/img/icon-192x192.png',
         badge: '/img/icon-maskable-192x192.png',
         tag: data.tag || 'recollections-notification',
+        renotify: true,
         data: {
             url: data.url || '/'
         }
-    });
+    };
+
+    try {
+        await self.registration.showNotification(title, options);
+    } catch (error) {
+        console.error('Service worker: Failed to show notification.', error, {
+            title: title,
+            permission: typeof Notification === 'undefined' ? 'unsupported' : Notification.permission,
+            options: options
+        });
+
+        await self.registration.showNotification(title, {
+            body: options.body,
+            tag: options.tag,
+            renotify: true,
+            data: options.data
+        });
+    }
 }
 
 async function onNotificationClick(event) {
@@ -82,6 +102,7 @@ async function onInstall(event) {
         .filter(asset => !offlineAssetsExclude.some(pattern => pattern.test(asset.url)))
         .map(asset => new Request(asset.url));
     await caches.open(cacheName).then(cache => cache.addAll(assetsRequests));
+    await self.skipWaiting();
 }
 
 async function onActivate(event) {
@@ -92,6 +113,7 @@ async function onActivate(event) {
     await Promise.all(cacheKeys
         .filter(key => key.startsWith(cacheNamePrefix) && key !== cacheName)
         .map(key => caches.delete(key)));
+    await self.clients.claim();
 }
 
 async function onFetch(event) {
