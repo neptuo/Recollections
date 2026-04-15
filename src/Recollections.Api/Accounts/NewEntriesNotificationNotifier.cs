@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Neptuo;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -35,6 +36,8 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
     public class NewEntriesNotificationNotifier
     {
+        private static readonly ConnectedUsersModel EmptyConnectedUsers = new(Array.Empty<string>(), Array.Empty<string>());
+
         private readonly AccountsDataContext accountsDb;
         private readonly EntriesDataContext entriesDb;
         private readonly IConnectionProvider connections;
@@ -67,10 +70,11 @@ namespace Neptuo.Recollections.Accounts.Notifications
             if (normalizedEntryIds.Count == 0)
                 return NewEntriesNotificationSnapshot.Empty;
 
-            List<string> candidateUserIds = await LoadCandidateUserIdsAsync();
+            List<string> candidateUserIds = await LoadCandidateUserIdsAsync(normalizedEntryIds);
             if (candidateUserIds.Count == 0)
                 return NewEntriesNotificationSnapshot.Empty;
 
+            IReadOnlyDictionary<string, ConnectedUsersModel> connectedUsersByUserId = await connections.GetConnectedUsersForAsync(candidateUserIds);
             Dictionary<string, HashSet<string>> result = new(StringComparer.Ordinal);
             IQueryable<Entry> candidateEntries = entriesDb.Entries
                 .AsNoTracking()
@@ -78,7 +82,9 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
             foreach (string userId in candidateUserIds)
             {
-                ConnectedUsersModel connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+                ConnectedUsersModel connectedUsers = connectedUsersByUserId.TryGetValue(userId, out ConnectedUsersModel candidateConnections)
+                    ? candidateConnections
+                    : EmptyConnectedUsers;
                 List<string> visibleEntryIds = await shareStatus
                     .OwnedByOrExplicitlySharedWithUser(entriesDb, candidateEntries, userId, connectedUsers)
                     .Where(e => e.UserId != userId)
@@ -194,9 +200,9 @@ namespace Neptuo.Recollections.Accounts.Notifications
         public async Task NotifyBeingAsync(string beingId, NewEntriesNotificationSnapshot beforeSnapshot, string trigger)
             => await NotifyEntriesAsync(await FindBeingEntryIdsAsync(beingId), beforeSnapshot, trigger);
 
-        private async Task<List<string>> LoadCandidateUserIdsAsync()
+        private async Task<List<string>> LoadCandidateUserIdsAsync(IReadOnlyCollection<string> entryIds)
         {
-            return await accountsDb.NotificationSettings
+            List<string> enabledUserIds = await accountsDb.NotificationSettings
                 .Where(s => s.IsEnabled)
                 .Join(
                     accountsDb.NotificationNewEntriesSettings.Where(s => s.IsEnabled),
@@ -212,33 +218,52 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 )
                 .Distinct()
                 .ToListAsync();
+
+            if (enabledUserIds.Count == 0)
+                return enabledUserIds;
+
+            HashSet<string> relevantUserIds = await LoadRelevantUserIdsAsync(entryIds);
+            if (relevantUserIds.Count == 0)
+                return new List<string>();
+
+            return enabledUserIds
+                .Where(relevantUserIds.Contains)
+                .ToList();
         }
 
         private async Task<List<UserNotificationNewEntriesDispatch>> ReserveDispatchesAsync(string userId, IEnumerable<string> entryIds)
         {
-            List<UserNotificationNewEntriesDispatch> result = new();
-            foreach (string entryId in NormalizeEntryIds(entryIds))
-            {
-                UserNotificationNewEntriesDispatch dispatch = new()
-                {
-                    UserId = userId,
-                    EntryId = entryId,
-                    Created = DateTime.Now
-                };
+            List<string> normalizedEntryIds = NormalizeEntryIds(entryIds);
+            if (normalizedEntryIds.Count == 0)
+                return new List<UserNotificationNewEntriesDispatch>();
 
-                accountsDb.NotificationNewEntriesDispatches.Add(dispatch);
-                try
-                {
-                    await accountsDb.SaveChangesAsync();
-                    result.Add(dispatch);
-                }
-                catch (DbUpdateException)
-                {
-                    accountsDb.Entry(dispatch).State = EntityState.Detached;
-                }
-            }
+            HashSet<string> reservedEntryIds = await FindReservedEntryIdsAsync(userId, normalizedEntryIds);
+            DateTime created = DateTime.Now;
+            List<UserNotificationNewEntriesDispatch> result = CreateDispatches(
+                userId,
+                normalizedEntryIds.Where(entryId => !reservedEntryIds.Contains(entryId)),
+                created
+            );
 
-            return result;
+            if (result.Count == 0)
+                return result;
+
+            if (await TrySaveDispatchesAsync(result))
+                return result;
+
+            reservedEntryIds = await FindReservedEntryIdsAsync(userId, normalizedEntryIds);
+            result = CreateDispatches(
+                userId,
+                normalizedEntryIds.Where(entryId => !reservedEntryIds.Contains(entryId)),
+                created
+            );
+
+            if (result.Count == 0)
+                return result;
+
+            return await TrySaveDispatchesAsync(result)
+                ? result
+                : await ReserveDispatchesOneByOneAsync(userId, normalizedEntryIds, created);
         }
 
         private async Task<List<string>> FindStoryEntryIdsAsync(string storyId)
@@ -276,5 +301,122 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 .Distinct(StringComparer.Ordinal)
                 .ToList()
                 ?? new List<string>();
+
+        private async Task<HashSet<string>> LoadRelevantUserIdsAsync(IReadOnlyCollection<string> entryIds)
+        {
+            HashSet<string> relevantUserIds = new(StringComparer.Ordinal);
+            List<string> ownerUserIds = await entriesDb.Entries
+                .AsNoTracking()
+                .Where(e => entryIds.Contains(e.Id))
+                .Select(e => e.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            relevantUserIds.UnionWith(await entriesDb.EntryShares
+                .AsNoTracking()
+                .Where(s => entryIds.Contains(s.EntryId))
+                .Select(s => s.UserId)
+                .Distinct()
+                .ToListAsync());
+
+            List<string> storyIds = await entriesDb.Entries
+                .AsNoTracking()
+                .Where(e => entryIds.Contains(e.Id) && (e.Story != null || e.Chapter != null))
+                .Select(e => e.Story != null ? e.Story.Id : e.Chapter.Story.Id)
+                .Distinct()
+                .ToListAsync();
+            if (storyIds.Count > 0)
+            {
+                relevantUserIds.UnionWith(await entriesDb.StoryShares
+                    .AsNoTracking()
+                    .Where(s => storyIds.Contains(s.StoryId))
+                    .Select(s => s.UserId)
+                    .Distinct()
+                    .ToListAsync());
+            }
+
+            relevantUserIds.UnionWith(await entriesDb.Entries
+                .AsNoTracking()
+                .Where(e => entryIds.Contains(e.Id))
+                .SelectMany(e => e.Beings)
+                .Select(b => b.UserId)
+                .Distinct()
+                .ToListAsync());
+
+            List<string> beingIds = await entriesDb.Entries
+                .AsNoTracking()
+                .Where(e => entryIds.Contains(e.Id))
+                .SelectMany(e => e.Beings.Where(b => b.Id != b.UserId && !b.IsSharingInherited))
+                .Select(b => b.Id)
+                .Distinct()
+                .ToListAsync();
+            if (beingIds.Count > 0)
+            {
+                relevantUserIds.UnionWith(await entriesDb.BeingShares
+                    .AsNoTracking()
+                    .Where(s => beingIds.Contains(s.BeingId))
+                    .Select(s => s.UserId)
+                    .Distinct()
+                    .ToListAsync());
+            }
+
+            IReadOnlyDictionary<string, ConnectedUsersModel> connectedUsersByOwnerId = await connections.GetConnectedUsersForAsync(ownerUserIds);
+            foreach (ConnectedUsersModel connectedUsers in connectedUsersByOwnerId.Values)
+                relevantUserIds.UnionWith(connectedUsers.ReaderUserIds);
+
+            relevantUserIds.RemoveWhere(String.IsNullOrWhiteSpace);
+            return relevantUserIds;
+        }
+
+        private Task<HashSet<string>> FindReservedEntryIdsAsync(string userId, IReadOnlyCollection<string> entryIds)
+        {
+            return accountsDb.NotificationNewEntriesDispatches
+                .AsNoTracking()
+                .Where(d => d.UserId == userId && entryIds.Contains(d.EntryId))
+                .Select(d => d.EntryId)
+                .ToHashSetAsync(StringComparer.Ordinal);
+        }
+
+        private static List<UserNotificationNewEntriesDispatch> CreateDispatches(string userId, IEnumerable<string> entryIds, DateTime created)
+        {
+            return entryIds
+                .Select(entryId => new UserNotificationNewEntriesDispatch()
+                {
+                    UserId = userId,
+                    EntryId = entryId,
+                    Created = created
+                })
+                .ToList();
+        }
+
+        private async Task<bool> TrySaveDispatchesAsync(List<UserNotificationNewEntriesDispatch> dispatches)
+        {
+            accountsDb.NotificationNewEntriesDispatches.AddRange(dispatches);
+            try
+            {
+                await accountsDb.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                foreach (UserNotificationNewEntriesDispatch dispatch in dispatches)
+                    accountsDb.Entry(dispatch).State = EntityState.Detached;
+
+                return false;
+            }
+        }
+
+        private async Task<List<UserNotificationNewEntriesDispatch>> ReserveDispatchesOneByOneAsync(string userId, IReadOnlyCollection<string> entryIds, DateTime created)
+        {
+            List<UserNotificationNewEntriesDispatch> result = new();
+            HashSet<string> reservedEntryIds = await FindReservedEntryIdsAsync(userId, entryIds);
+            foreach (UserNotificationNewEntriesDispatch dispatch in CreateDispatches(userId, entryIds.Where(entryId => !reservedEntryIds.Contains(entryId)), created))
+            {
+                if (await TrySaveDispatchesAsync(new List<UserNotificationNewEntriesDispatch> { dispatch }))
+                    result.Add(dispatch);
+            }
+
+            return result;
+        }
     }
 }

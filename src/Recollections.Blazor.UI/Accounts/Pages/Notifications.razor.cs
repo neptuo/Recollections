@@ -96,7 +96,7 @@ public partial class Notifications
             CurrentBrowserSubscription ??= await PushInterop.GetSubscriptionAsync();
             if (CurrentBrowserSubscription != null)
             {
-                await Api.DeleteNotificationSubscriptionAsync(CurrentBrowserSubscription);
+                await Api.DeleteNotificationSubscriptionAsync(CurrentBrowserSubscription.Endpoint);
                 await PushInterop.UnsubscribeAsync();
             }
 

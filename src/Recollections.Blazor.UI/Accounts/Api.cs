@@ -1,4 +1,5 @@
-﻿using Neptuo.Activators;
+﻿using Neptuo;
+using Neptuo.Activators;
 using Neptuo.Recollections.Commons.Exceptions;
 using Neptuo.Recollections.Sharing;
 using System;
@@ -61,14 +62,10 @@ namespace Neptuo.Recollections.Accounts
         public Task CreateNotificationSubscriptionAsync(PushSubscriptionModel model)
             => faultHandler.Wrap(http.PostAsJsonAsync("accounts/notifications/subscriptions", model));
 
-        public Task DeleteNotificationSubscriptionAsync(PushSubscriptionModel model)
+        public Task DeleteNotificationSubscriptionAsync(string endpoint)
         {
-            HttpRequestMessage request = new(HttpMethod.Delete, "accounts/notifications/subscriptions")
-            {
-                Content = JsonContent.Create(model)
-            };
-
-            return faultHandler.Wrap(http.SendAsync(request));
+            Ensure.NotNullOrEmpty(endpoint, "endpoint");
+            return faultHandler.Wrap(http.DeleteAsync($"accounts/notifications/subscriptions/{Uri.EscapeDataString(endpoint)}"));
         }
 
         public Task<ChangePasswordResponse> ChangePasswordAsync(ChangePasswordRequest request)

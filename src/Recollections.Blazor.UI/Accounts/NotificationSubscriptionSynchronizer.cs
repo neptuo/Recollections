@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Neptuo;
 using Neptuo.Recollections.Commons.Components;
 using System;
 using System.Threading.Tasks;

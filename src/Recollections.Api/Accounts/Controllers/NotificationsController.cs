@@ -98,6 +98,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [HttpPost("subscriptions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> SubscribeAsync([FromBody] PushSubscriptionModel model)
         {
@@ -124,6 +125,10 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 };
                 db.PushSubscriptions.Add(entity);
             }
+            else if (entity.RevokedAt == null && !String.Equals(entity.UserId, userId, StringComparison.Ordinal))
+            {
+                return Conflict();
+            }
 
             entity.UserId = userId;
             entity.Endpoint = endpoint;
@@ -136,19 +141,17 @@ namespace Neptuo.Recollections.Accounts.Controllers
             return Ok();
         }
 
-        [HttpDelete("subscriptions")]
+        [HttpDelete("subscriptions/{*endpoint}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> UnsubscribeAsync([FromBody] PushSubscriptionModel model)
+        public async Task<IActionResult> UnsubscribeAsync([FromRoute] string endpoint)
         {
-            Ensure.NotNull(model, "model");
-
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
 
-            string endpoint = model.Endpoint?.Trim();
+            endpoint = endpoint?.Trim();
             if (String.IsNullOrWhiteSpace(endpoint))
                 return BadRequest();
 
@@ -164,7 +167,6 @@ namespace Neptuo.Recollections.Accounts.Controllers
 
             return Ok();
         }
-
         private UserNotificationSettingsModel CreateModel(UserNotificationSettings settings, UserNotificationNewEntriesSettings newEntries, bool hasSubscription)
         {
             return new UserNotificationSettingsModel()
