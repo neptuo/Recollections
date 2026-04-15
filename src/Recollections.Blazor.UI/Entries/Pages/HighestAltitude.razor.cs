@@ -22,7 +22,7 @@ public partial class HighestAltitude
     protected string FormatEntryTitle(EntryListModel entry)
         => entry.Altitude != null
             ? $"{UiOptions.FormatWholeNumber(entry.Altitude.Value)} m"
-            : entry.When.ToShortDateString();
+            : entry.When.ToString(UiOptions.ShortDateFormat);
 
     protected override async Task OnInitializedAsync()
     {
