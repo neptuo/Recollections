@@ -4,11 +4,19 @@
 <DocumentTitle Value="Highest altitude" />
 <TemplateContent Name="MobileTitle">Highest altitude</TemplateContent>
 
-@if (!IsLoading && Items.Count == 0)
+@if (IsLoading)
+{
+    <div class="d-flex justify-content-center mt-4" role="status">
+        <div class="spinner-border">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (Items.Count == 0)
 {
     <Alert Mode="@AlertMode.Warning" Message="No entries with altitude yet..." />
 }
 else
 {
-    <Timeline Data="@Items" EntryTitleSelector="FormatEntryTitle" />
+    <Timeline Data="@Items" EntryTitleSelector="FormatEntryTitle" CssClass="mt-4" />
 }

@@ -47,6 +47,9 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public Func<EntryListModel, string> EntryTitleSelector { get; set; }
 
+        [Parameter]
+        public string CssClass { get; set; }
+
         private int offset;
         private Task loadAsyncFromParametersSet;
         private string scrollToEntryId;
