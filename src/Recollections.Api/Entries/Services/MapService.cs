@@ -61,6 +61,8 @@ public class MapService
             var item = results[i];
             if (HasNotLocationValue(item))
             {
+                // When an entry has an imported track, its representative location is the
+                // authoritative entry-level pin and intentionally wins over media fallbacks.
                 var source = items[i];
                 item.Location = source.TrackLocation;
             }

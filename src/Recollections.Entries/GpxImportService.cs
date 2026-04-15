@@ -194,24 +194,22 @@ namespace Neptuo.Recollections.Entries
 
         private static IReadOnlyList<LocationModel> Simplify(IReadOnlyList<LocationModel> locations)
         {
-            IReadOnlyList<LocationModel> uniqueLocations = Normalize(locations);
-
-            if (uniqueLocations.Count <= MaxLocationCount)
-                return uniqueLocations;
+            if (locations.Count <= MaxLocationCount)
+                return locations;
 
             List<LocationModel> result = new List<LocationModel>(MaxLocationCount);
-            double step = (uniqueLocations.Count - 1d) / (MaxLocationCount - 1d);
+            double step = (locations.Count - 1d) / (MaxLocationCount - 1d);
             for (int i = 0; i < MaxLocationCount; i++)
             {
                 int index = (int)Math.Round(i * step, MidpointRounding.AwayFromZero);
-                index = Math.Min(index, uniqueLocations.Count - 1);
+                index = Math.Min(index, locations.Count - 1);
 
-                LocationModel location = uniqueLocations[index];
+                LocationModel location = locations[index];
                 if (result.Count == 0 || !result[result.Count - 1].Equals(location))
                     result.Add(location.Clone());
             }
 
-            LocationModel last = uniqueLocations[uniqueLocations.Count - 1];
+            LocationModel last = locations[locations.Count - 1];
             if (!result[result.Count - 1].Equals(last))
                 result[result.Count - 1] = last.Clone();
 

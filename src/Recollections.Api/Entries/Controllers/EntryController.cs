@@ -175,13 +175,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             using (Stream source = file.OpenReadStream())
                 await fileStorage.SaveAsync(entity, source, EntryFileType.Track);
  
-            entity.TrackData = track.Data;
-            entity.TrackPointCount = track.PointCount;
-            entity.TrackTotalElevation = track.TotalElevation;
-            entity.TrackTotalDistance = track.TotalDistance;
-            entity.TrackLatitude = track.Location?.Latitude;
-            entity.TrackLongitude = track.Location?.Longitude;
-            entity.TrackAltitude = track.Location?.Altitude;
+            MapTrackToEntity(track, entity);
 
             db.Entries.Update(entity);
             await db.SaveChangesAsync();
@@ -241,26 +235,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Title = model.Title;
             entity.When = model.When;
             entity.Text = model.Text;
-            if (model.Track != null && model.Track.HasValue())
-            {
-                entity.TrackData = model.Track.Data;
-                entity.TrackPointCount = model.Track.PointCount;
-                entity.TrackTotalElevation = model.Track.TotalElevation;
-                entity.TrackTotalDistance = model.Track.TotalDistance;
-                entity.TrackLatitude = model.Track.Location?.Latitude;
-                entity.TrackLongitude = model.Track.Location?.Longitude;
-                entity.TrackAltitude = model.Track.Location?.Altitude;
-            }
-            else
-            {
-                entity.TrackData = null;
-                entity.TrackPointCount = null;
-                entity.TrackTotalElevation = null;
-                entity.TrackTotalDistance = null;
-                entity.TrackLatitude = null;
-                entity.TrackLongitude = null;
-                entity.TrackAltitude = null;
-            }
+            if (model.Track == null || !model.Track.HasValue())
+                ClearTrack(entity);
 
             for (int i = 0; i < model.Locations.Count; i++)
             {
@@ -284,6 +260,35 @@ namespace Neptuo.Recollections.Entries.Controllers
                 entity.Locations.RemoveAt(entity.Locations.Count - 1);
         }
 
+        private static void MapTrackToEntity(EntryTrackModel track, Entry entity)
+        {
+            if (track != null && track.HasValue())
+            {
+                entity.TrackData = track.Data;
+                entity.TrackPointCount = track.PointCount;
+                entity.TrackTotalElevation = track.TotalElevation;
+                entity.TrackTotalDistance = track.TotalDistance;
+                entity.TrackLatitude = track.Location?.Latitude;
+                entity.TrackLongitude = track.Location?.Longitude;
+                entity.TrackAltitude = track.Location?.Altitude;
+            }
+            else
+            {
+                ClearTrack(entity);
+            }
+        }
+
+        private static void ClearTrack(Entry entity)
+        {
+            entity.TrackData = null;
+            entity.TrackPointCount = null;
+            entity.TrackTotalElevation = null;
+            entity.TrackTotalDistance = null;
+            entity.TrackLatitude = null;
+            entity.TrackLongitude = null;
+            entity.TrackAltitude = null;
+        }
+ 
         public class GeoElevationResponse
         {
             public GeoElevation[] Items { get; set; }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using Neptuo.Recollections.Entries;
 using Neptuo.Recollections.Sharing;
@@ -228,6 +229,47 @@ public class EntryTrackImportTests : IClassFixture<ApiFactory>, IAsyncLifetime
         entry = await getResponse.ReadJsonAsync<AuthorizedModel<EntryModel>>();
         Assert.False(entry.Model.Track.HasValue());
         Assert.Null(await GetStoredTrackAsync());
+    }
+
+    [Fact]
+    public async Task TrackImport_EntryUpdate_IgnoresClientProvidedTrackPayload()
+    {
+        var client = factory.CreateClientForUser(CoOwnerUserId, CoOwnerUserName);
+        var importResponse = await client.PostAsync($"/api/entries/{EntryId}/track", CreateTrackUpload(CreateGpx([
+            (50.087, 14.421, 210d),
+            (50.095, 14.430, 215d),
+            (50.103, 14.438, 220d)
+        ])));
+        Assert.Equal(HttpStatusCode.OK, importResponse.StatusCode);
+
+        var imported = await importResponse.ReadJsonAsync<EntryModel>();
+
+        var getResponse = await client.GetAsync($"/api/entries/{EntryId}");
+        var entry = await getResponse.ReadJsonAsync<AuthorizedModel<EntryModel>>();
+        entry.Model.Title = "Updated title";
+        entry.Model.Track = new EntryTrackModel()
+        {
+            Data = "tampered-track-data",
+            PointCount = 999,
+            TotalElevation = 999d,
+            TotalDistance = 999d,
+            Location = new LocationModel() { Latitude = 0d, Longitude = 0d, Altitude = 0d }
+        };
+
+        var updateResponse = await client.PutAsJsonAsync($"/api/entries/{EntryId}", entry.Model);
+
+        Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        getResponse = await client.GetAsync($"/api/entries/{EntryId}");
+        entry = await getResponse.ReadJsonAsync<AuthorizedModel<EntryModel>>();
+        Assert.Equal("Updated title", entry.Model.Title);
+        Assert.Equal(imported.Track.Data, entry.Model.Track.Data);
+        Assert.Equal(imported.Track.PointCount, entry.Model.Track.PointCount);
+        Assert.Equal(imported.Track.TotalElevation, entry.Model.Track.TotalElevation);
+        Assert.Equal(imported.Track.TotalDistance, entry.Model.Track.TotalDistance);
+        Assert.Equal(imported.Track.Location.Latitude, entry.Model.Track.Location.Latitude);
+        Assert.Equal(imported.Track.Location.Longitude, entry.Model.Track.Location.Longitude);
+        Assert.Equal(imported.Track.Location.Altitude, entry.Model.Track.Location.Altitude);
     }
 
     private static MultipartFormDataContent CreateTrackUpload(string gpx, string fileName = "track.gpx")
