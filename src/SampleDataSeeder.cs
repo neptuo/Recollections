@@ -52,9 +52,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 3,
                     Locations:
                     [
-                        new(50.086520, 14.411350),
-                        new(50.087580, 14.420790),
-                        new(50.089860, 14.404020)
+                        new(50.086520, 14.411350, Altitude: 190),
+                        new(50.087580, 14.420790, Altitude: 195),
+                        new(50.089860, 14.404020, Altitude: 200)
                     ]
                 ),
                 new(
@@ -64,7 +64,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(50.097120, 14.417370)
+                        new(50.097120, 14.417370, Altitude: 250)
                     ]
                 )
             ]
@@ -84,7 +84,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(49.948540, 15.268210)
+                        new(49.948540, 15.268210, Altitude: 260)
                     ]
                 ),
                 new(
@@ -125,7 +125,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 0,
                     Locations:
                     [
-                        new(50.087640, 14.389840)
+                        new(50.087640, 14.389840, Altitude: 310)
                     ]
                 )
             ]
@@ -175,7 +175,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(48.208490, 16.372080)
+                        new(48.208490, 16.372080, Altitude: 171)
                     ]
                 ),
                 new(
@@ -185,7 +185,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 2,
                     Locations:
                     [
-                        new(48.203790, 16.361550)
+                        new(48.203790, 16.361550, Altitude: 177)
                     ]
                 )
             ]
@@ -205,7 +205,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(43.695120, 7.276360)
+                        new(43.695120, 7.276360, Altitude: 5)
                     ]
                 ),
                 new(
@@ -215,7 +215,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(43.710170, 7.261950)
+                        new(43.710170, 7.261950, Altitude: 12)
                     ]
                 )
             ]
@@ -325,7 +325,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(38.712620, -9.139140)
+                        new(38.712620, -9.139140, Altitude: 72)
                     ]
                 ),
                 new(
@@ -335,7 +335,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(38.714980, -9.143430)
+                        new(38.714980, -9.143430, Altitude: 95)
                     ]
                 )
             ]
