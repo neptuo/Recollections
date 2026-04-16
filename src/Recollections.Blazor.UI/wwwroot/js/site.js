@@ -152,30 +152,29 @@ window.Bootstrap = {
             var dismissHandler = function (e) {
                 var tip = popover.tip;
                 if (tip && !tip.contains(e.target) && !trigger.contains(e.target)) {
-                    popover.dispose();
-                    Bootstrap.Popover._active = null;
                     document.removeEventListener("pointerdown", dismissHandler);
+                    popover.dispose();
+                    if (originalTitle) {
+                        trigger.setAttribute("title", originalTitle);
+                    }
+                    Bootstrap.Popover._active = null;
                 }
             };
 
-            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler };
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle };
 
             setTimeout(function () {
                 document.addEventListener("pointerdown", dismissHandler);
             }, 0);
-
-            trigger.addEventListener("hidden.bs.popover", function () {
-                document.removeEventListener("pointerdown", dismissHandler);
-                if (originalTitle) {
-                    trigger.setAttribute("title", originalTitle);
-                }
-            }, { once: true });
         },
         _active: null,
         _hideActive: function () {
             if (Bootstrap.Popover._active) {
                 document.removeEventListener("pointerdown", Bootstrap.Popover._active.dismiss);
                 Bootstrap.Popover._active.popover.dispose();
+                if (Bootstrap.Popover._active.originalTitle) {
+                    Bootstrap.Popover._active.trigger.setAttribute("title", Bootstrap.Popover._active.originalTitle);
+                }
                 Bootstrap.Popover._active = null;
             }
         },

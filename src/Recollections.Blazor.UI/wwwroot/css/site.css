@@ -26011,11 +26011,10 @@ video.pswp__video {
   aspect-ratio: 1;
 }
 
-.popover .card {
+.entry-popover .card {
   border: 0;
 }
-
-.popover-body {
+.entry-popover .popover-body {
   padding: 0;
 }
 
@@ -26049,4 +26048,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-semipneumatic-meaghan/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=wwwroot/css/site.css.map */
