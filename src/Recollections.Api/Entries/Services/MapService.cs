@@ -23,7 +23,7 @@ public class MapService
         this.entryListMapper = entryListMapper;
     }
 
-    public async Task<List<MapEntryModel>> GetAsync(IQueryable<Entry> query, string userId, string[] userIds, ConnectedUsersModel connectedUsers)
+    public async Task<List<MapEntryModel>> GetAsync(IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers)
     {
         var items = await shareStatus
             .OwnedByOrExplicitlySharedWithUser(dataContext, query, userIds, connectedUsers)
@@ -95,7 +95,7 @@ public class MapService
 
         // Enrich with full entry list models
         var entryQuery = dataContext.Entries.Where(e => locationById.Keys.Contains(e.Id));
-        var (entryModels, _) = await entryListMapper.MapAsync(entryQuery, userId, connectedUsers);
+        var (entryModels, _) = await entryListMapper.MapAsync(entryQuery, userIds, connectedUsers);
 
         var results = new List<MapEntryModel>(entryModels.Count);
         foreach (var entry in entryModels)

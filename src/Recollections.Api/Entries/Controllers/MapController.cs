@@ -32,7 +32,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var results = await mapService.GetAsync(db.Entries, userId, [userId], connectedUsers);
+            var results = await mapService.GetAsync(db.Entries, [userId], connectedUsers);
             return Ok(results);
         }
 
@@ -44,7 +44,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 return Unauthorized();
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            var entries = await mapService.GetAsync(db.Entries, userId, [userId], connectedUsers);
+            var entries = await mapService.GetAsync(db.Entries, [userId], connectedUsers);
             var json = countryService.GetVisitedCountriesJson(entries);
             return Content(json, "application/json");
         }
