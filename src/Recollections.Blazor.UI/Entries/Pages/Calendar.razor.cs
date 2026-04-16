@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,9 +23,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
-        [Inject]
-        protected PopoverInterop Popover { get; set; }
-
         [Parameter]
         public int? Year { get; set; }
 
@@ -45,7 +43,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected bool IsLoading { get; set; }
 
         protected EntryListModel SelectedEntry { get; set; }
-        protected ElementReference popoverContentRef;
+        protected EntryCardPopover entryPopover;
         private Dictionary<string, ElementReference> badgeRefs = new();
         private bool showPopoverPending;
 
@@ -96,7 +94,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task ShowEntryPopoverAsync(EntryListModel model)
         {
-            await Popover.HideActiveAsync();
+            await entryPopover.HideAsync();
             SelectedEntry = model;
             showPopoverPending = true;
         }
@@ -108,7 +106,7 @@ namespace Neptuo.Recollections.Entries.Pages
             if (showPopoverPending && SelectedEntry != null && badgeRefs.TryGetValue(SelectedEntry.Id, out var triggerRef))
             {
                 showPopoverPending = false;
-                await Popover.ShowFromElementAsync(triggerRef, popoverContentRef);
+                await entryPopover.ShowAsync(triggerRef);
             }
         }
 
@@ -154,7 +152,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         public async ValueTask DisposeAsync()
         {
-            await Popover.HideActiveAsync();
+            await entryPopover.HideAsync();
         }
     }
 }

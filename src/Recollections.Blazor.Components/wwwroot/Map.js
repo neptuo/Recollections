@@ -307,6 +307,17 @@ export function redraw(container) {
     model.tiles.redraw();
 }
 
+export function showMarkerPopover(container, markerIndex, contentElement) {
+    const model = _mapData.get(container);
+    if (!model || !model.markers || !model.markers[markerIndex]) return;
+
+    const marker = model.markers[markerIndex];
+    const markerEl = marker.getElement();
+    if (markerEl) {
+        Bootstrap.Popover.ShowFromElement(markerEl, contentElement);
+    }
+}
+
 export function setViewMode(container, mode, countriesGeoJsonString) {
     const model = _mapData.get(container);
     if (!model) return;

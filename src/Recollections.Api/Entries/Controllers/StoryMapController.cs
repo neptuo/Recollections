@@ -27,6 +27,7 @@ public class StoryMapController(MapService mapService, DataContext db, ShareStat
         var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
         var results = await mapService.GetAsync(
             db.Entries.Where(e => e.Story.Id == storyId || e.Chapter.Story.Id == storyId), 
+            userId,
             [userId, ShareStatusService.PublicUserId], 
             connectedUsers
         );

@@ -19,6 +19,7 @@ public class BeingMapController(MapService mapService, DataContext db, ShareStat
         var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
         var results = await mapService.GetAsync(
             db.Entries.Where(e => e.Beings.Any(b => b.Id == beingId)),
+            userId,
             [userId, ShareStatusService.PublicUserId],
             connectedUsers
         );

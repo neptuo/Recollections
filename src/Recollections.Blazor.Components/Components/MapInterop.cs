@@ -194,6 +194,9 @@ namespace Neptuo.Recollections.Components
             previousViewMode = mode;
             await module.InvokeVoidAsync("setViewMode", editor.Container, mode, countriesGeoJson);
         }
+
+        public async Task ShowMarkerPopoverAsync(int markerIndex, ElementReference content)
+            => await module.InvokeVoidAsync("showMarkerPopover", editor.Container, markerIndex, content);
     }
 
     public record MapPosition(double Latitude, double Longitude, int Zoom);
