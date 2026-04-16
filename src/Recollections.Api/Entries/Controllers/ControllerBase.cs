@@ -83,8 +83,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             return await RunAsync(entity, sharePermission, shareStatus.GetStoryPermissionAsync, handler);
         }
 
-        protected Task<IActionResult> RunBeingAsync(string entryId, Permission sharePermission, Func<Being, Task<IActionResult>> handler)
-            => RunBeingAsync(entryId, sharePermission, (entity, permission) => handler(entity));
+        protected Task<IActionResult> RunBeingAsync(string beingId, Permission sharePermission, Func<Being, Task<IActionResult>> handler)
+            => RunBeingAsync(beingId, sharePermission, (entity, permission) => handler(entity));
 
         protected async Task<IActionResult> RunBeingAsync(string beingId, Permission sharePermission, Func<Being, Permission, Task<IActionResult>> handler)
         {
