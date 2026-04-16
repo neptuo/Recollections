@@ -19,22 +19,15 @@
     </form>
 
     <div class="row">
-        <ListView Items="@Items" IsLoading="@(Items.Count == 0 && IsLoading)" EmptyMessage="@EmptyMessage" Context="entry">
-            <EmptyContent>
-                <div class="col-12">
-                    <Alert Mode="@AlertMode.Warning" Message="@EmptyMessage" />
-                </div>
-            </EmptyContent>
-            <ChildContent>
-                <div class="col-sm-12 mb-4">
-                    <EntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
-                </div>
+        <ListView Items="@Items" IsLoading="@(Items.Count == 0 && IsLoading)" EmptyMessage="@EmptyMessage" EmptyColWrapper="true" Context="entry">
+            <div class="col-sm-12 mb-4">
+                <EntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
+            </div>
 
-                @if (Items.IndexOf(entry) == Items.Count - 3 && HasMore)
-                {
-                    <AutoloadNext Intersected="@LoadMoreAsync" />
-                }
-            </ChildContent>
+            @if (Items.IndexOf(entry) == Items.Count - 3 && HasMore)
+            {
+                <AutoloadNext Intersected="@LoadMoreAsync" />
+            }
         </ListView>
     </div>
 </div>
