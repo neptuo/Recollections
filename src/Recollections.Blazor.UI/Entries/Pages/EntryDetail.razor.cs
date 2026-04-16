@@ -108,9 +108,7 @@ namespace Neptuo.Recollections.Entries.Pages
             if (previousEntryId != EntryId)
             {
                 await LoadAsync();
-                await LoadStoryAsync();
-                await LoadBeingsAsync();
-                await LoadMediaAsync();
+                await Task.WhenAll(LoadStoryAsync(), LoadBeingsAsync(), LoadMediaAsync());
 
                 previousUploadListener?.Dispose();
                 previousUploadListener = FileUploader.AddProgressListener("entry", EntryId, (progresses) => _ = OnUploadProgressAsync(progresses));
