@@ -22,6 +22,9 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected Navigator Navigator { get; set; }
 
+        [Inject]
+        protected PopoverInterop Popover { get; set; }
+
         [Parameter]
         public int? Year { get; set; }
 
@@ -40,6 +43,11 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected List<EntryListModel> Models { get; } = [];
         protected bool IsLoading { get; set; }
+
+        protected EntryListModel SelectedEntry { get; set; }
+        protected ElementReference popoverContentRef;
+        private Dictionary<string, ElementReference> badgeRefs = new();
+        private bool showPopoverPending;
 
         public override async Task SetParametersAsync(ParameterView parameters)
         {
@@ -72,6 +80,8 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 IsLoading = true;
                 Models.Clear();
+                badgeRefs.Clear();
+                SelectedEntry = null;
                 if (IsMonthView)
                     Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
                 else
@@ -81,6 +91,24 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 IsLoading = false;
                 StateHasChanged();
+            }
+        }
+
+        protected async Task ShowEntryPopoverAsync(EntryListModel model)
+        {
+            await Popover.HideActiveAsync();
+            SelectedEntry = model;
+            showPopoverPending = true;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (showPopoverPending && SelectedEntry != null && badgeRefs.TryGetValue(SelectedEntry.Id, out var triggerRef))
+            {
+                showPopoverPending = false;
+                await Popover.ShowFromElementAsync(triggerRef, popoverContentRef);
             }
         }
 

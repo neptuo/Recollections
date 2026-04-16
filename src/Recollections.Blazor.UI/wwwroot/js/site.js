@@ -130,6 +130,46 @@ window.Bootstrap = {
                 });
             }
         },
+        ShowFromElement: function (trigger, contentElement) {
+            Bootstrap.Popover._hideActive();
+
+            var popover = new bootstrap.Popover(trigger, {
+                html: true,
+                sanitize: false,
+                content: contentElement.innerHTML,
+                placement: "top",
+                trigger: "manual"
+            });
+
+            popover.show();
+
+            var dismissHandler = function (e) {
+                var tip = popover.tip;
+                if (tip && !tip.contains(e.target) && !trigger.contains(e.target)) {
+                    popover.dispose();
+                    Bootstrap.Popover._active = null;
+                    document.removeEventListener("pointerdown", dismissHandler);
+                }
+            };
+
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler };
+
+            setTimeout(function () {
+                document.addEventListener("pointerdown", dismissHandler);
+            }, 0);
+
+            trigger.addEventListener("hidden.bs.popover", function () {
+                document.removeEventListener("pointerdown", dismissHandler);
+            }, { once: true });
+        },
+        _active: null,
+        _hideActive: function () {
+            if (Bootstrap.Popover._active) {
+                document.removeEventListener("pointerdown", Bootstrap.Popover._active.dismiss);
+                Bootstrap.Popover._active.popover.dispose();
+                Bootstrap.Popover._active = null;
+            }
+        },
         Dispose: function (container) {
             var popover = bootstrap.Popover.getInstance(container);
             if (popover != null) {

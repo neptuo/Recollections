@@ -15,6 +15,10 @@
         }
     }
 
+    span.badge.cursor-pointer:hover {
+        opacity: 0.85;
+    }
+
     .calendar-header,
     .calendar-cell {
         width: calc(100% / 7);
