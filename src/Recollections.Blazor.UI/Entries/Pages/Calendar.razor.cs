@@ -41,6 +41,11 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<EntryListModel> Models { get; } = [];
         protected bool IsLoading { get; set; }
 
+        protected int PrevMonthYear { get; set; }
+        protected int PrevMonthMonth { get; set; }
+        protected int NextMonthYear { get; set; }
+        protected int NextMonthMonth { get; set; }
+
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             int? prevYear = Year;
@@ -61,6 +66,12 @@ namespace Neptuo.Recollections.Entries.Pages
                 Year = Year,
                 Month = Month
             };
+
+            if (IsMonthView)
+            {
+                (PrevMonthYear, PrevMonthMonth) = DatePicker.PrevMonth(Year.Value, Month.Value);
+                (NextMonthYear, NextMonthMonth) = DatePicker.NextMonth(Year.Value, Month.Value);
+            }
 
             if (Year != prevYear || Month != prevMonth)
                 await LoadDataAsync();
@@ -122,6 +133,15 @@ namespace Neptuo.Recollections.Entries.Pages
                 if (date.Year != null)
                     Navigator.OpenCalendar(date.Year);
             }
+        }
+
+        protected void OnMonthSwiped(string direction)
+        {
+            var (year, month) = direction == "prev"
+                ? (PrevMonthYear, PrevMonthMonth)
+                : (NextMonthYear, NextMonthMonth);
+
+            Navigator.OpenCalendar(year, month);
         }
     }
 }
