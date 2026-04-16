@@ -111,6 +111,9 @@ namespace Neptuo.Recollections.Components
             Log.Debug("Dispose");
         }
 
+        public Task ShowMarkerPopoverAsync(int markerIndex, ElementReference content)
+            => Interop.ShowMarkerPopoverAsync(markerIndex, content);
+
         internal async void MoveMarker(int? index, double latitude, double longitude)
         {
             if (!IsEditable)

@@ -16,8 +16,8 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
     private const int PreviewMediaCount = 3;
     private IUserNameProvider userNames = userNames;
 
-    public Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int offset, bool includePreviewMedia = false)
-        => MapAsync(query, userId, connectedUsers, offset, PageSize, includePreviewMedia);
+    public Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers, int offset, bool includePreviewMedia = false)
+        => MapAsync(query, userIds, connectedUsers, offset, PageSize, includePreviewMedia);
 
     public static int NormalizePageSize(int? pageSize)
     {
@@ -26,7 +26,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
         return Math.Min(normalizedPageSize, MaxPageSize);
     }
 
-    public async Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string userId, ConnectedUsersModel connectedUsers, int? offset = null, int? pageSize = null, bool includePreviewMedia = false)
+    public async Task<(List<EntryListModel> models, bool hasMore)> MapAsync(IQueryable<Entry> query, string[] userIds, ConnectedUsersModel connectedUsers, int? offset = null, int? pageSize = null, bool includePreviewMedia = false)
     {
         if (offset != null)
         {
@@ -77,7 +77,7 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                         dataContext.Beings
                             .AsNoTracking()
                             .Where(b => b.Entries.Any(e => entryIdBatch.Contains(e.Id))),
-                        userId,
+                        userIds,
                         connectedUsers)
                     .Select(b => new
                     {

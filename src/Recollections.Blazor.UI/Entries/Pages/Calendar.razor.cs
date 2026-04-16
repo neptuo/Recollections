@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class Calendar
+    public partial class Calendar : IAsyncDisposable
     {
         [Inject]
         protected ILog<Calendar> Log { get; set; }
@@ -41,6 +42,11 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<EntryListModel> Models { get; } = [];
         protected bool IsLoading { get; set; }
 
+        protected EntryListModel SelectedEntry { get; set; }
+        protected EntryCardPopover entryPopover;
+        private Dictionary<string, ElementReference> badgeRefs = new();
+        private bool showPopoverPending;
+
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             int? prevYear = Year;
@@ -68,10 +74,16 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadDataAsync()
         {
+            if (entryPopover != null)
+                await entryPopover.HideAsync();
+            showPopoverPending = false;
+
             try
             {
                 IsLoading = true;
                 Models.Clear();
+                badgeRefs.Clear();
+                SelectedEntry = null;
                 if (IsMonthView)
                     Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
                 else
@@ -81,6 +93,28 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 IsLoading = false;
                 StateHasChanged();
+            }
+        }
+
+        protected async Task ShowEntryPopoverAsync(EntryListModel model)
+        {
+            await entryPopover.HideAsync();
+            SelectedEntry = model;
+            showPopoverPending = true;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            if (showPopoverPending)
+            {
+                showPopoverPending = false;
+
+                if (SelectedEntry != null && badgeRefs.TryGetValue(SelectedEntry.Id, out var triggerRef))
+                {
+                    await entryPopover.ShowAsync(triggerRef);
+                }
             }
         }
 
@@ -122,6 +156,11 @@ namespace Neptuo.Recollections.Entries.Pages
                 if (date.Year != null)
                     Navigator.OpenCalendar(date.Year);
             }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await entryPopover.HideAsync();
         }
     }
 }
