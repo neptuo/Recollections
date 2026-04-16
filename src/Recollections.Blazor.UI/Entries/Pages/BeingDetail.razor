@@ -34,21 +34,21 @@
                 </h2>
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
-                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)">
                         <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
                     </MapToggle>
                 </div>
 
                 @if (StoriesCount > 0)
                 {
-                    <div class="my-2">
+                    <div class="stories">
                         <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
                     </div>
                 }
 
                 @if (AltitudeCount > 0)
                 {
-                    <div class="my-2">
+                    <div class="altitudes">
                         <InlineLink Value="Highest altitude" Icon="arrow-up-short-wide" OnClick="ShowAltitudeAsync" />
                     </div>
                 }

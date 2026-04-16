@@ -71,7 +71,8 @@
         }
     }
 
-    &.inline-editable .inline-editor-value {
+    &.inline-editable .inline-editor-value,
+    &.inline-clickable .inline-editor-value {
         cursor: pointer;
     }
 
