@@ -6,8 +6,7 @@
 <DocumentTitle Value="@(Owner?.Name ?? UserId)" />
 <TemplateContent Name="MobileTitle">User profile</TemplateContent>
 
-@if (Model != null)
-{
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div class="my-sm-3">
@@ -29,4 +28,4 @@
             </div>
         </PermissionContainer>
     </CascadingValue>
-}
+</LoadingSection>

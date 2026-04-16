@@ -5,17 +5,10 @@
 
 <div class="card-list">
     <div class="row">
-        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="No memories from this day in previous years..." Context="entry">
-            <EmptyContent>
-                <div class="col-12">
-                    <Alert Mode="@AlertMode.Warning" Message="No memories from this day in previous years..." />
-                </div>
-            </EmptyContent>
-            <ChildContent>
-                <div class="col-sm-12 mb-4">
-                    <EntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
-                </div>
-            </ChildContent>
+        <ListView Items="@Items" IsLoading="@IsLoading" EmptyMessage="No memories from this day in previous years..." EmptyColWrapper="true" Context="entry">
+            <div class="col-sm-12 mb-4">
+                <EntryCard Model="entry" CardCssClass="h-100" OnCardClick="() => Navigator.OpenEntryDetail(entry.Id)" />
+            </div>
         </ListView>
     </div>
 </div>
