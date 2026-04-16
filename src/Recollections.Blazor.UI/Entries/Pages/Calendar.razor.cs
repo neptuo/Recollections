@@ -74,7 +74,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadDataAsync()
         {
-            await entryPopover.HideAsync();
+            if (entryPopover != null)
+                await entryPopover.HideAsync();
             showPopoverPending = false;
 
             try
