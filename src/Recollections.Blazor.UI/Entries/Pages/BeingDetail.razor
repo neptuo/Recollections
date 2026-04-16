@@ -49,7 +49,7 @@
                 @if (AltitudeCount > 0)
                 {
                     <div class="altitudes">
-                        <InlineLink Value="Highest altitude" Icon="arrow-up-short-wide" OnClick="ShowAltitudeAsync" />
+                        <InlineLink Value="@(HighestAltitude != null ? $"{UiOptions.FormatWholeNumber(HighestAltitude.Value)} m" : "Highest altitude")" Icon="arrow-up-short-wide" OnClick="ShowAltitudeAsync" />
                     </div>
                 }
 

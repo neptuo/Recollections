@@ -46,6 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<StoryListModel> StoryItems { get; } = new List<StoryListModel>();
 
         protected int AltitudeCount { get; set; }
+        protected double? HighestAltitude { get; set; }
         protected Offcanvas AltitudeOffcanvas { get; set; }
         protected bool IsAltitudeLoading { get; set; }
         protected List<EntryListModel> AltitudeItems { get; } = new List<EntryListModel>();
@@ -77,6 +78,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             var altitudeEntries = await Api.GetBeingHighestAltitudeAsync(BeingId);
             AltitudeCount = altitudeEntries.Count;
+            HighestAltitude = altitudeEntries.FirstOrDefault()?.Altitude;
         }
 
         private async Task LoadMapAsync()
