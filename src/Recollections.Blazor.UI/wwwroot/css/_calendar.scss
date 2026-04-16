@@ -42,12 +42,14 @@
     }
 }
 
-.popover .card {
-    border: 0;
-}
+.entry-popover {
+    .card {
+        border: 0;
+    }
 
-.popover-body {
-    padding: 0;
+    .popover-body {
+        padding: 0;
+    }
 }
 
 .date-picker {

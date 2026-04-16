@@ -58,7 +58,7 @@ else if (IsMonthView)
         {
             @foreach (var model in Models.Where(e => e.When.Day == day))
             {
-                <span @ref="badgeRefs[model.Id]" class="badge bg-primary text-white px-1 cursor-pointer" @onclick="@(() => ShowEntryPopoverAsync(model))" @onclick:preventDefault>
+                <span @ref="badgeRefs[model.Id]" role="button" tabindex="0" class="badge bg-primary text-white px-1 cursor-pointer" @onclick="@(() => ShowEntryPopoverAsync(model))" @onclick:preventDefault>
                     @model.Title
                 </span>
             }

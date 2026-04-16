@@ -72,10 +72,14 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (showPopoverPending && SelectedEntry != null && selectedMarkerIndex >= 0)
+            if (showPopoverPending)
             {
                 showPopoverPending = false;
-                await mapComponent.ShowMarkerPopoverAsync(selectedMarkerIndex, entryPopover.ContentRef);
+
+                if (SelectedEntry != null && selectedMarkerIndex >= 0)
+                {
+                    await mapComponent.ShowMarkerPopoverAsync(selectedMarkerIndex, entryPopover.ContentRef);
+                }
             }
         }
 

@@ -138,7 +138,8 @@ window.Bootstrap = {
                 sanitize: false,
                 content: contentElement.innerHTML,
                 placement: "top",
-                trigger: "manual"
+                trigger: "manual",
+                customClass: "entry-popover"
             });
 
             popover.show();

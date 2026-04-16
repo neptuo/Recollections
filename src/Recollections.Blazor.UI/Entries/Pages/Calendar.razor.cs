@@ -103,10 +103,14 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (showPopoverPending && SelectedEntry != null && badgeRefs.TryGetValue(SelectedEntry.Id, out var triggerRef))
+            if (showPopoverPending)
             {
                 showPopoverPending = false;
-                await entryPopover.ShowAsync(triggerRef);
+
+                if (SelectedEntry != null && badgeRefs.TryGetValue(SelectedEntry.Id, out var triggerRef))
+                {
+                    await entryPopover.ShowAsync(triggerRef);
+                }
             }
         }
 
