@@ -25237,7 +25237,7 @@ a:not(.btn, .nav-link, .dropdown-item, .leaflet-control-zoom-out, .leaflet-contr
   width: 24px;
   text-align: center;
 }
-.inline-editor-viewmode.inline-editable .inline-editor-value {
+.inline-editor-viewmode.inline-editable .inline-editor-value, .inline-editor-viewmode.inline-clickable .inline-editor-value {
   cursor: pointer;
 }
 .inline-editor-viewmode.inline-editable:hover .fa::before,

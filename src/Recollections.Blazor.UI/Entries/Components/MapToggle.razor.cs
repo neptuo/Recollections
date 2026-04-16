@@ -21,7 +21,7 @@ namespace Neptuo.Recollections.Entries.Components
         public bool IsPlaceHolder { get; set; }
 
         [Parameter]
-        public bool IsEnabled { get; set; } = true;
+        public bool? IsEnabled { get; set; }
 
         [Parameter]
         public RenderFragment ChildContent { get; set; }

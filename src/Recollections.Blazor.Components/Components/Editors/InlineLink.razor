@@ -1,6 +1,6 @@
 ﻿@inherits InlineEdit<string>
 
-<div class="inline-editor inline-link @GetModeCssClass()">
+<div class="inline-editor inline-link @GetModeCssClass() @(IsClickable ?? OnClick.HasDelegate ? "inline-clickable" : "")">
     <a class="inline-editor-value d-inline-block py-1 @(String.IsNullOrEmpty(Value) ? "text-muted" : "")" @onclick="@OnEditAsync">
         @if (!String.IsNullOrEmpty(Icon))
         {

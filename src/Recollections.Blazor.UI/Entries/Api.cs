@@ -204,6 +204,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<StoryListModel>> GetBeingStoriesAsync(string beingId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<StoryListModel>>($"beings/{beingId}/stories"));
 
+        public Task<List<EntryListModel>> GetBeingHighestAltitudeAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"beings/{beingId}/highest-altitude"));
+
         public Task<PageableList<EntryListModel>> SearchAsync(string query, int offset = 0)
         {
             string url = "search";

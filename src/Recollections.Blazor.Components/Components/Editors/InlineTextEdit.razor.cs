@@ -39,7 +39,9 @@ namespace Neptuo.Recollections.Components.Editors
 
             if (isEditSwitched)
             {
-                await Interop.InitializeAsync(this);
+                if (IsEditable)
+                    await Interop.InitializeAsync(this);
+
                 isEditSwitched = false;
             }
         }
