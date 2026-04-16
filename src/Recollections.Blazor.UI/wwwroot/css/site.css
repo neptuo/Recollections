@@ -25988,6 +25988,9 @@ video.pswp__video {
 .calendar a.badge:hover {
   color: white;
 }
+.calendar span.badge.cursor-pointer:hover {
+  opacity: 0.85;
+}
 .calendar .calendar-header,
 .calendar .calendar-cell {
   width: 14.2857142857%;
@@ -26006,6 +26009,14 @@ video.pswp__video {
 }
 .calendar .calendar-cell {
   aspect-ratio: 1;
+}
+
+.popover .card {
+  border: 0;
+}
+
+.popover-body {
+  padding: 0;
 }
 
 .date-picker .btn-outline-primary {
@@ -26038,4 +26049,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-issue-137-loading-progress-bars-for-all-async-oper-fab5fd/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-semipneumatic-meaghan/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

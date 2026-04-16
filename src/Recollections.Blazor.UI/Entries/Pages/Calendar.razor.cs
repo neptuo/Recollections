@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class Calendar
+    public partial class Calendar : IAsyncDisposable
     {
         [Inject]
         protected ILog<Calendar> Log { get; set; }
@@ -150,6 +150,11 @@ namespace Neptuo.Recollections.Entries.Pages
                 if (date.Year != null)
                     Navigator.OpenCalendar(date.Year);
             }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Popover.HideActiveAsync();
         }
     }
 }
