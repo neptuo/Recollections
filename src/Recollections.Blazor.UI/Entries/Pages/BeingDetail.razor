@@ -3,9 +3,7 @@
 
 <DocumentTitle Value="@(Model?.Name ?? "Being...")" />
 
-@if (Model != null)
-{
-
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <ActionMenu>
@@ -61,11 +59,11 @@
 
     <Offcanvas @ref="StoriesOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Stories with {Model.Name}")" IsBodyRenderedLazily="true">
         <div class="row">
-            <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." Context="story">
+            <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." EmptyColWrapper="true" Context="story">
                 <div class="col-sm-12 col-md-6 mb-3">
                     <StoryCard Model="story" OnCardClick="@(() => Navigator.OpenStoryDetail(story.Id))" />
                 </div>
             </ListView>
         </div>
     </Offcanvas>
-}
+</LoadingSection>

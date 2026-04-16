@@ -39,6 +39,7 @@ namespace Neptuo.Recollections.Entries.Pages
             : Year.ToString();
 
         protected List<EntryListModel> Models { get; } = [];
+        protected bool IsLoading { get; set; }
 
         public override async Task SetParametersAsync(ParameterView parameters)
         {
@@ -67,13 +68,20 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadDataAsync()
         {
-            Models.Clear();
-            if (IsMonthView)
-                Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
-            else
-                Models.AddRange(await Api.GetYearEntryListAsync(Year.Value));
-
-            StateHasChanged();
+            try
+            {
+                IsLoading = true;
+                Models.Clear();
+                if (IsMonthView)
+                    Models.AddRange(await Api.GetMonthEntryListAsync(Year.Value, Month.Value));
+                else
+                    Models.AddRange(await Api.GetYearEntryListAsync(Year.Value));
+            }
+            finally
+            {
+                IsLoading = false;
+                StateHasChanged();
+            }
         }
 
         protected string GetPrevPeriodUrl()

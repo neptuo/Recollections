@@ -1,12 +1,11 @@
-﻿@page "/users/{UserId}"
+@page "/users/{UserId}"
 @layout Commons.Layouts.MainLayout
 @inherits UserStateComponentBase
 
 <DocumentTitle Value="@(Owner?.Name ?? UserId)" />
 <TemplateContent Name="MobileTitle">User profile</TemplateContent>
 
-@if (Model != null)
-{
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <div class="my-sm-3">
@@ -62,4 +61,4 @@
     <Offcanvas @ref="AltitudeOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Highest altitude by {Owner.Name}")" IsBodyRenderedLazily="true">
         <Timeline Data="@AltitudeItems" EntryTitleSelector="FormatAltitudeTitle" />
     </Offcanvas>
-}
+</LoadingSection>

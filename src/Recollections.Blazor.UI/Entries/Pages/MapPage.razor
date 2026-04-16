@@ -4,7 +4,11 @@
 
 <DocumentTitle Value="Map" />
 
-@if (!IsLoading)
+@if (IsLoading)
+{
+    <Loading IsLoading="true" />
+}
+else
 {
     <div class="mappage">
         <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" EnableCountriesView="true" />

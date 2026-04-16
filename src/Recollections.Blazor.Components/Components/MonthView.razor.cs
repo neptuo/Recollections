@@ -19,6 +19,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public RenderFragment<int> ChildContent { get; set; }
 
+        [Parameter]
+        public string CssClass { get; set; }
+
         protected int FirstDay { get; set; }
         protected int MaxDay { get; set; }
 
