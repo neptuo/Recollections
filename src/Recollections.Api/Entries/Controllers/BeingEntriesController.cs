@@ -23,23 +23,23 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly ShareStatusService shareStatus;
         private readonly EntryListMapper entryMapper;
         private readonly StoryListMapper storyMapper;
-        private readonly HighestAltitudeService highestAltitudeService;
+        private readonly HighestAltitudeMapper highestAltitudeMapper;
         private readonly IConnectionProvider connections;
 
-        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, StoryListMapper storyMapper, HighestAltitudeService highestAltitudeService, IConnectionProvider connections)
+        public BeingEntriesController(DataContext db, ShareStatusService shareStatus, EntryListMapper entryMapper, StoryListMapper storyMapper, HighestAltitudeMapper highestAltitudeMapper, IConnectionProvider connections)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(entryMapper, "entryMapper");
             Ensure.NotNull(storyMapper, "storyMapper");
-            Ensure.NotNull(highestAltitudeService, "highestAltitudeService");
+            Ensure.NotNull(highestAltitudeMapper, "highestAltitudeMapper");
             Ensure.NotNull(connections, "connections");
             this.db = db;
             this.shareStatus = shareStatus;
             this.entryMapper = entryMapper;
             this.storyMapper = storyMapper;
-            this.highestAltitudeService = highestAltitudeService;
+            this.highestAltitudeMapper = highestAltitudeMapper;
             this.connections = connections;
         }
 
@@ -104,7 +104,12 @@ namespace Neptuo.Recollections.Entries.Controllers
             var userId = User.FindUserId();
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            var models = await highestAltitudeService.GetListAsync(userId, connectedUsers, beingId);
+            string[] userIds = [userId, ShareStatusService.PublicUserId];
+            var accessibleEntries = shareStatus
+                .OwnedByOrExplicitlySharedWithUser(db, db.Entries.AsNoTracking(), userIds, connectedUsers)
+                .Where(e => e.Beings.Any(b => b.Id == beingId));
+
+            var models = await highestAltitudeMapper.MapAsync(accessibleEntries, userId, userIds, connectedUsers);
             return Ok(models);
         });
     }

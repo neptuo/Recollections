@@ -8,36 +8,11 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries;
 
-public class HighestAltitudeService(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus)
+public class HighestAltitudeMapper(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus)
 {
     public const int ItemCount = 20;
 
-    public Task<List<EntryListModel>> GetListAsync(string userId, ConnectedUsersModel connectedUsers)
-    {
-        Ensure.NotNullOrEmpty(userId, "userId");
-        Ensure.NotNull(connectedUsers, "connectedUsers");
-
-        IQueryable<Entry> accessibleEntries = shareStatus
-            .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries.AsNoTracking(), userId, connectedUsers);
-
-        return GetListCoreAsync(accessibleEntries, userId, [userId], connectedUsers);
-    }
-
-    public Task<List<EntryListModel>> GetListAsync(string userId, ConnectedUsersModel connectedUsers, string beingId)
-    {
-        Ensure.NotNullOrEmpty(userId, "userId");
-        Ensure.NotNull(connectedUsers, "connectedUsers");
-        Ensure.NotNullOrEmpty(beingId, "beingId");
-
-        string[] userIds = [userId, ShareStatusService.PublicUserId];
-        IQueryable<Entry> accessibleEntries = shareStatus
-            .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries.AsNoTracking(), userIds, connectedUsers)
-            .Where(e => e.Beings.Any(b => b.Id == beingId));
-
-        return GetListCoreAsync(accessibleEntries, userId, userIds, connectedUsers);
-    }
-
-    private async Task<List<EntryListModel>> GetListCoreAsync(IQueryable<Entry> accessibleEntries, string userId, string[] userIds, ConnectedUsersModel connectedUsers)
+    public async Task<List<EntryListModel>> MapAsync(IQueryable<Entry> accessibleEntries, string userId, string[] userIds, ConnectedUsersModel connectedUsers)
     {
         List<EntryAltitudeInfo> rankedEntries = await GetRankedEntriesAsync(accessibleEntries);
         if (rankedEntries.Count == 0)
