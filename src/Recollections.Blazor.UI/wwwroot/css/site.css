@@ -25237,7 +25237,7 @@ a:not(.btn, .nav-link, .dropdown-item, .leaflet-control-zoom-out, .leaflet-contr
   width: 24px;
   text-align: center;
 }
-.inline-editor-viewmode.inline-editable .inline-editor-value {
+.inline-editor-viewmode.inline-editable .inline-editor-value, .inline-editor-viewmode.inline-clickable .inline-editor-value {
   cursor: pointer;
 }
 .inline-editor-viewmode.inline-editable:hover .fa::before,
@@ -26038,4 +26038,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-issue-137-loading-progress-bars-for-all-async-oper-fab5fd/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-issue-481-being-highest-altitude-view-5b1ef6/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */

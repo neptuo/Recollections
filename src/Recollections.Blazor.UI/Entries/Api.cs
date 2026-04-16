@@ -213,6 +213,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<EntryListModel>> GetProfileHighestAltitudeAsync(string userId)
             => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"profiles/{userId}/highest-altitude"));
 
+        public Task<List<EntryListModel>> GetBeingHighestAltitudeAsync(string beingId)
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"beings/{beingId}/highest-altitude"));
+
         public Task<PageableList<EntryListModel>> SearchAsync(string query, int offset = 0)
         {
             string url = "search";

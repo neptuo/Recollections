@@ -13,7 +13,7 @@ namespace Neptuo.Recollections.Accounts.Controllers;
 
 [ApiController]
 [Route("api/profiles/{id}")]
-public class ProfileEntriesController(EntriesDataContext db, ShareStatusService shareStatus, StoryListMapper storyMapper, HighestAltitudeService altitudeService, IConnectionProvider connections)
+public class ProfileEntriesController(EntriesDataContext db, ShareStatusService shareStatus, StoryListMapper storyMapper, HighestAltitudeMapper altitudeMapper, IConnectionProvider connections)
     : Entries.Controllers.ControllerBase(db, shareStatus)
 {
     [HttpGet("stories")]
@@ -53,12 +53,12 @@ public class ProfileEntriesController(EntriesDataContext db, ShareStatusService 
     {
         var userId = User.FindUserId();
         var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-        var models = await altitudeService.GetListAsync(
-            db.Entries.Where(e => e.UserId == id),
-            [userId, ShareStatusService.PublicUserId],
-            userId,
-            connectedUsers
-        );
+
+        string[] userIds = [userId, ShareStatusService.PublicUserId];
+        var accessibleEntries = shareStatus
+            .OwnedByOrExplicitlySharedWithUser(db, db.Entries.AsNoTracking().Where(e => e.UserId == id), userIds, connectedUsers);
+
+        var models = await altitudeMapper.MapAsync(accessibleEntries, userId, userIds, connectedUsers);
         return Ok(models);
     });
 }
