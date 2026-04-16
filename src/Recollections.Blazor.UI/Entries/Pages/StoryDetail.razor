@@ -3,9 +3,7 @@
 
 <DocumentTitle Value="@(Model?.Title ?? "Story...")" />
 
-@if (Model != null)
-{
-
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <ActionMenu>
@@ -89,4 +87,4 @@
     </CascadingValue>
 
     <EntryPicker @ref="EntryPicker" Selected="EntrySelected" />
-}
+</LoadingSection>

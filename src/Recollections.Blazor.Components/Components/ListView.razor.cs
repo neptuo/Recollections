@@ -24,6 +24,9 @@ namespace Neptuo.Recollections.Components
         public string EmptyMessage { get; set; } = "No data...";
 
         [Parameter]
+        public bool EmptyColWrapper { get; set; }
+
+        [Parameter]
         public RenderFragment EmptyContent { get; set; }
 
         [Parameter]
