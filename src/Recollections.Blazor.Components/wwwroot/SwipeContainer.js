@@ -1,5 +1,15 @@
 const _instances = new WeakMap();
 
+function getOffsets(state) {
+    const w = state.container.offsetWidth;
+    const gap = parseFloat(getComputedStyle(state.track).columnGap) || 0;
+    return {
+        center: -(w + gap),
+        prev: 0,
+        next: -(2 * w + 2 * gap)
+    };
+}
+
 export function initialize(dotnetRef, container) {
     if (_instances.has(container)) {
         _instances.get(container).dotnetRef = dotnetRef;
@@ -50,9 +60,8 @@ export function initialize(dotnetRef, container) {
         e.preventDefault();
 
         state.currentDelta = deltaX;
-        const containerWidth = state.container.offsetWidth;
-        const percent = (deltaX / containerWidth) * 100;
-        state.track.style.transform = `translateX(calc(-33.3333% + ${percent}%))`;
+        const offsets = getOffsets(state);
+        state.track.style.transform = `translateX(${offsets.center + deltaX}px)`;
     };
 
     state.onTouchEnd = () => {
@@ -64,13 +73,14 @@ export function initialize(dotnetRef, container) {
         state.isSwiping = false;
         const containerWidth = state.container.offsetWidth;
         const threshold = containerWidth * 0.2;
+        const offsets = getOffsets(state);
 
         state.track.style.transition = '';
 
         if (Math.abs(state.currentDelta) > threshold) {
             const direction = state.currentDelta > 0 ? 'prev' : 'next';
-            const targetPercent = direction === 'prev' ? '0%' : '-66.6666%';
-            state.track.style.transform = `translateX(${targetPercent})`;
+            const targetPx = direction === 'prev' ? offsets.prev : offsets.next;
+            state.track.style.transform = `translateX(${targetPx}px)`;
 
             state.track.addEventListener('transitionend', async () => {
                 state.track.style.transition = 'none';
