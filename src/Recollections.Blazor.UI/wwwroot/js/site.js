@@ -133,6 +133,11 @@ window.Bootstrap = {
         ShowFromElement: function (trigger, contentElement) {
             Bootstrap.Popover._hideActive();
 
+            var originalTitle = trigger.getAttribute("title");
+            if (originalTitle) {
+                trigger.removeAttribute("title");
+            }
+
             var popover = new bootstrap.Popover(trigger, {
                 html: true,
                 sanitize: false,
@@ -161,6 +166,9 @@ window.Bootstrap = {
 
             trigger.addEventListener("hidden.bs.popover", function () {
                 document.removeEventListener("pointerdown", dismissHandler);
+                if (originalTitle) {
+                    trigger.setAttribute("title", originalTitle);
+                }
             }, { once: true });
         },
         _active: null,
