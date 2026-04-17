@@ -89,7 +89,8 @@ namespace Neptuo.Recollections.Entries
 
                 entity.Location.Longitude = propertyReader.FindLongitude();
                 entity.Location.Latitude = propertyReader.FindLatitude();
-                entity.Location.Altitude = propertyReader.FindAltitude();
+                var altitude = propertyReader.FindAltitude();
+                entity.Location.Altitude = AltitudeBounds.IsValid(altitude) ? altitude : null;
 
                 if (isWhenIncluded)
                 {
