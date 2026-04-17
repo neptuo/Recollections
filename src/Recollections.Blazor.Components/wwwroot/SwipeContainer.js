@@ -27,10 +27,12 @@ export function initialize(dotnetRef, container) {
         startY: 0,
         currentDelta: 0,
         isSwiping: false,
-        isHorizontalSwipe: null
+        isHorizontalSwipe: null,
+        isAnimating: false
     };
 
     state.onTouchStart = (e) => {
+        if (state.isAnimating) return;
         if (e.touches.length !== 1) return;
         state.startX = e.touches[0].clientX;
         state.startY = e.touches[0].clientY;
@@ -80,16 +82,26 @@ export function initialize(dotnetRef, container) {
         if (Math.abs(state.currentDelta) > threshold) {
             const direction = state.currentDelta > 0 ? 'prev' : 'next';
             const targetPx = direction === 'prev' ? offsets.prev : offsets.next;
-            state.track.style.transform = `translateX(${targetPx}px)`;
 
-            state.track.addEventListener('transitionend', async () => {
+            state.isAnimating = true;
+
+            const onTransitionDone = async () => {
+                state.track.removeEventListener('transitionend', onTransitionDone);
+                state.track.removeEventListener('transitioncancel', onTransitionDone);
+
                 state.track.style.transition = 'none';
                 state.track.style.transform = '';
                 state.track.offsetHeight;
                 state.track.style.transition = '';
 
                 await state.dotnetRef.invokeMethodAsync('OnSwipeCompleted', direction);
-            }, { once: true });
+                state.isAnimating = false;
+            };
+
+            state.track.addEventListener('transitionend', onTransitionDone, { once: true });
+            state.track.addEventListener('transitioncancel', onTransitionDone, { once: true });
+
+            state.track.style.transform = `translateX(${targetPx}px)`;
         } else {
             state.track.style.transform = '';
         }
@@ -97,9 +109,19 @@ export function initialize(dotnetRef, container) {
         state.currentDelta = 0;
     };
 
+    state.onTouchCancel = () => {
+        if (!state.isSwiping) return;
+
+        state.isSwiping = false;
+        state.currentDelta = 0;
+        state.track.style.transition = '';
+        state.track.style.transform = '';
+    };
+
     container.addEventListener('touchstart', state.onTouchStart, { passive: true });
     container.addEventListener('touchmove', state.onTouchMove, { passive: false });
     container.addEventListener('touchend', state.onTouchEnd, { passive: true });
+    container.addEventListener('touchcancel', state.onTouchCancel, { passive: true });
 
     _instances.set(container, state);
 }
@@ -121,6 +143,7 @@ export function dispose(container) {
     container.removeEventListener('touchstart', state.onTouchStart);
     container.removeEventListener('touchmove', state.onTouchMove);
     container.removeEventListener('touchend', state.onTouchEnd);
+    container.removeEventListener('touchcancel', state.onTouchCancel);
 
     _instances.delete(container);
 }

@@ -171,11 +171,10 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void OnMonthSwiped(string direction)
         {
-            var (year, month) = direction == "prev"
-                ? (PrevMonthYear, PrevMonthMonth)
-                : (NextMonthYear, NextMonthMonth);
-
-            Navigator.OpenCalendar(year, month);
+            if (direction == "prev")
+                Navigator.OpenCalendar(PrevMonthYear, PrevMonthMonth);
+            else if (direction == "next")
+                Navigator.OpenCalendar(NextMonthYear, NextMonthMonth);
         }
 
         public async ValueTask DisposeAsync()
