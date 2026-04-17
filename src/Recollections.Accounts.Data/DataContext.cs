@@ -77,10 +77,12 @@ namespace Neptuo.Recollections.Accounts
 
             modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
                 .Property(p => p.UserId)
+                .HasMaxLength(36)
                 .IsRequired();
 
             modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
                 .Property(p => p.EntryId)
+                .HasMaxLength(36)
                 .IsRequired();
 
             modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
