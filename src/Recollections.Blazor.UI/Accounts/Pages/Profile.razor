@@ -1,7 +1,6 @@
-﻿@page "/users/{UserId}"
+@page "/users/{UserId}"
 @layout Commons.Layouts.MainLayout
 @inherits UserStateComponentBase
-@inject Entries.Api EntriesApi
 
 <DocumentTitle Value="@(Owner?.Name ?? UserId)" />
 <TemplateContent Name="MobileTitle">User profile</TemplateContent>
@@ -9,23 +8,63 @@
 <LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
+            <ActionMenu>
+                <ItemGroup Text="@Owner.Name">
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
+                </ItemGroup>
+            </ActionMenu>
+
             <div class="my-sm-3">
                 <h2 class="title">
                     <Icon Identifier="user" />
                     @Owner.Name
                 </h2>
 
-                <div class="datetime">
-                    <Icon Identifier="calendar-day" />
-                    @Model.RegistrationDate.ToString(UiOptions.DateFormat)
+                <div class="datetime inline-editor-viewmode">
+                    <span class="inline-editor-value d-inline-block py-1">
+                        <Icon Identifier="calendar-day" />
+                        @Model.RegistrationDate.ToString(UiOptions.DateFormat)
+                    </span>
                 </div>
 
-                <ActionPanel CssClass="my-3">
-                    <ShareLinkButton />
-                </ActionPanel>
+                <div class="gps">
+                    <MapToggle DialogTitle="@($"{Owner.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                    </MapToggle>
+                </div>
 
-                <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" NoMoreText="Here the user started..." />
+                @if (StoriesCount > 0)
+                {
+                    <div class="stories">
+                        <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
+                    </div>
+                }
+
+                @if (AltitudeItems.Count > 0)
+                {
+                    <div class="altitudes">
+                        <InlineLink Value="@($"Highest altitude ({AltitudeItems.Count})")" Icon="mountain" OnClick="ShowAltitudeAsync" />
+                    </div>
+                }
+
+                <div class="mt-4 timeline-narrow">
+                    <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" NoMoreText="Here the user started..." />
+                </div>
             </div>
         </PermissionContainer>
     </CascadingValue>
+
+    <Offcanvas @ref="StoriesOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Stories by {Owner.Name}")" IsBodyRenderedLazily="true">
+        <div class="row">
+            <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." Context="story">
+                <div class="col-sm-12 col-md-6 mb-3">
+                    <StoryCard Model="story" OnCardClick="@(() => Navigator.OpenStoryDetail(story.Id))" />
+                </div>
+            </ListView>
+        </div>
+    </Offcanvas>
+
+    <Offcanvas @ref="AltitudeOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Highest altitude by {Owner.Name}")" IsBodyRenderedLazily="true">
+        <Timeline Data="@AltitudeItems" EntryTitleSelector="FormatAltitudeTitle" />
+    </Offcanvas>
 </LoadingSection>
