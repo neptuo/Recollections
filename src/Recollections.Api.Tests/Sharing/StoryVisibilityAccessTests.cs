@@ -66,10 +66,10 @@ public class StoryVisibilityAccessTests : IClassFixture<ApiFactory>, IAsyncLifet
                 when: new DateTime(2024, 9, 2, 10, 0, 0, DateTimeKind.Utc));
             await DatabaseSeeder.SeedEntryShare(entriesDb, "svi-entry-public-chapter", ShareStatusService.PublicUserId, Permission.Read);
 
-            // A private entry in the public story (own visibility, not inheriting) — no shares.
+            // A private, non-shared entry in the public story — should NOT be visible anonymously.
             await DatabaseSeeder.SeedEntry(
                 entriesDb,
-                "svi-entry-private-inherited",
+                "svi-entry-private",
                 OwnerUserId,
                 isSharingInherited: false,
                 story: publicStory,
@@ -122,7 +122,7 @@ public class StoryVisibilityAccessTests : IClassFixture<ApiFactory>, IAsyncLifet
     }
 
     [Fact]
-    public async Task PublicStory_Timeline_AsAnonymous_FiltersOutInheritedEntries()
+    public async Task PublicStory_Timeline_AsAnonymous_FiltersOutPrivateAndChapterEntries()
     {
         var client = factory.CreateAnonymousClient();
         var response = await client.GetAsync($"/api/stories/{PublicStoryId}/timeline");
@@ -132,7 +132,7 @@ public class StoryVisibilityAccessTests : IClassFixture<ApiFactory>, IAsyncLifet
         var entryIds = page.Models.Select(e => e.Id).ToList();
 
         Assert.Contains("svi-entry-public", entryIds);
-        Assert.DoesNotContain("svi-entry-private-inherited", entryIds);
+        Assert.DoesNotContain("svi-entry-private", entryIds);
         Assert.DoesNotContain("svi-entry-public-chapter", entryIds); // chapter entries aren't in story timeline
     }
 
@@ -147,6 +147,6 @@ public class StoryVisibilityAccessTests : IClassFixture<ApiFactory>, IAsyncLifet
         var entryIds = models.Select(m => m.EntryId).ToList();
 
         Assert.Contains("svi-entry-public", entryIds);
-        Assert.DoesNotContain("svi-entry-private-inherited", entryIds);
+        Assert.DoesNotContain("svi-entry-private", entryIds);
     }
 }
