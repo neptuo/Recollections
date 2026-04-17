@@ -222,29 +222,18 @@ internal sealed class AltitudeBackfill
 
             using (reader)
             {
-                double altitudeMeters;
-                bool hasAltitude = false;
+                // ExifLib.ExifReader.GetTagValue<T> throws InvalidCastException when the
+                // underlying tag type does not match T (rather than returning false), so each
+                // probe is wrapped and we try types in the order ExifLib actually uses for
+                // GPSAltitude: rational (uint[] { numerator, denominator }), then double[].
+                double? altitudeMeters = TryReadRational(reader, ExifTags.GPSAltitude)
+                    ?? TryReadDoubleArray(reader, ExifTags.GPSAltitude);
 
-                if (reader.GetTagValue(ExifTags.GPSAltitude, out double[] altDoubles) && altDoubles != null && altDoubles.Length > 0)
-                {
-                    altitudeMeters = altDoubles[0];
-                    hasAltitude = true;
-                }
-                else if (reader.GetTagValue(ExifTags.GPSAltitude, out uint[] altRational) && altRational != null && altRational.Length >= 2 && altRational[1] != 0)
-                {
-                    altitudeMeters = altRational[0] / (double)altRational[1];
-                    hasAltitude = true;
-                }
-                else
-                {
-                    altitudeMeters = 0;
-                }
-
-                if (!hasAltitude)
+                if (altitudeMeters == null)
                     return new ExifAltitudeResult(true, null);
 
-                if (reader.GetTagValue(ExifTags.GPSAltitudeRef, out byte altRef) && altRef == 1)
-                    altitudeMeters = -altitudeMeters;
+                if (TryReadByte(reader, ExifTags.GPSAltitudeRef) == 1)
+                    altitudeMeters = -altitudeMeters.Value;
 
                 return new ExifAltitudeResult(true, altitudeMeters);
             }
@@ -253,6 +242,39 @@ internal sealed class AltitudeBackfill
         {
             buffered?.Dispose();
         }
+    }
+
+    private static double? TryReadRational(ExifReader reader, ExifTags tag)
+    {
+        try
+        {
+            if (reader.GetTagValue(tag, out uint[] value) && value != null && value.Length >= 2 && value[1] != 0)
+                return value[0] / (double)value[1];
+        }
+        catch (InvalidCastException) { }
+        return null;
+    }
+
+    private static double? TryReadDoubleArray(ExifReader reader, ExifTags tag)
+    {
+        try
+        {
+            if (reader.GetTagValue(tag, out double[] value) && value != null && value.Length > 0)
+                return value[0];
+        }
+        catch (InvalidCastException) { }
+        return null;
+    }
+
+    private static byte? TryReadByte(ExifReader reader, ExifTags tag)
+    {
+        try
+        {
+            if (reader.GetTagValue(tag, out byte value))
+                return value;
+        }
+        catch (InvalidCastException) { }
+        return null;
     }
 
     private static IFileStorage CreateFileStorage(string storageType, string connection)
