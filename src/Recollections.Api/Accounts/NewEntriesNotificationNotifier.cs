@@ -169,7 +169,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
                     continue;
                 }
 
-                log.LogDebug("Sending immediate new entry notification to user '{UserId}' for {EntryCount} newly available entrie(s) after '{Trigger}'.", pair.Key, reservedDispatches.Count, trigger);
+                log.LogDebug("Sending immediate new entry notification to user '{UserId}' for {EntryCount} newly available entries after '{Trigger}'.", pair.Key, reservedDispatches.Count, trigger);
                 List<PushNotificationSender.NewEntryNotificationItem> notificationEntries = reservedDispatches
                     .Select(d => notificationEntriesById.TryGetValue(d.EntryId, out PushNotificationSender.NewEntryNotificationItem entry)
                         ? entry
