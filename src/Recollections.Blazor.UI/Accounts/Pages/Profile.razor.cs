@@ -95,7 +95,7 @@ namespace Neptuo.Recollections.Accounts.Pages
                     Latitude = entry.Location.Latitude,
                     Longitude = entry.Location.Longitude,
                     Altitude = entry.Location.Altitude,
-                    Title = entry.Title
+                    Title = entry.Entry.Title
                 });
             }
             return markers;
@@ -104,7 +104,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected void OnMarkerSelected(int index)
         {
             var entry = MapEntries[index];
-            Navigator.OpenEntryDetail(entry.Id);
+            Navigator.OpenEntryDetail(entry.Entry.Id);
         }
 
         protected string FormatAltitudeTitle(EntryListModel entry)

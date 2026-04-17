@@ -58,7 +58,7 @@ public class ProfileMapEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var models = await response.ReadJsonAsync<List<MapEntryModel>>();
-        var entryIds = models.Select(model => model.Id).ToList();
+        var entryIds = models.Select(model => model.Entry.Id).ToList();
 
         Assert.Contains(VisibleEntryId, entryIds);
         Assert.DoesNotContain(HiddenEntryId, entryIds);
