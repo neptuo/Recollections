@@ -90,6 +90,9 @@ namespace Neptuo.Recollections.Accounts.Pages
             var markers = new List<MapMarkerModel>();
             foreach (var entry in entries)
             {
+                if (entry.Location == null || entry.Entry == null)
+                    continue;
+
                 markers.Add(new MapMarkerModel()
                 {
                     Latitude = entry.Location.Latitude,
