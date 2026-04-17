@@ -61,13 +61,19 @@ namespace Neptuo.Recollections.Entries
             if (reader == null)
                 return null;
 
-            if (reader.GetTagValue(ExifTags.GPSAltitude, out uint[] value))
+            if (!reader.GetTagValue(ExifTags.GPSAltitude, out uint[] value)
+                || value == null || value.Length < 2 || value[1] == 0)
             {
-                if (value != null)
-                    return value.FirstOrDefault();
+                return null;
             }
 
-            return null;
+            double altitudeMeters = value[0] / (double)value[1];
+
+            // GPSAltitudeRef: 0 = above sea level, 1 = below
+            if (reader.GetTagValue(ExifTags.GPSAltitudeRef, out byte altRef) && altRef == 1)
+                altitudeMeters = -altitudeMeters;
+
+            return altitudeMeters;
         }
 
         private double? FindCoordinate(ExifTags type)
