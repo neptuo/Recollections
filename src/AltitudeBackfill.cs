@@ -6,6 +6,7 @@
 #:project ./Recollections.Entries.Data/Recollections.Entries.Data.csproj
 #:project ./Recollections.Entries.SystemIo/Recollections.Entries.SystemIo.csproj
 
+using ExifLib;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo.Recollections;
@@ -112,7 +113,7 @@ internal sealed class AltitudeBackfill
         }
 
         Console.WriteLine();
-        Console.WriteLine($"Summary: {invalidCount} invalid altitude(s) found, {fixedCount} unset.");
+        Console.WriteLine($"Summary: {invalidCount} invalid altitude(s) found, {fixedCount} {(isDryRun ? "would be unset" : "unset")}.");
         if (fileStorage != null)
             Console.WriteLine($"Photo metadata: {metadataConfirmed} confirmed invalid, {metadataDiscrepancy} appeared valid in EXIF, {metadataUnavailable} unavailable.");
 
@@ -131,9 +132,10 @@ internal sealed class AltitudeBackfill
 
     private async Task VerifyImageMetadataAsync(IFileStorage fileStorage, Image image)
     {
+        Stream stream = null;
         try
         {
-            await using var stream = await fileStorage.FindAsync(image.Entry, image, ImageType.Original);
+            stream = await fileStorage.FindAsync(image.Entry, image, ImageType.Original);
             if (stream == null)
             {
                 metadataUnavailable++;
@@ -141,8 +143,15 @@ internal sealed class AltitudeBackfill
                 return;
             }
 
-            using var reader = new ImagePropertyReader(stream);
-            var exifAltitude = reader.FindAltitude();
+            var result = ReadExifAltitude(stream);
+            if (!result.Success)
+            {
+                metadataUnavailable++;
+                Console.WriteLine("    metadata: failed to read EXIF");
+                return;
+            }
+
+            var exifAltitude = result.Altitude;
             if (exifAltitude == null)
             {
                 metadataConfirmed++;
@@ -163,6 +172,86 @@ internal sealed class AltitudeBackfill
         {
             metadataUnavailable++;
             Console.WriteLine($"    metadata: failed to read original ({ex.GetType().Name}: {ex.Message})");
+        }
+        finally
+        {
+            if (stream != null)
+                await stream.DisposeAsync();
+        }
+    }
+
+    private readonly struct ExifAltitudeResult
+    {
+        public ExifAltitudeResult(bool success, double? altitude)
+        {
+            Success = success;
+            Altitude = altitude;
+        }
+
+        public bool Success { get; }
+        public double? Altitude { get; }
+    }
+
+    private static ExifAltitudeResult ReadExifAltitude(Stream content)
+    {
+        Stream seekable = content;
+        MemoryStream buffered = null;
+        if (!content.CanSeek)
+        {
+            buffered = new MemoryStream();
+            content.CopyTo(buffered);
+            buffered.Position = 0;
+            seekable = buffered;
+        }
+        else
+        {
+            content.Position = 0;
+        }
+
+        try
+        {
+            ExifReader reader;
+            try
+            {
+                reader = new ExifReader(seekable);
+            }
+            catch (ExifLibException)
+            {
+                return new ExifAltitudeResult(false, null);
+            }
+
+            using (reader)
+            {
+                double altitudeMeters;
+                bool hasAltitude = false;
+
+                if (reader.GetTagValue(ExifTags.GPSAltitude, out double[] altDoubles) && altDoubles != null && altDoubles.Length > 0)
+                {
+                    altitudeMeters = altDoubles[0];
+                    hasAltitude = true;
+                }
+                else if (reader.GetTagValue(ExifTags.GPSAltitude, out uint[] altRational) && altRational != null && altRational.Length >= 2 && altRational[1] != 0)
+                {
+                    altitudeMeters = altRational[0] / (double)altRational[1];
+                    hasAltitude = true;
+                }
+                else
+                {
+                    altitudeMeters = 0;
+                }
+
+                if (!hasAltitude)
+                    return new ExifAltitudeResult(true, null);
+
+                if (reader.GetTagValue(ExifTags.GPSAltitudeRef, out byte altRef) && altRef == 1)
+                    altitudeMeters = -altitudeMeters;
+
+                return new ExifAltitudeResult(true, altitudeMeters);
+            }
+        }
+        finally
+        {
+            buffered?.Dispose();
         }
     }
 
