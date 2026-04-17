@@ -201,6 +201,41 @@ public static class DatabaseSeeder
         return image;
     }
 
+    public static async Task<Video> SeedVideo(
+        EntriesDataContext db,
+        string videoId,
+        Entry entry,
+        string name = null,
+        DateTime? when = null,
+        double? latitude = null,
+        double? longitude = null,
+        double? altitude = null)
+    {
+        var video = new Video
+        {
+            Id = videoId,
+            Entry = entry,
+            Name = name ?? $"Video {videoId}",
+            FileName = $"{videoId}.mp4",
+            ContentType = "video/mp4",
+            Created = when ?? entry.When,
+            When = when ?? entry.When,
+            OriginalWidth = 1920,
+            OriginalHeight = 1080,
+            Location = latitude != null && longitude != null
+                ? new MediaLocation
+                {
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    Altitude = altitude,
+                }
+                : null,
+        };
+        db.Videos.Add(video);
+        await db.SaveChangesAsync();
+        return video;
+    }
+
     public static async Task SeedEntryShare(EntriesDataContext db, string entryId, string userId, Permission permission)
     {
         db.EntryShares.Add(new EntryShare(entryId, userId) { Permission = (int)permission });
