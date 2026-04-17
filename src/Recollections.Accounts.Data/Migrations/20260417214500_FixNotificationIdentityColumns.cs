@@ -1,4 +1,5 @@
 using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Neptuo.Recollections.Migrations;
 
@@ -15,6 +16,8 @@ namespace Neptuo.Recollections.Accounts.Migrations
     /// Server so the identity column is configured correctly. On SQLite, no action is necessary because the
     /// <c>INTEGER PRIMARY KEY AUTOINCREMENT</c> column is already generating values.
     /// </summary>
+    [DbContext(typeof(DataContext))]
+    [Migration("20260417214500_FixNotificationIdentityColumns")]
     public partial class FixNotificationIdentityColumns : MigrationWithSchema<DataContext>
     {
         private const string SqlServerProvider = "Microsoft.EntityFrameworkCore.SqlServer";
