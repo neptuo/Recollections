@@ -44,7 +44,7 @@ namespace Neptuo.Recollections.Accounts.Migrations
                         .Annotation("Sqlite:Autoincrement", true)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(maxLength: 36, nullable: false),
-                    Endpoint = table.Column<string>(nullable: false),
+                    Endpoint = table.Column<string>(maxLength: 800, nullable: false),
                     P256dh = table.Column<string>(nullable: false),
                     Auth = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),
@@ -84,10 +84,10 @@ namespace Neptuo.Recollections.Accounts.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    EntryId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    UserId = table.Column<string>(maxLength: 36, nullable: false),
+                    EntryId = table.Column<string>(maxLength: 36, nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    SentAt = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
