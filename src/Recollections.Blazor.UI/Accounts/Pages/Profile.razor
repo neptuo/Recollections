@@ -29,7 +29,7 @@
 
                 <div class="gps">
                     <MapToggle DialogTitle="@($"{Owner.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
-                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
 
@@ -53,6 +53,8 @@
             </div>
         </PermissionContainer>
     </CascadingValue>
+
+    <EntryCardPopover @ref="entryPopover" Model="PopoverHandler.SelectedEntry" />
 
     <Offcanvas @ref="StoriesOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Stories by {Owner.Name}")" IsBodyRenderedLazily="true">
         <div class="row">

@@ -28,11 +28,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected bool IsLoading { get; set; } = true;
 
-        protected EntryListModel SelectedEntry { get; set; }
+        protected MapPopoverHandler PopoverHandler { get; } = new();
         protected EntryCardPopover entryPopover;
         protected Map mapComponent;
-        private int selectedMarkerIndex = -1;
-        private bool showPopoverPending;
 
         protected async override Task OnInitializedAsync()
         {
@@ -61,31 +59,19 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task OnMarkerSelectedAsync(int index)
         {
-            await entryPopover.HideAsync();
-            selectedMarkerIndex = index;
-            SelectedEntry = Entries[index].Entry;
-            showPopoverPending = true;
+            await PopoverHandler.SelectAsync(index, Entries[index].Entry, entryPopover);
             StateHasChanged();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-
-            if (showPopoverPending)
-            {
-                showPopoverPending = false;
-
-                if (SelectedEntry != null && selectedMarkerIndex >= 0)
-                {
-                    await mapComponent.ShowMarkerPopoverAsync(selectedMarkerIndex, entryPopover.ContentRef);
-                }
-            }
+            await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
         }
 
         public async ValueTask DisposeAsync()
         {
-            await entryPopover.HideAsync();
+            await PopoverHandler.DisposeAsync(entryPopover);
         }
     }
 }

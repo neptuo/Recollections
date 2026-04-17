@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class StoryDetail(ILog<StoryDetail> log)
+    public partial class StoryDetail(ILog<StoryDetail> log) : IAsyncDisposable
     {
         [Inject]
         protected Api Api { get; set; }
@@ -46,6 +46,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
         protected GalleryPreviewModal GalleryPreviewModal { get; set; }
         
+        protected MapPopoverHandler PopoverHandler { get; } = new();
+        protected Map mapComponent;
+        protected EntryCardPopover entryPopover;
         protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
@@ -64,6 +67,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
+
+            await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
 
             if (SelectLastChapterTitleEdit)
             {
@@ -148,10 +153,16 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        protected void OnMarkerSelected(int index)
+        protected async Task OnMarkerSelectedAsync(int index)
         {
-            var entry = MapEntries[index];
-            Navigator.OpenEntryDetail(entry.Entry.Id);
+            await PopoverHandler.SelectAsync(index, MapEntries[index].Entry, entryPopover);
+            StateHasChanged();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (entryPopover != null)
+                await PopoverHandler.DisposeAsync(entryPopover);
         }
 
         protected async Task SaveAsync()

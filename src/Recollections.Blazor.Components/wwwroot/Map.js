@@ -212,10 +212,10 @@ function setMarkers(model, markers, isEditable) {
 
         const marker = Leaflet.marker(point, markerOptions).addTo(model.map);
         marker.id = i;
+        marker.on("click", e => {
+            model.interop.invokeMethodAsync("MapInterop.MarkerSelected", e.target.id);
+        });
         if (isEditable) {
-            marker.on("click", e => {
-                model.interop.invokeMethodAsync("MapInterop.MarkerSelected", e.target.id);
-            });
             marker.on("dragend", e => {
                 const latitude = e.target.getLatLng().lat;
                 const longitude = e.target.getLatLng().lng;
