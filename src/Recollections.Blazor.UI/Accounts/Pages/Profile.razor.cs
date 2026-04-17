@@ -108,9 +108,7 @@ namespace Neptuo.Recollections.Accounts.Pages
         }
 
         protected string FormatAltitudeTitle(EntryListModel entry)
-            => entry.Altitude != null
-                ? $"{UiOptions.FormatWholeNumber(entry.Altitude.Value)} m"
-                : entry.When.ToString(UiOptions.ShortDateFormat);
+            => UiOptions.FormatAltitudeEntryTitle(entry);
 
         protected Task ShowStoriesAsync()
         {
