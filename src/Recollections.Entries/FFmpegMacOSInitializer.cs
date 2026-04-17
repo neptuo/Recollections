@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using FFMediaToolkit;
 using HeyRed.ImageSharp.AVCodecFormats;
 
@@ -18,14 +19,23 @@ namespace Neptuo.Recollections.Entries
             "/usr/local/opt/ffmpeg@7/lib",
         };
 
-        private static bool initialized;
+        // FFmpeg 7.x dylibs we actually need. Versions match FFmpeg.AutoGen 7.1.1
+        // and FFMediaToolkit's dlopen set.
+        private static readonly string[] RequiredDylibs =
+        {
+            "libavcodec.61.dylib",
+            "libavformat.61.dylib",
+            "libavutil.59.dylib",
+            "libswscale.8.dylib",
+            "libswresample.5.dylib",
+        };
+
+        private static int initialized;
 
         public static void Initialize()
         {
-            if (initialized)
+            if (Interlocked.Exchange(ref initialized, 1) == 1)
                 return;
-
-            initialized = true;
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return;
@@ -60,6 +70,17 @@ namespace Neptuo.Recollections.Entries
         }
 
         private static bool ContainsFFmpegDylibs(string directory)
-            => Directory.Exists(directory) && File.Exists(Path.Combine(directory, "libavcodec.61.dylib"));
+        {
+            if (!Directory.Exists(directory))
+                return false;
+
+            foreach (var dylib in RequiredDylibs)
+            {
+                if (!File.Exists(Path.Combine(directory, dylib)))
+                    return false;
+            }
+
+            return true;
+        }
     }
 }
