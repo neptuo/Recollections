@@ -14,7 +14,7 @@
             </div>
         }
 
-        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="OnGalleryOpenInfoAsync" />
+        <Gallery @ref="Gallery" Models="@GalleryItems" BearerToken="@UserState.BearerToken" OnOpenInfo="OnGalleryOpenInfoAsync" />
         @BeforeContent
 
         @if(Collapsible && Entries.Count > 5)

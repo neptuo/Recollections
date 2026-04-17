@@ -21,8 +21,18 @@ namespace Neptuo.Recollections.Components
 
         public string ContentType { get; set; }
 
+        /// <summary>
+        /// Absolute URL of the preview-sized media (thumbnail for images, preview poster for videos).
+        /// </summary>
+        public string PreviewUrl { get; set; }
+
+        /// <summary>
+        /// Absolute URL of the original-sized media (used to stream original videos).
+        /// </summary>
+        public string OriginalUrl { get; set; }
+
         public override int GetHashCode()
-            => HashCode.Combine(Type, Title, SizeText, Width, Height, ContentType);
+            => HashCode.Combine(Type, Title, SizeText, Width, Height, ContentType, PreviewUrl, OriginalUrl);
 
         public override bool Equals(object obj)
             => (obj is GalleryModel other) && Equals(other);
@@ -33,6 +43,8 @@ namespace Neptuo.Recollections.Components
                 && SizeText == other.SizeText
                 && Width == other.Width
                 && Height == other.Height
-                && ContentType == other.ContentType;
+                && ContentType == other.ContentType
+                && PreviewUrl == other.PreviewUrl
+                && OriginalUrl == other.OriginalUrl;
     }
 }

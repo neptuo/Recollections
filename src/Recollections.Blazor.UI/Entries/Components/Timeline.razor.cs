@@ -246,7 +246,8 @@ namespace Neptuo.Recollections.Entries.Components
                         Type = "image",
                         Title = item.Image.Name,
                         Width = item.Image.Preview.Width,
-                        Height = item.Image.Preview.Height
+                        Height = item.Image.Preview.Height,
+                        PreviewUrl = Api.GetMediaUrl(item.Image.Preview.Url),
                     });
                 }
                 else if (item.Video != null)
@@ -257,25 +258,12 @@ namespace Neptuo.Recollections.Entries.Components
                         Title = item.Video.Name,
                         Width = item.Video.Preview.Width,
                         Height = item.Video.Preview.Height,
-                        ContentType = item.Video.ContentType
+                        ContentType = item.Video.ContentType,
+                        PreviewUrl = Api.GetMediaUrl(item.Video.Preview.Url),
+                        OriginalUrl = Api.GetMediaUrl(item.Video.Original.Url),
                     });
                 }
             }
-        }
-
-        protected Task<Stream> OnGetMediaDataAsync(int index, string type)
-        {
-            if (currentGalleryEntryId == null || !galleryMediaByEntryId.TryGetValue(currentGalleryEntryId, out List<MediaModel> media) || index >= media.Count)
-                return Task.FromResult<Stream>(null);
-
-            MediaModel item = media[index];
-            if (item.Image != null)
-                return Api.GetMediaDataAsync(item.Image.Preview.Url);
-
-            if (item.Video != null)
-                return Api.GetMediaDataAsync(type == "original" ? item.Video.Original.Url : item.Video.Preview.Url);
-
-            return Task.FromResult<Stream>(null);
         }
 
         protected async Task OnGalleryOpenInfoAsync(int index)

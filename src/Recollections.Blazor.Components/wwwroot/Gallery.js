@@ -11,6 +11,7 @@ let autoPlayTimer = null;
 let stopCallback = () => { };
 let interop = null;
 let items = [];
+let bearerToken = null;
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -74,9 +75,34 @@ function formatTitle(model, title) {
     return `${title} (${hint})`;
 }
 
-export function initialize(intr, i) {
+async function fetchBlobUrl(url, mimeType) {
+    const headers = {};
+    if (bearerToken) {
+        headers["Authorization"] = "Bearer " + bearerToken;
+    }
+
+    let response;
+    try {
+        response = await fetch(url, { headers });
+    } catch (e) {
+        console.warn("Gallery.fetchBlobUrl: fetch failed", url, e);
+        return null;
+    }
+
+    if (!response.ok) {
+        return null;
+    }
+
+    const blob = await response.blob();
+    const blobType = mimeType || blob.type || undefined;
+    const typedBlob = blobType && blob.type !== blobType ? blob.slice(0, blob.size, blobType) : blob;
+    return URL.createObjectURL(typedBlob);
+}
+
+export function initialize(intr, i, token) {
     interop = intr;
     items = i;
+    bearerToken = token;
 
     if (!isInitiazed) {
         lightbox.on('uiRegister', function () {
@@ -189,17 +215,11 @@ export function initialize(intr, i) {
                 const originalTitle = lightbox.pswp.currSlide.data.alt || '';
 
                 titleEl.innerHTML = `${videoIcon} ${originalTitle} (loading video...)`;
-                
-                const stream = await invokeInterop("GetImageDataAsync", index, "original");
-                if (!stream) {
+
+                const url = await fetchBlobUrl(model.originalUrl, model.contentType || "video/mp4");
+                if (!url) {
                     return;
                 }
-
-                const arrayBuffer = await stream.arrayBuffer();
-                const blob = new Blob([arrayBuffer], {
-                    type: model.contentType || "video/mp4"
-                });
-                const url = URL.createObjectURL(blob);
 
                 const imageEl = lightbox.pswp.currSlide.image;
                 const videoEl = document.createElement('video');
@@ -243,17 +263,12 @@ export function initialize(intr, i) {
                 e.itemData.provider = model.provider;
             } else {
                 e.itemData.provider = model.provider = new Promise(async resolve => {
-                    const stream = await invokeInterop("GetImageDataAsync", e.index, "");
-                    if (!stream) {
+                    const url = await fetchBlobUrl(model.previewUrl, model.contentType || "image/jpeg");
+                    if (!url) {
                         resolve('');
                         return;
                     }
 
-                    const arrayBuffer = await stream.arrayBuffer();
-                    const blob = new Blob([arrayBuffer], {
-                        type: "image/png"
-                    });
-                    const url = URL.createObjectURL(blob);
                     model.src = url;
 
                     console.log(`Loading image at index '${e.index}'`);
