@@ -42,6 +42,11 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<EntryListModel> Models { get; } = [];
         protected bool IsLoading { get; set; }
 
+        protected int PrevMonthYear { get; set; }
+        protected int PrevMonthMonth { get; set; }
+        protected int NextMonthYear { get; set; }
+        protected int NextMonthMonth { get; set; }
+
         protected EntryListModel SelectedEntry { get; set; }
         protected EntryCardPopover entryPopover;
         private Dictionary<string, ElementReference> badgeRefs = new();
@@ -67,6 +72,12 @@ namespace Neptuo.Recollections.Entries.Pages
                 Year = Year,
                 Month = Month
             };
+
+            if (IsMonthView)
+            {
+                (PrevMonthYear, PrevMonthMonth) = DatePicker.PrevMonth(Year.Value, Month.Value);
+                (NextMonthYear, NextMonthMonth) = DatePicker.NextMonth(Year.Value, Month.Value);
+            }
 
             if (Year != prevYear || Month != prevMonth)
                 await LoadDataAsync();
@@ -156,6 +167,14 @@ namespace Neptuo.Recollections.Entries.Pages
                 if (date.Year != null)
                     Navigator.OpenCalendar(date.Year);
             }
+        }
+
+        protected void OnMonthSwiped(string direction)
+        {
+            if (direction == "prev")
+                Navigator.OpenCalendar(PrevMonthYear, PrevMonthMonth);
+            else if (direction == "next")
+                Navigator.OpenCalendar(NextMonthYear, NextMonthMonth);
         }
 
         public async ValueTask DisposeAsync()

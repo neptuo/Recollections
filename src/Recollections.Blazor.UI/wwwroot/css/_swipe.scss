@@ -1,0 +1,18 @@
+.swipe-container {
+    overflow: hidden;
+    touch-action: pan-y pinch-zoom;
+    --swipe-gap: 2rem;
+}
+
+.swipe-track {
+    display: flex;
+    column-gap: var(--swipe-gap);
+    width: calc(300% + 2 * var(--swipe-gap));
+    transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
+    transition: transform 0.3s ease-out;
+}
+
+.swipe-panel {
+    width: calc((100% - 2 * var(--swipe-gap)) / 3);
+    flex-shrink: 0;
+}

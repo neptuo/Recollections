@@ -38,32 +38,54 @@
 }
 else if (IsMonthView)
 {
-    <MonthView Year="@Year.Value" Month="@Month.Value" CssClass="@(IsLoading ? "placeholder-glow" : "")" Context="day">
-        <div>
-            <span class="badge">
-                @day
-            </span>
-        </div>
+    <SwipeContainer OnSwiped="@OnMonthSwiped">
+        <PreviousContent>
+            <MonthView Year="@PrevMonthYear" Month="@PrevMonthMonth" Context="day">
+                <div>
+                    <span class="badge">
+                        @day
+                    </span>
+                </div>
+            </MonthView>
+        </PreviousContent>
+        <ChildContent>
+            <MonthView Year="@Year.Value" Month="@Month.Value" CssClass="@(IsLoading ? "placeholder-glow" : "")" Context="day">
+                <div>
+                    <span class="badge">
+                        @day
+                    </span>
+                </div>
 
-        @if (IsLoading)
-        {
-            @if (day % 5 == 1)
-            {
-                <span class="badge bg-secondary placeholder px-1">
-                    <span class="invisible">Entry</span>
-                </span>
-            }
-        }
-        else
-        {
-            @foreach (var model in Models.Where(e => e.When.Day == day))
-            {
-                <span @ref="badgeRefs[model.Id]" role="button" tabindex="0" class="badge bg-primary text-white px-1 cursor-pointer" @onclick="@(() => ShowEntryPopoverAsync(model))" @onclick:preventDefault>
-                    @model.Title
-                </span>
-            }
-        }
-    </MonthView>
+                @if (IsLoading)
+                {
+                    @if (day % 5 == 1)
+                    {
+                        <span class="badge bg-secondary placeholder px-1">
+                            <span class="invisible">Entry</span>
+                        </span>
+                    }
+                }
+                else
+                {
+                    @foreach (var model in Models.Where(e => e.When.Day == day))
+                    {
+                        <span @ref="badgeRefs[model.Id]" role="button" tabindex="0" class="badge bg-primary text-white px-1 cursor-pointer" @onclick="@(() => ShowEntryPopoverAsync(model))" @onclick:preventDefault>
+                            @model.Title
+                        </span>
+                    }
+                }
+            </MonthView>
+        </ChildContent>
+        <NextContent>
+            <MonthView Year="@NextMonthYear" Month="@NextMonthMonth" Context="day">
+                <div>
+                    <span class="badge">
+                        @day
+                    </span>
+                </div>
+            </MonthView>
+        </NextContent>
+    </SwipeContainer>
 }
 else if (IsYearView)
 {
