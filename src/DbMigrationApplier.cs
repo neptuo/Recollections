@@ -14,6 +14,7 @@ using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
 string connectionString;
 if (args.Length == 0)
 {
+    Console.WriteLine("Enter connection string to database to migrate:");
     connectionString = Console.ReadLine();
 }
 else if (args.Length != 1)

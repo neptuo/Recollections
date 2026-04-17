@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Neptuo.Recollections.Migrations;
 
 #nullable disable
 
 namespace Neptuo.Recollections.Entries.Migrations
 {
     /// <inheritdoc />
-    public partial class EntryTrackTotalDistance : Migration
+    public partial class EntryTrackTotalDistance : MigrationWithSchema<DataContext>
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -13,7 +14,7 @@ namespace Neptuo.Recollections.Entries.Migrations
             migrationBuilder.AddColumn<double>(
                 name: "TrackTotalDistance",
                 table: "Entries",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
         }
 
@@ -22,6 +23,7 @@ namespace Neptuo.Recollections.Entries.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "TrackTotalDistance",
+                schema: Schema.Name,
                 table: "Entries");
         }
     }
