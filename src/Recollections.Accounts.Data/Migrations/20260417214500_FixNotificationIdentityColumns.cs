@@ -41,7 +41,6 @@ namespace Neptuo.Recollections.Accounts.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(maxLength: 36, nullable: false),
                     Endpoint = table.Column<string>(maxLength: 800, nullable: false),
@@ -81,8 +80,7 @@ namespace Neptuo.Recollections.Accounts.Migrations
                 schema: Schema.Name,
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(maxLength: 36, nullable: false),
                     EntryId = table.Column<string>(maxLength: 36, nullable: false),
@@ -111,8 +109,11 @@ namespace Neptuo.Recollections.Accounts.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // No-op: the previous migrations already describe the table layout and rolling back this fix-up
-            // would leave the database in a broken state with a non-identity Id column.
+            if (migrationBuilder.ActiveProvider != SqlServerProvider)
+                return;
+
+            throw new NotSupportedException(
+                "This migration cannot be rolled back on SQL Server because it fixes incorrectly generated non-identity Id columns. Reverting it would leave the database schema in a broken state.");
         }
     }
 }
