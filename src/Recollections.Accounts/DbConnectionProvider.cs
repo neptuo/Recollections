@@ -18,6 +18,9 @@ public class DbConnectionProvider : IConnectionProvider
 
     public async Task<ConnectedUsersModel> GetConnectedUsersForAsync(string userId)
     {
+        if (string.IsNullOrWhiteSpace(userId))
+            return new(Array.Empty<string>(), Array.Empty<string>());
+
         IReadOnlyDictionary<string, ConnectedUsersModel> models = await GetConnectedUsersForAsync([userId]);
         return models.TryGetValue(userId, out ConnectedUsersModel connectedUsers)
             ? connectedUsers
