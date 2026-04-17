@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Accounts.Notifications;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -19,16 +20,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
         private readonly IConnectionProvider connections;
+        private readonly NewEntriesNotificationNotifier notificationNotifier;
 
-        public EntryBeingController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
+        public EntryBeingController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections, NewEntriesNotificationNotifier notificationNotifier)
             : base(db, shareStatus, RunEntryObserver)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(connections, "connections");
+            Ensure.NotNull(notificationNotifier, "notificationNotifier");
             this.db = db;
             this.shareStatus = shareStatus;
             this.connections = connections;
+            this.notificationNotifier = notificationNotifier;
         }
 
         private static IQueryable<Entry> RunEntryObserver(IQueryable<Entry> query)
@@ -64,6 +68,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPut]
         public Task<IActionResult> Update(string entryId, List<string> beingIds) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
+            NewEntriesNotificationSnapshot beforeSnapshot = await notificationNotifier.CaptureEntriesAsync(entry.Id);
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();
@@ -90,6 +95,7 @@ namespace Neptuo.Recollections.Entries.Controllers
                 entry.Beings.Add(being);
 
             await db.SaveChangesAsync();
+            await notificationNotifier.NotifyEntriesAsync(new[] { entry.Id }, beforeSnapshot, "entry-beings-update");
 
             return NoContent();
         });

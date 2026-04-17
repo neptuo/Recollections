@@ -1,4 +1,4 @@
-﻿window.Pwa = {
+window.Pwa = {
     Install: function () {
         if (window.PwaInstallPrompt) {
             window.PwaInstallPrompt.prompt();
@@ -19,6 +19,20 @@
             }
         });
     },
+    Version: async function () {
+        try {
+            const response = await fetch('service-worker-assets.js', { cache: 'no-store' });
+            if (!response.ok) {
+                return 'development';
+            }
+
+            const content = await response.text();
+            const match = content.match(/"version":"([^"]+)"/);
+            return match && match[1] ? match[1] : 'development';
+        } catch {
+            return 'development';
+        }
+    },
     installable: async () => {
         await Recollections.WaitForDotNet();
         DotNet.invokeMethodAsync('Recollections.Blazor.UI', 'Pwa.Installable');
@@ -29,6 +43,13 @@
     }
 };
 
+function activateWaitingServiceWorker(registration) {
+    var waiting = registration.waiting;
+    if (waiting != null) {
+        waiting.postMessage({ action: 'skipWaiting' });
+    }
+}
+
 window.addEventListener('beforeinstallprompt', function (e) {
     window.PwaInstallPrompt = e;
     Pwa.installable();
@@ -36,6 +57,8 @@ window.addEventListener('beforeinstallprompt', function (e) {
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+        activateWaitingServiceWorker(registration);
+
         if (registration.waiting !== null) {
             if (navigator.serviceWorker.controller) {
                 Pwa.updateable();
@@ -47,6 +70,7 @@ if ("serviceWorker" in navigator) {
                     installing.addEventListener("statechange", function () {
                         switch (installing.state) {
                             case 'installed':
+                                activateWaitingServiceWorker(registration);
                                 if (navigator.serviceWorker.controller) {
                                     Pwa.updateable();
                                 }

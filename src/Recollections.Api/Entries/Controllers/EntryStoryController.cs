@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Accounts.Notifications;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -20,16 +21,19 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly DataContext db;
         private readonly ShareStatusService shareStatus;
         private readonly IConnectionProvider connections;
+        private readonly NewEntriesNotificationNotifier notificationNotifier;
 
-        public EntryStoryController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections)
+        public EntryStoryController(DataContext db, ShareStatusService shareStatus, IConnectionProvider connections, NewEntriesNotificationNotifier notificationNotifier)
             : base(db, shareStatus, RunEntryModifier)
         {
             Ensure.NotNull(db, "db");
             Ensure.NotNull(shareStatus, "shareStatus");
             Ensure.NotNull(connections, "connections");
+            Ensure.NotNull(notificationNotifier, "notificationNotifier");
             this.db = db;
             this.shareStatus = shareStatus;
             this.connections = connections;
+            this.notificationNotifier = notificationNotifier;
         }
 
         private static IQueryable<Entry> RunEntryModifier(IQueryable<Entry> query)
@@ -73,6 +77,7 @@ namespace Neptuo.Recollections.Entries.Controllers
         [HttpPut]
         public Task<IActionResult> Update(string entryId, EntryStoryUpdateModel model) => RunEntryAsync(entryId, Permission.CoOwner, async entry =>
         {
+            NewEntriesNotificationSnapshot beforeSnapshot = await notificationNotifier.CaptureEntriesAsync(entry.Id);
             string userId = User.FindUserId();
             Story story = null;
             StoryChapter chapter = null;
@@ -125,6 +130,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             db.Entries.Update(entry);
             await db.SaveChangesAsync();
+            await notificationNotifier.NotifyEntriesAsync(new[] { entry.Id }, beforeSnapshot, "entry-story-update");
 
             return NoContent();
         });

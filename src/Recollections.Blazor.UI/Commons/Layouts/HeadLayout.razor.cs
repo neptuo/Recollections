@@ -21,6 +21,9 @@ public partial class HeadLayout : IDisposable
     [Inject]
     internal PropertyCollection Properties { get; set; }
 
+    [Inject]
+    internal NotificationSubscriptionSynchronizer NotificationSynchronizer { get; set; }
+
     [CascadingParameter]
     protected UserState UserState { get; set; }
 
@@ -36,6 +39,14 @@ public partial class HeadLayout : IDisposable
         base.OnInitialized();
 
         Navigator.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender && UserState?.IsAuthenticated == true)
+            await NotificationSynchronizer.EnsureCurrentBrowserAsync();
     }
 
     public void Dispose()
@@ -92,6 +103,7 @@ public class MenuList
 
         Add(new MenuItem("Profile", "address-card", OnClick: () => navigator.OpenProfile(userState.UserId)), User);
         Add(new MenuItem("Connections", "link", Url: navigator.UrlConnections()), User);
+        Add(new MenuItem("Notifications", "bell", Url: navigator.UrlNotifications()), User);
         Add(new MenuItem("Change password", "key", OnClick: changePassword), User);
         Add(new MenuItem("Theme", "moon", OnClick: changeTheme), User);
         Add(new MenuItem("Logout", "sign-out-alt", OnClick: () => _ = userState.LogoutAsync()), User);

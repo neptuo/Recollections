@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Neptuo;
 using Neptuo.Recollections.Accounts;
+using Neptuo.Recollections.Accounts.Notifications;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
@@ -31,8 +32,9 @@ namespace Neptuo.Recollections.Entries.Controllers
         private readonly FreeLimitsChecker freeLimits;
         private readonly IFileStorage fileStorage;
         private readonly GpxImportService gpxImportService;
- 
-        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits, IFileStorage fileStorage, GpxImportService gpxImportService)
+        private readonly NewEntriesNotificationNotifier notificationNotifier;
+
+        public EntryController(DataContext db, ImageService imageService, ShareStatusService shareStatus, ShareDeleter shareDeleter, IUserNameProvider userNames, FreeLimitsChecker freeLimits, IFileStorage fileStorage, GpxImportService gpxImportService, NewEntriesNotificationNotifier notificationNotifier)
             : base(db, shareStatus)
         {
             Ensure.NotNull(db, "db");
@@ -43,6 +45,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             Ensure.NotNull(freeLimits, "freeLimits");
             Ensure.NotNull(fileStorage, "fileStorage");
             Ensure.NotNull(gpxImportService, "gpxImportService");
+            Ensure.NotNull(notificationNotifier, "notificationNotifier");
             this.db = db;
             this.imageService = imageService;
             this.shareStatus = shareStatus;
@@ -51,6 +54,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             this.freeLimits = freeLimits;
             this.fileStorage = fileStorage;
             this.gpxImportService = gpxImportService;
+            this.notificationNotifier = notificationNotifier;
         }
 
         [HttpGet("{id}")]
@@ -96,6 +100,7 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             await db.Entries.AddAsync(entity);
             await db.SaveChangesAsync();
+            await notificationNotifier.NotifyEntriesAsync(new[] { entity.Id }, NewEntriesNotificationSnapshot.Empty, "entry-create");
 
             MapEntityToModel(entity, model);
             return CreatedAtAction(nameof(Get), new { id = entity.Id }, model);

@@ -220,6 +220,99 @@ window.Recollections = {
 };
 window.Recollections._DotNetPromise = new Promise(resolve => window.Recollections._DotNetPromiseResolve = resolve);
 
+window.Recollections.Notifications = {
+    isSupported: function () {
+        return "serviceWorker" in navigator && "PushManager" in window && typeof window.Notification !== "undefined";
+    },
+    getPermission: function () {
+        if (typeof window.Notification === "undefined") {
+            return "unsupported";
+        }
+
+        return window.Notification.permission;
+    },
+    getTimeZone: function () {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    },
+    getSubscription: async function () {
+        if (!window.Recollections.Notifications.isSupported()) {
+            return null;
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        return mapSubscription(subscription);
+    },
+    subscribe: async function (publicKey) {
+        if (!publicKey) {
+            throw new Error("Missing public push key.");
+        }
+
+        if (!window.Recollections.Notifications.isSupported()) {
+            throw new Error("Push notifications are not supported in this browser.");
+        }
+
+        let permission = window.Notification.permission;
+        if (permission !== "granted") {
+            permission = await window.Notification.requestPermission();
+        }
+
+        if (permission !== "granted") {
+            throw new Error("Notification permission was not granted.");
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+        let subscription = await registration.pushManager.getSubscription();
+        if (subscription === null) {
+            subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey)
+            });
+        }
+
+        return mapSubscription(subscription);
+    },
+    unsubscribe: async function () {
+        if (!window.Recollections.Notifications.isSupported()) {
+            return null;
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        const mapped = mapSubscription(subscription);
+        if (subscription !== null) {
+            await subscription.unsubscribe();
+        }
+
+        return mapped;
+    }
+};
+
+function mapSubscription(subscription) {
+    if (subscription === null) {
+        return null;
+    }
+
+    const json = subscription.toJSON();
+    return {
+        endpoint: json.endpoint,
+        p256dh: json.keys?.p256dh,
+        auth: json.keys?.auth
+    };
+}
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const normalized = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = window.atob(normalized);
+    const output = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) {
+        output[i] = raw.charCodeAt(i);
+    }
+
+    return output;
+}
+
 const _easyMdeData = new WeakMap();
 
 window.InlineMarkdownEdit = {

@@ -24988,7 +24988,7 @@ body {
 }
 
 .offcanvas-bottom-menu {
-  --bs-offcanvas-height: 320px;
+  --bs-offcanvas-height: auto;
 }
 .offcanvas-bottom-menu .versions {
   font-size: 0.6rem;
@@ -25975,6 +25975,36 @@ video.pswp__video {
   color: rgba(250, 128, 114, 0.5);
 }
 
+.swipe-container {
+  overflow: hidden;
+  -ms-touch-action: pan-y pinch-zoom;
+      touch-action: pan-y pinch-zoom;
+  --swipe-gap: 2rem;
+}
+
+.swipe-track {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-column-gap: var(--swipe-gap);
+     -moz-column-gap: var(--swipe-gap);
+          column-gap: var(--swipe-gap);
+  width: calc(300% + 2 * var(--swipe-gap));
+  -webkit-transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
+      -ms-transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
+          transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+  transition: -webkit-transform 0.3s ease-out;
+  transition: transform 0.3s ease-out;
+  transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
+}
+
+.swipe-panel {
+  width: calc((100% - 2 * var(--swipe-gap)) / 3);
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
 .calendar .badge {
   display: block;
   margin-bottom: 0.125rem;
@@ -26048,4 +26078,3 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=wwwroot/css/site.css.map */

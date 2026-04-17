@@ -122,23 +122,7 @@ namespace Neptuo.Recollections.Entries
         }
 
         private static void EnsureDatabase(IServiceCollection services)
-        {
-            try
-            {
-                using (var scope = services.BuildServiceProvider().CreateScope())
-                {
-                    var provider = scope.ServiceProvider;
-                    var db = provider.GetService<DataContext>();
-
-                    db.Database.Migrate();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
+            => DevelopmentDatabaseMigrator.EnsureMigrated<DataContext>(services);
 
         public void Configure(IServiceProvider services)
         {

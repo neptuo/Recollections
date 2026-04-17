@@ -1,0 +1,184 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Neptuo;
+using Neptuo.Recollections.Accounts.Notifications;
+using System;
+using System.Threading.Tasks;
+
+namespace Neptuo.Recollections.Accounts.Controllers
+{
+    [ApiController]
+    [Route("api/accounts/notifications")]
+    public class NotificationsController : ControllerBase
+    {
+        private readonly DataContext db;
+        private readonly NotificationOptions options;
+
+        public NotificationsController(DataContext db, IOptions<NotificationOptions> options)
+        {
+            Ensure.NotNull(db, "db");
+            Ensure.NotNull(options, "options");
+            this.db = db;
+            this.options = options.Value;
+        }
+
+        [HttpGet]
+        [ProducesDefaultResponseType(typeof(UserNotificationSettingsModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetAsync()
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            UserNotificationSettings settings = await db.NotificationSettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            UserNotificationNewEntriesSettings newEntries = await db.NotificationNewEntriesSettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            bool hasSubscription = await db.PushSubscriptions
+                .AnyAsync(s => s.UserId == userId && s.RevokedAt == null);
+
+            return Ok(CreateModel(settings, newEntries, hasSubscription));
+        }
+
+        [HttpPut]
+        [ProducesDefaultResponseType(typeof(UserNotificationSettingsModel))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> PutAsync([FromBody] UserNotificationSettingsModel model)
+        {
+            Ensure.NotNull(model, "model");
+
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            UserNotificationSettings settings = await db.NotificationSettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (settings == null)
+            {
+                settings = new UserNotificationSettings()
+                {
+                    UserId = userId
+                };
+                db.NotificationSettings.Add(settings);
+            }
+
+            settings.IsEnabled = model.IsEnabled;
+
+            UserNotificationNewEntriesSettings newEntries = await db.NotificationNewEntriesSettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (newEntries == null)
+            {
+                newEntries = new UserNotificationNewEntriesSettings()
+                {
+                    UserId = userId
+                };
+                db.NotificationNewEntriesSettings.Add(newEntries);
+            }
+
+            newEntries.IsEnabled = model.NewEntries?.IsEnabled == true;
+
+            await db.SaveChangesAsync();
+
+            bool hasSubscription = await db.PushSubscriptions
+                .AnyAsync(s => s.UserId == userId && s.RevokedAt == null);
+
+            return Ok(CreateModel(settings, newEntries, hasSubscription));
+        }
+
+        [HttpPost("subscriptions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> SubscribeAsync([FromBody] PushSubscriptionModel model)
+        {
+            Ensure.NotNull(model, "model");
+
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            string endpoint = model.Endpoint?.Trim();
+            string p256dh = model.P256dh?.Trim();
+            string auth = model.Auth?.Trim();
+            if (String.IsNullOrWhiteSpace(endpoint) || String.IsNullOrWhiteSpace(p256dh) || String.IsNullOrWhiteSpace(auth))
+                return BadRequest();
+
+            UserNotificationPushSubscription entity = await db.PushSubscriptions
+                .FirstOrDefaultAsync(s => s.Endpoint == endpoint);
+
+            if (entity == null)
+            {
+                entity = new UserNotificationPushSubscription()
+                {
+                    CreatedAt = DateTime.Now
+                };
+                db.PushSubscriptions.Add(entity);
+            }
+            else if (entity.RevokedAt == null && !String.Equals(entity.UserId, userId, StringComparison.Ordinal))
+            {
+                return Conflict();
+            }
+
+            entity.UserId = userId;
+            entity.Endpoint = endpoint;
+            entity.P256dh = p256dh;
+            entity.Auth = auth;
+            entity.LastSeenAt = DateTime.Now;
+            entity.RevokedAt = null;
+
+            await db.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpDelete("subscriptions/{*endpoint}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> UnsubscribeAsync([FromRoute] string endpoint)
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            endpoint = endpoint?.Trim();
+            if (String.IsNullOrWhiteSpace(endpoint))
+                return BadRequest();
+
+            UserNotificationPushSubscription entity = await db.PushSubscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.Endpoint == endpoint);
+
+            if (entity != null)
+            {
+                entity.LastSeenAt = DateTime.Now;
+                entity.RevokedAt = DateTime.Now;
+                await db.SaveChangesAsync();
+            }
+
+            return Ok();
+        }
+        private UserNotificationSettingsModel CreateModel(UserNotificationSettings settings, UserNotificationNewEntriesSettings newEntries, bool hasSubscription)
+        {
+            return new UserNotificationSettingsModel()
+            {
+                IsEnabled = settings?.IsEnabled == true,
+                HasSubscription = hasSubscription,
+                PushPublicKey = options.PublicKey,
+                NewEntries = new UserNotificationNewEntriesSettingsModel()
+                {
+                    IsEnabled = newEntries?.IsEnabled == true
+                }
+            };
+        }
+    }
+}

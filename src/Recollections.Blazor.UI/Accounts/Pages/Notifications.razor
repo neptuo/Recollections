@@ -1,0 +1,114 @@
+@using Neptuo.Recollections.Accounts
+@page "/notifications"
+@layout Commons.Layouts.MainLayout
+@inherits UserStateAuthenticatedComponentBase
+
+<DocumentTitle Value="Notifications" />
+
+<div class="beings">
+    <Validation ErrorMessages="ErrorMessages" />
+
+    @if (!String.IsNullOrEmpty(StatusMessage))
+    {
+        <div class="alert alert-success my-4" role="alert">
+            <Icon Identifier="check" CssClass="me-1" />
+            @StatusMessage
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert alert-secondary my-4" role="alert">
+            Loading notification settings...
+        </div>
+    }
+    else
+    {
+        <form @onsubmit="SaveAsync">
+            <div class="card my-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <Icon Identifier="bell" CssClass="me-1" />
+                        Notification preferences
+                    </h5>
+                    <div class="mt-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notificationsEnabled" @bind="Model.IsEnabled" />
+                            <label class="form-check-label" for="notificationsEnabled">Enable notifications</label>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <section>
+                        <h6 class="mb-3">
+                            <Icon Identifier="stream" CssClass="me-1" />
+                            New entries from connections
+                        </h6>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="newEntriesEnabled" @bind="Model.NewEntries.IsEnabled" />
+                            <label class="form-check-label" for="newEntriesEnabled">Notify me about new entries from my active connections</label>
+                        </div>
+                        <div class="form-text mt-2">
+                            This fires as soon as an entry from another user becomes available to you through sharing.
+                        </div>
+                    </section>
+
+                    <hr class="my-4" />
+
+                    <div class="mt-4">
+                        <button class="btn btn-primary" disabled="@IsBusy">
+                            Save settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card my-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <Icon Identifier="mobile-alt" CssClass="me-1" />
+                        Browser subscription
+                    </h5>
+
+                    @if (!IsPushSupported)
+                    {
+                        <div class="alert alert-warning mt-3" role="alert">
+                            This browser does not support Web Push notifications.
+                        </div>
+                    }
+                    else if (String.IsNullOrWhiteSpace(Model.PushPublicKey))
+                    {
+                        <div class="alert alert-warning mt-3" role="alert">
+                            Push delivery is not configured on the server yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mt-3">
+                            <div>
+                                Browser permission:
+                                <strong>@BrowserPermissionLabel</strong>
+                            </div>
+                            <div>
+                                This browser:
+                                <strong>@(HasBrowserSubscription ? "Subscribed" : "Not subscribed")</strong>
+                            </div>
+                            <div>
+                                Any active subscription on your account:
+                                <strong>@(Model.HasSubscription ? "Yes" : "No")</strong>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="button" class="@BrowserSubscriptionButtonCssClass" @onclick="ToggleSubscriptionAsync" disabled="@((!HasBrowserSubscription && !CanSubscribe) || IsBusy)">
+                                <Icon Identifier="@BrowserSubscriptionButtonIcon" CssClass="me-1" />
+                                @BrowserSubscriptionButtonText
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </form>
+    }
+</div>

@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Neptuo.Recollections.Accounts.Notifications;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -37,11 +38,17 @@ namespace Neptuo.Recollections.Accounts
             services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
             services.Configure<TokenLoginOptions>(o => configuration.GetSection("TokenLogin").Bind(o.Tokens));
             services.Configure<UserPropertyOptions>(configuration.GetSection("Properties"));
+            services.Configure<NotificationOptions>(configuration.GetSection("Notifications"));
 
             services
                 .AddTransient<IUserNameProvider, DbUserNameProvider>()
                 .AddTransient<IConnectionProvider, DbConnectionProvider>()
                 .AddTransient<IUserPremiumProvider, DbUserPremiumProvider>();
+
+            services
+                .AddTransient<WebPush.WebPushClient>()
+                .AddTransient<PushNotificationSender>()
+                .AddTransient<NewEntriesNotificationNotifier>();
 
             services
                 .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)
@@ -88,25 +95,7 @@ namespace Neptuo.Recollections.Accounts
         }
 
         private static void EnsureDatabase(IServiceCollection services)
-        {
-            try
-            {
-                using (var scope = services.BuildServiceProvider().CreateScope())
-                {
-                    var provider = scope.ServiceProvider;
-                    var userManager = provider.GetService<UserManager<User>>();
-                    var db = provider.GetService<DataContext>();
-
-                    //db.Database.EnsureCreated();
-                    db.Database.Migrate();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
+            => DevelopmentDatabaseMigrator.EnsureMigrated<DataContext>(services);
 
         public void ConfigureAuthentication(IApplicationBuilder app, IWebHostEnvironment env)
         {
