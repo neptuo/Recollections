@@ -4,6 +4,7 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <RootNamespace>Neptuo.Recollections</RootNamespace>
     <VersionPrefix>0.0.0</VersionPrefix>
+    <UserSecretsId>d6deddd9-abab-4afc-b198-860f7b9d2417</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup>

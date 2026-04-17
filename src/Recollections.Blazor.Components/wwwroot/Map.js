@@ -212,10 +212,10 @@ function setMarkers(model, markers, isEditable) {
 
         const marker = Leaflet.marker(point, markerOptions).addTo(model.map);
         marker.id = i;
+        marker.on("click", e => {
+            model.interop.invokeMethodAsync("MapInterop.MarkerSelected", e.target.id);
+        });
         if (isEditable) {
-            marker.on("click", e => {
-                model.interop.invokeMethodAsync("MapInterop.MarkerSelected", e.target.id);
-            });
             marker.on("dragend", e => {
                 const latitude = e.target.getLatLng().lat;
                 const longitude = e.target.getLatLng().lng;
@@ -305,6 +305,17 @@ export function centerAt(container, latitude, longitude, zoom) {
 export function redraw(container) {
     const model = _mapData.get(container);
     model.tiles.redraw();
+}
+
+export function showMarkerPopover(container, markerIndex, contentElement) {
+    const model = _mapData.get(container);
+    if (!model || !model.markers || !model.markers[markerIndex]) return;
+
+    const marker = model.markers[markerIndex];
+    const markerEl = marker.getElement();
+    if (markerEl) {
+        Bootstrap.Popover.ShowFromElement(markerEl, contentElement);
+    }
 }
 
 export function setViewMode(container, mode, countriesGeoJsonString) {

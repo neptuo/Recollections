@@ -8,18 +8,12 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries;
 
-public class HighestAltitudeService(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus)
+public class HighestAltitudeMapper(DataContext dataContext, EntryListMapper entryMapper, ShareStatusService shareStatus)
 {
     public const int ItemCount = 20;
 
-    public async Task<List<EntryListModel>> GetListAsync(string userId, ConnectedUsersModel connectedUsers)
+    public async Task<List<EntryListModel>> MapAsync(IQueryable<Entry> accessibleEntries, string userId, string[] userIds, ConnectedUsersModel connectedUsers)
     {
-        Ensure.NotNullOrEmpty(userId, "userId");
-        Ensure.NotNull(connectedUsers, "connectedUsers");
-
-        IQueryable<Entry> accessibleEntries = shareStatus
-            .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries.AsNoTracking(), userId, connectedUsers);
-
         List<EntryAltitudeInfo> rankedEntries = await GetRankedEntriesAsync(accessibleEntries);
         if (rankedEntries.Count == 0)
             return [];
@@ -31,11 +25,11 @@ public class HighestAltitudeService(DataContext dataContext, EntryListMapper ent
         var query = shareStatus.OwnedByOrExplicitlySharedWithUser(
             dataContext,
             dataContext.Entries.Where(e => entryIds.Contains(e.Id)),
-            userId,
+            userIds,
             connectedUsers
         );
 
-        var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers, includePreviewMedia: true);
+        var (models, _) = await entryMapper.MapAsync(query, [userId], connectedUsers, includePreviewMedia: true);
         Dictionary<string, EntryListModel> modelsById = models.ToDictionary(model => model.Id);
 
         return rankedEntries

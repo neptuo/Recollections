@@ -3,9 +3,7 @@
 
 <DocumentTitle Value="@(Model?.Title ?? "Story...")" />
 
-@if (Model != null)
-{
-
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <ActionMenu>
@@ -38,7 +36,7 @@
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
                     <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
-                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
                 @{
@@ -88,5 +86,7 @@
         </PermissionContainer>
     </CascadingValue>
 
+    <EntryCardPopover @ref="entryPopover" Model="PopoverHandler.SelectedEntry" />
+
     <EntryPicker @ref="EntryPicker" Selected="EntrySelected" />
-}
+</LoadingSection>

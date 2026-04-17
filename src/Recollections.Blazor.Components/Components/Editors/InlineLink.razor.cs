@@ -34,7 +34,7 @@ namespace Neptuo.Recollections.Components.Editors
         {
             await base.OnEditAsync();
 
-            if (IsEditMode)
+            if (IsClickable ?? true)
                 await OnClick.InvokeAsync();
 
             await OnResetAsync();

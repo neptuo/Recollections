@@ -52,10 +52,11 @@ internal sealed class SampleDataSeeder
                     MediaCount: 3,
                     Locations:
                     [
-                        new(50.086520, 14.411350),
-                        new(50.087580, 14.420790),
-                        new(50.089860, 14.404020)
-                    ]
+                        new(50.086520, 14.411350, Altitude: 190),
+                        new(50.087580, 14.420790, Altitude: 195),
+                        new(50.089860, 14.404020, Altitude: 200)
+                    ],
+                    BeingNames: ["Jon", "Max"]
                 ),
                 new(
                     Title: "Coffee at Letna",
@@ -64,8 +65,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(50.097120, 14.417370)
-                    ]
+                        new(50.097120, 14.417370, Altitude: 250)
+                    ],
+                    BeingNames: ["Jon"]
                 )
             ]
         ),
@@ -84,8 +86,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(49.948540, 15.268210)
-                    ]
+                        new(49.948540, 15.268210, Altitude: 260)
+                    ],
+                    BeingNames: ["Jon", "Max"]
                 ),
                 new(
                     Title: "Sunday lunch by the square",
@@ -94,8 +97,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(49.947170, 15.268410)
-                    ]
+                        new(49.947170, 15.268410, 252)
+                    ],
+                    BeingNames: ["Jon"]
                 )
             ]
         ),
@@ -114,9 +118,10 @@ internal sealed class SampleDataSeeder
                     MediaCount: 0,
                     Locations:
                     [
-                        new(50.067820, 14.414940),
-                        new(50.075160, 14.431640)
-                    ]
+                        new(50.067820, 14.414940, 185),
+                        new(50.075160, 14.431640, 190)
+                    ],
+                    BeingNames: ["Jon"]
                 ),
                 new(
                     Title: "Hilltop overlook",
@@ -125,8 +130,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 0,
                     Locations:
                     [
-                        new(50.087640, 14.389840)
-                    ]
+                        new(50.087640, 14.389840, Altitude: 310)
+                    ],
+                    BeingNames: ["Jon", "Max"]
                 )
             ]
         ),
@@ -145,7 +151,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(50.081300, 14.428100)
+                        new(50.081300, 14.428100, 210)
                     ]
                 ),
                 new(
@@ -155,7 +161,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 0,
                     Locations:
                     [
-                        new(50.080710, 14.427380)
+                        new(50.080710, 14.427380, 208)
                     ]
                 )
             ]
@@ -175,8 +181,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(48.208490, 16.372080)
-                    ]
+                        new(48.208490, 16.372080, Altitude: 171)
+                    ],
+                    BeingNames: ["Jane"]
                 ),
                 new(
                     Title: "Museum courtyard palettes",
@@ -185,8 +192,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 2,
                     Locations:
                     [
-                        new(48.203790, 16.361550)
-                    ]
+                        new(48.203790, 16.361550, Altitude: 177)
+                    ],
+                    BeingNames: ["Jane"]
                 )
             ]
         ),
@@ -205,8 +213,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(43.695120, 7.276360)
-                    ]
+                        new(43.695120, 7.276360, Altitude: 5)
+                    ],
+                    BeingNames: ["Jane"]
                 ),
                 new(
                     Title: "Late afternoon by the promenade",
@@ -215,8 +224,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(43.710170, 7.261950)
-                    ]
+                        new(43.710170, 7.261950, Altitude: 12)
+                    ],
+                    BeingNames: ["Jane"]
                 )
             ]
         ),
@@ -235,8 +245,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(48.210760, 16.370440)
-                    ]
+                        new(48.210760, 16.370440, 168)
+                    ],
+                    BeingNames: ["Jane"]
                 ),
                 new(
                     Title: "Fresh fruit and postcards",
@@ -245,8 +256,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 0,
                     Locations:
                     [
-                        new(48.211850, 16.369110)
-                    ]
+                        new(48.211850, 16.369110, 170)
+                    ],
+                    BeingNames: ["Jane"]
                 )
             ]
         ),
@@ -265,8 +277,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(47.606460, -122.332750)
-                    ]
+                        new(47.606460, -122.332750, 50)
+                    ],
+                    BeingNames: ["Bill"]
                 ),
                 new(
                     Title: "Street corner reflections",
@@ -275,8 +288,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(47.608610, -122.335920)
-                    ]
+                        new(47.608610, -122.335920, 55)
+                    ],
+                    BeingNames: ["Bill"]
                 )
             ]
         ),
@@ -295,7 +309,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(45.515290, -122.678410)
+                        new(45.515290, -122.678410, 15)
                     ]
                 ),
                 new(
@@ -305,7 +319,7 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(45.516580, -122.681120)
+                        new(45.516580, -122.681120, 18)
                     ]
                 )
             ]
@@ -325,8 +339,9 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(38.712620, -9.139140)
-                    ]
+                        new(38.712620, -9.139140, Altitude: 72)
+                    ],
+                    BeingNames: ["Bill"]
                 ),
                 new(
                     Title: "Sunset tram ride",
@@ -335,10 +350,39 @@ internal sealed class SampleDataSeeder
                     MediaCount: 1,
                     Locations:
                     [
-                        new(38.714980, -9.143430)
-                    ]
+                        new(38.714980, -9.143430, Altitude: 95)
+                    ],
+                    BeingNames: ["Bill"]
                 )
             ]
+        )
+    ];
+
+    private static readonly SampleBeingDefinition[] Beings =
+    [
+        new(
+            OwnerUserName: "jondoe",
+            Name: "Jon",
+            Icon: "user",
+            Text: "Main personal profile."
+        ),
+        new(
+            OwnerUserName: "jondoe",
+            Name: "Max",
+            Icon: "dog",
+            Text: "Family dog, always on the trail."
+        ),
+        new(
+            OwnerUserName: "janedoe",
+            Name: "Jane",
+            Icon: "female",
+            Text: "Design trips and market finds."
+        ),
+        new(
+            OwnerUserName: "billdoe",
+            Name: "Bill",
+            Icon: "male",
+            Text: "Photos, studio work, and city breaks."
         )
     ];
 
@@ -381,7 +425,8 @@ internal sealed class SampleDataSeeder
 
         string mediaRoot = options.ResolveMediaDirectory(repositoryRoot);
         var mediaFiles = GetMediaFiles(mediaRoot, repositoryRoot);
-        await SeedStoriesAsync(entriesDb, imageService, users, mediaFiles);
+        var beingsByName = await SeedBeingsAsync(entriesDb, users);
+        await SeedStoriesAsync(entriesDb, imageService, users, mediaFiles, beingsByName);
 
         Console.WriteLine();
         Console.WriteLine("Sample data seeded successfully.");
@@ -526,7 +571,33 @@ internal sealed class SampleDataSeeder
         await accountsDb.SaveChangesAsync();
     }
 
-    private static async Task SeedStoriesAsync(EntriesDataContext entriesDb, ImageService imageService, IReadOnlyDictionary<string, User> users, IReadOnlyList<string> mediaFiles)
+    private static async Task<Dictionary<string, Being>> SeedBeingsAsync(EntriesDataContext entriesDb, IReadOnlyDictionary<string, User> users)
+    {
+        var beingsByName = new Dictionary<string, Being>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (SampleBeingDefinition definition in Beings)
+        {
+            User owner = users[definition.OwnerUserName];
+            var being = new Being
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = owner.Id,
+                Name = definition.Name,
+                Icon = definition.Icon,
+                Text = definition.Text,
+                Created = DateTime.Now,
+                IsSharingInherited = true
+            };
+
+            entriesDb.Beings.Add(being);
+            beingsByName[definition.Name] = being;
+        }
+
+        await entriesDb.SaveChangesAsync();
+        return beingsByName;
+    }
+
+    private static async Task SeedStoriesAsync(EntriesDataContext entriesDb, ImageService imageService, IReadOnlyDictionary<string, User> users, IReadOnlyList<string> mediaFiles, IReadOnlyDictionary<string, Being> beingsByName)
     {
         var seededEntries = new List<SeededEntry>();
 
@@ -581,6 +652,12 @@ internal sealed class SampleDataSeeder
 
                 entriesDb.Entries.Add(entry);
                 seededEntries.Add(new SeededEntry(entry, entryDefinition.MediaCount));
+
+                foreach (string beingName in entryDefinition.BeingNames)
+                {
+                    if (beingsByName.TryGetValue(beingName, out Being? being))
+                        entry.Beings.Add(being);
+                }
             }
         }
 
@@ -655,10 +732,16 @@ internal sealed class SampleDataSeeder
         DateTime When,
         string Text,
         int MediaCount,
-        SampleLocationDefinition[] Locations
-    );
+        SampleLocationDefinition[] Locations,
+        string[]? BeingNames = null
+    )
+    {
+        public string[] BeingNames { get; init; } = BeingNames ?? [];
+    }
 
     private sealed record SampleLocationDefinition(double Latitude, double Longitude, double? Altitude = null);
+
+    private sealed record SampleBeingDefinition(string OwnerUserName, string Name, string Icon, string Text);
 
     private sealed record SeededEntry(Entry Entry, int MediaCount);
 

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class MapPage
+    public partial class MapPage : IAsyncDisposable
     {
         [Inject]
         protected Api Api { get; set; }
@@ -27,6 +27,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
         protected bool IsLoading { get; set; } = true;
+
+        protected MapPopoverHandler PopoverHandler { get; } = new();
+        protected EntryCardPopover entryPopover;
+        protected Map mapComponent;
 
         protected async override Task OnInitializedAsync()
         {
@@ -46,17 +50,28 @@ namespace Neptuo.Recollections.Entries.Pages
                     Latitude = entry.Location.Latitude,
                     Longitude = entry.Location.Longitude,
                     Altitude = entry.Location.Altitude,
-                    Title = entry.Title
+                    Title = entry.Entry.Title
                 });
             }
 
             IsLoading = false;
         }
 
-        protected void OnMarkerSelected(int index)
+        protected async Task OnMarkerSelectedAsync(int index)
         {
-            var entry = Entries[index];
-            Navigator.OpenEntryDetail(entry.Id);
+            await PopoverHandler.SelectAsync(index, Entries[index].Entry, entryPopover);
+            StateHasChanged();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await PopoverHandler.DisposeAsync(entryPopover);
         }
     }
 }

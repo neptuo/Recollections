@@ -3,9 +3,7 @@
 
 <DocumentTitle Value="@(Model?.Name ?? "Being...")" />
 
-@if (Model != null)
-{
-
+<LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
             <ActionMenu>
@@ -34,15 +32,22 @@
                 </h2>
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
-                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
-                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)">
+                        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
 
                 @if (StoriesCount > 0)
                 {
-                    <div class="my-2">
+                    <div class="stories">
                         <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
+                    </div>
+                }
+
+                @if (AltitudeCount > 0)
+                {
+                    <div class="altitudes">
+                        <InlineLink Value="@(HighestAltitude != null ? $"{UiOptions.FormatWholeNumber(HighestAltitude.Value)} m" : "Highest altitude")" Icon="arrow-up-short-wide" OnClick="ShowAltitudeAsync" />
                     </div>
                 }
 
@@ -57,15 +62,36 @@
         </PermissionContainer>
     </CascadingValue>
 
+    <EntryCardPopover @ref="entryPopover" Model="PopoverHandler.SelectedEntry" />
+
     <BeingIconPicker @ref="IconPicker" Value="@Model.Icon" Selected="@(async value => await SaveIconAsync(value))" />
 
     <Offcanvas @ref="StoriesOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Stories with {Model.Name}")" IsBodyRenderedLazily="true">
         <div class="row">
-            <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." Context="story">
+            <ListView Items="@StoryItems" IsLoading="@IsStoriesLoading" EmptyMessage="No stories found..." EmptyColWrapper="true" Context="story">
                 <div class="col-sm-12 col-md-6 mb-3">
                     <StoryCard Model="story" OnCardClick="@(() => Navigator.OpenStoryDetail(story.Id))" />
                 </div>
             </ListView>
         </div>
     </Offcanvas>
-}
+
+    <Offcanvas @ref="AltitudeOffcanvas" class="offcanvas-half" Direction="start" Title="@($"Highest altitude with {Model.Name}")" IsBodyRenderedLazily="true">
+        @if (IsAltitudeLoading)
+        {
+            <div class="d-flex justify-content-center mt-4" role="status">
+                <div class="spinner-border">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        }
+        else if (AltitudeItems.Count == 0)
+        {
+            <Alert Mode="@AlertMode.Warning" Message="No entries with altitude yet..." />
+        }
+        else
+        {
+            <Timeline Data="@AltitudeItems" EntryTitleSelector="FormatAltitudeEntryTitle" />
+        }
+    </Offcanvas>
+</LoadingSection>

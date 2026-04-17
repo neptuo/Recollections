@@ -22,6 +22,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Api Api { get; set; }
 
         protected bool IsLoading { get; set; }
+        protected bool IsSaving { get; set; }
 
         public string Title { get; set; }
         public List<string> ErrorMessages { get; } = new List<string>();
@@ -46,14 +47,22 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task CreateAsync()
         {
-            var model = new StoryModel()
+            IsSaving = true;
+            try
             {
-                Id = Guid.NewGuid().ToString(),
-                Title = Title
-            };
+                var model = new StoryModel()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Title = Title
+                };
 
-            await Api.CreateStoryAsync(model);
-            Navigator.OpenStoryDetail(model.Id);
+                await Api.CreateStoryAsync(model);
+                Navigator.OpenStoryDetail(model.Id);
+            }
+            finally
+            {
+                IsSaving = false;
+            }
         }
     }
 }

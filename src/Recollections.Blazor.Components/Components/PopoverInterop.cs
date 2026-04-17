@@ -22,5 +22,11 @@ namespace Neptuo.Recollections.Components
 
         public ValueTask ShowAsync(ElementReference element, string title, string body)
             => jsRuntime.InvokeVoidAsync("Bootstrap.Popover.Show", element, title, body);
+
+        public ValueTask ShowFromElementAsync(ElementReference trigger, ElementReference content)
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Popover.ShowFromElement", trigger, content);
+
+        public ValueTask HideActiveAsync()
+            => jsRuntime.InvokeVoidAsync("Bootstrap.Popover._hideActive");
     }
 }

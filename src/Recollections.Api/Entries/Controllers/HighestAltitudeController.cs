@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Sharing;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Neptuo.Recollections.Entries.Controllers;
 
 [Authorize]
 [Route("api/highest-altitude")]
-public class HighestAltitudeController(DataContext dataContext, HighestAltitudeService service, ShareStatusService shareStatus, IConnectionProvider connections)
+public class HighestAltitudeController(DataContext dataContext, HighestAltitudeMapper mapper, ShareStatusService shareStatus, IConnectionProvider connections)
     : ControllerBase(dataContext, shareStatus)
 {
     [HttpGet]
@@ -24,7 +25,10 @@ public class HighestAltitudeController(DataContext dataContext, HighestAltitudeS
             return Unauthorized();
 
         var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-        var models = await service.GetListAsync(userId, connectedUsers);
+        var accessibleEntries = shareStatus.OwnedByOrExplicitlySharedWithUser(
+            dataContext, dataContext.Entries.AsNoTracking(), userId, connectedUsers);
+
+        var models = await mapper.MapAsync(accessibleEntries, userId, [userId], connectedUsers);
         return Ok(models);
     }
 }

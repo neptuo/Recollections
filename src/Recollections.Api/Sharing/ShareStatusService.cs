@@ -200,14 +200,20 @@ namespace Neptuo.Recollections.Sharing
             => GetPermissionAsync(being, db.BeingShares.Where(s => s.BeingId == being.Id), userId);
 
         public IQueryable<Being> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Being> query, string userId, ConnectedUsersModel connectedUsers)
+            => OwnedByOrExplicitlySharedWithUser(db, query, [userId], connectedUsers);
+
+        public IQueryable<Being> OwnedByOrExplicitlySharedWithUser(DataContext db, IQueryable<Being> query, string[] userIds, ConnectedUsersModel connectedUsers)
         {
-            if (userId == null)
-                userId = PublicUserId;
+            for (int i = 0; i < userIds.Length; i++)
+            {
+                if (userIds[i] == null)
+                    userIds[i] = PublicUserId;
+            }
 
             return query.Where(
-                e => e.UserId == userId || (
-                    (connectedUsers.ActiveUserIds.Contains(e.UserId) || userId == PublicUserId) && (
-                        (!e.IsSharingInherited && db.BeingShares.Any(s => s.BeingId == e.Id && s.UserId == userId))
+                e => userIds.Contains(e.UserId) || (
+                    (connectedUsers.ActiveUserIds.Contains(e.UserId) || userIds.Contains(PublicUserId)) && (
+                        (!e.IsSharingInherited && db.BeingShares.Any(s => s.BeingId == e.Id && userIds.Contains(s.UserId)))
                         || (e.IsSharingInherited && connectedUsers.ReaderUserIds.Contains(e.UserId))
                     )
                 )
