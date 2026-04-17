@@ -20,7 +20,7 @@
 
 ## Database Migrations
 
-EF Core migrations run against both **SQLite** (local dev) and **Azure SQL Server** (prod). Migrations are typically scaffolded via the SQLite provider, so you MUST manually review and adjust them so they work correctly on SQL Server as well. See issues #494 and #498 for past breakage.
+EF Core migrations run against both **SQLite** (local dev) and **Azure SQL Server** (prod). Migrations are typically scaffolded via the SQLite provider, so you MUST manually review and adjust them so they work correctly on SQL Server as well. See PRs #494 and #498 for past breakage.
 
 When adding or reviewing a migration, verify ALL of the following:
 
@@ -29,6 +29,6 @@ When adding or reviewing a migration, verify ALL of the following:
 - **String foreign key columns** must declare a `maxLength` that matches the referenced column (e.g. `maxLength: 36` for FKs to `AspNetUsers.Id`). A mismatched or missing length causes SQL Server to reject the FK due to incompatible types (`nvarchar(max)` vs `nvarchar(36)`).
 - **Indexed string columns** must declare a `maxLength`. SQL Server cannot build an index key over `nvarchar(max)`.
 - **No hardcoded SQLite-specific column types** (e.g. `type: "TEXT"`, `type: "INTEGER"`). Let EF map the CLR type so each provider picks the correct native type.
-- **Provider-specific fix-up migrations** (e.g. repairing past mistakes on SQL Server only) must guard with `migrationBuilder.ActiveProvider` and clearly document in an XML comment why the migration exists and why `Down` is a no-op (if applicable).
+- **Provider-specific fix-up migrations** (e.g. repairing past mistakes on SQL Server only) must guard with `migrationBuilder.ActiveProvider` and clearly document in an XML comment why the migration exists and why `Down` is a no-op, throws, or is otherwise intentionally limited (if applicable).
 
 Before committing a migration, re-read the generated `*.cs` file top-to-bottom with this checklist in mind — do not rely on the scaffolder's output alone.
