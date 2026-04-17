@@ -33,7 +33,7 @@
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
                     <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)">
-                        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" />
+                        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
 
@@ -61,6 +61,8 @@
             </div>
         </PermissionContainer>
     </CascadingValue>
+
+    <EntryCardPopover @ref="entryPopover" Model="PopoverHandler.SelectedEntry" />
 
     <BeingIconPicker @ref="IconPicker" Value="@Model.Icon" Selected="@(async value => await SaveIconAsync(value))" />
 

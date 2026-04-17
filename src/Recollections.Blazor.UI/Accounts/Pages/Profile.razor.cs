@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Pages
 {
-    public partial class Profile
+    public partial class Profile : IAsyncDisposable
     {
         [Inject]
         protected Api Api { get; set; }
@@ -35,6 +35,9 @@ namespace Neptuo.Recollections.Accounts.Pages
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
 
+        protected MapPopoverHandler PopoverHandler { get; } = new();
+        protected Map mapComponent;
+        protected EntryCardPopover entryPopover;
         protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
@@ -101,10 +104,21 @@ namespace Neptuo.Recollections.Accounts.Pages
             return markers;
         }
 
-        protected void OnMarkerSelected(int index)
+        protected async Task OnMarkerSelectedAsync(int index)
         {
-            var entry = MapEntries[index];
-            Navigator.OpenEntryDetail(entry.Entry.Id);
+            await PopoverHandler.SelectAsync(index, MapEntries[index].Entry, entryPopover);
+            StateHasChanged();
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await PopoverHandler.DisposeAsync(entryPopover);
         }
 
         protected string FormatAltitudeTitle(EntryListModel entry)
