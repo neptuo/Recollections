@@ -16,6 +16,7 @@ namespace Neptuo.Recollections
             {
                 if (args.Length == 0)
                 {
+                    Console.WriteLine("Enter connection string to database to migrate:");
                     connectionString = Console.ReadLine();
                 }
                 else if (args.Length != 1)
