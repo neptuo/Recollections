@@ -143,7 +143,26 @@ internal sealed class AltitudeBackfill
                 return;
             }
 
-            var result = ReadExifAltitude(stream);
+            // Buffer so we can hand the bytes to both readers without fighting over the stream
+            // (and because ImagePropertyReader / ExifReader dispose the stream they wrap).
+            byte[] bytes;
+            using (var buffer = new MemoryStream())
+            {
+                await stream.CopyToAsync(buffer);
+                bytes = buffer.ToArray();
+            }
+
+            // Run the production reader used by the import pipeline so we can see whether its
+            // output matches the broken value stored in the DB.
+            double? productionAltitude;
+            using (var production = new ImagePropertyReader(new MemoryStream(bytes, writable: false)))
+                productionAltitude = production.FindAltitude();
+
+            // Run the corrected reader to get what the altitude should actually be.
+            ExifAltitudeResult result;
+            using (var correctedStream = new MemoryStream(bytes, writable: false))
+                result = ReadExifAltitude(correctedStream);
+
             if (!result.Success)
             {
                 metadataUnavailable++;
@@ -151,21 +170,26 @@ internal sealed class AltitudeBackfill
                 return;
             }
 
-            var exifAltitude = result.Altitude;
-            if (exifAltitude == null)
+            var correctedAltitude = result.Altitude;
+            Console.WriteLine($"    metadata: production reader = {FormatAltitude(productionAltitude)}, corrected reader = {FormatAltitude(correctedAltitude)}");
+
+            if (correctedAltitude == null)
             {
                 metadataConfirmed++;
                 Console.WriteLine("    metadata: no altitude in EXIF (confirmed invalid import)");
             }
-            else if (!AltitudeBounds.IsValid(exifAltitude))
+            else if (!AltitudeBounds.IsValid(correctedAltitude))
             {
                 metadataConfirmed++;
-                Console.WriteLine($"    metadata: EXIF altitude {exifAltitude} is also out of bounds (confirmed)");
+                Console.WriteLine($"    metadata: EXIF altitude {correctedAltitude} is also out of bounds (confirmed)");
             }
             else
             {
                 metadataDiscrepancy++;
-                Console.WriteLine($"    metadata: EXIF altitude {exifAltitude} looks valid — import pipeline may have corrupted the value");
+                if (productionAltitude != null && Math.Abs(productionAltitude.Value - image.Location.Altitude!.Value) < 0.0001)
+                    Console.WriteLine($"    metadata: corrected EXIF altitude {correctedAltitude} is valid; production reader returned the same broken {productionAltitude} that was stored -> import pipeline bug");
+                else
+                    Console.WriteLine($"    metadata: corrected EXIF altitude {correctedAltitude} looks valid - import pipeline may have corrupted the value");
             }
         }
         catch (Exception ex)
@@ -276,6 +300,9 @@ internal sealed class AltitudeBackfill
         catch (InvalidCastException) { }
         return null;
     }
+
+    private static string FormatAltitude(double? value)
+        => value == null ? "<none>" : value.Value.ToString("0.######");
 
     private static IFileStorage CreateFileStorage(string storageType, string connection)
     {
