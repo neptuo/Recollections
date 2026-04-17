@@ -441,6 +441,42 @@ window.ImageSource = {
             URL.revokeObjectURL(url);
         }
         element.src = url;
+    },
+    SetFromUrl: async function (element, url, mimeType, bearerToken) {
+        const headers = {};
+        if (bearerToken) {
+            headers["Authorization"] = "Bearer " + bearerToken;
+        }
+
+        let response;
+        try {
+            response = await fetch(url, { headers });
+        } catch (e) {
+            console.warn("ImageSource.SetFromUrl: fetch failed", url, e);
+            return 0;
+        }
+
+        if (!response.ok) {
+            return response.status;
+        }
+
+        const blob = await response.blob();
+        const blobType = mimeType || blob.type || undefined;
+        const typedBlob = blobType && blob.type !== blobType ? blob.slice(0, blob.size, blobType) : blob;
+        const objectUrl = URL.createObjectURL(typedBlob);
+
+        const revoke = () => URL.revokeObjectURL(objectUrl);
+        const tag = element.tagName ? element.tagName.toLowerCase() : "";
+        if (tag === "video") {
+            element.addEventListener("loadeddata", revoke, { once: true });
+            element.addEventListener("error", revoke, { once: true });
+        } else {
+            element.addEventListener("load", revoke, { once: true });
+            element.addEventListener("error", revoke, { once: true });
+        }
+
+        element.src = objectUrl;
+        return response.status;
     }
 }
 

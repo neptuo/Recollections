@@ -1,4 +1,4 @@
-﻿<div class="image justify-content-center @(!IsLoadingNotFound && Content == null ? "placeholder-glow" : "")">
+﻿<div class="image justify-content-center @(!IsLoadingNotFound && !IsLoaded ? "placeholder-glow" : "")">
     @if (OnClick.HasDelegate)
     {
         <a href="@GetLinkUrl()" class="position-relative d-block w-100" @onclick="@OnClick" @onclick:stopPropagation @onclick:preventDefault>
@@ -20,7 +20,7 @@
 {
     RenderFragment RenderImage() 
     {
-        if (Content != null)
+        if (IsLoaded)
         {
             if (IsVideoContent)
                 return @<video @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" controls playsinline preload autoplay />;
