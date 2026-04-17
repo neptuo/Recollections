@@ -8,15 +8,23 @@
 <LoadingSection IsLoading="@(Model == null)">
     <CascadingValue Value="@Model">
         <PermissionContainer State="@Permissions">
+            <ActionMenu>
+                <ItemGroup Text="@Owner.Name">
+                    <ShareLinkButton Layout="ButtonLayout.Item" />
+                </ItemGroup>
+            </ActionMenu>
+
             <div class="my-sm-3">
                 <h2 class="title">
                     <Icon Identifier="user" />
                     @Owner.Name
                 </h2>
 
-                <div class="datetime">
-                    <Icon Identifier="calendar-day" />
-                    @Model.RegistrationDate.ToString(UiOptions.DateFormat)
+                <div class="datetime inline-editor-viewmode">
+                    <span class="inline-editor-value d-inline-block py-1">
+                        <Icon Identifier="calendar-day" />
+                        @Model.RegistrationDate.ToString(UiOptions.DateFormat)
+                    </span>
                 </div>
 
                 <div class="gps">
@@ -27,23 +35,21 @@
 
                 @if (StoriesCount > 0)
                 {
-                    <div class="my-2">
+                    <div class="stories">
                         <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
                     </div>
                 }
 
                 @if (AltitudeItems.Count > 0)
                 {
-                    <div class="my-2">
+                    <div class="altitudes">
                         <InlineLink Value="@($"Highest altitude ({AltitudeItems.Count})")" Icon="mountain" OnClick="ShowAltitudeAsync" />
                     </div>
                 }
 
-                <ActionPanel CssClass="my-3">
-                    <ShareLinkButton />
-                </ActionPanel>
-
-                <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" NoMoreText="Here the user started..." />
+                <div class="mt-4 timeline-narrow">
+                    <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" NoMoreText="Here the user started..." />
+                </div>
             </div>
         </PermissionContainer>
     </CascadingValue>
