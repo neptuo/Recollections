@@ -29,7 +29,7 @@ public class HighestAltitudeMapper(DataContext dataContext, EntryListMapper entr
             connectedUsers
         );
 
-        var (models, _) = await entryMapper.MapAsync(query, userId, connectedUsers, includePreviewMedia: true);
+        var (models, _) = await entryMapper.MapAsync(query, [userId], connectedUsers, includePreviewMedia: true);
         Dictionary<string, EntryListModel> modelsById = models.ToDictionary(model => model.Id);
 
         return rankedEntries

@@ -11,6 +11,8 @@
 else
 {
     <div class="mappage">
-        <Map Markers="@Markers" MarkerSelected="OnMarkerSelected" EnableCountriesView="true" />
+        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" EnableCountriesView="true" />
     </div>
 }
+
+<EntryCardPopover @ref="entryPopover" Model="SelectedEntry" />

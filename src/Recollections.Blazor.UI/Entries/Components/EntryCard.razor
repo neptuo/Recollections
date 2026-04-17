@@ -39,38 +39,36 @@
                 </div>
             }
 
-            <div>
-                @if (Model.GpsCount > 0)
-                {
-                    <span class="information">
-                        <Icon Prefix="fas" Identifier="location-arrow" />
-                        @Model.GpsCount
-                    </span>
-                }
+            @if (Model.GpsCount > 0)
+            {
+                <div class="information">
+                    <Icon Prefix="fas" Identifier="location-arrow" />
+                    @Model.GpsCount
+                </div>
+            }
 
-                @if (Model.ImageCount > 0)
-                {
-                    <span class="information">
-                        <Icon Identifier="image" />
-                        @Model.ImageCount
-                    </span>
-                }
+            @if (Model.ImageCount > 0)
+            {
+                <div class="information">
+                    <Icon Identifier="image" />
+                    @Model.ImageCount
+                </div>
+            }
 
-                @if (Model.VideoCount > 0)
-                {
-                    <span class="information">
-                        <Icon Identifier="film" />
-                        @Model.VideoCount
-                    </span>
-                }
+            @if (Model.VideoCount > 0)
+            {
+                <div class="information">
+                    <Icon Identifier="film" />
+                    @Model.VideoCount
+                </div>
+            }
 
-                @if (UserState.UserId != Model.UserId)
-                {
-                    <span class="information">
-                        <Icon Identifier="user" />
-                        @Model.UserName
-                    </span>
-                }
-            </div>
+            @if (UserState.UserId != Model.UserId)
+            {
+                <div class="information">
+                    <Icon Identifier="user" />
+                    @Model.UserName
+                </div>
+            }
         </div>;
 }

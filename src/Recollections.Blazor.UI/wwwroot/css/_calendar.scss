@@ -15,6 +15,10 @@
         }
     }
 
+    span.badge.cursor-pointer:hover {
+        opacity: 0.85;
+    }
+
     .calendar-header,
     .calendar-cell {
         width: calc(100% / 7);
@@ -37,6 +41,17 @@
         aspect-ratio: 1;
     }
 }
+
+.entry-popover {
+    .card {
+        border: 0;
+    }
+
+    .popover-body {
+        padding: 0;
+    }
+}
+
 .date-picker {
     .btn-outline-primary {
         color: var(--bs-card-title-color) !important;

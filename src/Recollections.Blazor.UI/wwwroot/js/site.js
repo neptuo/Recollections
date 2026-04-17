@@ -130,6 +130,54 @@ window.Bootstrap = {
                 });
             }
         },
+        ShowFromElement: function (trigger, contentElement) {
+            Bootstrap.Popover._hideActive();
+
+            var originalTitle = trigger.getAttribute("title");
+            if (originalTitle) {
+                trigger.removeAttribute("title");
+            }
+
+            var popover = new bootstrap.Popover(trigger, {
+                html: true,
+                sanitize: false,
+                content: contentElement.innerHTML,
+                placement: "top",
+                trigger: "manual",
+                customClass: "entry-popover"
+            });
+
+            popover.show();
+
+            var dismissHandler = function (e) {
+                var tip = popover.tip;
+                if (tip && !tip.contains(e.target) && !trigger.contains(e.target)) {
+                    document.removeEventListener("pointerdown", dismissHandler);
+                    popover.dispose();
+                    if (originalTitle) {
+                        trigger.setAttribute("title", originalTitle);
+                    }
+                    Bootstrap.Popover._active = null;
+                }
+            };
+
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle };
+
+            setTimeout(function () {
+                document.addEventListener("pointerdown", dismissHandler);
+            }, 0);
+        },
+        _active: null,
+        _hideActive: function () {
+            if (Bootstrap.Popover._active) {
+                document.removeEventListener("pointerdown", Bootstrap.Popover._active.dismiss);
+                Bootstrap.Popover._active.popover.dispose();
+                if (Bootstrap.Popover._active.originalTitle) {
+                    Bootstrap.Popover._active.trigger.setAttribute("title", Bootstrap.Popover._active.originalTitle);
+                }
+                Bootstrap.Popover._active = null;
+            }
+        },
         Dispose: function (container) {
             var popover = bootstrap.Popover.getInstance(container);
             if (popover != null) {
