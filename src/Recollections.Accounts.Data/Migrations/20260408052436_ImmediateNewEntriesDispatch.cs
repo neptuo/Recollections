@@ -17,12 +17,12 @@ namespace Neptuo.Recollections.Accounts.Migrations
                 schema: Schema.Name,
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    EntryId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    UserId = table.Column<string>(maxLength: 36, nullable: false),
+                    EntryId = table.Column<string>(maxLength: 36, nullable: false),
+                    Created = table.Column<DateTime>(nullable: false),
+                    SentAt = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {

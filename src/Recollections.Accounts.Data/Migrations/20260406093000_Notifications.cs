@@ -19,7 +19,7 @@ namespace Neptuo.Recollections.Accounts.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(maxLength: 36, nullable: false),
-                    Endpoint = table.Column<string>(nullable: false),
+                    Endpoint = table.Column<string>(maxLength: 800, nullable: false),
                     P256dh = table.Column<string>(nullable: false),
                     Auth = table.Column<string>(nullable: false),
                     CreatedAt = table.Column<DateTime>(nullable: false),

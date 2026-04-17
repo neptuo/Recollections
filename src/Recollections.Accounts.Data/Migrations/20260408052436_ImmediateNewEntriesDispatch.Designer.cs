@@ -296,6 +296,7 @@ namespace Neptuo.Recollections.Accounts.Migrations
 
                     b.Property<string>("Endpoint")
                         .IsRequired()
+                        .HasMaxLength(800)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastSeenAt")

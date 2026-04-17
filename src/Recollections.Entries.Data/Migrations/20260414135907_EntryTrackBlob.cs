@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Neptuo.Recollections.Migrations;
 
 #nullable disable
 
 namespace Neptuo.Recollections.Entries.Migrations
 {
     /// <inheritdoc />
-    public partial class EntryTrackBlob : Migration
+    public partial class EntryTrackBlob : MigrationWithSchema<DataContext>
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -13,31 +14,31 @@ namespace Neptuo.Recollections.Entries.Migrations
             migrationBuilder.AddColumn<double>(
                 name: "TrackAltitude",
                 table: "Entries",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "TrackData",
                 table: "Entries",
-                type: "TEXT",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "TrackLatitude",
                 table: "Entries",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<double>(
                 name: "TrackLongitude",
                 table: "Entries",
-                type: "REAL",
+                schema: Schema.Name,
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
                 name: "TrackPointCount",
                 table: "Entries",
-                type: "INTEGER",
+                schema: Schema.Name,
                 nullable: true);
         }
 
@@ -46,22 +47,27 @@ namespace Neptuo.Recollections.Entries.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "TrackAltitude",
+                schema: Schema.Name,
                 table: "Entries");
 
             migrationBuilder.DropColumn(
                 name: "TrackData",
+                schema: Schema.Name,
                 table: "Entries");
 
             migrationBuilder.DropColumn(
                 name: "TrackLatitude",
+                schema: Schema.Name,
                 table: "Entries");
 
             migrationBuilder.DropColumn(
                 name: "TrackLongitude",
+                schema: Schema.Name,
                 table: "Entries");
 
             migrationBuilder.DropColumn(
                 name: "TrackPointCount",
+                schema: Schema.Name,
                 table: "Entries");
         }
     }

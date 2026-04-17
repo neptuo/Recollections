@@ -102,6 +102,7 @@ namespace Neptuo.Recollections.Accounts
 
             modelBuilder.Entity<UserNotificationPushSubscription>()
                 .Property(p => p.Endpoint)
+                .HasMaxLength(800)
                 .IsRequired();
 
             modelBuilder.Entity<UserNotificationPushSubscription>()
