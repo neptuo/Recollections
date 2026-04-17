@@ -77,7 +77,7 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var models = await response.ReadJsonAsync<List<MapEntryModel>>();
-        var entryIds = models.Select(model => model.Id).ToList();
+        var entryIds = models.Select(model => model.Entry.Id).ToList();
 
         Assert.Contains(VisibleEntryId, entryIds);
         Assert.Contains(ImageFallbackEntryId, entryIds);
@@ -89,11 +89,11 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(5, models.Count);
         Assert.All(models, model => Assert.True(model.Location?.HasValue() == true));
 
-        var trackFallback = models.Single(model => model.Id == TrackFallbackEntryId);
+        var trackFallback = models.Single(model => model.Entry.Id == TrackFallbackEntryId);
         Assert.Equal(50.02, trackFallback.Location.Latitude);
         Assert.Equal(14.02, trackFallback.Location.Longitude);
 
-        var trackPreferred = models.Single(model => model.Id == TrackPreferredEntryId);
+        var trackPreferred = models.Single(model => model.Entry.Id == TrackPreferredEntryId);
         Assert.Equal(49.02, trackPreferred.Location.Latitude);
         Assert.Equal(15.02, trackPreferred.Location.Longitude);
     }
@@ -168,7 +168,7 @@ public class StoryMapEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var models = await response.ReadJsonAsync<List<MapEntryModel>>();
-        var entryIds = models.Select(model => model.Id).ToList();
+        var entryIds = models.Select(model => model.Entry.Id).ToList();
 
         Assert.Contains(VisibleDirectEntryId, entryIds);
         Assert.Contains(VisibleChapterEntryId, entryIds);
@@ -230,7 +230,7 @@ public class BeingMapEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var models = await response.ReadJsonAsync<List<MapEntryModel>>();
-        var entryIds = models.Select(model => model.Id).ToList();
+        var entryIds = models.Select(model => model.Entry.Id).ToList();
 
         Assert.Contains(VisibleEntryId, entryIds);
         Assert.DoesNotContain(HiddenEntryId, entryIds);

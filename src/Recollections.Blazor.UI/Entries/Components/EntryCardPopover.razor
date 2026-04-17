@@ -1,0 +1,32 @@
+@code
+{
+    [Inject]
+    protected Navigator Navigator { get; set; }
+
+    [Inject]
+    protected PopoverInterop Popover { get; set; }
+
+    [Parameter]
+    public EntryListModel Model { get; set; }
+
+    public ElementReference ContentRef;
+
+    public async Task ShowAsync(ElementReference trigger)
+    {
+        await Popover.ShowFromElementAsync(trigger, ContentRef);
+    }
+
+    public async Task HideAsync()
+    {
+        await Popover.HideActiveAsync();
+    }
+}
+
+@if (Model != null)
+{
+    <div @ref="ContentRef" style="display:none">
+        <a href="@Navigator.UrlEntryDetail(Model.Id)" class="text-decoration-none text-body">
+            <EntryCard Model="Model" />
+        </a>
+    </div>
+}

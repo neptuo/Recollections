@@ -25975,36 +25975,6 @@ video.pswp__video {
   color: rgba(250, 128, 114, 0.5);
 }
 
-.swipe-container {
-  overflow: hidden;
-  -ms-touch-action: pan-y pinch-zoom;
-      touch-action: pan-y pinch-zoom;
-  --swipe-gap: 2rem;
-}
-
-.swipe-track {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-column-gap: var(--swipe-gap);
-     -moz-column-gap: var(--swipe-gap);
-          column-gap: var(--swipe-gap);
-  width: calc(300% + 2 * var(--swipe-gap));
-  -webkit-transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
-      -ms-transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
-          transform: translateX(calc(-33.3333% - var(--swipe-gap) / 3));
-  -webkit-transition: -webkit-transform 0.3s ease-out;
-  transition: -webkit-transform 0.3s ease-out;
-  transition: transform 0.3s ease-out;
-  transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
-}
-
-.swipe-panel {
-  width: calc((100% - 2 * var(--swipe-gap)) / 3);
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
-}
-
 .calendar .badge {
   display: block;
   margin-bottom: 0.125rem;
@@ -26017,6 +25987,9 @@ video.pswp__video {
 }
 .calendar a.badge:hover {
   color: white;
+}
+.calendar span.badge.cursor-pointer:hover {
+  opacity: 0.85;
 }
 .calendar .calendar-header,
 .calendar .calendar-cell {
@@ -26036,6 +26009,13 @@ video.pswp__video {
 }
 .calendar .calendar-cell {
   aspect-ratio: 1;
+}
+
+.entry-popover .card {
+  border: 0;
+}
+.entry-popover .popover-body {
+  padding: 0;
 }
 
 .date-picker .btn-outline-primary {
@@ -26068,4 +26048,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-petalled-esmeralda/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=wwwroot/css/site.css.map */
