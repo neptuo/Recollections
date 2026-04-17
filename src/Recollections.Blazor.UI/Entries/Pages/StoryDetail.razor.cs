@@ -161,8 +161,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         public async ValueTask DisposeAsync()
         {
-            if (entryPopover != null)
-                await PopoverHandler.DisposeAsync(entryPopover);
+            await PopoverHandler.DisposeAsync(entryPopover);
         }
 
         protected async Task SaveAsync()

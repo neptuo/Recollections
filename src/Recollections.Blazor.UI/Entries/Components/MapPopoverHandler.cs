@@ -33,7 +33,8 @@ namespace Neptuo.Recollections.Entries.Components
 
         public async ValueTask DisposeAsync(EntryCardPopover popover)
         {
-            await popover.HideAsync();
+            if (popover != null)
+                await popover.HideAsync();
         }
     }
 }

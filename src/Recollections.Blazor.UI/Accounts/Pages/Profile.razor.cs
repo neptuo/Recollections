@@ -118,8 +118,7 @@ namespace Neptuo.Recollections.Accounts.Pages
 
         public async ValueTask DisposeAsync()
         {
-            if (entryPopover != null)
-                await PopoverHandler.DisposeAsync(entryPopover);
+            await PopoverHandler.DisposeAsync(entryPopover);
         }
 
         protected string FormatAltitudeTitle(EntryListModel entry)
