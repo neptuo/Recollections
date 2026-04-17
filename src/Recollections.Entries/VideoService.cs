@@ -23,6 +23,11 @@ namespace Neptuo.Recollections.Entries
         private const int ThumbnailWidth = 200;
         private const int ThumbnailHeight = 150;
 
+        static VideoService()
+        {
+            FFmpegMacOSInitializer.Initialize();
+        }
+
         private readonly DataContext dataContext;
         private readonly IFileStorage fileStorage;
         private readonly ImageResizeService resizeService;
