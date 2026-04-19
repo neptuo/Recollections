@@ -8,12 +8,18 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Commons.Components;
 
-public record ReleaseNotesEntry(string Version, string Html);
+public record ReleaseNotesEntry(
+    string Version,
+    int Milestone,
+    List<string> BreakingChanges,
+    List<string> NewFeatures,
+    List<string> BugFixes
+);
 
 public class ReleaseNotesState
 {
     private readonly HttpClient http;
-    private Task<List<ReleaseNotesEntry>> fetchTask;
+    private List<ReleaseNotesEntry> cachedEntries;
 
     public ReleaseNotesState(HttpClient http)
     {
@@ -21,12 +27,13 @@ public class ReleaseNotesState
         this.http = http;
     }
 
-    private Task<List<ReleaseNotesEntry>> EnsureFetchedAsync()
+    private async Task<List<ReleaseNotesEntry>> EnsureFetchedAsync()
     {
-        if (fetchTask == null)
-            fetchTask = http.GetFromJsonAsync<List<ReleaseNotesEntry>>("/release-notes.json");
+        if (cachedEntries != null)
+            return cachedEntries;
 
-        return fetchTask;
+        cachedEntries = await http.GetFromJsonAsync<List<ReleaseNotesEntry>>("/release-notes.json");
+        return cachedEntries;
     }
 
     public async Task<List<ReleaseNotesEntry>> GetAllAsync()

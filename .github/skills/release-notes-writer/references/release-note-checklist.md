@@ -5,14 +5,14 @@ Use this checklist after collecting milestone items and before editing
 
 ## Keep the Existing Format
 
-- One `<h3>New features</h3>` heading inside the `html` value.
-- One `<ul>` with short bullet fragments.
+- Items are **plain-text strings** — no HTML tags in the values.
+- The component renders `<h3>` headings, `<ul>` lists, and the GitHub button automatically.
 - No trailing periods.
-- No issue numbers, PR numbers, or commit SHAs in the HTML.
-- One GitHub button pointing to the matching milestone with `?closed=1`.
+- No issue numbers, PR numbers, or commit SHAs in the items.
 - The new entry must be **prepended** at the top of the JSON array (newest-first).
-- The JSON must remain valid: all double-quotes in the HTML escaped as `\"`,
-  newlines represented as `\n`.
+- Leave `breakingChanges` and `bugFixes` as `[]` if there are none.
+- The `milestone` field is the integer GitHub milestone number.
+- The JSON must remain valid.
 
 ## Prefer Product Language
 
