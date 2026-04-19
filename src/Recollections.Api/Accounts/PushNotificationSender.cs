@@ -59,6 +59,23 @@ namespace Neptuo.Recollections.Accounts.Notifications
             );
         }
 
+        public Task<int> SendOnThisDayAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, int entryCount, DateTime localDate)
+        {
+            Ensure.NotNull(subscriptions, "subscriptions");
+            if (entryCount < 1)
+                return Task.FromResult(0);
+
+            string body = entryCount == 1
+                ? "You have one recollection from this day in a previous year."
+                : $"You have {entryCount} recollections from this day in previous years.";
+            string tag = $"on-this-day-{localDate:yyyy-MM-dd}";
+
+            return SendAsync(
+                subscriptions,
+                new NotificationPayload("On this day", body, "/on-this-day", tag)
+            );
+        }
+
         private async Task<int> SendAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, NotificationPayload payload)
         {
             bool hasSubject = !String.IsNullOrWhiteSpace(options.Subject);

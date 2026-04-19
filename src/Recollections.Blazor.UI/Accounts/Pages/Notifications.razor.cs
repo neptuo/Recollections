@@ -56,6 +56,27 @@ public partial class Notifications
     {
         await base.OnInitializedAsync();
         await LoadAsync();
+        await EnsureTimeZoneAsync();
+    }
+
+    private async Task EnsureTimeZoneAsync()
+    {
+        if (Model?.OnThisDay == null)
+            return;
+
+        if (!String.IsNullOrWhiteSpace(Model.OnThisDay.TimeZone) && Model.OnThisDay.TimeZone != "UTC")
+            return;
+
+        try
+        {
+            string detected = await PushInterop.GetTimeZoneAsync();
+            if (!String.IsNullOrWhiteSpace(detected))
+                Model.OnThisDay.TimeZone = detected;
+        }
+        catch
+        {
+            // Ignore detection failures; user can keep the stored value.
+        }
     }
 
     protected async Task SaveAsync()
@@ -78,6 +99,13 @@ public partial class Notifications
 
             Model.IsEnabled = true;
             Model.NewEntries.IsEnabled = true;
+            Model.OnThisDay.IsEnabled = true;
+            if (String.IsNullOrWhiteSpace(Model.OnThisDay.TimeZone) || Model.OnThisDay.TimeZone == "UTC")
+            {
+                string detected = await PushInterop.GetTimeZoneAsync();
+                if (!String.IsNullOrWhiteSpace(detected))
+                    Model.OnThisDay.TimeZone = detected;
+            }
             await Api.SetNotificationSettingsAsync(Model);
 
             CurrentBrowserSubscription = await PushInterop.SubscribeAsync(Model.PushPublicKey);
@@ -116,6 +144,7 @@ public partial class Notifications
         IsLoading = true;
 
         Model = await Api.GetNotificationSettingsAsync();
+        Model.OnThisDay ??= new UserNotificationOnThisDaySettingsModel();
         await RefreshBrowserStateAsync();
 
         IsLoading = false;

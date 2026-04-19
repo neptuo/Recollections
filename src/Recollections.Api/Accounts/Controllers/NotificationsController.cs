@@ -40,10 +40,13 @@ namespace Neptuo.Recollections.Accounts.Controllers
             UserNotificationNewEntriesSettings newEntries = await db.NotificationNewEntriesSettings
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
+            UserNotificationOnThisDaySettings onThisDay = await db.NotificationOnThisDaySettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
             bool hasSubscription = await db.PushSubscriptions
                 .AnyAsync(s => s.UserId == userId && s.RevokedAt == null);
 
-            return Ok(CreateModel(settings, newEntries, hasSubscription));
+            return Ok(CreateModel(settings, newEntries, onThisDay, hasSubscription));
         }
 
         [HttpPut]
@@ -87,12 +90,29 @@ namespace Neptuo.Recollections.Accounts.Controllers
 
             newEntries.IsEnabled = model.NewEntries?.IsEnabled == true;
 
+            UserNotificationOnThisDaySettings onThisDay = await db.NotificationOnThisDaySettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (onThisDay == null)
+            {
+                onThisDay = new UserNotificationOnThisDaySettings()
+                {
+                    UserId = userId
+                };
+                db.NotificationOnThisDaySettings.Add(onThisDay);
+            }
+
+            UserNotificationOnThisDaySettingsModel onThisDayModel = model.OnThisDay ?? new UserNotificationOnThisDaySettingsModel();
+            onThisDay.IsEnabled = onThisDayModel.IsEnabled;
+            onThisDay.PreferredHour = Math.Clamp(onThisDayModel.PreferredHour, 0, 23);
+            onThisDay.TimeZone = NormalizeTimeZone(onThisDayModel.TimeZone);
+
             await db.SaveChangesAsync();
 
             bool hasSubscription = await db.PushSubscriptions
                 .AnyAsync(s => s.UserId == userId && s.RevokedAt == null);
 
-            return Ok(CreateModel(settings, newEntries, hasSubscription));
+            return Ok(CreateModel(settings, newEntries, onThisDay, hasSubscription));
         }
 
         [HttpPost("subscriptions")]
@@ -167,7 +187,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
 
             return Ok();
         }
-        private UserNotificationSettingsModel CreateModel(UserNotificationSettings settings, UserNotificationNewEntriesSettings newEntries, bool hasSubscription)
+        private UserNotificationSettingsModel CreateModel(UserNotificationSettings settings, UserNotificationNewEntriesSettings newEntries, UserNotificationOnThisDaySettings onThisDay, bool hasSubscription)
         {
             return new UserNotificationSettingsModel()
             {
@@ -177,8 +197,24 @@ namespace Neptuo.Recollections.Accounts.Controllers
                 NewEntries = new UserNotificationNewEntriesSettingsModel()
                 {
                     IsEnabled = newEntries?.IsEnabled == true
+                },
+                OnThisDay = new UserNotificationOnThisDaySettingsModel()
+                {
+                    IsEnabled = onThisDay?.IsEnabled == true,
+                    PreferredHour = onThisDay != null ? Math.Clamp(onThisDay.PreferredHour, 0, 23) : 8,
+                    TimeZone = NormalizeTimeZone(onThisDay?.TimeZone)
                 }
             };
+        }
+
+        private static string NormalizeTimeZone(string timeZone)
+        {
+            if (String.IsNullOrWhiteSpace(timeZone))
+                return "UTC";
+
+            return TimeZoneInfo.TryFindSystemTimeZoneById(timeZone.Trim(), out _)
+                ? timeZone.Trim()
+                : "UTC";
         }
     }
 }
