@@ -8,8 +8,6 @@ namespace Neptuo.Recollections.Entries;
 
 public class EntryMediaMapper(DataContext dataContext, ImageService imageService, VideoService videoService)
 {
-    private const int MaxEntriesPerLimitedQuery = 100;
-
     public async Task<List<MediaModel>> MapAsync(string entryId, string userId, int? take = null)
     {
         Ensure.NotNullOrEmpty(entryId, nameof(entryId));
@@ -32,8 +30,10 @@ public class EntryMediaMapper(DataContext dataContext, ImageService imageService
             return [];
 
         List<string> entryIds = userIdsByEntryId.Keys.ToList();
-        List<(string EntryId, Image Entity)> images = await LoadImagesAsync(entryIds, takePerEntry);
-        List<(string EntryId, Video Entity)> videos = await LoadVideosAsync(entryIds, takePerEntry);
+
+        // Load all images and videos for the matching entries in a single query each
+        List<(string EntryId, Image Entity)> images = await LoadImagesAsync(entryIds);
+        List<(string EntryId, Video Entity)> videos = await LoadVideosAsync(entryIds);
 
         var result = new Dictionary<string, List<MediaModel>>(entryIds.Count);
         foreach (string entryId in entryIds)
@@ -59,6 +59,7 @@ public class EntryMediaMapper(DataContext dataContext, ImageService imageService
             media.Add(new MediaModel { Type = "video", Video = model });
         }
 
+        // Order by timestamp and trim per entry in memory
         foreach (string entryId in entryIds)
         {
             List<MediaModel> ordered = result[entryId]
@@ -77,101 +78,33 @@ public class EntryMediaMapper(DataContext dataContext, ImageService imageService
     private static DateTime GetWhen(MediaModel media)
         => media.Image?.When ?? media.Video?.When ?? DateTime.MinValue;
 
-    private async Task<List<(string EntryId, Image Entity)>> LoadImagesAsync(List<string> entryIds, int? takePerEntry)
+    private async Task<List<(string EntryId, Image Entity)>> LoadImagesAsync(List<string> entryIds)
     {
-        List<(string EntryId, Image Entity)> result = [];
-        foreach (List<string> batch in BatchEntryIds(entryIds, takePerEntry))
-        {
-            var images = await CreateImageQuery(batch, takePerEntry)
-                .Select(i => new
-                {
-                    EntryId = i.Entry.Id,
-                    Entity = i
-                })
-                .AsNoTracking()
-                .ToListAsync();
+        var images = await dataContext.Images
+            .Where(i => entryIds.Contains(i.Entry.Id))
+            .Select(i => new
+            {
+                EntryId = i.Entry.Id,
+                Entity = i
+            })
+            .AsNoTracking()
+            .ToListAsync();
 
-            result.AddRange(images.Select(i => (i.EntryId, i.Entity)));
-        }
-
-        return result;
+        return images.Select(i => (i.EntryId, i.Entity)).ToList();
     }
 
-    private async Task<List<(string EntryId, Video Entity)>> LoadVideosAsync(List<string> entryIds, int? takePerEntry)
+    private async Task<List<(string EntryId, Video Entity)>> LoadVideosAsync(List<string> entryIds)
     {
-        List<(string EntryId, Video Entity)> result = [];
-        foreach (List<string> batch in BatchEntryIds(entryIds, takePerEntry))
-        {
-            var videos = await CreateVideoQuery(batch, takePerEntry)
-                .Select(v => new
-                {
-                    EntryId = v.Entry.Id,
-                    Entity = v
-                })
-                .AsNoTracking()
-                .ToListAsync();
+        var videos = await dataContext.Videos
+            .Where(v => entryIds.Contains(v.Entry.Id))
+            .Select(v => new
+            {
+                EntryId = v.Entry.Id,
+                Entity = v
+            })
+            .AsNoTracking()
+            .ToListAsync();
 
-            result.AddRange(videos.Select(v => (v.EntryId, v.Entity)));
-        }
-
-        return result;
-    }
-
-    private static IEnumerable<List<string>> BatchEntryIds(List<string> entryIds, int? takePerEntry)
-    {
-        if (takePerEntry == null || entryIds.Count <= MaxEntriesPerLimitedQuery)
-        {
-            yield return entryIds;
-            yield break;
-        }
-
-        for (int i = 0; i < entryIds.Count; i += MaxEntriesPerLimitedQuery)
-            yield return entryIds.Skip(i).Take(MaxEntriesPerLimitedQuery).ToList();
-    }
-
-    private IQueryable<Image> CreateImageQuery(List<string> entryIds, int? takePerEntry)
-    {
-        if (takePerEntry == null)
-        {
-            return dataContext.Images
-                .Where(i => entryIds.Contains(i.Entry.Id));
-        }
-
-        IQueryable<Image> result = dataContext.Images.Where(i => false);
-        foreach (string entryId in entryIds)
-        {
-            string currentEntryId = entryId;
-            result = result.Concat(
-                dataContext.Images
-                    .Where(i => i.Entry.Id == currentEntryId)
-                    .OrderBy(i => i.When)
-                    .Take(takePerEntry.Value)
-            );
-        }
-
-        return result;
-    }
-
-    private IQueryable<Video> CreateVideoQuery(List<string> entryIds, int? takePerEntry)
-    {
-        if (takePerEntry == null)
-        {
-            return dataContext.Videos
-                .Where(v => entryIds.Contains(v.Entry.Id));
-        }
-
-        IQueryable<Video> result = dataContext.Videos.Where(v => false);
-        foreach (string entryId in entryIds)
-        {
-            string currentEntryId = entryId;
-            result = result.Concat(
-                dataContext.Videos
-                    .Where(v => v.Entry.Id == currentEntryId)
-                    .OrderBy(v => v.When)
-                    .Take(takePerEntry.Value)
-            );
-        }
-
-        return result;
+        return videos.Select(v => (v.EntryId, v.Entity)).ToList();
     }
 }
