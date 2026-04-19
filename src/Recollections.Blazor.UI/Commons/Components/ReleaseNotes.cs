@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,29 +10,34 @@ namespace Neptuo.Recollections.Commons.Components
     public partial class ReleaseNotes : ComponentBase
     {
         [Inject]
-        protected Navigator Navigator { get; set; }
+        protected ReleaseNotesState State { get; set; }
 
-        private readonly HttpClient http = new HttpClient();
-        private static Task<string> getTask;
-        private string value;
+        [Parameter]
+        public string SinceVersion { get; set; }
+
+        private List<ReleaseNotesEntry> entries;
 
         protected override async Task OnInitializedAsync()
         {
-            http.BaseAddress = new Uri(Navigator.UrlOrigin());
-
             await base.OnInitializedAsync();
 
-            if (getTask == null)
-                getTask = http.GetStringAsync("/release-notes.html");
-
-            value = await getTask;
+            entries = String.IsNullOrWhiteSpace(SinceVersion)
+                ? await State.GetAllAsync()
+                : await State.GetSinceAsync(SinceVersion);
         }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             base.BuildRenderTree(builder);
 
-            builder.AddMarkupContent(0, value);
+            if (entries == null)
+                return;
+
+            var sb = new StringBuilder();
+            foreach (var entry in entries)
+                sb.Append(entry.Html);
+
+            builder.AddMarkupContent(0, sb.ToString());
         }
     }
 }

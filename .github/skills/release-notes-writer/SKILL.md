@@ -3,8 +3,8 @@ name: release-notes-writer
 description: >
   Prepare Recollections release notes by finding the matching GitHub milestone,
   extracting the delivered user-facing changes, and updating
-  `src/Recollections.Blazor.UI/wwwroot/release-notes.html`. USE FOR: "prepare
-  release notes", "update release-notes.html", "write release notes for v0.18.0",
+  `src/Recollections.Blazor.UI/wwwroot/release-notes.json`. USE FOR: "prepare
+  release notes", "update release-notes.json", "write release notes for v0.18.0",
   summarizing a milestone, release summary from GitHub issues or PRs. DO NOT
   USE FOR: exhaustive changelogs, CI/test summaries, deployment notes, or API
   release notes that do not update the Blazor UI release notes page. INVOKES:
@@ -20,9 +20,33 @@ Recollections release.
 
 Update only:
 
-- `src/Recollections.Blazor.UI/wwwroot/release-notes.html`
+- `src/Recollections.Blazor.UI/wwwroot/release-notes.json`
 
-Keep the existing structure:
+The file is a JSON array ordered newest-first. Each element has:
+
+- `version` — the release version string (e.g. `"0.19.0"`)
+- `html` — the full HTML markup for that release (same structure as the old
+  `release-notes.html` file)
+
+Example shape:
+
+```json
+[
+    {
+        "version": "0.19.0",
+        "html": "<h3>New features</h3>\n<ul>\n    <li>...</li>\n</ul>\n\n<div class=\"row\">...</div>"
+    },
+    {
+        "version": "0.18.0",
+        "html": "..."
+    }
+]
+```
+
+**Always prepend** the new release object at the top of the array so entries
+remain ordered newest-first. Do **not** remove or modify existing entries.
+
+Keep the `html` value consistent with the previous HTML structure:
 
 ```html
 <h3>New features</h3>
@@ -40,6 +64,9 @@ Keep the existing structure:
 </div>
 ```
 
+Escape all double-quotes in the HTML value as `\"` and represent newlines as
+`\n` (standard JSON string escaping).
+
 ## Process
 
 ### 1. Find the Release Milestone
@@ -56,12 +83,12 @@ gh api repos/neptuo/Recollections/milestones --paginate --jq '.[] | [.number, .t
 
 ### 2. Learn the Repo's Release-Note Style
 
-- Read the current `release-notes.html`.
+- Read the current `release-notes.json`.
 - Inspect its recent history with:
 
 ```bash
-git --no-pager log --follow --oneline -- src/Recollections.Blazor.UI/wwwroot/release-notes.html
-git --no-pager show <commit>:src/Recollections.Blazor.UI/wwwroot/release-notes.html
+git --no-pager log --follow --oneline -- src/Recollections.Blazor.UI/wwwroot/release-notes.json
+git --no-pager show <commit>:src/Recollections.Blazor.UI/wwwroot/release-notes.json
 ```
 
 - Match the existing style:
@@ -117,28 +144,33 @@ Avoid:
 
 ### 6. Update the File
 
-- Replace the existing bullet list with the new release content.
+- Build the HTML string for the new entry following the template above.
+- Prepend a new JSON object `{ "version": "X.Y.Z", "html": "..." }` at the
+  start of the array in `release-notes.json`.
 - Update the milestone link to the matching milestone number.
-- Keep indentation and HTML structure consistent with the file history.
+- Keep indentation and JSON structure consistent with the file.
 
 ### 7. Final Check
 
 - Make sure every bullet is user-facing.
 - Make sure the milestone link ends with `?closed=1`.
 - Make sure the page does not mention CI or tests.
+- Make sure the new entry is at index 0 (newest-first).
+- Make sure the JSON is valid (no unescaped quotes or bare newlines in strings).
 
 ## Example
 
 ### Example 1: Preparing a Release Page
 
-**User Request**: `Prepare release notes for v0.18.0 and update src/Recollections.Blazor.UI/wwwroot/release-notes.html`
+**User Request**: `Prepare release notes for v0.18.0 and update src/Recollections.Blazor.UI/wwwroot/release-notes.json`
 
 **Expected behavior**:
 
 1. Find the `v0.18.0` milestone number on GitHub.
-2. Review the history of `release-notes.html` to match prior wording.
+2. Review the history of `release-notes.json` to match prior wording.
 3. Summarize the milestone into short user-facing bullets.
-4. Update the milestone link in the HTML.
+4. Prepend the new entry at the top of the JSON array.
+5. Update the milestone link in the HTML value.
 
 ## References
 

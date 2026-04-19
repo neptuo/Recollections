@@ -1,0 +1,6 @@
+[
+    {
+        "version": "0.19.0",
+        "html": "<h3>New features</h3>\n<ul>\n    <li>New Highest altitude view, with dedicated versions on beings and user profiles</li>\n    <li>Map, stories, and highest altitude views on user profiles</li>\n    <li>Swipe between months on the calendar view</li>\n    <li>Tap entries on calendar and map views to see a quick card preview</li>\n    <li>Push notifications when your connections share new entries</li>\n    <li>Global drag-and-drop upload form with media preview before upload</li>\n    <li>Upload progress visible on entry media, with a lighter progress visual in the PWA</li>\n    <li>Manage GPX tracks on entries and see total elevation</li>\n    <li>Loading progress bars for async operations across the app</li>\n</ul>\n\n<div class=\"row\">\n    <div class=\"col-12 col-md-auto\">\n        <a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://github.com/neptuo/Recollections/milestone/50?closed=1\" class=\"btn bg-light-subtle w-100\">\n            <span class=\"fab fa-github\"></span>\n            See details on GitHub\n        </a>\n    </div>\n</div>"
+    }
+]

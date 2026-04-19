@@ -18,10 +18,14 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         internal ILog<PwaUpdate> Log { get; set; }
 
+        [Inject]
+        internal AppUpdateState AppUpdateState { get; set; }
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         protected bool IsUpdateable { get; set; }
+        protected string LastSeenVersion { get; private set; }
 
         protected override void OnInitialized()
         {
@@ -38,12 +42,21 @@ namespace Neptuo.Recollections.Commons.Components
         {
             Log.Debug("Updateable=True");
 
+            _ = InvokeAsync(LoadLastSeenVersionAsync);
+        }
+
+        private async Task LoadLastSeenVersionAsync()
+        {
+            LastSeenVersion = await AppUpdateState.GetLastSeenClientVersionAsync();
             IsUpdateable = true;
             StateHasChanged();
         }
 
-        protected async Task UpdateAsync() 
-            => await Interop.UpdateAsync();
+        protected async Task UpdateAsync()
+        {
+            await AppUpdateState.RememberClientVersionAsync();
+            await Interop.UpdateAsync();
+        }
 
         public void Dispose()
         {
