@@ -63,15 +63,11 @@ namespace Neptuo.Recollections.Components
             && Markers[0].Longitude != null;
 
         protected bool IsInitialized { get; set; }
-        protected bool IsViewModeApplied { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
             TileType = await Service.GetTypeAsync();
-
-            if (EnableCountriesView)
-                ViewMode = await Service.GetViewModeAsync();
 
             IsInitialized = true;
         }
@@ -85,13 +81,6 @@ namespace Neptuo.Recollections.Components
 
             await base.OnAfterRenderAsync(firstRender);
             await Interop.InitializeAsync(this);
-
-            if (!IsViewModeApplied && EnableCountriesView && ViewMode == "countries")
-            {
-                IsViewModeApplied = true;
-                var geoJson = await Service.GetCountriesGeoJsonAsync();
-                await Interop.SetViewModeAsync(ViewMode, geoJson);
-            }
 
             if (Markers.Count > 0 || !String.IsNullOrEmpty(Path))
                 IsZoomed = true;
@@ -199,8 +188,6 @@ namespace Neptuo.Recollections.Components
             {
                 await Interop.SetViewModeAsync(ViewMode, null);
             }
-
-            await Service.SetViewModeAsync(ViewMode);
         }
     }
 }

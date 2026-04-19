@@ -19,15 +19,6 @@ namespace Neptuo.Recollections.Accounts
             => properties.SetAsync(MapType, type);
 
         
-        private const string MapViewMode = "Map.ViewMode";
-
-        public static Task<string> MapViewModeAsync(this PropertyCollection properties) 
-            => properties.GetAsync(MapViewMode, "markers");
-
-        public static Task MapViewModeAsync(this PropertyCollection properties, string mode) 
-            => properties.SetAsync(MapViewMode, mode);
-
-        
         private const string Theme = "App.Theme";
 
         public static Task<ThemeType> ThemeAsync(this PropertyCollection properties) 
