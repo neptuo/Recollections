@@ -28,7 +28,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
             this.log = log;
         }
 
-        public bool IsConfigured
+        public virtual bool IsConfigured
             => !String.IsNullOrWhiteSpace(options.Subject)
                 && !String.IsNullOrWhiteSpace(options.PublicKey)
                 && !String.IsNullOrWhiteSpace(options.PrivateKey);
@@ -59,7 +59,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
             );
         }
 
-        public Task<int> SendOnThisDayAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, int entryCount, DateTime localDate)
+        public virtual Task<int> SendOnThisDayAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, int entryCount, DateTime localDate)
         {
             Ensure.NotNull(subscriptions, "subscriptions");
             if (entryCount < 1)
