@@ -67,7 +67,12 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
         private TimeSpan ResolveTickInterval()
         {
-            TimeSpan configured = options.CurrentValue?.OnThisDay?.TickInterval ?? TimeSpan.FromMinutes(5);
+            TimeSpan configured = options.CurrentValue?.OnThisDay?.TickInterval ?? TimeSpan.Zero;
+            if (configured <= TimeSpan.Zero)
+            {
+                log.LogWarning("'On this day' tick interval is not configured (Accounts:Notifications:OnThisDay:TickInterval). Falling back to 15 minutes.");
+                configured = TimeSpan.FromMinutes(15);
+            }
             return configured < MinTickInterval ? MinTickInterval : configured;
         }
 

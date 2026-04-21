@@ -13,7 +13,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
     public class OnThisDayNotificationOptions
     {
-        public TimeSpan TickInterval { get; set; } = TimeSpan.FromMinutes(15);
+        public TimeSpan TickInterval { get; set; }
 
         /// <summary>
         /// Offset added to the current UTC clock when the notifier evaluates user
