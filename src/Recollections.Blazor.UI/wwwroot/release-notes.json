@@ -1,5 +1,19 @@
 [
     {
+        "version": "0.20.0",
+        "milestone": 52,
+        "breakingChanges": [],
+        "newFeatures": [
+            "\"On this day\" push notifications for anniversaries of your own and shared entries",
+            "Update screen now highlights what's new since your last seen version",
+            "Videos and images stream in as they download instead of waiting for the full file"
+        ],
+        "bugFixes": [
+            "Faster timeline loading for large stories",
+            "Country map view is now a session toggle instead of a saved preference"
+        ]
+    },
+    {
         "version": "0.19.0",
         "milestone": 50,
         "breakingChanges": [],
