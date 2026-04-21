@@ -82,8 +82,14 @@ namespace Neptuo.Recollections
         public string UrlGithubRepositoryIssuesNew()
             => "https://github.com/neptuo/Recollections/issues/new";
 
-        public string UrlAbout()
+        public string UrlAboutSite()
             => "https://about.recollections.app";
+
+        public void OpenAboutSite()
+            => uri.NavigateTo(UrlAboutSite());
+
+        public string UrlAbout()
+            => "/about";
 
         public void OpenAbout()
             => uri.NavigateTo(UrlAbout());
