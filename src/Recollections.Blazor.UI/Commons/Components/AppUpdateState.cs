@@ -53,6 +53,13 @@ public class AppUpdateState
     public async Task<string> GetLastSeenClientVersionAsync()
         => await localStorage.GetItemAsync<string>(ClientVersionKey);
 
-    public async Task RememberClientVersionAsync()
-        => await localStorage.SetItemAsync(ClientVersionKey, GetClientVersion());
+    public async Task RememberClientVersionAsync(string version = null)
+        => await localStorage.SetItemAsync(ClientVersionKey, version ?? GetClientVersion());
+
+    public async Task SeedClientVersionIfMissingAsync()
+    {
+        var existing = await GetLastSeenClientVersionAsync();
+        if (String.IsNullOrWhiteSpace(existing))
+            await RememberClientVersionAsync();
+    }
 }

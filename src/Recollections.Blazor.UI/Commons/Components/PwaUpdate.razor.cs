@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         internal AppUpdateState AppUpdateState { get; set; }
 
+        [Inject]
+        internal ReleaseNotesState ReleaseNotesState { get; set; }
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
@@ -33,6 +36,8 @@ namespace Neptuo.Recollections.Commons.Components
 
             base.OnInitialized();
             Interop.Initialize(this);
+
+            _ = InvokeAsync(AppUpdateState.SeedClientVersionIfMissingAsync);
         }
 
         public void MakeInstallable()
@@ -50,12 +55,22 @@ namespace Neptuo.Recollections.Commons.Components
             LastSeenVersion = await AppUpdateState.GetLastSeenClientVersionAsync();
             IsUpdateable = true;
             StateHasChanged();
+
+            // Record the newest shown version so dismiss-then-silent-SW-activate
+            // doesn't leave LastSeenVersion stale and duplicate notes next cycle.
+            await RememberNewestShownVersionAsync();
         }
 
         protected async Task UpdateAsync()
         {
-            await AppUpdateState.RememberClientVersionAsync();
+            await RememberNewestShownVersionAsync();
             await Interop.UpdateAsync();
+        }
+
+        private async Task RememberNewestShownVersionAsync()
+        {
+            var latest = await ReleaseNotesState.GetLatestVersionAsync();
+            await AppUpdateState.RememberClientVersionAsync(latest);
         }
 
         public void Dispose()

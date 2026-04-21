@@ -58,4 +58,15 @@ public class ReleaseNotesState
             .Where(e => Version.TryParse(e.Version, out Version v) && v > since)
             .ToList();
     }
+
+    public async Task<string> GetLatestVersionAsync()
+    {
+        var all = await EnsureFetchedAsync();
+        return all
+            ?.Select(e => Version.TryParse(e.Version, out var v) ? v : null)
+            .Where(v => v != null)
+            .OrderByDescending(v => v)
+            .FirstOrDefault()
+            ?.ToString();
+    }
 }
