@@ -20,11 +20,11 @@
         "version": "0.18.1",
         "milestone": 49,
         "breakingChanges": [],
-        "newFeatures": [
+        "newFeatures": [],
+        "bugFixes": [
             "Timeline no longer jumps back to a previously opened entry",
             "Related stories on Being detail are now shown only once"
-        ],
-        "bugFixes": []
+        ]
     },
     {
         "version": "0.18.0",
