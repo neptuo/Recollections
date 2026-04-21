@@ -100,7 +100,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
             string rawPayload = JsonSerializer.Serialize(payload, serializerOptions);
             VapidDetails vapidDetails = new VapidDetails(options.Subject, options.PublicKey, options.PrivateKey);
 
-            log.LogDebug(
+            log.LogInformation(
                 "Sending push notification '{Tag}' to {SubscriptionCount} active subscription(s).",
                 payload.Tag,
                 activeSubscriptions.Count
@@ -126,7 +126,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
                     await client.SendNotificationAsync(subscription, rawPayload, vapidDetails);
                     deliveredCount++;
-                    log.LogDebug("Push notification '{Tag}' delivered to '{Endpoint}'.", payload.Tag, endpoint);
+                    log.LogInformation("Push notification '{Tag}' delivered to '{Endpoint}'.", payload.Tag, endpoint);
                 }
                 catch (WebPushException ex) when (ex.StatusCode == HttpStatusCode.Gone || ex.StatusCode == HttpStatusCode.NotFound)
                 {
@@ -135,11 +135,15 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 }
                 catch (WebPushException ex)
                 {
-                    log.LogError(ex, "Failed to deliver push notification '{Tag}' to '{Endpoint}' with status code '{StatusCode}'.", payload.Tag, endpoint, ex.StatusCode);
+                    log.LogError(ex, "Failed to deliver push notification '{Tag}' to '{Endpoint}' with status code '{StatusCode}'. Response body: {ResponseBody}.", payload.Tag, endpoint, ex.StatusCode, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, "Unexpected error delivering push notification '{Tag}' to '{Endpoint}'.", payload.Tag, endpoint);
                 }
             }
 
-            log.LogDebug(
+            log.LogInformation(
                 "Push notification '{Tag}' delivery finished. Delivered to {DeliveredCount} of {SubscriptionCount} active subscription(s).",
                 payload.Tag,
                 deliveredCount,
