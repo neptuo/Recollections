@@ -8,6 +8,7 @@ namespace Neptuo.Recollections.Commons.Components;
 public class AppUpdateState
 {
     private const string KeyPrefix = "app-update";
+    private const string ClientVersionKey = "app-update:client-version";
     private readonly ILocalStorageService localStorage;
     private readonly PwaInstallInterop pwaInstallInterop;
 
@@ -44,5 +45,21 @@ public class AppUpdateState
     {
         Ensure.NotNullOrEmpty(scope, "scope");
         await localStorage.RemoveItemAsync($"{KeyPrefix}:{scope}:version");
+    }
+
+    public string GetClientVersion()
+        => typeof(AppUpdateState).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+
+    public async Task<string> GetLastSeenClientVersionAsync()
+        => await localStorage.GetItemAsync<string>(ClientVersionKey);
+
+    public async Task RememberClientVersionAsync(string version = null)
+        => await localStorage.SetItemAsync(ClientVersionKey, version ?? GetClientVersion());
+
+    public async Task SeedClientVersionIfMissingAsync()
+    {
+        var existing = await GetLastSeenClientVersionAsync();
+        if (String.IsNullOrWhiteSpace(existing))
+            await RememberClientVersionAsync();
     }
 }

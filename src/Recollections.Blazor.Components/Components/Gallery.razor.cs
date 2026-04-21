@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Components
         public List<GalleryModel> Models { get; set; }
 
         [Parameter]
-        public Func<int, string, Task<Stream>> DataGetter { get; set; }
+        public string BearerToken { get; set; }
 
         [Parameter]
         public EventCallback<int> OnOpenInfo { get; set; }
@@ -37,13 +37,14 @@ namespace Neptuo.Recollections.Components
                     hashCode.Add(model);
             }
 
+            hashCode.Add(BearerToken);
             return hashCode.ToHashCode();
         }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            await Interop.InitializedAsync(this, Models ?? []);
+            await Interop.InitializedAsync(this, Models ?? [], BearerToken);
 
             // 'Models' is passed as reference, so when SetParametersAsync is called, it already contains a new items.
             // Because of that it's important we compute the 'previous' value at the end of the rendering cycle,
@@ -71,7 +72,7 @@ namespace Neptuo.Recollections.Components
         {
             if (Models.Count > index)
             {
-                await Interop.InitializedAsync(this, Models ?? []);
+                await Interop.InitializedAsync(this, Models ?? [], BearerToken);
                 await Interop.OpenAsync(index);
             }
         }

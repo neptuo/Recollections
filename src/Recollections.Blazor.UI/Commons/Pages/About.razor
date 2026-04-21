@@ -1,0 +1,91 @@
+@page "/about"
+@inject ReleaseNotesState State
+@inject Navigator Navigator
+
+<DocumentTitle Value="About" />
+
+<div class="mt-4">
+    <h2 class="d-none d-sm-block">About</h2>
+    <p>
+        <a href="@Navigator.UrlAboutSite()" target="_blank" rel="noopener noreferrer" class="btn btn-primary d-block d-sm-inline-block">
+            <span class="fab fa-safari"></span>
+            Find more about Recollections
+        </a>
+    </p>
+</div>
+
+<h3 class="mt-3">Release notes</h3>
+
+@if (entries == null)
+{
+    <p>Loading...</p>
+}
+else if (entries.Count == 0)
+{
+    <p>No release notes available.</p>
+}
+else
+{
+    <div class="accordion" id="releaseNotesAccordion">
+        @for (int i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            var headingId = $"release-notes-heading-{i}";
+            var collapseId = $"release-notes-collapse-{i}";
+            var isFirst = i == 0;
+
+            <div class="accordion-item">
+                <h3 class="accordion-header" id="@headingId">
+                    <button class="accordion-button @(isFirst ? "" : "collapsed")" type="button"
+                            data-bs-toggle="collapse" data-bs-target="@($"#{collapseId}")"
+                            aria-expanded="@(isFirst ? "true" : "false")" aria-controls="@collapseId">
+                        v@(entry.Version)
+                    </button>
+                </h3>
+                <div id="@collapseId" class="accordion-collapse collapse @(isFirst ? "show" : "")"
+                     aria-labelledby="@headingId" data-bs-parent="#releaseNotesAccordion">
+                    <div class="accordion-body">
+                        @Section("Breaking changes", entry.BreakingChanges)
+                        @Section("New features", entry.NewFeatures)
+                        @Section("Bug fixes", entry.BugFixes)
+
+                        <div class="row">
+                            <div class="col-12 col-md-auto">
+                                <a target="_blank" rel="noopener noreferrer"
+                                   href="@($"https://github.com/neptuo/Recollections/milestone/{entry.Milestone}?closed=1")"
+                                   class="btn bg-light-subtle w-100">
+                                    <span class="fab fa-github"></span>
+                                    See details on GitHub
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<ReleaseNotesEntry> entries;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        entries = await State.GetAllAsync();
+    }
+
+    private RenderFragment Section(string heading, List<string> items) =>
+        @<text>
+            @if (items != null && items.Count > 0)
+            {
+                <h4>@heading</h4>
+                <ul>
+                    @foreach (var item in items)
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            }
+        </text>;
+}

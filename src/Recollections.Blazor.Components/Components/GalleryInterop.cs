@@ -22,7 +22,7 @@ namespace Neptuo.Recollections.Components
             this.js = js;
         }
 
-        public async Task InitializedAsync(Gallery component, List<GalleryModel> models)
+        public async Task InitializedAsync(Gallery component, List<GalleryModel> models, string bearerToken)
         {
             Ensure.NotNull(component, "component");
             this.component = component;
@@ -30,7 +30,7 @@ namespace Neptuo.Recollections.Components
             module ??= await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Gallery.js");
             selfReference ??= DotNetObjectReference.Create(this);
 
-            await module.InvokeVoidAsync("initialize", selfReference, models);
+            await module.InvokeVoidAsync("initialize", selfReference, models, bearerToken);
         }
 
         public async Task OpenAsync(int index)
@@ -51,19 +51,6 @@ namespace Neptuo.Recollections.Components
                 return false;
 
             return await module.InvokeAsync<bool>("isOpen");
-        }
-
-        [JSInvokable]
-        public async Task<DotNetStreamReference> GetImageDataAsync(int index, string type)
-        {
-            if (component?.DataGetter == null)
-                return null;
- 
-            var stream = await component.DataGetter(index, type);
-            if (stream == null)
-                return null;
-
-            return new DotNetStreamReference(stream);
         }
 
         [JSInvokable]

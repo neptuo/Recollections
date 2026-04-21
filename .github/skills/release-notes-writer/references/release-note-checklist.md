@@ -1,15 +1,18 @@
 # Release Note Checklist
 
 Use this checklist after collecting milestone items and before editing
-`src/Recollections.Blazor.UI/wwwroot/release-notes.html`.
+`src/Recollections.Blazor.UI/wwwroot/release-notes.json`.
 
 ## Keep the Existing Format
 
-- One `<h3>New features</h3>` heading.
-- One `<ul>` with short bullet fragments.
+- Items are **plain-text strings** — no HTML tags in the values.
+- The component renders `<h3>` headings, `<ul>` lists, and the GitHub button automatically.
 - No trailing periods.
-- No issue numbers, PR numbers, or commit SHAs in the HTML.
-- One GitHub button pointing to the matching milestone with `?closed=1`.
+- No issue numbers, PR numbers, or commit SHAs in the items.
+- The new entry must be **prepended** at the top of the JSON array (newest-first).
+- Leave `breakingChanges` and `bugFixes` as `[]` if there are none.
+- The `milestone` field is the integer GitHub milestone number.
+- The JSON must remain valid.
 
 ## Prefer Product Language
 
@@ -51,6 +54,6 @@ Examples:
 ```bash
 gh api repos/neptuo/Recollections/milestones --paginate --jq '.[] | [.number, .title, .state] | @tsv'
 gh api --paginate 'repos/neptuo/Recollections/issues?milestone={number}&state=closed&per_page=100'
-git --no-pager log --follow --oneline -- src/Recollections.Blazor.UI/wwwroot/release-notes.html
-git --no-pager show <commit>:src/Recollections.Blazor.UI/wwwroot/release-notes.html
+git --no-pager log --follow --oneline -- src/Recollections.Blazor.UI/wwwroot/release-notes.json
+git --no-pager show <commit>:src/Recollections.Blazor.UI/wwwroot/release-notes.json
 ```

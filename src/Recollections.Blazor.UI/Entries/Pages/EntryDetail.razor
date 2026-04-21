@@ -92,7 +92,7 @@
                 @if (Media?.Count > 0)
                 {
                     <div class="images my-3">
-                        <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="@OnGalleryOpenInfoAsync" />
+                        <Gallery @ref="Gallery" Models="@GalleryItems" BearerToken="@UserState.BearerToken" OnOpenInfo="@OnGalleryOpenInfoAsync" />
 
                         @foreach (var item in Media)
                         {

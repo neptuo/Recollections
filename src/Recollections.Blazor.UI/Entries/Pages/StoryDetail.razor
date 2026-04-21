@@ -80,7 +80,7 @@
                     }
                 </div>
 
-                <Gallery @ref="Gallery" Models="@GalleryItems" DataGetter="OnGetMediaDataAsync" OnOpenInfo="OnGalleryOpenInfoAsync" />
+                <Gallery @ref="Gallery" Models="@GalleryItems" BearerToken="@UserState.BearerToken" OnOpenInfo="OnGalleryOpenInfoAsync" />
                 <GalleryPreviewModal @ref="GalleryPreviewModal" Title="@Model.Title" Media="@AllMedia" OnMediaClick="@(index => Gallery.OpenAsync(index))" />
             </div>
         </PermissionContainer>

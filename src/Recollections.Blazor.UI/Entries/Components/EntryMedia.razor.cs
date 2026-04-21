@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Neptuo.Logging;
+using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
 using System;
-using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
@@ -17,7 +15,8 @@ namespace Neptuo.Recollections.Entries.Components
         private string url;
         private string previousUrl;
 
-        protected Stream Content { get; private set; }
+        protected bool HasUrl { get; private set; }
+        protected bool IsLoaded { get; private set; }
         protected bool IsLoadingNotFound { get; set; }
 
         [Inject]
@@ -32,8 +31,8 @@ namespace Neptuo.Recollections.Entries.Components
         [Inject]
         protected ILog<EntryMedia> Log { get; set; }
 
-        [Inject]
-        protected ExceptionPanelSuppression ExceptionPanelSuppression { get; set; }
+        [CascadingParameter]
+        protected UserState UserState { get; set; }
 
         [Parameter]
         [CascadingParameter]
@@ -61,7 +60,7 @@ namespace Neptuo.Recollections.Entries.Components
         public bool ClickToPlay { get; set; }
 
         protected ElementReference Element { get; set; }
-        
+
         protected bool IsVideoLoading = false;
         protected bool IsVideoContent = false;
 
@@ -83,64 +82,91 @@ namespace Neptuo.Recollections.Entries.Components
             previousUrl = url;
         }
 
-        protected async override Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
-            await base.OnParametersSetAsync();
+            base.OnParametersSet();
 
-            if (!IsVideoContent)
+            if (IsVideoContent)
+                return;
+
+            string mediaUrl = null;
+            if (Image != null)
+                mediaUrl = FindImageUrl(Image);
+            else if (Video != null)
+                mediaUrl = FindImageUrl(Video);
+
+            if (mediaUrl != null)
             {
-                string mediaUrl = null;
-                if (Image != null)
-                    mediaUrl = FindImageUrl(Image);
-                else if (Video != null)
-                    mediaUrl = FindImageUrl(Video);
-
-                if (mediaUrl != null)
+                if (previousUrl != mediaUrl)
                 {
-                    if (previousUrl != mediaUrl)
-                    {
-                        IsLoadingNotFound = false;
-                        previousUrl = mediaUrl;
-                        url = mediaUrl;
-                        hasSourceChanged = true;
-                        _ = LoadMediaDataAsync(mediaUrl).ContinueWith(_ => StateHasChanged());
-                    }
-
-                    return;
-                }
-                else
-                {
-                    Content = null;
+                    IsLoadingNotFound = false;
+                    IsLoaded = false;
+                    previousUrl = mediaUrl;
+                    url = mediaUrl;
+                    hasSourceChanged = true;
+                    HasUrl = true;
                 }
             }
-        }
-
-        private async Task LoadMediaDataAsync(string mediaUrl)
-        {
-            using (ExceptionPanelSuppression.Enter<HttpRequestException>(e => e.StatusCode == HttpStatusCode.NotFound))
+            else
             {
-                try
-                {
-                    Log.Debug("Downloading media from {0}", mediaUrl);
-                    Content = await Api.GetMediaDataAsync(mediaUrl);
-                    Log.Debug("Media downloaded successfully");
-                }
-                catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
-                {
-                    Log.Debug("Exception during image download");
-                    IsLoadingNotFound = true;
-                }
+                url = null;
+                HasUrl = false;
+                IsLoaded = false;
             }
         }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            if (Content != null && hasSourceChanged)
+            if (hasSourceChanged && url != null)
             {
                 hasSourceChanged = false;
-                await ImageInterop.SetAsync(Element, Content, IsVideoContent ? Video?.ContentType : null);
+                await LoadFromUrlAsync(url, IsVideoContent ? Video?.ContentType : null);
             }
+        }
+
+        private async Task LoadFromUrlAsync(string mediaUrl, string contentType)
+        {
+            string absoluteUrl = Api.GetMediaUrl(mediaUrl);
+            Log.Debug("Downloading media from {0}", absoluteUrl);
+
+            int status;
+            try
+            {
+                status = await ImageInterop.SetFromUrlAsync(Element, absoluteUrl, contentType, UserState?.BearerToken);
+            }
+            catch (Exception e)
+            {
+                HandleMediaLoadFailure(0, $"Exception during media download: {e.Message}");
+                return;
+            }
+            finally
+            {
+                IsVideoLoading = false;
+            }
+
+            if (!IsSuccessfulStatus(status))
+            {
+                HandleMediaLoadFailure(status, $"Media download failed with status '{status}'");
+                return;
+            }
+
+            Log.Debug("Media downloaded successfully");
+            IsLoaded = true;
+            IsLoadingNotFound = false;
+            StateHasChanged();
+        }
+
+        private static bool IsSuccessfulStatus(int status)
+            => status >= (int)HttpStatusCode.OK && status < 300;
+
+        private void HandleMediaLoadFailure(int status, string message)
+        {
+            Log.Debug(message);
+            IsLoadingNotFound = status == (int)HttpStatusCode.NotFound;
+            IsLoaded = false;
+            HasUrl = false;
+            StateHasChanged();
         }
 
         private string FindImageUrl(IMediaUrlList media, MediaType? type = null)
@@ -164,13 +190,13 @@ namespace Neptuo.Recollections.Entries.Components
                 return;
 
             IsVideoLoading = true;
-            LoadMediaDataAsync(FindImageUrl(Video, MediaType.Original)).ContinueWith(_ =>
-            {
-                IsVideoLoading = false;
-                IsVideoContent = true;
-                hasSourceChanged = true;
-                StateHasChanged();
-            });
+            IsVideoContent = true;
+            url = FindImageUrl(Video, MediaType.Original);
+            previousUrl = url;
+            hasSourceChanged = true;
+            HasUrl = true;
+            IsLoaded = false;
+            StateHasChanged();
         }
     }
 }

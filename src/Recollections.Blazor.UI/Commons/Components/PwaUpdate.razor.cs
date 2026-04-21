@@ -18,10 +18,17 @@ namespace Neptuo.Recollections.Commons.Components
         [Inject]
         internal ILog<PwaUpdate> Log { get; set; }
 
+        [Inject]
+        internal AppUpdateState AppUpdateState { get; set; }
+
+        [Inject]
+        internal ReleaseNotesState ReleaseNotesState { get; set; }
+
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
         protected bool IsUpdateable { get; set; }
+        protected string LastSeenVersion { get; private set; }
 
         protected override void OnInitialized()
         {
@@ -29,6 +36,8 @@ namespace Neptuo.Recollections.Commons.Components
 
             base.OnInitialized();
             Interop.Initialize(this);
+
+            _ = InvokeAsync(AppUpdateState.SeedClientVersionIfMissingAsync);
         }
 
         public void MakeInstallable()
@@ -38,12 +47,38 @@ namespace Neptuo.Recollections.Commons.Components
         {
             Log.Debug("Updateable=True");
 
-            IsUpdateable = true;
-            StateHasChanged();
+            _ = InvokeAsync(LoadLastSeenVersionAsync);
         }
 
-        protected async Task UpdateAsync() 
-            => await Interop.UpdateAsync();
+        private async Task LoadLastSeenVersionAsync()
+        {
+            LastSeenVersion = await AppUpdateState.GetLastSeenClientVersionAsync();
+            IsUpdateable = true;
+            StateHasChanged();
+
+            // Record the newest shown version so dismiss-then-silent-SW-activate
+            // doesn't leave LastSeenVersion stale and duplicate notes next cycle.
+            await RememberNewestShownVersionAsync();
+        }
+
+        protected async Task UpdateAsync()
+        {
+            await RememberNewestShownVersionAsync();
+            await Interop.UpdateAsync();
+        }
+
+        private async Task RememberNewestShownVersionAsync()
+        {
+            try
+            {
+                var latest = await ReleaseNotesState.GetLatestVersionAsync();
+                await AppUpdateState.RememberClientVersionAsync(latest);
+            }
+            catch (Exception e)
+            {
+                Log.Debug($"Failed to remember newest shown release-notes version: {e.Message}");
+            }
+        }
 
         public void Dispose()
         {

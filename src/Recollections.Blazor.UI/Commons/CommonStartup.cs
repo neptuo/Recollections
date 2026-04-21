@@ -15,7 +15,8 @@ namespace Neptuo.Recollections.Commons
         {
             services
                 .AddSingleton<PwaInstallInterop>()
-                .AddScoped<AppUpdateState>();
+                .AddScoped<AppUpdateState>()
+                .AddScoped<ReleaseNotesState>();
         }
     }
 }

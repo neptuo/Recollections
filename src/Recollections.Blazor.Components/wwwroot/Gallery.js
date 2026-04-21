@@ -11,6 +11,8 @@ let autoPlayTimer = null;
 let stopCallback = () => { };
 let interop = null;
 let items = [];
+let bearerToken = null;
+const createdObjectUrls = new Set();
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -74,9 +76,47 @@ function formatTitle(model, title) {
     return `${title} (${hint})`;
 }
 
-export function initialize(intr, i) {
+async function fetchBlobUrl(url, mimeType) {
+    const fetcher = window.ImageSource && window.ImageSource.FetchObjectUrlAsync;
+    if (!fetcher) {
+        console.error("Gallery.fetchBlobUrl: window.ImageSource.FetchObjectUrlAsync is not available");
+        return null;
+    }
+
+    const { objectUrl } = await fetcher(url, mimeType, bearerToken);
+    if (objectUrl) {
+        createdObjectUrls.add(objectUrl);
+    }
+    return objectUrl;
+}
+
+function revokeObjectUrl(url) {
+    if (url && createdObjectUrls.delete(url)) {
+        URL.revokeObjectURL(url);
+    }
+}
+
+function revokeAllObjectUrls() {
+    for (const url of createdObjectUrls) {
+        URL.revokeObjectURL(url);
+    }
+    createdObjectUrls.clear();
+    for (const model of items) {
+        if (model) {
+            model.src = null;
+            model.provider = null;
+        }
+    }
+}
+
+export function initialize(intr, i, token) {
+    if (items !== i) {
+        revokeAllObjectUrls();
+    }
+
     interop = intr;
     items = i;
+    bearerToken = token;
 
     if (!isInitiazed) {
         lightbox.on('uiRegister', function () {
@@ -189,19 +229,14 @@ export function initialize(intr, i) {
                 const originalTitle = lightbox.pswp.currSlide.data.alt || '';
 
                 titleEl.innerHTML = `${videoIcon} ${originalTitle} (loading video...)`;
-                
-                const stream = await invokeInterop("GetImageDataAsync", index, "original");
-                if (!stream) {
+
+                const url = await fetchBlobUrl(model.originalUrl, model.contentType || "video/mp4");
+                if (!url) {
                     return;
                 }
 
-                const arrayBuffer = await stream.arrayBuffer();
-                const blob = new Blob([arrayBuffer], {
-                    type: model.contentType || "video/mp4"
-                });
-                const url = URL.createObjectURL(blob);
-
                 const imageEl = lightbox.pswp.currSlide.image;
+                const previousSrc = imageEl.getAttribute('src');
                 const videoEl = document.createElement('video');
                 videoEl.src = url;
                 videoEl.controls = true;
@@ -214,6 +249,13 @@ export function initialize(intr, i) {
                 imageEl.parentNode.replaceChild(videoEl, imageEl);
                 lightbox.pswp.currSlide.image = videoEl;
                 titleEl.style.display = 'none';
+
+                // The poster image that was showing before is no longer attached; drop its blob URL.
+                if (previousSrc && previousSrc === model.src) {
+                    revokeObjectUrl(previousSrc);
+                    model.src = null;
+                    model.provider = null;
+                }
             });
         });
 
@@ -243,17 +285,14 @@ export function initialize(intr, i) {
                 e.itemData.provider = model.provider;
             } else {
                 e.itemData.provider = model.provider = new Promise(async resolve => {
-                    const stream = await invokeInterop("GetImageDataAsync", e.index, "");
-                    if (!stream) {
+                    // For videos the preview is a JPEG poster, so let the response content-type win.
+                    const previewMimeType = isVideo(model) ? null : (model.contentType || null);
+                    const url = await fetchBlobUrl(model.previewUrl, previewMimeType);
+                    if (!url) {
                         resolve('');
                         return;
                     }
 
-                    const arrayBuffer = await stream.arrayBuffer();
-                    const blob = new Blob([arrayBuffer], {
-                        type: "image/png"
-                    });
-                    const url = URL.createObjectURL(blob);
                     model.src = url;
 
                     console.log(`Loading image at index '${e.index}'`);
@@ -292,5 +331,7 @@ export function dispose() {
     autoPlayTimer = null;
     stopCallback();
     stopCallback = () => { };
+    revokeAllObjectUrls();
     items = [];
+    bearerToken = null;
 }

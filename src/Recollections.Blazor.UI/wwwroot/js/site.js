@@ -441,6 +441,59 @@ window.ImageSource = {
             URL.revokeObjectURL(url);
         }
         element.src = url;
+    },
+    FetchObjectUrlAsync: async function (url, mimeType, bearerToken) {
+        const headers = {};
+        if (bearerToken) {
+            headers["Authorization"] = "Bearer " + bearerToken;
+        }
+
+        let response;
+        try {
+            response = await fetch(url, { headers });
+        } catch (e) {
+            console.warn("ImageSource.FetchObjectUrlAsync: fetch failed", url, e);
+            return { status: 0, objectUrl: null };
+        }
+
+        if (!response.ok) {
+            return { status: response.status, objectUrl: null };
+        }
+
+        const blob = await response.blob();
+        const blobType = mimeType || blob.type || undefined;
+        const typedBlob = blobType && blob.type !== blobType ? blob.slice(0, blob.size, blobType) : blob;
+        return { status: response.status, objectUrl: URL.createObjectURL(typedBlob) };
+    },
+    SetFromUrl: async function (element, url, mimeType, bearerToken) {
+        const { status, objectUrl } = await window.ImageSource.FetchObjectUrlAsync(url, mimeType, bearerToken);
+        if (!objectUrl) {
+            return status;
+        }
+
+        return await new Promise(resolve => {
+            const tag = element.tagName ? element.tagName.toLowerCase() : "";
+            const loadEvent = tag === "video" ? "loadeddata" : "load";
+
+            const cleanup = () => {
+                element.removeEventListener(loadEvent, onLoad);
+                element.removeEventListener("error", onError);
+            };
+            const onLoad = () => {
+                cleanup();
+                URL.revokeObjectURL(objectUrl);
+                resolve(status);
+            };
+            const onError = () => {
+                cleanup();
+                URL.revokeObjectURL(objectUrl);
+                resolve(0);
+            };
+
+            element.addEventListener(loadEvent, onLoad, { once: true });
+            element.addEventListener("error", onError, { once: true });
+            element.src = objectUrl;
+        });
     }
 }
 

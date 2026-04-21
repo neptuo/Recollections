@@ -228,7 +228,8 @@ namespace Neptuo.Recollections.Entries.Pages
                         Type = "image",
                         Title = item.Image.Name,
                         Width = item.Image.Preview.Width,
-                        Height = item.Image.Preview.Height
+                        Height = item.Image.Preview.Height,
+                        PreviewUrl = Api.GetMediaUrl(item.Image.Preview.Url),
                     });
                 }
                 else if (item.Video != null)
@@ -241,38 +242,13 @@ namespace Neptuo.Recollections.Entries.Pages
                         Width = item.Video.Preview.Width,
                         Height = item.Video.Preview.Height,
                         ContentType = item.Video.ContentType,
+                        PreviewUrl = Api.GetMediaUrl(item.Video.Preview.Url),
+                        OriginalUrl = Api.GetMediaUrl(item.Video.Original.Url),
                     });
                 }
             }
         }
 
-        protected async Task<Stream> OnGetMediaDataAsync(int index, string type)
-        {
-            if (index >= Media.Count)
-                return null;
-
-            var item = Media[index];
-            if (item.Image != null)
-            {
-                var image = item.Image;
-                Log.Debug($"Get image for gallery at '{index}' (count '{Media.Count}'), URL is '{image.Preview.Url}'.");
-
-                var stream = await Api.GetMediaDataAsync(image.Preview.Url);
-                Log.Debug($"Got image data for gallery at '{index}'");
-
-                return stream;
-            }
-            else if (item.Video != null)
-            {
-                if (type == "original")
-                    return await Api.GetMediaDataAsync(item.Video.Original.Url);
-                else
-                    return await Api.GetMediaDataAsync(item.Video.Preview.Url);
-            }
-
-            return null;
-        }
-        
         private async Task OnGalleryOpenInfoAsync(int index)
         {
             await Gallery.CloseAsync();
