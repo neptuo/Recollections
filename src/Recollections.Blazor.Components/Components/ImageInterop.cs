@@ -19,5 +19,8 @@ namespace Neptuo.Recollections.Components
 
         public ValueTask SetAsync(IJSObjectReference element, Stream stream, string contentType = null)
             => SetInternalAsync(element, stream, contentType);
+
+        public ValueTask<int> SetFromUrlAsync(ElementReference element, string url, string contentType = null, string bearerToken = null)
+            => jsRuntime.InvokeAsync<int>("ImageSource.SetFromUrl", element, url, contentType, bearerToken);
     }
 }
