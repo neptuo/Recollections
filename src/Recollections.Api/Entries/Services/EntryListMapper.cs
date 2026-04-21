@@ -71,7 +71,8 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
         {
             foreach (List<string> entryIdBatch in Batch(entryIdsWithBeings, QueryBatchSize))
             {
-                var accessibleBeings = await shareStatus
+                // Single query: load entry↔being links with being data, filtered by accessibility
+                var accessibleEntryBeings = await shareStatus
                     .OwnedByOrExplicitlySharedWithUser(
                         dataContext,
                         dataContext.Beings
@@ -79,43 +80,28 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
                             .Where(b => b.Entries.Any(e => entryIdBatch.Contains(e.Id))),
                         userIds,
                         connectedUsers)
-                    .Select(b => new
-                    {
-                        b.Id,
-                        b.Name,
-                        b.Icon
-                    })
-                    .ToDictionaryAsync(b => b.Id);
-
-                if (accessibleBeings.Count == 0)
-                    continue;
-
-                var entryBeingLinks = await dataContext.Entries
-                    .AsNoTracking()
-                    .Where(e => entryIdBatch.Contains(e.Id))
                     .SelectMany(
-                        e => e.Beings,
-                        (e, b) => new
+                        b => b.Entries.Where(e => entryIdBatch.Contains(e.Id)),
+                        (b, e) => new
                         {
                             EntryId = e.Id,
-                            BeingId = b.Id
+                            BeingId = b.Id,
+                            b.Name,
+                            b.Icon
                         })
                     .ToListAsync();
 
-                foreach (var item in entryBeingLinks
-                    .Where(item => accessibleBeings.ContainsKey(item.BeingId))
+                foreach (var item in accessibleEntryBeings
                     .OrderBy(item => item.EntryId)
-                    .ThenBy(item => accessibleBeings[item.BeingId].Name))
+                    .ThenBy(item => item.Name))
                 {
                     if (!beingsByEntryId.TryGetValue(item.EntryId, out List<EntryBeingModel> entryBeings))
                         beingsByEntryId[item.EntryId] = entryBeings = [];
 
-                    var being = accessibleBeings[item.BeingId];
-
                     entryBeings.Add(new EntryBeingModel(
-                        Id: being.Id,
-                        Name: being.Name,
-                        Icon: being.Icon
+                        Id: item.BeingId,
+                        Name: item.Name,
+                        Icon: item.Icon
                     ));
                 }
             }
@@ -137,10 +123,16 @@ public class EntryListMapper(DataContext dataContext, IUserNameProvider userName
             }
         }
 
-        var userNames = await this.userNames.GetUserNamesAsync(result.Select(e => e.UserId).ToArray());
+        string[] allUserIds = result.Select(e => e.UserId).ToArray();
+        string[] distinctUserIds = allUserIds.Distinct().ToArray();
+        var distinctUserNames = await this.userNames.GetUserNamesAsync(distinctUserIds);
+        var userNameByUserId = new Dictionary<string, string>(distinctUserIds.Length);
+        for (int i = 0; i < distinctUserIds.Length; i++)
+            userNameByUserId[distinctUserIds[i]] = distinctUserNames[i];
+
         return (result.Select((e, index) => new EntryListModel(
             UserId: e.UserId,
-            UserName: userNames[index],
+            UserName: userNameByUserId[e.UserId],
             Id: e.Id,
             Title: e.Title,
             TextWordCount: (e.Text ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries).Length,
