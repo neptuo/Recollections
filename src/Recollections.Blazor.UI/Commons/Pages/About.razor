@@ -4,16 +4,17 @@
 
 <DocumentTitle Value="About" />
 
-<h1 class="mt-4">About</h1>
+<div class="mt-4">
+    <h2 class="d-none d-sm-block">About</h2>
+    <p>
+        <a href="@Navigator.UrlAboutSite()" target="_blank" rel="noopener noreferrer" class="btn btn-primary d-block d-sm-inline-block">
+            <span class="fab fa-safari"></span>
+            Find more about Recollections
+        </a>
+    </p>
+</div>
 
-<p>
-    <a href="@Navigator.UrlAboutSite()" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-        <span class="fab fa-safari"></span>
-        Find more about Recollections
-    </a>
-</p>
-
-<h2 class="mt-5">Release notes</h2>
+<h3 class="mt-3">Release notes</h3>
 
 @if (entries == null)
 {
