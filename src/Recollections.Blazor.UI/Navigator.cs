@@ -88,6 +88,12 @@ namespace Neptuo.Recollections
         public void OpenAbout()
             => uri.NavigateTo(UrlAbout());
 
+        public string UrlAboutPage()
+            => "/about";
+
+        public void OpenAboutPage()
+            => uri.NavigateTo(UrlAboutPage());
+
         public string UrlLogin()
             => "/login";
 
