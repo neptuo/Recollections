@@ -3,26 +3,43 @@
 
 @if (entries != null)
 {
-    foreach (var entry in entries)
+    if (Group)
     {
-        @Section("Breaking changes", entry.BreakingChanges)
-        @Section("New features", entry.NewFeatures)
-        @Section("Bug fixes", entry.BugFixes)
+        <h2>
+            @(SinceVersion ?? "0.0.0")
+            <Icon Identifier="arrow-right" CssClass="fs-5" />
+            @entries.First().Version
+        </h2>
+        @Section("Breaking changes", entries.SelectMany(e => e.BreakingChanges).ToArray())
+        @Section("New features", entries.SelectMany(e => e.NewFeatures).ToArray())
+        @Section("Bug fixes", entries.SelectMany(e => e.BugFixes).ToArray())
+    }
+    else
+    {
+        foreach (var entry in entries)
+        {
+            @Section("Breaking changes", entry.BreakingChanges)
+            @Section("New features", entry.NewFeatures)
+            @Section("Bug fixes", entry.BugFixes)
 
-        <div class="row">
-            <div class="col-12 col-md-auto">
-                <a target="_blank" rel="noopener noreferrer" href="@($"https://github.com/neptuo/Recollections/milestone/{entry.Milestone}?closed=1")" class="btn bg-light-subtle w-100">
-                    <span class="fab fa-github"></span>
-                    See details on GitHub
-                </a>
+            <div class="row">
+                <div class="col-12 col-md-auto">
+                    <a target="_blank" rel="noopener noreferrer" href="@($"https://github.com/neptuo/Recollections/milestone/{entry.Milestone}?closed=1")" class="btn bg-light-subtle w-100">
+                        <span class="fab fa-github"></span>
+                        See details on GitHub
+                    </a>
+                </div>
             </div>
-        </div>
+        }
     }
 }
 
 @code {
     [Parameter]
     public string SinceVersion { get; set; }
+
+    [Parameter]
+    public bool Group { get; set; }
 
     private List<ReleaseNotesEntry> entries;
 
@@ -35,7 +52,7 @@
             : await State.GetSinceAsync(SinceVersion);
     }
 
-    private RenderFragment Section(string heading, List<string> items) =>
+    private RenderFragment Section(string heading, ICollection<string> items) =>
         @<text>
             @if (items != null && items.Count > 0)
             {
