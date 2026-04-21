@@ -20,19 +20,39 @@
 {
     RenderFragment RenderImage() 
     {
-        if (IsLoaded)
+        if (HasUrl)
         {
+            string mediaClass = $"rounded {(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")} {(!IsLoaded ? "d-none" : "")}";
+
             if (IsVideoContent)
-                return @<video @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" controls playsinline preload autoplay />;
+            {
+                return @<text>
+                    <video @ref="@Element" class="@mediaClass" controls playsinline preload autoplay />
+                    @if (!IsLoaded)
+                    {
+                        @RenderPlaceholder()
+                    }
+                </text>;
+            }
 
             Action onClick = null;
             if (ClickToPlay && Video != null)
                 onClick = DownloadVideo;
 
-            return @<img @ref="@Element" class="rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "")" @onclick="@onClick" />;
+            return @<text>
+                <img @ref="@Element" class="@mediaClass" @onclick="@onClick" />
+                @if (!IsLoaded)
+                {
+                    @RenderPlaceholder()
+                }
+            </text>;
         }
 
-        return @<div class="img rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "") @(IsLoadingNotFound ? "alert m-0 alert-danger" : "placeholder")">
+        return RenderPlaceholder();
+    }
+
+    RenderFragment RenderPlaceholder() =>
+        @<div class="img rounded @(Type == MediaType.Thumbnail ? "ratio ratio-4x3" : "") @(IsLoadingNotFound ? "alert m-0 alert-danger" : "placeholder")">
             @if (IsLoadingNotFound)
             {
                 <div class="d-flex justify-content-center align-items-center">
@@ -50,6 +70,5 @@
                 </div>
             }
         </div>;
-    }
 }
 

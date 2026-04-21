@@ -12,6 +12,7 @@ let stopCallback = () => { };
 let interop = null;
 let items = [];
 let bearerToken = null;
+const createdObjectUrls = new Set();
 
 const playDurationSeconds = 4;
 const playIcon = '<i class="fas fa-play"></i>';
@@ -76,30 +77,43 @@ function formatTitle(model, title) {
 }
 
 async function fetchBlobUrl(url, mimeType) {
-    const headers = {};
-    if (bearerToken) {
-        headers["Authorization"] = "Bearer " + bearerToken;
-    }
-
-    let response;
-    try {
-        response = await fetch(url, { headers });
-    } catch (e) {
-        console.warn("Gallery.fetchBlobUrl: fetch failed", url, e);
+    const fetcher = window.ImageSource && window.ImageSource.FetchObjectUrlAsync;
+    if (!fetcher) {
+        console.error("Gallery.fetchBlobUrl: window.ImageSource.FetchObjectUrlAsync is not available");
         return null;
     }
 
-    if (!response.ok) {
-        return null;
+    const { objectUrl } = await fetcher(url, mimeType, bearerToken);
+    if (objectUrl) {
+        createdObjectUrls.add(objectUrl);
     }
+    return objectUrl;
+}
 
-    const blob = await response.blob();
-    const blobType = mimeType || blob.type || undefined;
-    const typedBlob = blobType && blob.type !== blobType ? blob.slice(0, blob.size, blobType) : blob;
-    return URL.createObjectURL(typedBlob);
+function revokeObjectUrl(url) {
+    if (url && createdObjectUrls.delete(url)) {
+        URL.revokeObjectURL(url);
+    }
+}
+
+function revokeAllObjectUrls() {
+    for (const url of createdObjectUrls) {
+        URL.revokeObjectURL(url);
+    }
+    createdObjectUrls.clear();
+    for (const model of items) {
+        if (model) {
+            model.src = null;
+            model.provider = null;
+        }
+    }
 }
 
 export function initialize(intr, i, token) {
+    if (items !== i) {
+        revokeAllObjectUrls();
+    }
+
     interop = intr;
     items = i;
     bearerToken = token;
@@ -222,6 +236,7 @@ export function initialize(intr, i, token) {
                 }
 
                 const imageEl = lightbox.pswp.currSlide.image;
+                const previousSrc = imageEl.getAttribute('src');
                 const videoEl = document.createElement('video');
                 videoEl.src = url;
                 videoEl.controls = true;
@@ -234,6 +249,13 @@ export function initialize(intr, i, token) {
                 imageEl.parentNode.replaceChild(videoEl, imageEl);
                 lightbox.pswp.currSlide.image = videoEl;
                 titleEl.style.display = 'none';
+
+                // The poster image that was showing before is no longer attached; drop its blob URL.
+                if (previousSrc && previousSrc === model.src) {
+                    revokeObjectUrl(previousSrc);
+                    model.src = null;
+                    model.provider = null;
+                }
             });
         });
 
@@ -263,7 +285,9 @@ export function initialize(intr, i, token) {
                 e.itemData.provider = model.provider;
             } else {
                 e.itemData.provider = model.provider = new Promise(async resolve => {
-                    const url = await fetchBlobUrl(model.previewUrl, model.contentType || "image/jpeg");
+                    // For videos the preview is a JPEG poster, so let the response content-type win.
+                    const previewMimeType = isVideo(model) ? null : (model.contentType || null);
+                    const url = await fetchBlobUrl(model.previewUrl, previewMimeType);
                     if (!url) {
                         resolve('');
                         return;
@@ -307,5 +331,7 @@ export function dispose() {
     autoPlayTimer = null;
     stopCallback();
     stopCallback = () => { };
+    revokeAllObjectUrls();
     items = [];
+    bearerToken = null;
 }

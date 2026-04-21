@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Models;
 using System;
-using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Components
@@ -18,6 +15,7 @@ namespace Neptuo.Recollections.Entries.Components
         private string url;
         private string previousUrl;
 
+        protected bool HasUrl { get; private set; }
         protected bool IsLoaded { get; private set; }
         protected bool IsLoadingNotFound { get; set; }
 
@@ -102,15 +100,17 @@ namespace Neptuo.Recollections.Entries.Components
                 if (previousUrl != mediaUrl)
                 {
                     IsLoadingNotFound = false;
+                    IsLoaded = false;
                     previousUrl = mediaUrl;
                     url = mediaUrl;
                     hasSourceChanged = true;
-                    IsLoaded = true;
+                    HasUrl = true;
                 }
             }
             else
             {
                 url = null;
+                HasUrl = false;
                 IsLoaded = false;
             }
         }
@@ -137,21 +137,36 @@ namespace Neptuo.Recollections.Entries.Components
             }
             catch (Exception e)
             {
-                Log.Debug("Exception during media download: {0}", e.Message);
+                HandleMediaLoadFailure(0, $"Exception during media download: {e.Message}");
+                return;
+            }
+            finally
+            {
+                IsVideoLoading = false;
+            }
+
+            if (!IsSuccessfulStatus(status))
+            {
+                HandleMediaLoadFailure(status, $"Media download failed with status '{status}'");
                 return;
             }
 
-            if (status == (int)HttpStatusCode.NotFound)
-            {
-                Log.Debug("Media not found");
-                IsLoadingNotFound = true;
-                IsLoaded = false;
-                StateHasChanged();
-            }
-            else
-            {
-                Log.Debug("Media downloaded successfully");
-            }
+            Log.Debug("Media downloaded successfully");
+            IsLoaded = true;
+            IsLoadingNotFound = false;
+            StateHasChanged();
+        }
+
+        private static bool IsSuccessfulStatus(int status)
+            => status >= (int)HttpStatusCode.OK && status < 300;
+
+        private void HandleMediaLoadFailure(int status, string message)
+        {
+            Log.Debug(message);
+            IsLoadingNotFound = status == (int)HttpStatusCode.NotFound;
+            IsLoaded = false;
+            HasUrl = false;
+            StateHasChanged();
         }
 
         private string FindImageUrl(IMediaUrlList media, MediaType? type = null)
@@ -179,8 +194,8 @@ namespace Neptuo.Recollections.Entries.Components
             url = FindImageUrl(Video, MediaType.Original);
             previousUrl = url;
             hasSourceChanged = true;
-            IsLoaded = true;
-            IsVideoLoading = false;
+            HasUrl = true;
+            IsLoaded = false;
             StateHasChanged();
         }
     }
