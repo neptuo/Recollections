@@ -9,6 +9,7 @@
             "Swipe between months on the calendar view",
             "Tap entries on calendar and map views to see a quick card preview",
             "Push notifications when your connections share new entries",
+            "Daily \"On this day\" push notifications for anniversaries of your own and shared entries",
             "Global drag-and-drop upload form with media preview before upload",
             "Upload progress visible on entry media, with a lighter progress visual in the PWA",
             "Manage GPX tracks on entries and see total elevation",
