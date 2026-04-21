@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Neptuo;
 using Neptuo.Recollections.Accounts.Notifications;
@@ -165,8 +167,11 @@ namespace Neptuo.Recollections.Accounts.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> TestOnThisDayAsync([FromServices] OnThisDayNotificationNotifier notifier)
+        public async Task<IActionResult> TestOnThisDayAsync([FromServices] OnThisDayNotificationNotifier notifier, [FromServices] IWebHostEnvironment env)
         {
+            if (!env.IsDevelopment())
+                return NotFound();
+
             string userId = HttpContext.User.FindUserId();
             if (userId == null)
                 return Unauthorized();

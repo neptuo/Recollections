@@ -191,7 +191,26 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 return OnThisDayTestResult.NoSubscriptions;
             }
 
-            int delivered = await sender.SendOnThisDayAsync(subscriptions, matchCount, localDate);
+            int delivered;
+            try
+            {
+                delivered = await sender.SendOnThisDayAsync(subscriptions, matchCount, localDate);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Failed to send 'on this day' notification to user '{UserId}' on {LocalDate:yyyy-MM-dd}. Releasing dispatch row.", candidate.UserId, localDate);
+                if (dispatch != null)
+                {
+                    accountsDb.NotificationOnThisDayDispatches.Remove(dispatch);
+                    await accountsDb.SaveChangesAsync(cancellationToken);
+                }
+                return OnThisDayTestResult.DeliveryFailed;
+            }
+
             if (delivered < 1)
             {
                 log.LogWarning("'On this day' notification was not delivered to user '{UserId}' on {LocalDate:yyyy-MM-dd}. Releasing dispatch row.", candidate.UserId, localDate);

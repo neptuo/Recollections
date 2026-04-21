@@ -126,7 +126,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
                     await client.SendNotificationAsync(subscription, rawPayload, vapidDetails);
                     deliveredCount++;
-                    log.LogInformation("Push notification '{Tag}' delivered to '{Endpoint}'.", payload.Tag, endpoint);
+                    log.LogDebug("Push notification '{Tag}' delivered to '{Endpoint}'.", payload.Tag, endpoint);
                 }
                 catch (WebPushException ex) when (ex.StatusCode == HttpStatusCode.Gone || ex.StatusCode == HttpStatusCode.NotFound)
                 {

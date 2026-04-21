@@ -100,12 +100,7 @@ public partial class Notifications
             Model.IsEnabled = true;
             Model.NewEntries.IsEnabled = true;
             Model.OnThisDay.IsEnabled = true;
-            if (String.IsNullOrWhiteSpace(Model.OnThisDay.TimeZone) || Model.OnThisDay.TimeZone == "UTC")
-            {
-                string detected = await PushInterop.GetTimeZoneAsync();
-                if (!String.IsNullOrWhiteSpace(detected))
-                    Model.OnThisDay.TimeZone = detected;
-            }
+            await EnsureTimeZoneAsync();
             await Api.SetNotificationSettingsAsync(Model);
 
             CurrentBrowserSubscription = await PushInterop.SubscribeAsync(Model.PushPublicKey);

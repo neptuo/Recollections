@@ -11,7 +11,7 @@ namespace Neptuo.Recollections.Accounts
 
         public DateTime Date { get; set; }
 
-        public DateTime Created { get; set; } = DateTime.Now;
+        public DateTime Created { get; set; } = DateTime.UtcNow;
         public DateTime? SentAt { get; set; }
     }
 }
