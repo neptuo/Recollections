@@ -99,7 +99,7 @@ public class MenuList
         Add(new MenuItem("Search", "search", Url: navigator.UrlSearch()), Main, Bottom);
         Add(new MenuItem("Stories", "book", Url: navigator.UrlStories()), Main, Bottom);
         Add(new MenuItem("Beings", "user-friends", Url: navigator.UrlBeings()), Main);
-        Add(new MenuItem("About", "info-circle", Url: navigator.UrlAboutPage()), Main);
+        Add(new MenuItem("About", "info-circle", Url: navigator.UrlAbout()), Main);
 
         Add(new MenuItem("Profile", "address-card", OnClick: () => navigator.OpenProfile(userState.UserId)), User);
         Add(new MenuItem("Connections", "link", Url: navigator.UrlConnections()), User);
