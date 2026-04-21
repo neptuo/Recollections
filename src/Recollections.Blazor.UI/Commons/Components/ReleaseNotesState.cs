@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Neptuo;
 using System;
 using System.Collections.Generic;
@@ -19,12 +20,15 @@ public record ReleaseNotesEntry(
 public class ReleaseNotesState
 {
     private readonly HttpClient http;
+    private readonly NavigationManager navigation;
     private List<ReleaseNotesEntry> cachedEntries;
 
-    public ReleaseNotesState(HttpClient http)
+    public ReleaseNotesState(HttpClient http, NavigationManager navigation)
     {
         Ensure.NotNull(http, "http");
+        Ensure.NotNull(navigation, "navigation");
         this.http = http;
+        this.navigation = navigation;
     }
 
     private async Task<List<ReleaseNotesEntry>> EnsureFetchedAsync()
@@ -32,7 +36,8 @@ public class ReleaseNotesState
         if (cachedEntries != null)
             return cachedEntries;
 
-        cachedEntries = await http.GetFromJsonAsync<List<ReleaseNotesEntry>>("/release-notes.json");
+        var url = new Uri(new Uri(navigation.BaseUri), "release-notes.json");
+        cachedEntries = await http.GetFromJsonAsync<List<ReleaseNotesEntry>>(url);
         return cachedEntries;
     }
 
