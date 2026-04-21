@@ -69,8 +69,15 @@ namespace Neptuo.Recollections.Commons.Components
 
         private async Task RememberNewestShownVersionAsync()
         {
-            var latest = await ReleaseNotesState.GetLatestVersionAsync();
-            await AppUpdateState.RememberClientVersionAsync(latest);
+            try
+            {
+                var latest = await ReleaseNotesState.GetLatestVersionAsync();
+                await AppUpdateState.RememberClientVersionAsync(latest);
+            }
+            catch (Exception e)
+            {
+                Log.Debug($"Failed to remember newest shown release-notes version: {e.Message}");
+            }
         }
 
         public void Dispose()

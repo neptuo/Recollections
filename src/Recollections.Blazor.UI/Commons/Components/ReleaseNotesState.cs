@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Components;
 using Neptuo;
+using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Commons.Components;
@@ -21,14 +23,17 @@ public class ReleaseNotesState
 {
     private readonly HttpClient http;
     private readonly NavigationManager navigation;
+    private readonly ILog<ReleaseNotesState> log;
     private List<ReleaseNotesEntry> cachedEntries;
 
-    public ReleaseNotesState(HttpClient http, NavigationManager navigation)
+    public ReleaseNotesState(HttpClient http, NavigationManager navigation, ILog<ReleaseNotesState> log)
     {
         Ensure.NotNull(http, "http");
         Ensure.NotNull(navigation, "navigation");
+        Ensure.NotNull(log, "log");
         this.http = http;
         this.navigation = navigation;
+        this.log = log;
     }
 
     private async Task<List<ReleaseNotesEntry>> EnsureFetchedAsync()
@@ -36,9 +41,22 @@ public class ReleaseNotesState
         if (cachedEntries != null)
             return cachedEntries;
 
-        var url = new Uri(new Uri(navigation.BaseUri), "release-notes.json");
-        cachedEntries = await http.GetFromJsonAsync<List<ReleaseNotesEntry>>(url);
-        return cachedEntries;
+        try
+        {
+            var url = new Uri(new Uri(navigation.BaseUri), "release-notes.json");
+            cachedEntries = await http.GetFromJsonAsync<List<ReleaseNotesEntry>>(url);
+            return cachedEntries;
+        }
+        catch (HttpRequestException e)
+        {
+            log.Debug($"Failed to fetch release-notes.json: {e.Message}");
+            return [];
+        }
+        catch (JsonException e)
+        {
+            log.Debug($"Failed to parse release-notes.json: {e.Message}");
+            return [];
+        }
     }
 
     public async Task<List<ReleaseNotesEntry>> GetAllAsync()
