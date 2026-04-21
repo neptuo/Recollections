@@ -18,6 +18,8 @@ namespace Neptuo.Recollections.Accounts
         public DbSet<UserNotificationSettings> NotificationSettings { get; set; }
         public DbSet<UserNotificationNewEntriesSettings> NotificationNewEntriesSettings { get; set; }
         public DbSet<UserNotificationNewEntriesDispatch> NotificationNewEntriesDispatches { get; set; }
+        public DbSet<UserNotificationOnThisDaySettings> NotificationOnThisDaySettings { get; set; }
+        public DbSet<UserNotificationOnThisDayDispatch> NotificationOnThisDayDispatches { get; set; }
         public DbSet<UserNotificationPushSubscription> PushSubscriptions { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options, SchemaOptions<DataContext> schema)
@@ -90,6 +92,43 @@ namespace Neptuo.Recollections.Accounts
                 .IsUnique();
 
             modelBuilder.Entity<UserNotificationNewEntriesDispatch>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationOnThisDaySettings>()
+                .ToTable("UserNotificationOnThisDaySettings")
+                .HasKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationOnThisDaySettings>()
+                .Property(p => p.UserId)
+                .HasMaxLength(36)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationOnThisDaySettings>()
+                .Property(p => p.TimeZone)
+                .HasMaxLength(64)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationOnThisDaySettings>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+
+            modelBuilder.Entity<UserNotificationOnThisDayDispatch>()
+                .ToTable("UserNotificationOnThisDayDispatches")
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<UserNotificationOnThisDayDispatch>()
+                .Property(p => p.UserId)
+                .HasMaxLength(36)
+                .IsRequired();
+
+            modelBuilder.Entity<UserNotificationOnThisDayDispatch>()
+                .HasIndex(p => new { p.UserId, p.Date })
+                .IsUnique();
+
+            modelBuilder.Entity<UserNotificationOnThisDayDispatch>()
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId);

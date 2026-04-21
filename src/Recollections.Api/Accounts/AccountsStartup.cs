@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -48,7 +49,11 @@ namespace Neptuo.Recollections.Accounts
             services
                 .AddTransient<WebPush.WebPushClient>()
                 .AddTransient<PushNotificationSender>()
-                .AddTransient<NewEntriesNotificationNotifier>();
+                .AddTransient<NewEntriesNotificationNotifier>()
+                .AddSingleton<OnThisDayNotificationNotifier>()
+                .AddHostedService<OnThisDayNotificationBackgroundService>();
+
+            services.TryAddSingleton(TimeProvider.System);
 
             services
                 .AddDbContextWithSchema<DataContext>(configuration.GetSection("Database"), pathResolver)

@@ -28,7 +28,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
             this.log = log;
         }
 
-        public bool IsConfigured
+        public virtual bool IsConfigured
             => !String.IsNullOrWhiteSpace(options.Subject)
                 && !String.IsNullOrWhiteSpace(options.PublicKey)
                 && !String.IsNullOrWhiteSpace(options.PrivateKey);
@@ -59,6 +59,23 @@ namespace Neptuo.Recollections.Accounts.Notifications
             );
         }
 
+        public virtual Task<int> SendOnThisDayAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, int entryCount, DateTime localDate)
+        {
+            Ensure.NotNull(subscriptions, "subscriptions");
+            if (entryCount < 1)
+                return Task.FromResult(0);
+
+            string body = entryCount == 1
+                ? "You have one recollection from this day in a previous year."
+                : $"You have {entryCount} recollections from this day in previous years.";
+            string tag = $"on-this-day-{localDate:yyyy-MM-dd}";
+
+            return SendAsync(
+                subscriptions,
+                new NotificationPayload("On this day", body, "/on-this-day", tag)
+            );
+        }
+
         private async Task<int> SendAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, NotificationPayload payload)
         {
             bool hasSubject = !String.IsNullOrWhiteSpace(options.Subject);
@@ -83,7 +100,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
             string rawPayload = JsonSerializer.Serialize(payload, serializerOptions);
             VapidDetails vapidDetails = new VapidDetails(options.Subject, options.PublicKey, options.PrivateKey);
 
-            log.LogDebug(
+            log.LogInformation(
                 "Sending push notification '{Tag}' to {SubscriptionCount} active subscription(s).",
                 payload.Tag,
                 activeSubscriptions.Count
@@ -118,11 +135,15 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 }
                 catch (WebPushException ex)
                 {
-                    log.LogError(ex, "Failed to deliver push notification '{Tag}' to '{Endpoint}' with status code '{StatusCode}'.", payload.Tag, endpoint, ex.StatusCode);
+                    log.LogError(ex, "Failed to deliver push notification '{Tag}' to '{Endpoint}' with status code '{StatusCode}'. Response body: {ResponseBody}.", payload.Tag, endpoint, ex.StatusCode, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    log.LogError(ex, "Unexpected error delivering push notification '{Tag}' to '{Endpoint}'.", payload.Tag, endpoint);
                 }
             }
 
-            log.LogDebug(
+            log.LogInformation(
                 "Push notification '{Tag}' delivery finished. Delivered to {DeliveredCount} of {SubscriptionCount} active subscription(s).",
                 payload.Tag,
                 deliveredCount,

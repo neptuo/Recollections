@@ -56,6 +56,32 @@
 
                     <hr class="my-4" />
 
+                    <section>
+                        <h6 class="mb-3">
+                            <Icon Identifier="calendar-day" CssClass="me-1" />
+                            On this day
+                        </h6>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="onThisDayEnabled" @bind="Model.OnThisDay.IsEnabled" />
+                            <label class="form-check-label" for="onThisDayEnabled">Remind me about anniversaries of my own and shared entries</label>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-sm-3 col-md-2">
+                                <label class="form-label" for="onThisDayHour">Preferred hour</label>
+                                <input class="form-control" type="number" id="onThisDayHour" min="0" max="23" @bind="Model.OnThisDay.PreferredHour" />
+                            </div>
+                            <div class="col-sm-5 col-md-4">
+                                <label class="form-label" for="onThisDayTimeZone">Time zone</label>
+                                <input class="form-control" type="text" id="onThisDayTimeZone" @bind="Model.OnThisDay.TimeZone" />
+                            </div>
+                        </div>
+                        <div class="form-text mt-2">
+                            Delivered at most once per day shortly after the selected local hour.
+                        </div>
+                    </section>
+
+                    <hr class="my-4" />
+
                     <div class="mt-4">
                         <button class="btn btn-primary" disabled="@IsBusy">
                             Save settings

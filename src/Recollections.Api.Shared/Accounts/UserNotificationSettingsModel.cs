@@ -6,10 +6,13 @@ namespace Neptuo.Recollections.Accounts
         public bool HasSubscription { get; set; }
         public string PushPublicKey { get; set; }
         public UserNotificationNewEntriesSettingsModel NewEntries { get; set; }
+        public UserNotificationOnThisDaySettingsModel OnThisDay { get; set; }
 
         public UserNotificationSettingsModel()
         {
             NewEntries = new UserNotificationNewEntriesSettingsModel();
+            OnThisDay = new UserNotificationOnThisDaySettingsModel();
         }
     }
 }
+
