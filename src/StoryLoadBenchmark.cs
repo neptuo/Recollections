@@ -57,7 +57,7 @@ internal sealed class StoryLoadBenchmark
             var user = await accountsDb.Users.FirstOrDefaultAsync(u => u.UserName == "jondoe");
             if (user == null)
             {
-                Console.WriteLine("Error: user 'jondoe' not found. Run SampleDataSeeder with --large first.");
+                Console.WriteLine("Error: user 'jondoe' not found. Run SampleDataSeeder with --large (or --story-entries <count>) first.");
                 return;
             }
 

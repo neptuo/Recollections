@@ -8,6 +8,9 @@ namespace Neptuo.Recollections.Entries;
 
 public class EntryMediaMapper(DataContext dataContext, ImageService imageService, VideoService videoService)
 {
+    // Keep IN (...) lists well below SQLite's default 999-parameter limit and SQL Server's 2100 limit.
+    private const int QueryBatchSize = 250;
+
     public async Task<List<MediaModel>> MapAsync(string entryId, string userId, int? take = null)
     {
         Ensure.NotNullOrEmpty(entryId, nameof(entryId));
@@ -80,31 +83,55 @@ public class EntryMediaMapper(DataContext dataContext, ImageService imageService
 
     private async Task<List<(string EntryId, Image Entity)>> LoadImagesAsync(List<string> entryIds)
     {
-        var images = await dataContext.Images
-            .Where(i => entryIds.Contains(i.Entry.Id))
-            .Select(i => new
-            {
-                EntryId = i.Entry.Id,
-                Entity = i
-            })
-            .AsNoTracking()
-            .ToListAsync();
+        var result = new List<(string EntryId, Image Entity)>();
+        foreach (List<string> batch in Batch(entryIds, QueryBatchSize))
+        {
+            var images = await dataContext.Images
+                .Where(i => batch.Contains(i.Entry.Id))
+                .Select(i => new
+                {
+                    EntryId = i.Entry.Id,
+                    Entity = i
+                })
+                .AsNoTracking()
+                .ToListAsync();
 
-        return images.Select(i => (i.EntryId, i.Entity)).ToList();
+            result.AddRange(images.Select(i => (i.EntryId, i.Entity)));
+        }
+
+        return result;
     }
 
     private async Task<List<(string EntryId, Video Entity)>> LoadVideosAsync(List<string> entryIds)
     {
-        var videos = await dataContext.Videos
-            .Where(v => entryIds.Contains(v.Entry.Id))
-            .Select(v => new
-            {
-                EntryId = v.Entry.Id,
-                Entity = v
-            })
-            .AsNoTracking()
-            .ToListAsync();
+        var result = new List<(string EntryId, Video Entity)>();
+        foreach (List<string> batch in Batch(entryIds, QueryBatchSize))
+        {
+            var videos = await dataContext.Videos
+                .Where(v => batch.Contains(v.Entry.Id))
+                .Select(v => new
+                {
+                    EntryId = v.Entry.Id,
+                    Entity = v
+                })
+                .AsNoTracking()
+                .ToListAsync();
 
-        return videos.Select(v => (v.EntryId, v.Entity)).ToList();
+            result.AddRange(videos.Select(v => (v.EntryId, v.Entity)));
+        }
+
+        return result;
+    }
+
+    private static IEnumerable<List<string>> Batch(List<string> values, int size)
+    {
+        if (values.Count <= size)
+        {
+            yield return values;
+            yield break;
+        }
+
+        for (int i = 0; i < values.Count; i += size)
+            yield return values.Skip(i).Take(size).ToList();
     }
 }
