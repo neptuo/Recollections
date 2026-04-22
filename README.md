@@ -15,8 +15,7 @@ Here are some tips and tricks.
 We have an Aspire app host.
 
 - `dotnet tool restore`
-- `dotnet watch build src/Recollections.Blazor.UI` to make Blazor recompile on change
-- `dotnet run ./src/AppHost.cs` to run the app host
+- `dotnet run ./src/AppHost.cs`
 
 ### Sample data and screenshots
 
