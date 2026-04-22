@@ -1,10 +1,10 @@
 #:sdk Microsoft.NET.Sdk
 #:property PublishAot=false
-#:project ./Recollections.Data.Ef/Recollections.Data.Ef.csproj
-#:project ./Recollections.Entries/Recollections.Entries.csproj
-#:project ./Recollections.Entries.Azure/Recollections.Entries.Azure.csproj
-#:project ./Recollections.Entries.Data/Recollections.Entries.Data.csproj
-#:project ./Recollections.Entries.SystemIo/Recollections.Entries.SystemIo.csproj
+#:project ../src/Recollections.Data.Ef/Recollections.Data.Ef.csproj
+#:project ../src/Recollections.Entries/Recollections.Entries.csproj
+#:project ../src/Recollections.Entries.Azure/Recollections.Entries.Azure.csproj
+#:project ../src/Recollections.Entries.Data/Recollections.Entries.Data.csproj
+#:project ../src/Recollections.Entries.SystemIo/Recollections.Entries.SystemIo.csproj
 
 using ExifLib;
 using Microsoft.EntityFrameworkCore;
@@ -384,7 +384,7 @@ internal sealed class AltitudeBackfill
 
     private static void PrintUsage()
     {
-        Console.WriteLine("Usage: dotnet run ./src/AltitudeBackfill.cs -- <db-connection-string> [--storage fs|azure --storage-conn <value>] [--dry-run]");
+        Console.WriteLine("Usage: dotnet run ./tools/AltitudeBackfill.cs -- <db-connection-string> [--storage fs|azure --storage-conn <value>] [--dry-run]");
         Console.WriteLine();
         Console.WriteLine("Unsets altitudes that fall outside plausible Earth bounds");
         Console.WriteLine($"  (min = {AltitudeBounds.MinMeters} m Challenger Deep, max = {AltitudeBounds.MaxMeters} m Mount Everest)");

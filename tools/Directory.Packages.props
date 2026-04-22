@@ -1,0 +1,51 @@
+<Project>
+  <PropertyGroup>
+	<FrameworkPackageVersion>10.0.6</FrameworkPackageVersion>
+  </PropertyGroup>
+  <ItemGroup>
+	<!-- Transitive dependencies -->
+	<PackageVersion Include="System.Runtime.Caching" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.3" />
+	<PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+
+	<!-- Actual dependencies -->
+	<PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
+	<PackageVersion Include="Blazored.SessionStorage" Version="2.4.0" />
+	<PackageVersion Include="CommonMark.NET" Version="0.15.1" />
+	<PackageVersion Include="ExifLib.Standard" Version="1.7.0" />
+	<PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.AspNetCore.WebUtilities" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Azure.Storage.Files.Shares" Version="12.24.0" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Http" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Identity.Stores" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Options" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Neptuo" Version="6.0.2" />
+	<PackageVersion Include="Neptuo.Events" Version="1.3.1" />
+	<PackageVersion Include="Neptuo.Exceptions" Version="1.2.2" />
+	<PackageVersion Include="SixLabors.ImageSharp" Version="3.1.12" />
+	<PackageVersion Include="ImageSharp.AVCodecFormats" Version="5.1.1" />
+	<PackageVersion Include="ImageSharp.AVCodecFormats.Native" Version="3.0.0" />
+	<PackageVersion Include="System.Drawing.Common" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
+	<PackageVersion Include="WebPush" Version="1.0.12" />
+	<PackageVersion Include="Yarp.ReverseProxy" Version="2.3.0" />
+
+	<!-- Test dependencies -->
+	<PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(FrameworkPackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.1.0" />
+	<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+	<PackageVersion Include="xunit" Version="2.9.3" />
+	<PackageVersion Include="xunit.runner.visualstudio" Version="3.1.0" />
+  </ItemGroup>
+</Project>
