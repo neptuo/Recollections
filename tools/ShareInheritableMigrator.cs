@@ -1,7 +1,7 @@
 #:sdk Microsoft.NET.Sdk
 #:property PublishAot=false
-#:project ./Recollections.Data.Ef/Recollections.Data.Ef.csproj
-#:project ./Recollections.Entries.Data/Recollections.Entries.Data.csproj
+#:project ../src/Recollections.Data.Ef/Recollections.Data.Ef.csproj
+#:project ../src/Recollections.Entries.Data/Recollections.Entries.Data.csproj
 
 using Microsoft.EntityFrameworkCore;
 using Neptuo.Recollections;

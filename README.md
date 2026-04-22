@@ -22,7 +22,7 @@ We have an Aspire app host.
 To seed the local development databases and media with the sample users/stories used for screenshots:
 
 ```sh
-dotnet run ./src/SampleDataSeeder.cs
+dotnet run ./tools/SampleDataSeeder.cs
 ```
 
 Sample credentials:

@@ -1,13 +1,13 @@
 #:sdk Microsoft.NET.Sdk
 #:property PublishAot=false
-#:project ./Recollections.Api/Recollections.Api.csproj
-#:project ./Recollections.Accounts/Recollections.Accounts.csproj
-#:project ./Recollections.Accounts.Data/Recollections.Accounts.Data.csproj
-#:project ./Recollections.Data.Ef/Recollections.Data.Ef.csproj
-#:project ./Recollections.Entries/Recollections.Entries.csproj
-#:project ./Recollections.Entries.Data/Recollections.Entries.Data.csproj
-#:project ./Recollections.Entries.SystemIo/Recollections.Entries.SystemIo.csproj
-#:project ./Recollections.SystemIo/Recollections.SystemIo.csproj
+#:project ../src/Recollections.Api/Recollections.Api.csproj
+#:project ../src/Recollections.Accounts/Recollections.Accounts.csproj
+#:project ../src/Recollections.Accounts.Data/Recollections.Accounts.Data.csproj
+#:project ../src/Recollections.Data.Ef/Recollections.Data.Ef.csproj
+#:project ../src/Recollections.Entries/Recollections.Entries.csproj
+#:project ../src/Recollections.Entries.Data/Recollections.Entries.Data.csproj
+#:project ../src/Recollections.Entries.SystemIo/Recollections.Entries.SystemIo.csproj
+#:project ../src/Recollections.SystemIo/Recollections.SystemIo.csproj
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
