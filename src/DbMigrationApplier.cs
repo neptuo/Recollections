@@ -11,20 +11,23 @@ using Neptuo.Recollections.Migrations;
 using AccountsDataContext = Neptuo.Recollections.Accounts.DataContext;
 using EntriesDataContext = Neptuo.Recollections.Entries.DataContext;
 
-string connectionString;
-if (args.Length == 0)
+string? connectionString = null;
+if (String.IsNullOrEmpty(connectionString))
 {
-    Console.WriteLine("Enter connection string to database to migrate:");
-    connectionString = Console.ReadLine();
-}
-else if (args.Length != 1)
-{
-    Console.WriteLine("Pass one argument with connection string to database to migrate.");
-    return;
-}
-else
-{
-    connectionString = args[0];
+    if (args.Length == 0)
+    {
+        Console.WriteLine("Enter connection string to database to migrate:");
+        connectionString = Console.ReadLine();
+    }
+    else if (args.Length != 1)
+    {
+        Console.WriteLine("Pass one argument with connection string to database to migrate.");
+        return;
+    }
+    else
+    {
+        connectionString = args[0];
+    }
 }
 
 Console.WriteLine("Creating contexts.");
