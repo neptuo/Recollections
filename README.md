@@ -4,7 +4,7 @@ Manage your recollections
 
 ## Docker
 
-Currently published to private repository.
+API images are published to [ghcr.io/neptuo/recollections-api](https://ghcr.io/neptuo/recollections-api)
 
 ## Developer notes
 
