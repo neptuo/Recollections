@@ -53,6 +53,36 @@ Render video original size on its own row underneath duration by stacking the me
 
 **Review:** Build verified; no regressions detected.
 
+### Tank & Switch: Production Float Insert Failure (2026-04-23)
+
+**Issue:** Image and Video location uploads fail on SQL Server with "Parameter @p10: supplied value is not a valid instance of data type float" when EXIF GPS metadata is corrupted or malformed.
+
+**Root Cause:** ImagePropertyReader.ToDoubleCoordinates() produces NaN or Infinity when parsing corrupted GPS arrays. These non-finite floats propagate to ImageService.SetProperties() (lines 90–91) without validation, unlike altitude (line 93, which uses AltitudeBounds.IsValid()). SQL Server rejects non-finite floats at parameter binding; SQLite accepts them, masking the bug during development.
+
+**Why It Matters:** Corrupted EXIF GPS (zero-length arrays, malformed rationals, extreme values >999999) can produce NaN/Infinity. A single bad image upload crashes the entire operation in production.
+
+**Fix Strategy:**
+1. Add `IsValidCoordinate()` helper to ImagePropertyReader matching `AltitudeBounds` pattern: `value != null && double.IsFinite(value.Value)`.
+2. Validate in `FindCoordinate()` before returning: return NaN/Infinity as null.
+3. Optional: Create `CoordinateBounds` class with methods `IsValidLatitude()` / `IsValidLongitude()` [-90,90] / [-180,180].
+4. Update ImageService.SetProperties() to apply additional bounds checks (defensive layering).
+
+**Test Coverage:**
+- ImagePropertyReader with corrupted EXIF GPS arrays → returns null
+- ImageService.SetProperties() with invalid coordinates → nullifies or rejects
+- API manual edits with NaN/Infinity → validation exception or silently nullified
+- Integration test: attempt direct save of non-finite coordinate → DB or EF rejects
+
+**Implementation Scope:**
+- `src/Recollections.Entries/ImagePropertyReader.cs` (FindCoordinate, new helper)
+- `src/Recollections.Entries/ImageService.cs` (SetProperties, optional bounds check)
+- Same fix applies to Video.Location (identical pattern)
+- No schema/migration changes needed
+
+**Decision:** Add defensive validation layer to ImagePropertyReader.FindCoordinate() using double.IsFinite(). Coordinates outside valid ranges silently nullified. Multi-layer validation in SetProperties recommended but optional for initial fix.
+
+**Follow-Up:** Monitor Video.Location handling post-deployment. Consider extracting CoordinateBounds as a reusable utility if other services also process GPS data.
+
 ## Governance
 
 - All meaningful changes require team consensus
