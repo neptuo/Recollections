@@ -53,6 +53,59 @@ Render video original size on its own row underneath duration by stacking the me
 
 **Review:** Build verified; no regressions detected.
 
+### Tank & Switch: Production Float Insert Failure (2026-04-23)
+
+**Issue:** Image and Video location uploads fail on SQL Server with "Parameter @p10: supplied value is not a valid instance of data type float" when EXIF GPS metadata is corrupted or malformed.
+
+**Root Cause:** ImagePropertyReader.ToDoubleCoordinates() produces NaN or Infinity when parsing corrupted GPS arrays. These non-finite floats propagate to ImageService.SetProperties() (lines 90–91) without validation, unlike altitude (line 93, which uses AltitudeBounds.IsValid()). SQL Server rejects non-finite floats at parameter binding; SQLite accepts them, masking the bug during development.
+
+**Why It Matters:** Corrupted EXIF GPS (zero-length arrays, malformed rationals, extreme values >999999) can produce NaN/Infinity. A single bad image upload crashes the entire operation in production.
+
+**Implementation (Completed 2026-04-23):**
+1. Added `CoordinateBounds` class with finite/range validation for latitude [-90,90] and longitude [-180,180].
+2. Added `MediaLocationSanitizer` to normalize media locations in one place before persistence.
+3. Updated `ImagePropertyReader` to use safe EXIF tag reads and null out malformed GPS arrays/non-finite values.
+4. Updated `ImageService` and `VideoService` to sanitize media locations after EXIF/video metadata import and manual model mapping.
+5. Added regression coverage with synthetic JPEG fixture (see Tank: Synthetic Test Fixtures below).
+
+**Files Created:**
+- `src/Recollections.Entries.Data/CoordinateBounds.cs`
+- `src/Recollections.Entries.Data/MediaLocationSanitizer.cs`
+- `src\Recollections.Api.Tests\TestData\Images\SyntheticExifImageGenerator.cs`
+- `src\Recollections.Api.Tests\TestFixtureInitializer.cs`
+- `src\Recollections.Api.Tests\Entries\ImagePropertyReaderRegressionTests.cs`
+- `src\Recollections.Api.Tests\Entries\ImageImportRegressionTests.cs`
+
+**Files Modified:**
+- `src/Recollections.Entries/ImagePropertyReader.cs`
+- `src/Recollections.Entries/ImageService.cs`
+- `src/Recollections.Entries/VideoService.cs`
+
+**Validation:** All 227 tests pass. Multi-layer validation: parser → service → EF/SQL Server chain holds.
+
+**Follow-Up:** Monitor Video.Location handling post-deployment. Consider extracting CoordinateBounds as a reusable utility if other services also process GPS data.
+
+### Tank: Synthetic Test Fixtures for Personal Data (2026-04-23)
+
+**Policy Decision:** Test fixtures must not contain personal or identifying data (real GPS coordinates, personal photos, PII, etc.). Use programmatically-generated synthetic data with obviously-fake values instead.
+
+**Context:** PR #510 regression tests initially used a real personal JPEG (`20260423_073316.jpg`) containing Marek's photo and actual GPS coordinates. This created privacy risk by shipping personal data in a public repository.
+
+**Implementation:**
+1. Created `SyntheticExifImageGenerator` using SixLabors.ImageSharp to generate controlled test JPEGs with EXIF GPS tags
+2. `TestFixtureInitializer` generates synthetic fixture at test runtime (not git-tracked)
+3. Synthetic coordinates use obviously-fake round numbers (10.5°N, 20.75°E, 150m altitude)
+4. Regression tests updated to use synthetic fixture with precision-based assertions
+
+**Rationale:**
+- **Privacy:** Real coordinates and personal photos are PII and should not ship in public repos
+- **Simplicity:** Synthetic data is easier to reason about and reproducible
+- **Test Intent:** Regression validates coordinate sanitization logic, not specific values — synthetic data serves equally well
+
+**Related:** Commit dc6d98f (Replace personal test image with synthetic EXIF fixture)
+
+**Note:** Old personal image remains in git history (not scrubbed; pending user decision)
+
 ## Governance
 
 - All meaningful changes require team consensus

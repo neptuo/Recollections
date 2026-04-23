@@ -145,6 +145,8 @@ namespace Neptuo.Recollections.Entries
                                 if (double.TryParse(parts[2], CultureInfo.InvariantCulture, out var altitude))
                                     entity.Location.Altitude = altitude;
                             }
+
+                            MediaLocationSanitizer.Normalize(entity.Location);
                         }
                     }
                 }
@@ -260,6 +262,7 @@ namespace Neptuo.Recollections.Entries
             entity.Location.Latitude = model.Location.Latitude;
             entity.Location.Longitude = model.Location.Longitude;
             entity.Location.Altitude = model.Location.Altitude;
+            MediaLocationSanitizer.Normalize(entity.Location);
         }
 
         public async Task SetLocationFromOriginalAsync(Entry entry, Video video)
