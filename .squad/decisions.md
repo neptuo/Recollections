@@ -71,7 +71,8 @@ Render video original size on its own row underneath duration by stacking the me
 **Files Created:**
 - `src/Recollections.Entries.Data/CoordinateBounds.cs`
 - `src/Recollections.Entries.Data/MediaLocationSanitizer.cs`
-- `src\Recollections.Api.Tests\TestData\Images\20260423_073316.jpg`
+- `src\Recollections.Api.Tests\TestData\Images\SyntheticExifImageGenerator.cs`
+- `src\Recollections.Api.Tests\TestFixtureInitializer.cs`
 - `src\Recollections.Api.Tests\Entries\ImagePropertyReaderRegressionTests.cs`
 - `src\Recollections.Api.Tests\Entries\ImageImportRegressionTests.cs`
 

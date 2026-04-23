@@ -26,6 +26,6 @@ Switch protects the release path by focusing on regressions, edge cases, and rea
 - **Multi-layer input validation is essential for external data sources.** EXIF parsing, service-layer bounds checks, and optionally model validation on API edits should all guard against NaN/Infinity reaching the database.
 - **Corrupted EXIF GPS array scenarios:** zero-length arrays, malformed rationals, extreme values (>999999) all produce NaN or Infinity when converted. Silent nullification is better than crash.
 - **Video location uses the same pattern as Image location** — the bug likely affects both. Any fix must include Video.cs as well.
-- **Regression asset path:** `src/Recollections.Api.Tests\TestData\Images\20260423_073316.jpg` is now the real image fixture for EXIF import coverage.
+- **Regression asset path:** `src/Recollections.Api.Tests\TestData\Images\synthetic-exif-gps.jpg` is the synthetic image fixture for EXIF import coverage (generated at test-fixture initialization time, not committed).
 - **Upload integration tests need explicit storage/free-limit config in `src\Recollections.Api.Tests\Infrastructure\ApiFactory.cs`.** Without those test settings, premium media validators can throw before the import path is exercised.
 - **Shared normalization now lives in `src\Recollections.Entries.Data\MediaLocationSanitizer.cs`.** Image and video services both call it after metadata import and model mapping, so review media-location bugs there first.

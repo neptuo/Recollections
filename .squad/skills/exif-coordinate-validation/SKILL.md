@@ -120,7 +120,8 @@ Three regression tests must cover:
 - `src/Recollections.Entries.Data/MediaLocationSanitizer.cs` — Shared location normalization.
 - `src/Recollections.Entries/ImageService.cs` — Apply normalization in `SetProperties()` and `MapModelToEntity()`.
 - `src/Recollections.Entries/VideoService.cs` — Same pattern for video metadata and model updates.
-- `src/Recollections.Api.Tests/TestData/Images/20260423_073316.jpg` — Real regression asset.
+- `src/Recollections.Api.Tests/TestData/Images/SyntheticExifImageGenerator.cs` — Generates synthetic JPEG fixtures with controlled EXIF GPS data.
+- `src/Recollections.Api.Tests/TestFixtureInitializer.cs` — Initializes synthetic test fixtures before tests run.
 - `src/Recollections.Api.Tests/Entries/*.cs` — Regression coverage.
 - `src/Recollections.Api.Tests/Infrastructure/ApiFactory.cs` — Test-only storage/free-limit config for upload scenarios.
 
