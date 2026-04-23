@@ -14,6 +14,7 @@ Tank owns the backend delivery path for recollections, accounts, and entry/media
 - 📌 Team hired on 2026-04-04
 - ✅ 2026-04-08: Resolved build issue in `src\VideoSizeBackfill.cs`; video backfill migration now runs and updates 46 videos from local database
 - ✅ 2026-04-23: Fixed production float insert failure by adding CoordinateBounds, MediaLocationSanitizer, and multi-layer coordinate validation across ImageService and VideoService. Real JPEG regression fixture integrated. Switch approved for release. All 227 tests pass.
+- ✅ 2026-04-23: Opened PR #510 on branch fix/image-import-exif-coordinate-guard (commits d9f249a, 3589b65, c604bdb). EXIF coordinate boundary validation now guards image import workflow. URL: https://github.com/neptuo/Recollections/pull/510
 
 ## Learnings
 
