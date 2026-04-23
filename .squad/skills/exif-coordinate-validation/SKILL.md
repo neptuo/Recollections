@@ -54,7 +54,7 @@ private double? FindCoordinate(ExifTags type)
 **Why this layer:** Catches bad EXIF at the source.
 
 ### Layer 2: Bounds Validation (Service)
-Create a bounds class parallel to `AltitudeBounds`:
+Create a bounds class parallel to `AltitudeBounds`, then centralize normalization in a shared media-location helper:
 
 ```csharp
 // CoordinateBounds.cs
@@ -71,6 +71,26 @@ public static class CoordinateBounds
     public static bool IsValidLongitude(double longitude)
         => double.IsFinite(longitude) && longitude >= LongitudeMin && longitude <= LongitudeMax;
 }
+
+// MediaLocationSanitizer.cs
+public static class MediaLocationSanitizer
+{
+    public static void Normalize(MediaLocation location)
+    {
+        if (location == null)
+            return;
+
+        location.Latitude = CoordinateBounds.NormalizeLatitude(location.Latitude);
+        location.Longitude = CoordinateBounds.NormalizeLongitude(location.Longitude);
+        location.Altitude = AltitudeBounds.IsValid(location.Altitude) ? location.Altitude : null;
+
+        if (location.Latitude == null || location.Longitude == null)
+        {
+            location.Latitude = null;
+            location.Longitude = null;
+        }
+    }
+}
 ```
 
 Apply in `ImageService.SetProperties()`:
@@ -78,38 +98,40 @@ Apply in `ImageService.SetProperties()`:
 ```csharp
 entity.Location.Latitude = propertyReader.FindLatitude();
 entity.Location.Longitude = propertyReader.FindLongitude();
-
-if (entity.Location.Latitude.HasValue && !CoordinateBounds.IsValidLatitude(entity.Location.Latitude.Value))
-    entity.Location.Latitude = null;
-if (entity.Location.Longitude.HasValue && !CoordinateBounds.IsValidLongitude(entity.Location.Longitude.Value))
-    entity.Location.Longitude = null;
+entity.Location.Altitude = propertyReader.FindAltitude();
+MediaLocationSanitizer.Normalize(entity.Location);
 ```
 
-**Why this layer:** Defense in depth—catches coordinate values from any source (EXIF, API edit, etc.).
+Use the same `MediaLocationSanitizer.Normalize()` call after `MapModelToEntity()` in image/video services so manual edits cannot persist NaN/Infinity either.
+
+**Why this layer:** Defense in depth—catches coordinate values from any source (EXIF, video container metadata, API edit, etc.).
 
 ### Layer 3: Test Coverage
 Three regression tests must cover:
 
-1. **EXIF parsing with corrupted arrays** → `FindLatitude()` returns `null` or valid value, never NaN.
+1. **EXIF parsing with the regression image** → `FindLatitude()` / `FindLongitude()` return finite values and no EXIF exceptions escape.
 2. **Service layer validation** → Invalid coordinates are nullified before save.
-3. **Manual API edits** → User-submitted coordinates are bounds-checked.
+3. **Import endpoint regression** → `POST /api/entries/{entryId}/images` succeeds and stores only finite coordinates for the known failing image.
 
 ## Files to Update
 
 - `src/Recollections.Entries/ImagePropertyReader.cs` — Add finite check in `FindCoordinate()`.
-- `src/Recollections.Entries.Data/CoordinateBounds.cs` — Create new bounds class.
-- `src/Recollections.Entries/ImageService.cs` — Apply bounds validation in `SetProperties()`.
-- `src/Recollections.Entries/VideoService.cs` — Same pattern (Video also imports location).
+- `src/Recollections.Entries.Data/CoordinateBounds.cs` — Bounds + normalization helpers.
+- `src/Recollections.Entries.Data/MediaLocationSanitizer.cs` — Shared location normalization.
+- `src/Recollections.Entries/ImageService.cs` — Apply normalization in `SetProperties()` and `MapModelToEntity()`.
+- `src/Recollections.Entries/VideoService.cs` — Same pattern for video metadata and model updates.
+- `src/Recollections.Api.Tests/TestData/Images/20260423_073316.jpg` — Real regression asset.
+- `src/Recollections.Api.Tests/Entries/*.cs` — Regression coverage.
+- `src/Recollections.Api.Tests/Infrastructure/ApiFactory.cs` — Test-only storage/free-limit config for upload scenarios.
 
 ## Checklist
 
-- [ ] `double.IsFinite()` check on computed coordinates at EXIF parse time.
-- [ ] `CoordinateBounds` class created with lat/lon min/max constants.
-- [ ] Service layer applies bounds validation before storing to entity.
-- [ ] Test: Corrupted EXIF GPS → returns null.
-- [ ] Test: Non-finite coordinate in model → nullified before save.
-- [ ] Test: Integration test verifies database save succeeds.
-- [ ] Video service also updated (same pattern).
+- [x] `double.IsFinite()` check on computed coordinates at EXIF parse time.
+- [x] `CoordinateBounds` class created with lat/lon min/max constants.
+- [x] Shared `MediaLocationSanitizer` normalizes coordinates before storing to entity.
+- [x] Regression EXIF read test covers the failing image.
+- [x] Import integration test verifies database save succeeds.
+- [x] Video service also updated (same pattern).
 
 ---
 

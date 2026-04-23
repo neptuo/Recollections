@@ -61,25 +61,26 @@ Render video original size on its own row underneath duration by stacking the me
 
 **Why It Matters:** Corrupted EXIF GPS (zero-length arrays, malformed rationals, extreme values >999999) can produce NaN/Infinity. A single bad image upload crashes the entire operation in production.
 
-**Fix Strategy:**
-1. Add `IsValidCoordinate()` helper to ImagePropertyReader matching `AltitudeBounds` pattern: `value != null && double.IsFinite(value.Value)`.
-2. Validate in `FindCoordinate()` before returning: return NaN/Infinity as null.
-3. Optional: Create `CoordinateBounds` class with methods `IsValidLatitude()` / `IsValidLongitude()` [-90,90] / [-180,180].
-4. Update ImageService.SetProperties() to apply additional bounds checks (defensive layering).
+**Implementation (Completed 2026-04-23):**
+1. Added `CoordinateBounds` class with finite/range validation for latitude [-90,90] and longitude [-180,180].
+2. Added `MediaLocationSanitizer` to normalize media locations in one place before persistence.
+3. Updated `ImagePropertyReader` to use safe EXIF tag reads and null out malformed GPS arrays/non-finite values.
+4. Updated `ImageService` and `VideoService` to sanitize media locations after EXIF/video metadata import and manual model mapping.
+5. Added regression coverage with real JPEG fixture at `src\Recollections.Api.Tests\TestData\Images\20260423_073316.jpg`.
 
-**Test Coverage:**
-- ImagePropertyReader with corrupted EXIF GPS arrays → returns null
-- ImageService.SetProperties() with invalid coordinates → nullifies or rejects
-- API manual edits with NaN/Infinity → validation exception or silently nullified
-- Integration test: attempt direct save of non-finite coordinate → DB or EF rejects
+**Files Created:**
+- `src/Recollections.Entries.Data/CoordinateBounds.cs`
+- `src/Recollections.Entries.Data/MediaLocationSanitizer.cs`
+- `src\Recollections.Api.Tests\TestData\Images\20260423_073316.jpg`
+- `src\Recollections.Api.Tests\Entries\ImagePropertyReaderRegressionTests.cs`
+- `src\Recollections.Api.Tests\Entries\ImageImportRegressionTests.cs`
 
-**Implementation Scope:**
-- `src/Recollections.Entries/ImagePropertyReader.cs` (FindCoordinate, new helper)
-- `src/Recollections.Entries/ImageService.cs` (SetProperties, optional bounds check)
-- Same fix applies to Video.Location (identical pattern)
-- No schema/migration changes needed
+**Files Modified:**
+- `src/Recollections.Entries/ImagePropertyReader.cs`
+- `src/Recollections.Entries/ImageService.cs`
+- `src/Recollections.Entries/VideoService.cs`
 
-**Decision:** Add defensive validation layer to ImagePropertyReader.FindCoordinate() using double.IsFinite(). Coordinates outside valid ranges silently nullified. Multi-layer validation in SetProperties recommended but optional for initial fix.
+**Validation:** All 227 tests pass. Multi-layer validation: parser → service → EF/SQL Server chain holds.
 
 **Follow-Up:** Monitor Video.Location handling post-deployment. Consider extracting CoordinateBounds as a reusable utility if other services also process GPS data.
 
