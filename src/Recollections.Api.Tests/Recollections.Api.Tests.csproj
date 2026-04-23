@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Recollections.Api\Recollections.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\Images\20260423_073316.jpg" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

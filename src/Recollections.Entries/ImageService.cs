@@ -89,8 +89,8 @@ namespace Neptuo.Recollections.Entries
 
                 entity.Location.Longitude = propertyReader.FindLongitude();
                 entity.Location.Latitude = propertyReader.FindLatitude();
-                var altitude = propertyReader.FindAltitude();
-                entity.Location.Altitude = AltitudeBounds.IsValid(altitude) ? altitude : null;
+                entity.Location.Altitude = propertyReader.FindAltitude();
+                MediaLocationSanitizer.Normalize(entity.Location);
 
                 if (isWhenIncluded)
                 {
@@ -236,6 +236,7 @@ namespace Neptuo.Recollections.Entries
             entity.Location.Latitude = model.Location.Latitude;
             entity.Location.Longitude = model.Location.Longitude;
             entity.Location.Altitude = model.Location.Altitude;
+            MediaLocationSanitizer.Normalize(entity.Location);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace Neptuo.Recollections.Entries
             if (reader == null)
                 return null;
 
-            if (!reader.GetTagValue(ExifTags.GPSAltitude, out uint[] value)
+            if (!TryGetTagValue(ExifTags.GPSAltitude, out uint[] value)
                 || value == null || value.Length < 2 || value[1] == 0)
             {
                 return null;
@@ -70,7 +70,7 @@ namespace Neptuo.Recollections.Entries
             double altitudeMeters = value[0] / (double)value[1];
 
             // GPSAltitudeRef: 0 = above sea level, 1 = below
-            if (reader.GetTagValue(ExifTags.GPSAltitudeRef, out byte altRef) && altRef == 1)
+            if (TryGetTagValue(ExifTags.GPSAltitudeRef, out byte altRef) && altRef == 1)
                 altitudeMeters = -altitudeMeters;
 
             return altitudeMeters;
@@ -81,10 +81,16 @@ namespace Neptuo.Recollections.Entries
             if (reader == null)
                 return null;
 
-            if (reader.GetTagValue(type, out double[] coordinates))
-                return ToDoubleCoordinates(coordinates);
+            if (!TryGetTagValue(type, out double[] coordinates) || coordinates == null || coordinates.Length < 3)
+                return null;
 
-            return null;
+            double value = ToDoubleCoordinates(coordinates);
+            return type switch
+            {
+                ExifTags.GPSLatitude => CoordinateBounds.NormalizeLatitude(value),
+                ExifTags.GPSLongitude => CoordinateBounds.NormalizeLongitude(value),
+                _ => double.IsFinite(value) ? value : null
+            };
         }
 
         private double ToDoubleCoordinates(double[] coordinates)
@@ -96,15 +102,29 @@ namespace Neptuo.Recollections.Entries
             if (reader == null)
                 return null;
 
-            try
-            {
-                if (reader.GetTagValue(type, out T value))
-                    return value;
-            }
-            catch (FormatException)
-            { }
+            if (TryGetTagValue(type, out T value))
+                return value;
 
             return default;
+        }
+
+        private bool TryGetTagValue<T>(ExifTags type, out T value)
+        {
+            if (reader != null)
+            {
+                try
+                {
+                    if (reader.GetTagValue(type, out value))
+                        return true;
+                }
+                catch (FormatException)
+                { }
+                catch (InvalidCastException)
+                { }
+            }
+
+            value = default;
+            return false;
         }
 
         protected override void DisposeManagedResources()
