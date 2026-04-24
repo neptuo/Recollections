@@ -20,10 +20,28 @@
 
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
     <link href="css/site.css" rel="stylesheet" />
+
+    <style>
+        /* Splash continuation: match the installed-app manifest splash (#fa8072)
+           so the OS splash -> first HTML paint hand-off is invisible. The overlay
+           is removed as soon as Blazor replaces <app>'s contents. */
+        html { background: #fa8072; }
+        body { margin: 0; }
+        #app-splash {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fa8072;
+            z-index: 9999;
+        }
+        #app-splash .loading-bar div { background: #fff; }
+    </style>
 </head>
 <body>
     <app>
-        <div class="d-flex justify-content-center">
+        <div id="app-splash">
             <div class="loading-bar">
                 <div></div>
                 <div></div>
