@@ -50,7 +50,7 @@ async function onPush(event) {
     const options = {
         body: data.body || 'You have a new entry waiting in your timeline.',
         icon: '/img/icon-192x192.png',
-        badge: '/img/icon-maskable-192x192.png',
+        badge: '/img/icon-badge-96x96.png',
         tag: data.tag || 'recollections-notification',
         renotify: true,
         data: {
