@@ -18,12 +18,34 @@
     <link rel="icon" href="/img/icon-192x192.png" type="image/png" />
     <link rel="apple-touch-icon" href="/img/icon-maskable-192x192.png" />
 
+    <style>
+        /* Splash continuation: match the installed-app manifest splash (#fa8072)
+           so the OS splash -> first HTML paint hand-off is invisible. Declared
+           before the external stylesheets so the very first paint is salmon;
+           site.css's `body { background: var(--bs-body-bg) }` rule is intentionally
+           left to win the cascade for `body` once the app loads, while the inline
+           `html` background persists and the #app-splash overlay covers everything
+           until Blazor mounts. */
+        html, body { background: #fa8072; }
+        body { margin: 0; }
+        #app-splash {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fa8072;
+            z-index: 9999;
+        }
+        #app-splash .loading-bar div { background: #fff; }
+    </style>
+
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
     <link href="css/site.css" rel="stylesheet" />
 </head>
 <body>
     <app>
-        <div class="d-flex justify-content-center">
+        <div id="app-splash">
             <div class="loading-bar">
                 <div></div>
                 <div></div>
