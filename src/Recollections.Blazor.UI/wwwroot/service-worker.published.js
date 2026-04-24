@@ -122,16 +122,45 @@ async function onFetch(event) {
         return response;
     }
 
+    // Strip the auth token from navigation URLs before touching the cache or
+    // the network. The SPA still reads window.location.search after it boots,
+    // so the token remains available for the API auth exchange; this just
+    // keeps the SW's fetch/cache fallback from failing on a URL the server
+    // doesn't handle.
+    const fetchRequest = stripTokenFromNavigation(event.request);
+
     let cachedResponse = null;
-    if (event.request.method === 'GET') {
+    if (fetchRequest.method === 'GET') {
         // For all navigation requests, try to serve index.html from cache
         // If you need some URLs to be server-rendered, edit the following check to exclude those URLs
-        const shouldServeIndexHtml = event.request.mode === 'navigate';
+        const shouldServeIndexHtml = fetchRequest.mode === 'navigate';
 
-        const request = shouldServeIndexHtml ? 'index.html' : event.request;
+        const request = shouldServeIndexHtml ? 'index.html' : fetchRequest;
         const cache = await caches.open(cacheName);
         cachedResponse = await cache.match(request);
     }
 
-    return cachedResponse || fetch(event.request);
+    return cachedResponse || fetch(fetchRequest);
+}
+
+function stripTokenFromNavigation(request) {
+    if (request.mode !== 'navigate') {
+        return request;
+    }
+
+    const url = new URL(request.url);
+    if (!url.searchParams.has('token')) {
+        return request;
+    }
+
+    url.searchParams.delete('token');
+    return new Request(url.toString(), {
+        method: request.method,
+        headers: request.headers,
+        mode: request.mode,
+        credentials: request.credentials,
+        redirect: request.redirect,
+        referrer: request.referrer,
+        integrity: request.integrity
+    });
 }
