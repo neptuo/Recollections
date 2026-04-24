@@ -6,9 +6,9 @@ function shareTargetHandler(event) {
             const files = formData.getAll("allfiles");
             await storeFiles(files, null, null, null, null);
 
-            const allClients = await clients.matchAll();
-            if (allClients && allClients.length > 0) {
-                return Response.redirect(allClients[0].url, 303);
+            const existingClient = await findExistingClient(event);
+            if (existingClient) {
+                return Response.redirect(existingClient.url, 303);
             } else {
                 return Response.redirect('/', 303);
             }
@@ -16,6 +16,20 @@ function shareTargetHandler(event) {
     }
 
     return null;
+}
+
+// Picks the window the user is currently looking at so the share target
+// handler can redirect back to it instead of always landing on the timeline.
+// The client that is being navigated for this POST is excluded because its
+// URL already points at the share target action ("/").
+async function findExistingClient(event) {
+    const excludeId = event.resultingClientId;
+    const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const candidates = allClients.filter(c => c.id && c.id !== excludeId);
+    return candidates.find(c => c.focused)
+        || candidates.find(c => c.visibilityState === 'visible')
+        || candidates[0]
+        || null;
 }
 
 // Sync with FileUpload.js (1:1)
