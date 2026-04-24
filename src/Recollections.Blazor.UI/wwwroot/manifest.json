@@ -1,8 +1,18 @@
 {
+  "id": "recollections-app",
   "short_name": "Recollections",
   "name": "Recollections by Neptuo",
+  "description": "Capture your memories as a timeline of entries with photos, locations and notes.",
   "start_url": "/",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "orientation": "any",
+  "background_color": "#212529",
+  "theme_color": "#212529",
+  "categories": ["travel", "lifestyle", "photo"],
   "icons": [
     {
       "src":"/img/icon-192x192.png",
