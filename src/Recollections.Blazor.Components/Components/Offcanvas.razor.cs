@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Logging;
 using System;
 using System.Collections.Generic;
@@ -100,6 +101,17 @@ public partial class Offcanvas : System.IDisposable
     {
         IsVisible = isVisible;
         StateHasChanged();
+    }
+
+    protected Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (IsVisible)
+        {
+            Hide();
+            context.PreventNavigation();
+        }
+
+        return Task.CompletedTask;
     }
 
     public void Show() => Interop.Show(Element);
