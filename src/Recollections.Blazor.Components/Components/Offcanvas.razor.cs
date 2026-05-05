@@ -24,9 +24,6 @@ public partial class Offcanvas : System.IDisposable
     [Inject]
     protected OffcanvasInterop Interop { get; set; }
 
-    [Inject]
-    protected NavigationManager NavigationManager { get; set; }
-
     [Parameter]
     public string Title { get; set; }
 
@@ -108,7 +105,7 @@ public partial class Offcanvas : System.IDisposable
 
     protected Task OnBeforeInternalNavigation(LocationChangingContext context)
     {
-        if (IsVisible && context.TargetLocation != NavigationManager.Uri)
+        if (IsVisible && context.IsNavigationIntercepted)
         {
             Hide();
             context.PreventNavigation();
