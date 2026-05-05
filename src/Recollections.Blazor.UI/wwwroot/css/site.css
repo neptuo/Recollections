@@ -25288,6 +25288,10 @@ input.input-number-noarrows[type=number] {
   top: var(--blz-top-bar-height);
   z-index: 1021;
 }
+.file-progress-global .list-group {
+  max-height: 50vh;
+  overflow-y: auto;
+}
 
 .btn-floating {
   --self-width: 46px;
@@ -26078,5 +26082,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-issue-394-notifications-for-on-this-day-aa1641/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=wwwroot/css/site.css.map */
