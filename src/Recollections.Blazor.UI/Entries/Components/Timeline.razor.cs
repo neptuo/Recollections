@@ -109,11 +109,21 @@ namespace Neptuo.Recollections.Entries.Components
             else if (previousDataKey != DataKey && previousDataKey != null)
             {
                 previousDataKey = DataKey;
-                Log.Debug($"DataKey changed to '{DataKey}', reloading");
-                Entries.Clear();
-                offset = 0;
-                HasMore = false;
-                loadAsyncFromParametersSet = LoadAsync().ContinueWith(t => { loadAsyncFromParametersSet = null; StateHasChanged(); });
+                if (loadAsyncFromParametersSet != null)
+                {
+                    Log.Debug($"DataKey changed to '{DataKey}', but load already in progress, skipping");
+                }
+                else
+                {
+                    Log.Debug($"DataKey changed to '{DataKey}', reloading");
+                    Entries.Clear();
+                    offset = 0;
+                    HasMore = false;
+                    galleryMediaByEntryId.Clear();
+                    galleryMediaLoading.Clear();
+                    currentGalleryEntryId = null;
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => InvokeAsync(() => { loadAsyncFromParametersSet = null; StateHasChanged(); }));
+                }
             }
             else if (Entries.Count == 0)
             {
@@ -121,7 +131,7 @@ namespace Neptuo.Recollections.Entries.Components
                 if (loadAsyncFromParametersSet == null)
                 {
                     Log.Debug("LoadAsync");
-                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(t => { loadAsyncFromParametersSet = null; StateHasChanged(); });
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => InvokeAsync(() => { loadAsyncFromParametersSet = null; StateHasChanged(); }));
                 }
                 else
                 {
