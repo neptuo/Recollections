@@ -48,7 +48,7 @@
                 }
 
                 <div class="mt-4 timeline-narrow">
-                    <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" NoMoreText="Here the user started..." />
+                    <Timeline DataGetter="@((offset, count) => EntriesApi.GetTimelineListAsync(UserId, offset, count))" DataKey="@UserId" NoMoreText="Here the user started..." />
                 </div>
             </div>
         </PermissionContainer>
