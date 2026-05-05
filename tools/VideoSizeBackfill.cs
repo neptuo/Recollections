@@ -29,7 +29,7 @@ using var entries = new EntriesDataContext(
     DbContextOptions<EntriesDataContext>(connectionString, "Entries"),
     Schema<EntriesDataContext>("Entries"));
 
-IFileStorage fileStorage = CreateFileStorage(storageType, storagePath);
+IFileStorage? fileStorage = CreateFileStorage(storageType, storagePath);
 if (fileStorage == null)
     return;
 
@@ -42,7 +42,7 @@ var videos = await entries.Videos
 Console.WriteLine($"Found '{videos.Count}' videos.");
 foreach (var video in videos)
 {
-    using Stream content = await fileStorage.FindAsync(video.Entry, video, VideoType.Original);
+    using Stream? content = await fileStorage.FindAsync(video.Entry, video, VideoType.Original);
     if (content == null)
     {
         Console.WriteLine($"Missing original file for '{video.Id}'.");
@@ -59,18 +59,18 @@ await entries.SaveChangesAsync();
 Console.WriteLine("Done.");
 
 
-static IFileStorage CreateFileStorage(string storageType, string connection)
+static IFileStorage? CreateFileStorage(string storageType, string storagePathOrConnectionString)
 {
     if (storageType == "fs")
     {
         return new SystemIoFileStorage(
             path => path,
-            Options.Create(new SystemIoStorageOptions() { PathTemplate = connection }),
+            Options.Create(new SystemIoStorageOptions() { PathTemplate = storagePathOrConnectionString }),
             ImageFormatDefinition.Jpeg);
     }
 
     if (storageType == "azure")
-        return new AzureFileStorage(Options.Create(new AzureStorageOptions() { ConnectionString = connection }));
+        return new AzureFileStorage(Options.Create(new AzureStorageOptions() { ConnectionString = storagePathOrConnectionString }));
 
     Console.WriteLine($"Not supported type of file storage '{storageType}'.");
     return null;
