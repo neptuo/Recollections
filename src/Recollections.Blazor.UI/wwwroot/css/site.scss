@@ -52,7 +52,7 @@ body {
 }
 
 .offcanvas-bottom {
-    bottom: var(--blz-bottom-bar-height); // Duplicated for .offcanvas-bottom-to-end
+    bottom: calc(var(--blz-bottom-bar-height) - 1px); // Duplicated for .offcanvas-bottom-to-end
 }
 
 .offcanvas-start {
