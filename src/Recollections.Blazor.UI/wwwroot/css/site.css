@@ -24999,8 +24999,10 @@ body {
   bottom: 55px;
 }
 
-.offcanvas-bottom {
-  bottom: calc(var(--blz-bottom-bar-height) - 1px);
+@media (max-width: 575.98px) {
+  .offcanvas-bottom {
+    bottom: calc(var(--blz-bottom-bar-height) - 1px);
+  }
 }
 
 .offcanvas-start {
