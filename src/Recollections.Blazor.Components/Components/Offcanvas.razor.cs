@@ -115,7 +115,7 @@ public partial class Offcanvas : System.IDisposable
 
     private ValueTask OnLocationChanging(LocationChangingContext context)
     {
-        if (IsVisible && context.IsNavigationIntercepted)
+        if (IsVisible && context.TargetLocation != NavigationManager.Uri)
         {
             Hide();
             context.PreventNavigation();
