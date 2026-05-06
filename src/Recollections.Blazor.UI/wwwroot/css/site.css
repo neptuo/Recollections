@@ -25295,6 +25295,55 @@ input.input-number-noarrows[type=number] {
   overflow-y: auto;
 }
 
+.progress-bar-indeterminate {
+  width: 100% !important;
+  -webkit-animation: progress-indeterminate 4s ease-in-out infinite;
+          animation: progress-indeterminate 4s ease-in-out infinite;
+  background-size: 200% 100%;
+  background-image: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(50%, var(--bs-primary)), to(transparent));
+  background-image: linear-gradient(90deg, transparent 0%, var(--bs-primary) 50%, transparent 100%);
+  background-color: transparent !important;
+}
+
+@-webkit-keyframes progress-indeterminate {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.upload-pulse {
+  -webkit-animation: upload-pulse-anim 1s ease-in-out infinite;
+          animation: upload-pulse-anim 1s ease-in-out infinite;
+}
+
+@-webkit-keyframes upload-pulse-anim {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes upload-pulse-anim {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
 .btn-floating {
   --self-width: 46px;
   position: fixed;
