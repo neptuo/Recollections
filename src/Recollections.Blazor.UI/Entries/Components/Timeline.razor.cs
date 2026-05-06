@@ -122,7 +122,7 @@ namespace Neptuo.Recollections.Entries.Components
                     galleryMediaByEntryId.Clear();
                     galleryMediaLoading.Clear();
                     currentGalleryEntryId = null;
-                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => InvokeAsync(() => { loadAsyncFromParametersSet = null; StateHasChanged(); }));
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => { loadAsyncFromParametersSet = null; StateHasChanged(); });
                 }
             }
             else if (Entries.Count == 0)
@@ -131,7 +131,7 @@ namespace Neptuo.Recollections.Entries.Components
                 if (loadAsyncFromParametersSet == null)
                 {
                     Log.Debug("LoadAsync");
-                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => InvokeAsync(() => { loadAsyncFromParametersSet = null; StateHasChanged(); }));
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => { loadAsyncFromParametersSet = null; StateHasChanged(); });
                 }
                 else
                 {
