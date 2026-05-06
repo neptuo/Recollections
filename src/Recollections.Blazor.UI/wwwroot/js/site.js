@@ -481,6 +481,11 @@ window.ImageSource = {
             return status;
         }
 
+        if (!element) {
+            URL.revokeObjectURL(objectUrl);
+            return 0;
+        }
+
         return await new Promise(resolve => {
             const tag = element.tagName ? element.tagName.toLowerCase() : "";
             const loadEvent = tag === "video" ? "loadeddata" : "load";
