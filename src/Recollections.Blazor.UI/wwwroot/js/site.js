@@ -48,25 +48,19 @@ window.Bootstrap = {
         _activeCount: 0,
         _ensurePopstateListener: function () {
             if (this._popstateHandler) return;
-            this._popstateHandler = () => {
-                console.debug("[Offcanvas] popstate fired, setting flag");
-                this._isPopstate = true;
-            };
+            this._popstateHandler = () => { this._isPopstate = true; };
             // Use capture phase to fire before Blazor's popstate handler
             window.addEventListener("popstate", this._popstateHandler, true);
-            console.debug("[Offcanvas] popstate listener registered (capture phase)");
         },
         _removePopstateListener: function () {
             if (this._popstateHandler && this._activeCount === 0) {
                 window.removeEventListener("popstate", this._popstateHandler, true);
                 this._popstateHandler = null;
-                console.debug("[Offcanvas] popstate listener removed");
             }
         },
         IsPopstate: function () {
             const value = this._isPopstate;
             this._isPopstate = false;
-            console.debug("[Offcanvas] IsPopstate called, returning:", value);
             return value;
         },
         Initialize: function (interop, container) {
@@ -75,14 +69,12 @@ window.Bootstrap = {
                 offcanvas = new bootstrap.Offcanvas(container);
                 container.addEventListener("show.bs.offcanvas", () => {
                     this._activeCount++;
-                    this._isPopstate = false; // Clear stale flag from prior navigation
-                    console.debug("[Offcanvas] show event, activeCount:", this._activeCount);
+                    this._isPopstate = false;
                     this._ensurePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", true);
                 });
                 container.addEventListener("hide.bs.offcanvas", () => {
                     this._activeCount = Math.max(0, this._activeCount - 1);
-                    console.debug("[Offcanvas] hide event, activeCount:", this._activeCount);
                     this._removePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", false);
                 });

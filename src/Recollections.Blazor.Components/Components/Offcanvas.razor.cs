@@ -109,26 +109,16 @@ public partial class Offcanvas : System.IDisposable
 
     internal void UpdateVisibility(bool isVisible) 
     {
-        Log.Debug($"Offcanvas '{Title}' visibility changed: {IsVisible} -> {isVisible}");
         IsVisible = isVisible;
         StateHasChanged();
     }
 
     private ValueTask OnLocationChanging(LocationChangingContext context)
     {
-        Log.Debug($"Offcanvas '{Title}' OnLocationChanging: IsVisible={IsVisible}, TargetLocation='{context.TargetLocation}', CurrentUri='{NavigationManager.Uri}'");
-
-        if (IsVisible)
+        if (IsVisible && Interop.IsPopstate())
         {
-            bool isPopstate = Interop.IsPopstate();
-            Log.Debug($"Offcanvas '{Title}' IsPopstate={isPopstate}");
-
-            if (isPopstate)
-            {
-                Log.Debug($"Offcanvas '{Title}' preventing navigation and hiding");
-                Hide();
-                context.PreventNavigation();
-            }
+            Hide();
+            context.PreventNavigation();
         }
 
         return ValueTask.CompletedTask;
