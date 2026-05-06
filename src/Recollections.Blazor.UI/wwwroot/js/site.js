@@ -140,8 +140,9 @@ window.Bootstrap = {
                 trigger.removeAttribute("title");
             }
 
-            // Remember original parent so we can move the node back on hide.
+            // Remember original position so we can restore the node exactly on hide.
             var originalParent = contentElement.parentNode;
+            var originalNextSibling = contentElement.nextSibling;
 
             // Show the content element (it starts hidden) and pass the live DOM node
             // so async updates (e.g. image loading via JS interop) are visible.
@@ -165,7 +166,7 @@ window.Bootstrap = {
                 }
             };
 
-            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle, contentElement: contentElement, originalParent: originalParent };
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle, contentElement: contentElement, originalParent: originalParent, originalNextSibling: originalNextSibling };
 
             setTimeout(function () {
                 document.addEventListener("pointerdown", dismissHandler);
@@ -178,11 +179,11 @@ window.Bootstrap = {
 
             document.removeEventListener("pointerdown", active.dismiss);
 
-            // Move the content element back to its original parent before dispose
-            // so Blazor's DOM tree stays intact.
+            // Move the content element back to its exact original position before
+            // dispose so Blazor's DOM diffing isn't confused by reordering.
             if (active.contentElement && active.originalParent) {
                 active.contentElement.style.display = "none";
-                active.originalParent.appendChild(active.contentElement);
+                active.originalParent.insertBefore(active.contentElement, active.originalNextSibling);
             }
 
             active.popover.dispose();
