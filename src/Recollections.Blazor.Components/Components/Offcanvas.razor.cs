@@ -17,12 +17,16 @@ public partial class Offcanvas : System.IDisposable
     private string headerCssClass;
     private string bodyCssClass;
     private bool hasBodyRendered;
+    private IDisposable locationChangingToken;
 
     [Inject]
     protected ILog<Offcanvas> Log { get; set; }
 
     [Inject]
     protected OffcanvasInterop Interop { get; set; }
+
+    [Inject]
+    protected NavigationManager NavigationManager { get; set; }
 
     [Parameter]
     public string Title { get; set; }
@@ -58,6 +62,12 @@ public partial class Offcanvas : System.IDisposable
     public bool IsContainer { get; set; } = false;
 
     public bool IsVisible { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        locationChangingToken = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+    }
 
     protected override void OnParametersSet()
     {
@@ -103,7 +113,7 @@ public partial class Offcanvas : System.IDisposable
         StateHasChanged();
     }
 
-    protected Task OnBeforeInternalNavigation(LocationChangingContext context)
+    private ValueTask OnLocationChanging(LocationChangingContext context)
     {
         if (IsVisible && context.IsNavigationIntercepted)
         {
@@ -111,7 +121,7 @@ public partial class Offcanvas : System.IDisposable
             context.PreventNavigation();
         }
 
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     public void Show() => Interop.Show(Element);
@@ -119,6 +129,7 @@ public partial class Offcanvas : System.IDisposable
 
     public void Dispose()
     {
+        locationChangingToken.Dispose();
         Interop.Dispose(Element);
     }
 }
