@@ -24,7 +24,7 @@
                         />
                     </div>
                     <div class="progress" style="height: 2px">
-                        <div class="progress-bar" style="width: @(currentPercentage)%"></div>
+                        <div class="progress-bar @(currentPercentage == 0 ? "progress-bar-indeterminate" : "")" style="width: @(currentPercentage)%"></div>
                     </div>
                     @if (IsExpanded)
                     {
@@ -49,7 +49,14 @@
                                         }
                                         else if (file.Status == "current")
                                         {
-                                            <span>@file.Percentual %</span>
+                                            @if (file.Percentual == 0)
+                                            {
+                                                <Icon Identifier="arrow-up" CssClass="text-primary upload-pulse" />
+                                            }
+                                            else
+                                            {
+                                                <span class="text-nowrap">@file.Percentual %</span>
+                                            }
                                         }
                                         else
                                         {

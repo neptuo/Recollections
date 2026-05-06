@@ -82,7 +82,7 @@
                 {
                     <div class="gps">
                         <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@MapTitle" IsPlaceHolder="@(!HasMapContent)" IsEnabled="@(HasMapContent || Permissions.IsEditable)">
-                            <Map Markers="@Markers" Path="@Model.Track?.Data" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" PathSelected="OnTrackSelected" />
+                            <Map @ref="mapComponent" Markers="@Markers" Path="@Model.Track?.Data" MarkersChanged="@(() => SaveLocationsAsync())" IsAdditive="true" MarkerSelected="OnLocationSelected" PathSelected="OnTrackSelected" />
                         </MapToggle>
                     </div>
                 }
@@ -151,3 +151,5 @@
     <StoryPicker @ref="StoryPicker" Selected="StorySelectedAsync" />
     <BeingPicker @ref="BeingPicker" Selected="BeingSelectedAsync" />
 </LoadingSection>
+
+<MediaCardPopover @ref="mediaPopover" EntryId="@EntryId" Model="MediaPopoverHandler.SelectedMedia" />

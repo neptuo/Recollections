@@ -42,7 +42,7 @@
     // For smaller screens, show offcanvas at the bottom
     @include media-breakpoint-down(sm) {
         & {
-            bottom: var(--blz-bottom-bar-height);
+            bottom: calc(var(--blz-bottom-bar-height) - 1px);
             right: 0;
             left: 0;
             height: var(--#{$prefix}offcanvas-height);

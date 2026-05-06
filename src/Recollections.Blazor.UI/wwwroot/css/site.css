@@ -24999,8 +24999,10 @@ body {
   bottom: 55px;
 }
 
-.offcanvas-bottom {
-  bottom: var(--blz-bottom-bar-height);
+@media (max-width: 575.98px) {
+  .offcanvas-bottom {
+    bottom: calc(var(--blz-bottom-bar-height) - 1px);
+  }
 }
 
 .offcanvas-start {
@@ -25288,7 +25290,60 @@ input.input-number-noarrows[type=number] {
   top: var(--blz-top-bar-height);
   z-index: 1021;
 }
+.file-progress-global .list-group {
+  max-height: 50vh;
+  overflow-y: auto;
+}
 
+.progress-bar-indeterminate {
+  width: 100% !important;
+  -webkit-animation: progress-indeterminate 4s ease-in-out infinite;
+          animation: progress-indeterminate 4s ease-in-out infinite;
+  background-size: 200% 100%;
+  background-image: -webkit-gradient(linear, left top, right top, from(transparent), color-stop(50%, var(--bs-primary)), to(transparent));
+  background-image: linear-gradient(90deg, transparent 0%, var(--bs-primary) 50%, transparent 100%);
+  background-color: transparent !important;
+}
+
+@-webkit-keyframes progress-indeterminate {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes progress-indeterminate {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.upload-pulse {
+  -webkit-animation: upload-pulse-anim 1s ease-in-out infinite;
+          animation: upload-pulse-anim 1s ease-in-out infinite;
+}
+
+@-webkit-keyframes upload-pulse-anim {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes upload-pulse-anim {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
 .btn-floating {
   --self-width: 46px;
   position: fixed;
@@ -25330,7 +25385,7 @@ input.input-number-noarrows[type=number] {
 
 @media (max-width: 575.98px) {
   .offcanvas-bottom-to-end {
-    bottom: var(--blz-bottom-bar-height);
+    bottom: calc(var(--blz-bottom-bar-height) - 1px);
     right: 0;
     left: 0;
     height: var(--bs-offcanvas-height);
@@ -26078,4 +26133,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-issue-520-offcanvas-should-prevent-back-navigation-ab4381/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=site.css.map */

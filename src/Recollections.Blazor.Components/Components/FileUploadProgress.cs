@@ -49,6 +49,8 @@ public record FileUploadProgress(
                 return "Uploaded";
             else if (IsCurrent && Percentual == 100)
                 return $"Saving...";
+            else if (IsCurrent && Percentual == 0)
+                return "Uploading...";
             else if (IsCurrent)
                 return $"{Percentual}%";
             else if (IsError)

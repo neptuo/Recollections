@@ -48,17 +48,7 @@
                 <VersionInfo Separator="false" />
             </div>
         </TitleContent>
-        <HeaderContent>
-            @foreach (var item in Menu.User.Where(m => m.Text == "Logout"))
-            {
-                <button class="btn p-1 border-0 text-danger ms-auto" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
-                    <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
-                    <span class="text d-inline text-truncate">
-                        @item.Text
-                    </span>
-                </button>
-            }
-        </HeaderContent>
+        <HeaderContent />
         <ChildContent>
             @if (Menu != null)
             {
@@ -68,7 +58,7 @@
                 </div>
                 <hr />
                 <div class="row g-1">
-                    @foreach (var item in Menu.User.Where(m => m.Text != "Logout"))
+                    @foreach (var item in Menu.User)
                         @MainMenuItem(item)
                 </div>
             }
@@ -81,12 +71,13 @@
     RenderFragment MainMenuItem(MenuItem item)
     {
         var isLogout = item.Text == "Logout";
+        var colClass = isLogout ? "col-3 ms-auto" : "col-3";
         return 
-            @<div class="col-3">
+            @<div class="@colClass">
                 @if (item.Url != null)
                 {
                     <Match Url="@item.Url" PageType="@item.PageType" Context="IsActive">
-                        <a href="@item.Url" class="btn p-1 border-0 @(IsActive ? "text-primary" : "") w-100">
+                        <a href="@item.Url" class="btn p-1 px-0 border-0 @(IsActive ? "text-primary" : "") w-100">
                             <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                             <span class="text d-block text-truncate">
                                 @item.Text
@@ -96,7 +87,7 @@
                 }
                 else
                 {
-                    <button class="btn p-1 border-0 w-100" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
+                    <button class="btn p-1 px-0 border-0 w-100 @(isLogout ? "text-danger" : "")" @onclick="@(() => { Offcanvas.Hide(); item.OnClick(); })">
                         <Icon Identifier="@item.Icon" CssClass="@item.CssClass" />
                         <span class="text d-block text-truncate">
                             @item.Text

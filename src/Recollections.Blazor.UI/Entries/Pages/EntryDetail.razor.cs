@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
 {
-    public partial class EntryDetail : IDisposable
+    public partial class EntryDetail : IAsyncDisposable
     {
         [Inject]
         protected Api Api { get; set; }
@@ -57,6 +57,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected EntryStoryModel Story { get; set; }
         protected List<EntryBeingModel> Beings { get; } = new List<EntryBeingModel>();
         protected string BeingsTitle => Beings.Count > 0 ? String.Join(", ", Beings.Select(b => b.Name)) : null;
+        protected MediaPopoverHandler MediaPopoverHandler { get; } = new();
+        protected MediaCardPopover mediaPopover;
+        protected Map mapComponent;
+
         protected bool HasStory => Story != null && Story.StoryId != null;
         protected string StoryTitle
         {
@@ -117,10 +121,17 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
         
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             previousUploadListener?.Dispose();
             previousTrackUploadListener?.Dispose();
+            await MediaPopoverHandler.DisposeAsync(mediaPopover);
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            await MediaPopoverHandler.TryShowPopoverAsync(mapComponent, mediaPopover);
         }
 
         private async Task LoadStoryAsync()
@@ -379,7 +390,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected LocationEdit LocationEdit { get; set; }
         protected TrackEdit TrackEdit { get; set; }
 
-        protected void OnLocationSelected(int index)
+        protected async Task OnLocationSelected(int index)
         {
             Log.Debug($"Marker selected '{index}'.");
 
@@ -387,19 +398,12 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 var media = Media[index];
                 if (media.Image != null)
-                {
-                    var image = media.Image;
-                    Log.Debug($"Selected image '{image.Id}'.");
-
-                    Navigator.OpenImageDetail(EntryId, image.Id);
-                }
+                    Log.Debug($"Selected image '{media.Image.Id}'.");
                 else if (media.Video != null)
-                {
-                    var video = media.Video;
-                    Log.Debug($"Selected video '{video.Id}'.");
+                    Log.Debug($"Selected video '{media.Video.Id}'.");
 
-                    Navigator.OpenVideoDetail(EntryId, video.Id);
-                }
+                await MediaPopoverHandler.SelectAsync(index, media, mediaPopover);
+                StateHasChanged();
             }
             else
             {
