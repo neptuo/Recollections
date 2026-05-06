@@ -140,6 +140,9 @@ window.Bootstrap = {
                 trigger.removeAttribute("title");
             }
 
+            // Remember original parent so we can move the node back on hide.
+            var originalParent = contentElement.parentNode;
+
             // Show the content element (it starts hidden) and pass the live DOM node
             // so async updates (e.g. image loading via JS interop) are visible.
             contentElement.style.display = "";
@@ -158,35 +161,40 @@ window.Bootstrap = {
             var dismissHandler = function (e) {
                 var tip = popover.tip;
                 if (tip && !tip.contains(e.target) && !trigger.contains(e.target)) {
-                    document.removeEventListener("pointerdown", dismissHandler);
-                    contentElement.style.display = "none";
-                    popover.dispose();
-                    if (originalTitle) {
-                        trigger.setAttribute("title", originalTitle);
-                    }
-                    Bootstrap.Popover._active = null;
+                    Bootstrap.Popover._disposeActive();
                 }
             };
 
-            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle, contentElement: contentElement };
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle, contentElement: contentElement, originalParent: originalParent };
 
             setTimeout(function () {
                 document.addEventListener("pointerdown", dismissHandler);
             }, 0);
         },
         _active: null,
-        _hideActive: function () {
-            if (Bootstrap.Popover._active) {
-                document.removeEventListener("pointerdown", Bootstrap.Popover._active.dismiss);
-                if (Bootstrap.Popover._active.contentElement) {
-                    Bootstrap.Popover._active.contentElement.style.display = "none";
-                }
-                Bootstrap.Popover._active.popover.dispose();
-                if (Bootstrap.Popover._active.originalTitle) {
-                    Bootstrap.Popover._active.trigger.setAttribute("title", Bootstrap.Popover._active.originalTitle);
-                }
-                Bootstrap.Popover._active = null;
+        _disposeActive: function () {
+            var active = Bootstrap.Popover._active;
+            if (!active) return;
+
+            document.removeEventListener("pointerdown", active.dismiss);
+
+            // Move the content element back to its original parent before dispose
+            // so Blazor's DOM tree stays intact.
+            if (active.contentElement && active.originalParent) {
+                active.contentElement.style.display = "none";
+                active.originalParent.appendChild(active.contentElement);
             }
+
+            active.popover.dispose();
+
+            if (active.originalTitle) {
+                active.trigger.setAttribute("title", active.originalTitle);
+            }
+
+            Bootstrap.Popover._active = null;
+        },
+        _hideActive: function () {
+            Bootstrap.Popover._disposeActive();
         },
         Dispose: function (container) {
             var popover = bootstrap.Popover.getInstance(container);
