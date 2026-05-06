@@ -50,6 +50,10 @@ namespace Neptuo.Recollections.Entries.Components
         [Parameter]
         public string CssClass { get; set; }
 
+        [Parameter]
+        public string DataKey { get; set; }
+
+        private string previousDataKey;
         private int offset;
         private Task loadAsyncFromParametersSet;
         private string scrollToEntryId;
@@ -102,17 +106,41 @@ namespace Neptuo.Recollections.Entries.Components
                 var position = FindPositionFromHistoryEntry();
                 QueuePositionRestore(position);
             }
+            else if (previousDataKey != DataKey && previousDataKey != null)
+            {
+                previousDataKey = DataKey;
+                if (loadAsyncFromParametersSet != null)
+                {
+                    Log.Debug($"DataKey changed to '{DataKey}', but load already in progress, skipping");
+                }
+                else
+                {
+                    Log.Debug($"DataKey changed to '{DataKey}', reloading");
+                    Entries.Clear();
+                    offset = 0;
+                    HasMore = false;
+                    galleryMediaByEntryId.Clear();
+                    galleryMediaLoading.Clear();
+                    currentGalleryEntryId = null;
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => { loadAsyncFromParametersSet = null; StateHasChanged(); });
+                }
+            }
             else if (Entries.Count == 0)
             {
+                previousDataKey = DataKey;
                 if (loadAsyncFromParametersSet == null)
                 {
                     Log.Debug("LoadAsync");
-                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(t => { loadAsyncFromParametersSet = null; StateHasChanged(); });
+                    loadAsyncFromParametersSet = LoadAsync().ContinueWith(_ => { loadAsyncFromParametersSet = null; StateHasChanged(); });
                 }
                 else
                 {
                     Log.Debug("LoadAsync skipped due to pending load operation");
                 }
+            }
+            else
+            {
+                previousDataKey = DataKey;
             }
         }
 
