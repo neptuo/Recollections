@@ -48,15 +48,13 @@ window.Bootstrap = {
         _activeCount: 0,
         _ensurePopstateListener: function () {
             if (this._popstateHandler) return;
-            this._popstateHandler = () => {
-                this._isPopstate = true;
-                queueMicrotask(() => { this._isPopstate = false; });
-            };
-            window.addEventListener("popstate", this._popstateHandler);
+            this._popstateHandler = () => { this._isPopstate = true; };
+            // Use capture phase to fire before Blazor's popstate handler
+            window.addEventListener("popstate", this._popstateHandler, true);
         },
         _removePopstateListener: function () {
             if (this._popstateHandler && this._activeCount === 0) {
-                window.removeEventListener("popstate", this._popstateHandler);
+                window.removeEventListener("popstate", this._popstateHandler, true);
                 this._popstateHandler = null;
             }
         },
