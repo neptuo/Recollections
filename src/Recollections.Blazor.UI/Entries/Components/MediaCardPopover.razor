@@ -4,9 +4,6 @@
     protected Navigator Navigator { get; set; }
 
     [Inject]
-    protected Entries.Api Api { get; set; }
-
-    [Inject]
     protected PopoverInterop Popover { get; set; }
 
     [Inject]
@@ -37,9 +34,9 @@
         @if (Model.Image != null)
         {
             <a href="@Navigator.UrlImageDetail(EntryId, Model.Image.Id)" class="text-decoration-none text-body">
-                <div class="card">
+                <div class="card" style="max-width: 200px;">
                     <div class="card-body p-0">
-                        <img src="@Api.GetMediaUrl(Model.Image.Thumbnail.Url)" class="card-img-top" alt="@Model.Image.Name" style="max-width: 200px;" />
+                        <EntryMedia EntryId="@EntryId" Image="@Model.Image" Type="@MediaType.Thumbnail" />
                     </div>
                     <div class="card-footer p-2">
                         <div class="information">
@@ -57,9 +54,9 @@
         else if (Model.Video != null)
         {
             <a href="@Navigator.UrlVideoDetail(EntryId, Model.Video.Id)" class="text-decoration-none text-body">
-                <div class="card">
+                <div class="card" style="max-width: 200px;">
                     <div class="card-body p-0">
-                        <img src="@Api.GetMediaUrl(Model.Video.Thumbnail.Url)" class="card-img-top" alt="@Model.Video.Name" style="max-width: 200px;" />
+                        <EntryMedia EntryId="@EntryId" Video="@Model.Video" Type="@MediaType.Thumbnail" />
                     </div>
                     <div class="card-footer p-2">
                         <div class="information">
