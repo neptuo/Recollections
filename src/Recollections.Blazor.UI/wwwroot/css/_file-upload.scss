@@ -1,4 +1,9 @@
 ﻿.file-progress-global {
     top: var(--blz-top-bar-height);
     z-index: 1021;
+
+    .list-group {
+        max-height: 50vh;
+        overflow-y: auto;
+    }
 }

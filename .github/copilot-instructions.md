@@ -7,6 +7,7 @@
 ## Running the Application
 
 - Restore .NET tools with `dotnet tool restore` before building. This installs the `excubo.webcompiler` tool needed to compile SCSS files.
+- Recompile SCSS after changing `.scss` files by running `dotnet build src/WatchScss.proj /p:RootPath=src/Recollections.Blazor.UI`. This regenerates `site.css` and `site.min.css`.
 - Run the application with `dotnet run ./src/AppHost.cs`.
 - If the default ports are already in use, invoke the `run-custom-ports` skill to run the application on a different set of ports.
 
