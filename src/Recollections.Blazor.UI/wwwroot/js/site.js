@@ -43,14 +43,45 @@ window.Bootstrap = {
         }
     },
     Offcanvas: {
+        _isPopstate: false,
+        _popstateHandler: null,
+        _activeCount: 0,
+        _ensurePopstateListener: function () {
+            if (this._popstateHandler) return;
+            this._popstateHandler = () => {
+                // Don't claim popstate if a higher-layer overlay (e.g. PhotoSwipe gallery) is open;
+                // it has its own NavigationLock that handles back navigation.
+                if (document.querySelector('.pswp--open')) return;
+
+                this._isPopstate = true;
+            };
+            // Use capture phase to fire before Blazor's popstate handler
+            window.addEventListener("popstate", this._popstateHandler, true);
+        },
+        _removePopstateListener: function () {
+            if (this._popstateHandler && this._activeCount === 0) {
+                window.removeEventListener("popstate", this._popstateHandler, true);
+                this._popstateHandler = null;
+            }
+        },
+        IsPopstate: function () {
+            const value = this._isPopstate;
+            this._isPopstate = false;
+            return value;
+        },
         Initialize: function (interop, container) {
             let offcanvas = bootstrap.Offcanvas.getInstance(container);
             if (!offcanvas) {
                 offcanvas = new bootstrap.Offcanvas(container);
                 container.addEventListener("show.bs.offcanvas", () => {
+                    this._activeCount++;
+                    this._isPopstate = false;
+                    this._ensurePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", true);
                 });
                 container.addEventListener("hide.bs.offcanvas", () => {
+                    this._activeCount = Math.max(0, this._activeCount - 1);
+                    this._removePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", false);
                 });
             }
