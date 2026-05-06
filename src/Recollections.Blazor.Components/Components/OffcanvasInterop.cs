@@ -11,6 +11,7 @@ namespace Neptuo.Recollections.Components;
 public class OffcanvasInterop
 {
     private readonly IJSRuntime jsRuntime;
+    private readonly IJSInProcessRuntime jsInProcessRuntime;
     private readonly DotNetObjectReference<OffcanvasInterop> thisReference;
     private Offcanvas component;
 
@@ -18,6 +19,7 @@ public class OffcanvasInterop
     {
         Ensure.NotNull(jsRuntime, "jsRuntime");
         this.jsRuntime = jsRuntime;
+        this.jsInProcessRuntime = (IJSInProcessRuntime)jsRuntime;
         thisReference = DotNetObjectReference.Create(this);
     }
 
@@ -25,6 +27,11 @@ public class OffcanvasInterop
     {
         this.component = component;
         await jsRuntime.InvokeVoidAsync("Bootstrap.Offcanvas.Initialize", thisReference, element);
+    }
+
+    internal bool IsPopstate()
+    {
+        return jsInProcessRuntime.Invoke<bool>("Bootstrap.Offcanvas.IsPopstate");
     }
 
     internal void Show(ElementReference element)

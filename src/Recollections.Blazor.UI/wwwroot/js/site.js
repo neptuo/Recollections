@@ -43,14 +43,37 @@ window.Bootstrap = {
         }
     },
     Offcanvas: {
+        _isPopstate: false,
+        _popstateHandler: null,
+        _activeCount: 0,
+        _ensurePopstateListener: function () {
+            if (this._popstateHandler) return;
+            this._popstateHandler = () => { this._isPopstate = true; };
+            window.addEventListener("popstate", this._popstateHandler);
+        },
+        _removePopstateListener: function () {
+            if (this._popstateHandler && this._activeCount === 0) {
+                window.removeEventListener("popstate", this._popstateHandler);
+                this._popstateHandler = null;
+            }
+        },
+        IsPopstate: function () {
+            const value = this._isPopstate;
+            this._isPopstate = false;
+            return value;
+        },
         Initialize: function (interop, container) {
             let offcanvas = bootstrap.Offcanvas.getInstance(container);
             if (!offcanvas) {
                 offcanvas = new bootstrap.Offcanvas(container);
                 container.addEventListener("show.bs.offcanvas", () => {
+                    this._activeCount++;
+                    this._ensurePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", true);
                 });
                 container.addEventListener("hide.bs.offcanvas", () => {
+                    this._activeCount = Math.max(0, this._activeCount - 1);
+                    this._removePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", false);
                 });
             }
