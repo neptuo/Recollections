@@ -75,6 +75,7 @@ window.Bootstrap = {
                 offcanvas = new bootstrap.Offcanvas(container);
                 container.addEventListener("show.bs.offcanvas", () => {
                     this._activeCount++;
+                    this._isPopstate = false; // Clear stale flag from prior navigation
                     console.debug("[Offcanvas] show event, activeCount:", this._activeCount);
                     this._ensurePopstateListener();
                     interop.invokeMethodAsync("Offcanvas.VisibilityChanged", true);
