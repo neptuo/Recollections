@@ -148,6 +148,12 @@ function stripTokenFromNavigation(request) {
         return request;
     }
 
+    // Only rebuild GET navigations; non-GET (e.g. form POSTs) carry a body
+    // that wouldn't survive being copied into a new Request here.
+    if (request.method !== 'GET') {
+        return request;
+    }
+
     const url = new URL(request.url);
     if (!url.searchParams.has('token')) {
         return request;
