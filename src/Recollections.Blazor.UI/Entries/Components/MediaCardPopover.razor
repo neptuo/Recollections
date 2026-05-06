@@ -1,0 +1,75 @@
+@code
+{
+    [Inject]
+    protected Navigator Navigator { get; set; }
+
+    [Inject]
+    protected PopoverInterop Popover { get; set; }
+
+    [Inject]
+    protected UiOptions UiOptions { get; set; }
+
+    [Parameter]
+    public string EntryId { get; set; }
+
+    [Parameter]
+    public MediaModel Model { get; set; }
+
+    public ElementReference ContentRef;
+
+    public async Task ShowAsync(ElementReference trigger)
+    {
+        await Popover.ShowFromElementAsync(trigger, ContentRef);
+    }
+
+    public async Task HideAsync()
+    {
+        await Popover.HideActiveAsync();
+    }
+}
+
+@if (Model != null)
+{
+    <div @ref="ContentRef" style="display:none">
+        @if (Model.Image != null)
+        {
+            <a href="@Navigator.UrlImageDetail(EntryId, Model.Image.Id)" class="text-decoration-none text-body">
+                <div class="card" style="max-width: 200px;">
+                    <div class="card-body p-0">
+                        <EntryMedia EntryId="@EntryId" Image="@Model.Image" Type="@MediaType.Thumbnail" />
+                    </div>
+                    <div class="card-footer p-2">
+                        <div class="information">
+                            <Icon Identifier="image" />
+                            @Model.Image.Name
+                        </div>
+                        <div class="information">
+                            <Icon Identifier="calendar-alt" />
+                            @Model.Image.When.ToString(UiOptions.DateFormat)
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+        else if (Model.Video != null)
+        {
+            <a href="@Navigator.UrlVideoDetail(EntryId, Model.Video.Id)" class="text-decoration-none text-body">
+                <div class="card" style="max-width: 200px;">
+                    <div class="card-body p-0">
+                        <EntryMedia EntryId="@EntryId" Video="@Model.Video" Type="@MediaType.Thumbnail" />
+                    </div>
+                    <div class="card-footer p-2">
+                        <div class="information">
+                            <Icon Identifier="film" />
+                            @Model.Video.Name
+                        </div>
+                        <div class="information">
+                            <Icon Identifier="calendar-alt" />
+                            @Model.Video.When.ToString(UiOptions.DateFormat)
+                        </div>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+}

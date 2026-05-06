@@ -133,15 +133,25 @@ window.Bootstrap = {
         ShowFromElement: function (trigger, contentElement) {
             Bootstrap.Popover._hideActive();
 
+            if (!contentElement) return;
+
             var originalTitle = trigger.getAttribute("title");
             if (originalTitle) {
                 trigger.removeAttribute("title");
             }
 
+            // Remember original position so we can restore the node exactly on hide.
+            var originalParent = contentElement.parentNode;
+            var originalNextSibling = contentElement.nextSibling;
+
+            // Show the content element (it starts hidden) and pass the live DOM node
+            // so async updates (e.g. image loading via JS interop) are visible.
+            contentElement.style.display = "";
+
             var popover = new bootstrap.Popover(trigger, {
                 html: true,
                 sanitize: false,
-                content: contentElement.innerHTML,
+                content: contentElement,
                 placement: "top",
                 trigger: "manual",
                 customClass: "entry-popover"
@@ -152,31 +162,40 @@ window.Bootstrap = {
             var dismissHandler = function (e) {
                 var tip = popover.tip;
                 if (tip && !tip.contains(e.target) && !trigger.contains(e.target)) {
-                    document.removeEventListener("pointerdown", dismissHandler);
-                    popover.dispose();
-                    if (originalTitle) {
-                        trigger.setAttribute("title", originalTitle);
-                    }
-                    Bootstrap.Popover._active = null;
+                    Bootstrap.Popover._disposeActive();
                 }
             };
 
-            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle };
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle, contentElement: contentElement, originalParent: originalParent, originalNextSibling: originalNextSibling };
 
             setTimeout(function () {
                 document.addEventListener("pointerdown", dismissHandler);
             }, 0);
         },
         _active: null,
-        _hideActive: function () {
-            if (Bootstrap.Popover._active) {
-                document.removeEventListener("pointerdown", Bootstrap.Popover._active.dismiss);
-                Bootstrap.Popover._active.popover.dispose();
-                if (Bootstrap.Popover._active.originalTitle) {
-                    Bootstrap.Popover._active.trigger.setAttribute("title", Bootstrap.Popover._active.originalTitle);
-                }
-                Bootstrap.Popover._active = null;
+        _disposeActive: function () {
+            var active = Bootstrap.Popover._active;
+            if (!active) return;
+
+            document.removeEventListener("pointerdown", active.dismiss);
+
+            // Move the content element back to its exact original position before
+            // dispose so Blazor's DOM diffing isn't confused by reordering.
+            if (active.contentElement && active.originalParent) {
+                active.contentElement.style.display = "none";
+                active.originalParent.insertBefore(active.contentElement, active.originalNextSibling);
             }
+
+            active.popover.dispose();
+
+            if (active.originalTitle) {
+                active.trigger.setAttribute("title", active.originalTitle);
+            }
+
+            Bootstrap.Popover._active = null;
+        },
+        _hideActive: function () {
+            Bootstrap.Popover._disposeActive();
         },
         Dispose: function (container) {
             var popover = bootstrap.Popover.getInstance(container);
@@ -469,6 +488,11 @@ window.ImageSource = {
         const { status, objectUrl } = await window.ImageSource.FetchObjectUrlAsync(url, mimeType, bearerToken);
         if (!objectUrl) {
             return status;
+        }
+
+        if (!element) {
+            URL.revokeObjectURL(objectUrl);
+            return 0;
         }
 
         return await new Promise(resolve => {
