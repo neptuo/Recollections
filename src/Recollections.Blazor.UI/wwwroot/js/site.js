@@ -133,6 +133,8 @@ window.Bootstrap = {
         ShowFromElement: function (trigger, contentElement) {
             Bootstrap.Popover._hideActive();
 
+            if (!contentElement) return;
+
             var originalTitle = trigger.getAttribute("title");
             if (originalTitle) {
                 trigger.removeAttribute("title");

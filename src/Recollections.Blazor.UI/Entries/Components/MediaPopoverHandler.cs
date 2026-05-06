@@ -24,7 +24,7 @@ namespace Neptuo.Recollections.Entries.Components
             {
                 showPopoverPending = false;
 
-                if (SelectedMedia != null && selectedMarkerIndex >= 0 && map != null)
+                if (SelectedMedia != null && selectedMarkerIndex >= 0 && map != null && popover.ContentRef.Id != null)
                 {
                     await map.ShowMarkerPopoverAsync(selectedMarkerIndex, popover.ContentRef);
                 }
