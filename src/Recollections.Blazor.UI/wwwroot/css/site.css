@@ -24999,8 +24999,10 @@ body {
   bottom: 55px;
 }
 
-.offcanvas-bottom {
-  bottom: var(--blz-bottom-bar-height);
+@media (max-width: 575.98px) {
+  .offcanvas-bottom {
+    bottom: calc(var(--blz-bottom-bar-height) - 1px);
+  }
 }
 
 .offcanvas-start {
@@ -25334,7 +25336,7 @@ input.input-number-noarrows[type=number] {
 
 @media (max-width: 575.98px) {
   .offcanvas-bottom-to-end {
-    bottom: var(--blz-bottom-bar-height);
+    bottom: calc(var(--blz-bottom-bar-height) - 1px);
     right: 0;
     left: 0;
     height: var(--bs-offcanvas-height);
