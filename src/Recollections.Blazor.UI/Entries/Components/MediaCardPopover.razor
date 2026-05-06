@@ -35,10 +35,7 @@
         {
             <a href="@Navigator.UrlImageDetail(EntryId, Model.Image.Id)" class="text-decoration-none text-body">
                 <div class="card" style="max-width: 200px;">
-                    <div class="card-body p-0">
-                        <EntryMedia EntryId="@EntryId" Image="@Model.Image" Type="@MediaType.Thumbnail" />
-                    </div>
-                    <div class="card-footer p-2">
+                    <div class="card-body p-3">
                         <div class="information">
                             <Icon Identifier="image" />
                             @Model.Image.Name
@@ -55,10 +52,7 @@
         {
             <a href="@Navigator.UrlVideoDetail(EntryId, Model.Video.Id)" class="text-decoration-none text-body">
                 <div class="card" style="max-width: 200px;">
-                    <div class="card-body p-0">
-                        <EntryMedia EntryId="@EntryId" Video="@Model.Video" Type="@MediaType.Thumbnail" />
-                    </div>
-                    <div class="card-footer p-2">
+                    <div class="card-body p-3">
                         <div class="information">
                             <Icon Identifier="film" />
                             @Model.Video.Name
