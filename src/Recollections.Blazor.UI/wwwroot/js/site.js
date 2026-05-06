@@ -48,7 +48,10 @@ window.Bootstrap = {
         _activeCount: 0,
         _ensurePopstateListener: function () {
             if (this._popstateHandler) return;
-            this._popstateHandler = () => { this._isPopstate = true; };
+            this._popstateHandler = () => {
+                this._isPopstate = true;
+                queueMicrotask(() => { this._isPopstate = false; });
+            };
             window.addEventListener("popstate", this._popstateHandler);
         },
         _removePopstateListener: function () {
