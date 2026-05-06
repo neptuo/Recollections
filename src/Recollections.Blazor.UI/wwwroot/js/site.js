@@ -138,10 +138,14 @@ window.Bootstrap = {
                 trigger.removeAttribute("title");
             }
 
+            // Show the content element (it starts hidden) and pass the live DOM node
+            // so async updates (e.g. image loading via JS interop) are visible.
+            contentElement.style.display = "";
+
             var popover = new bootstrap.Popover(trigger, {
                 html: true,
                 sanitize: false,
-                content: contentElement.innerHTML,
+                content: contentElement,
                 placement: "top",
                 trigger: "manual",
                 customClass: "entry-popover"
@@ -153,6 +157,7 @@ window.Bootstrap = {
                 var tip = popover.tip;
                 if (tip && !tip.contains(e.target) && !trigger.contains(e.target)) {
                     document.removeEventListener("pointerdown", dismissHandler);
+                    contentElement.style.display = "none";
                     popover.dispose();
                     if (originalTitle) {
                         trigger.setAttribute("title", originalTitle);
@@ -161,7 +166,7 @@ window.Bootstrap = {
                 }
             };
 
-            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle };
+            Bootstrap.Popover._active = { popover: popover, dismiss: dismissHandler, trigger: trigger, originalTitle: originalTitle, contentElement: contentElement };
 
             setTimeout(function () {
                 document.addEventListener("pointerdown", dismissHandler);
@@ -171,6 +176,9 @@ window.Bootstrap = {
         _hideActive: function () {
             if (Bootstrap.Popover._active) {
                 document.removeEventListener("pointerdown", Bootstrap.Popover._active.dismiss);
+                if (Bootstrap.Popover._active.contentElement) {
+                    Bootstrap.Popover._active.contentElement.style.display = "none";
+                }
                 Bootstrap.Popover._active.popover.dispose();
                 if (Bootstrap.Popover._active.originalTitle) {
                     Bootstrap.Popover._active.trigger.setAttribute("title", Bootstrap.Popover._active.originalTitle);
