@@ -1,5 +1,40 @@
 [
     {
+        "version": "0.20.3",
+        "milestone": 56,
+        "breakingChanges": [],
+        "newFeatures": [
+            "Popup card preview for image and video markers on entry detail map",
+            "Reorganized bottom navigation menu"
+        ],
+        "bugFixes": [
+            "Offcanvas panels now close on back navigation instead of leaving the page",
+            "Fixed upload progress display in PWA",
+            "Shared media preview banner no longer overflows on small screens",
+            "Detail pages now react correctly when navigating between entries",
+            "Fixed 1px gap between bottom menu and system bar"
+        ]
+    },
+    {
+        "version": "0.20.2",
+        "milestone": 55,
+        "breakingChanges": [],
+        "newFeatures": [],
+        "bugFixes": [
+            "Current page is preserved when sharing files to the app",
+            "Eliminated install-launch flash and improved PWA Store readiness"
+        ]
+    },
+    {
+        "version": "0.20.1",
+        "milestone": 54,
+        "breakingChanges": [],
+        "newFeatures": [],
+        "bugFixes": [
+            "Fixed Android notification badge showing as a blank square"
+        ]
+    },
+    {
         "version": "0.20.0",
         "milestone": 52,
         "breakingChanges": [],
