@@ -48,7 +48,13 @@ window.Bootstrap = {
         _activeCount: 0,
         _ensurePopstateListener: function () {
             if (this._popstateHandler) return;
-            this._popstateHandler = () => { this._isPopstate = true; };
+            this._popstateHandler = () => {
+                // Don't claim popstate if a higher-layer overlay (e.g. PhotoSwipe gallery) is open;
+                // it has its own NavigationLock that handles back navigation.
+                if (document.querySelector('.pswp--open')) return;
+
+                this._isPopstate = true;
+            };
             // Use capture phase to fire before Blazor's popstate handler
             window.addEventListener("popstate", this._popstateHandler, true);
         },
