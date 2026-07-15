@@ -1,5 +1,17 @@
 [
     {
+        "version": "0.20.4",
+        "milestone": 57,
+        "breakingChanges": [],
+        "newFeatures": [],
+        "bugFixes": [
+            "On this day cards now show related beings",
+            "Image upload now works with filenames containing diacritics",
+            "Phone file picker now allows selecting videos",
+            "Timeline gallery now shows video size"
+        ]
+    },
+    {
         "version": "0.20.3",
         "milestone": 56,
         "breakingChanges": [],
