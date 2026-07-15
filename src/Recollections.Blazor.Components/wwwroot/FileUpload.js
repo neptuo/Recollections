@@ -14,7 +14,12 @@ function deserializeFileNameHeaderValue(headerValue) {
         return headerValue;
     }
 
-    return decodeURIComponent(headerValue.substring(FILE_NAME_HEADER_PREFIX.length));
+    const encodedFileName = headerValue.substring(FILE_NAME_HEADER_PREFIX.length);
+    try {
+        return decodeURIComponent(encodedFileName);
+    } catch {
+        return encodedFileName;
+    }
 }
 
 async function storeFiles(files, actionUrl, entityType, entityId, userId) {
