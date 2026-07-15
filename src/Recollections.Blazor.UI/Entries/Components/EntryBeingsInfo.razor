@@ -1,0 +1,28 @@
+@if (Beings.Count > 0)
+{
+    foreach (var being in Beings)
+    {
+        if (Inline)
+        {
+            <span class="information">
+                <BeingIcon Identifier="@being.Icon" />
+                @being.Name
+            </span>
+        }
+        else
+        {
+            <div class="information">
+                <BeingIcon Identifier="@being.Icon" />
+                @being.Name
+            </div>
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public List<EntryBeingModel> Beings { get; set; } = [];
+
+    [Parameter]
+    public bool Inline { get; set; } = true;
+}

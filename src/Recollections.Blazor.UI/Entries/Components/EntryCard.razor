@@ -62,7 +62,9 @@
                     @Model.VideoCount
                 </div>
             }
-
+ 
+            <EntryBeingsInfo Beings="Model.Beings" Inline="false" />
+ 
             @if (UserState.UserId != Model.UserId)
             {
                 <div class="information">
