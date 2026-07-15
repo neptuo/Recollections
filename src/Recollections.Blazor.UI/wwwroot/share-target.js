@@ -32,6 +32,12 @@ async function findExistingClient(event) {
         || null;
 }
 
+const FILE_NAME_HEADER_PREFIX = 'u:';
+
+function serializeFileNameHeaderValue(fileName) {
+    return `${FILE_NAME_HEADER_PREFIX}${encodeURIComponent(fileName || '')}`;
+}
+
 // Sync with FileUpload.js (1:1)
 async function storeFiles(files, actionUrl, entityType, entityId, userId) {
     const mediaCache = await caches.open('media');
@@ -47,7 +53,7 @@ async function storeFiles(files, actionUrl, entityType, entityId, userId) {
                     'X-User-Id': userId || '',
                     'X-Action-Url': actionUrl || '',
 
-                    'X-File-Name': file.name,
+                    'X-File-Name': serializeFileNameHeaderValue(file.name),
                     'X-Last-Modified': file.lastModified,
                     'Content-Size': file.size,
                     'Content-Type': file.type,
