@@ -96,16 +96,7 @@
                                 </span>
                             }
 
-                            @if (entry.Beings != null)
-                            {
-                                foreach (var being in entry.Beings)
-                                {
-                                    <span class="information">
-                                        <BeingIcon Identifier="@being.Icon" />
-                                        @being.Name
-                                    </span>
-                                }
-                            }
+                            <EntryBeingsInfo Beings="entry.Beings" />
 
                             @if (UserState.UserId != entry.UserId)
                             {
