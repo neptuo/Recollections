@@ -7,6 +7,7 @@
 	<PackageVersion Include="System.Runtime.Caching" Version="$(FrameworkPackageVersion)" />
 	<PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.3" />
 	<PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+	<PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
 
 	<!-- Actual dependencies -->
 	<PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
