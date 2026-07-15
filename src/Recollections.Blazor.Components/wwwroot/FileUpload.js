@@ -1,4 +1,27 @@
 ﻿// Sync with share-target.js (1:1)
+const FILE_NAME_HEADER_PREFIX = 'u:';
+
+function serializeFileNameHeaderValue(fileName) {
+    return `${FILE_NAME_HEADER_PREFIX}${encodeURIComponent(fileName || '')}`;
+}
+
+function deserializeFileNameHeaderValue(headerValue) {
+    if (!headerValue) {
+        return '';
+    }
+
+    if (!headerValue.startsWith(FILE_NAME_HEADER_PREFIX)) {
+        return headerValue;
+    }
+
+    const encodedFileName = headerValue.substring(FILE_NAME_HEADER_PREFIX.length);
+    try {
+        return decodeURIComponent(encodedFileName);
+    } catch {
+        return encodedFileName;
+    }
+}
+
 async function storeFiles(files, actionUrl, entityType, entityId, userId) {
     const mediaCache = await caches.open('media');
     
@@ -13,7 +36,7 @@ async function storeFiles(files, actionUrl, entityType, entityId, userId) {
                     'X-User-Id': userId || '',
                     'X-Action-Url': actionUrl || '',
 
-                    'X-File-Name': file.name,
+                    'X-File-Name': serializeFileNameHeaderValue(file.name),
                     'X-Last-Modified': file.lastModified,
                     'Content-Size': file.size,
                     'Content-Type': file.type,
@@ -56,7 +79,7 @@ async function getStoredFilesByFlag(assigned) {
 
         if (isPassed) {
             const file = await response.blob();
-            file.name = response.headers.get('X-File-Name');
+            file.name = deserializeFileNameHeaderValue(response.headers.get('X-File-Name'));
             file.lastModified = Number.parseInt(response.headers.get('X-Last-Modified'));
             
             const storedFile = {
