@@ -230,34 +230,7 @@ namespace Neptuo.Recollections.Entries.Pages
             }
 
             GalleryItems.Clear();
-            foreach (var item in Media)
-            {
-                if (item.Image != null)
-                {
-                    GalleryItems.Add(new GalleryModel()
-                    {
-                        Type = "image",
-                        Title = item.Image.Name,
-                        Width = item.Image.Preview.Width,
-                        Height = item.Image.Preview.Height,
-                        PreviewUrl = Api.GetMediaUrl(item.Image.Preview.Url),
-                    });
-                }
-                else if (item.Video != null)
-                {
-                    GalleryItems.Add(new GalleryModel()
-                    {
-                        Type = "video",
-                        Title = item.Video.Name,
-                        SizeText = Utils.FileSizeText(item.Video.OriginalSize),
-                        Width = item.Video.Preview.Width,
-                        Height = item.Video.Preview.Height,
-                        ContentType = item.Video.ContentType,
-                        PreviewUrl = Api.GetMediaUrl(item.Video.Preview.Url),
-                        OriginalUrl = Api.GetMediaUrl(item.Video.Original.Url),
-                    });
-                }
-            }
+            GalleryModelMapper.AddMapped(GalleryItems, Media, Api);
         }
 
         private async Task OnGalleryOpenInfoAsync(int index)

@@ -265,33 +265,7 @@ namespace Neptuo.Recollections.Entries.Components
         private void UpdateGalleryItems(IEnumerable<MediaModel> media)
         {
             GalleryItems.Clear();
-            foreach (MediaModel item in media)
-            {
-                if (item.Image != null)
-                {
-                    GalleryItems.Add(new GalleryModel
-                    {
-                        Type = "image",
-                        Title = item.Image.Name,
-                        Width = item.Image.Preview.Width,
-                        Height = item.Image.Preview.Height,
-                        PreviewUrl = Api.GetMediaUrl(item.Image.Preview.Url),
-                    });
-                }
-                else if (item.Video != null)
-                {
-                    GalleryItems.Add(new GalleryModel
-                    {
-                        Type = "video",
-                        Title = item.Video.Name,
-                        Width = item.Video.Preview.Width,
-                        Height = item.Video.Preview.Height,
-                        ContentType = item.Video.ContentType,
-                        PreviewUrl = Api.GetMediaUrl(item.Video.Preview.Url),
-                        OriginalUrl = Api.GetMediaUrl(item.Video.Original.Url),
-                    });
-                }
-            }
+            GalleryModelMapper.AddMapped(GalleryItems, media, Api);
         }
 
         protected async Task OnGalleryOpenInfoAsync(int index)
