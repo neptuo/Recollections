@@ -1,4 +1,5 @@
 #:sdk Aspire.AppHost.Sdk@13.2.3
+#:package MessagePack
 #:project .\Recollections.Api\Recollections.Api.csproj
 #:project .\Recollections.Blazor.UI\Recollections.Blazor.UI.csproj
 
