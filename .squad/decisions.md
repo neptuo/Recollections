@@ -106,6 +106,18 @@ Render video original size on its own row underneath duration by stacking the me
 
 **Note:** Old personal image remains in git history (not scrubbed; pending user decision)
 
+### Dozer: AppHost MessagePack Vulnerability Fix (2026-07-15)
+
+Fix AppHost MessagePack advisories by upgrading the file-based AppHost SDK and removing temporary MessagePack overrides.
+
+**Why:** `src/AppHost.cs` is a file-based app, so `#:sdk Aspire.AppHost.Sdk` controls the transitive hosting graph. Moving from `Aspire.AppHost.Sdk@13.2.3` to `13.4.6` pulls in non-vulnerable transitive dependencies, making the previously-added explicit MessagePack pins unnecessary.
+
+**Implementation:**
+- Updated `#:sdk Aspire.AppHost.Sdk` in `src/AppHost.cs` from `13.2.3` to `13.4.6`.
+- Removed the temporary MessagePack overrides (`<PackageVersion Include="MessagePack" ... />` and `#:package MessagePack`) now that the SDK update resolves the advisories.
+
+**Verification:** `dotnet package list --file src/AppHost.cs --vulnerable --include-transitive --no-restore` reports no vulnerable packages, and `dotnet build src/AppHost.cs --no-restore` succeeds.
+
 ## Governance
 
 - All meaningful changes require team consensus
