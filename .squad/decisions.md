@@ -108,13 +108,13 @@ Render video original size on its own row underneath duration by stacking the me
 
 ### Dozer: AppHost MessagePack Vulnerability Fix (2026-07-15)
 
-Fix AppHost MessagePack advisories by overriding the transitive package in the file-based AppHost instead of bumping the Aspire SDK.
+Fix AppHost MessagePack advisories by upgrading the file-based AppHost SDK and removing temporary MessagePack overrides.
 
-**Why:** `src/AppHost.cs` is a file-based app, not a checked-in AppHost `.csproj`. Its `#:sdk Aspire.AppHost.Sdk@13.2.3` auto-references `Aspire.Hosting.AppHost` 13.2.3, which brings `StreamJsonRpc` 2.22.23 and therefore `MessagePack` 2.5.192. The minimum safe MessagePack version for the reported advisories is 2.5.301. Adding a central `PackageVersion` plus a `#:package MessagePack` override is the smallest hosting-scoped fix and avoids a broader Aspire upgrade.
+**Why:** `src/AppHost.cs` is a file-based app, so `#:sdk Aspire.AppHost.Sdk` controls the transitive hosting graph. Moving from `Aspire.AppHost.Sdk@13.2.3` to `13.4.6` pulls in non-vulnerable transitive dependencies, making the previously-added explicit MessagePack pins unnecessary.
 
 **Implementation:**
-- Added `<PackageVersion Include="MessagePack" Version="2.5.301" />` to `Directory.Packages.props`.
-- Added `#:package MessagePack` to `src/AppHost.cs` so the file-based AppHost promotes the safe version into its restore graph.
+- Updated `#:sdk Aspire.AppHost.Sdk` in `src/AppHost.cs` from `13.2.3` to `13.4.6`.
+- Removed the temporary MessagePack overrides (`<PackageVersion Include="MessagePack" ... />` and `#:package MessagePack`) now that the SDK update resolves the advisories.
 
 **Verification:** `dotnet package list --file src/AppHost.cs --vulnerable --include-transitive --no-restore` reports no vulnerable packages, and `dotnet build src/AppHost.cs --no-restore` succeeds.
 
