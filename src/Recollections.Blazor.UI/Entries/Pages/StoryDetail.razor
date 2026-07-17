@@ -35,7 +35,7 @@
                 <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
-                    <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                    <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(IsMapLoading ? "Loading locations..." : Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(IsMapLoading || Markers.Count == 0)" IsEnabled="@(!IsMapLoading && Markers.Count != 0)">
                         <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
@@ -47,9 +47,11 @@
                         1 => "1 image",
                         _ => $"{GalleryItems.Count} images and videos"
                     };
-                    string placeholder = GalleryItems.Count == 0 ? "No images or videos..." : null;
+                    string placeholder = IsMediaLoading ? "Loading images or videos..." : GalleryItems.Count == 0 ? "No images or videos..." : null;
+                    if (IsMediaLoading)
+                        value = null;
                     <div>
-                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => GalleryPreviewModal.Show())" IsClickable="@(GalleryItems.Count > 0)"  />
+                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => GalleryPreviewModal.Show())" IsClickable="@(!IsMediaLoading && GalleryItems.Count > 0)"  />
                     </div>
                 }
                 <div class="my-3">

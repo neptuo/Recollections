@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
@@ -29,6 +30,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected IExceptionHandler ExceptionHandler { get; set; }
 
         private string previousStoryId;
+        private long loadVersion;
+        private bool shouldLoadSecondaryData;
 
         [Parameter]
         public string StoryId { get; set; }
@@ -42,6 +45,8 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<EntryMediaModel> Media { get; set; } = [];
         protected List<MediaModel> AllMedia { get; set; } = [];
         protected List<GalleryModel> GalleryItems { get; } = [];
+        protected bool IsMapLoading { get; set; }
+        protected bool IsMediaLoading { get; set; }
         protected bool SelectLastChapterTitleEdit { get; set; }
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
         protected GalleryPreviewModal GalleryPreviewModal { get; set; }
@@ -70,6 +75,12 @@ namespace Neptuo.Recollections.Entries.Pages
 
             await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
 
+            if (shouldLoadSecondaryData)
+            {
+                shouldLoadSecondaryData = false;
+                await LoadSecondaryDataAsync(loadVersion, StoryId);
+            }
+
             if (SelectLastChapterTitleEdit)
             {
                 log.Debug("Selecting last chapter title edit.");
@@ -80,6 +91,8 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
+            long currentLoadVersion = Interlocked.Increment(ref loadVersion);
+
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetStoryAsync(StoryId);
 
@@ -96,14 +109,29 @@ namespace Neptuo.Recollections.Entries.Pages
             for (int i = 0; i < Model.Chapters.Count; i++)
                 Entries[Model.Chapters[i].Id] = entries[i + 1].Models;
 
-            await LoadMapAsync();
-            await LoadMediaAsync();
+            // A newer story load has started while this one was fetching.
+            if (currentLoadVersion != loadVersion)
+                return;
+
+            IsMapLoading = true;
+            IsMediaLoading = true;
+            ApplyMap([]);
+            ApplyMedia([]);
+            shouldLoadSecondaryData = true;
+            StateHasChanged();
         }
 
         protected async Task LoadMediaAsync()
         {
-            Media.Clear();
-            Media = await Api.GetStoryMediaAsync(StoryId);
+            IsMediaLoading = true;
+            var media = await Api.GetStoryMediaAsync(StoryId);
+            ApplyMedia(media);
+            IsMediaLoading = false;
+        }
+
+        private void ApplyMedia(List<EntryMediaModel> media)
+        {
+            Media = media;
             GalleryItems.Clear();
             AllMedia.Clear();
             foreach (var entry in Media)
@@ -117,9 +145,9 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        private async Task LoadMapAsync()
+        private void ApplyMap(List<MapEntryModel> mapEntries)
         {
-            MapEntries = await Api.GetStoryMapAsync(StoryId);
+            MapEntries = mapEntries;
             Markers.Clear();
             foreach (var entry in MapEntries)
             {
@@ -131,6 +159,22 @@ namespace Neptuo.Recollections.Entries.Pages
                     Title = entry.Entry.Title
                 });
             }
+        }
+
+        private async Task LoadSecondaryDataAsync(long currentLoadVersion, string storyId)
+        {
+            var mapTask = Api.GetStoryMapAsync(storyId);
+            var mediaTask = Api.GetStoryMediaAsync(storyId);
+            await Task.WhenAll(mapTask, mediaTask);
+
+            if (currentLoadVersion != loadVersion || storyId != StoryId)
+                return;
+
+            ApplyMap(mapTask.Result);
+            IsMapLoading = false;
+            ApplyMedia(mediaTask.Result);
+            IsMediaLoading = false;
+            StateHasChanged();
         }
 
         protected async Task OnMarkerSelectedAsync(int index)
