@@ -106,7 +106,7 @@ public class SearchEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
     public async Task Search_UserB_ReturnsOnlyAuthorizedMatchesAcrossSupportedFields()
     {
         var client = factory.CreateClientForUser(UserBId, UserBName);
-        var response = await client.GetAsync("/api/search?q=Alpha&offset=0");
+        var response = await client.GetAsync("/api/entries/search?q=Alpha&offset=0");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -119,6 +119,19 @@ public class SearchEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.Contains(ChapterVisibleEntryId, entryIds);
         Assert.DoesNotContain(HiddenTitleEntryId, entryIds);
         Assert.DoesNotContain(HiddenChapterEntryId, entryIds);
+        Assert.Equal(4, page.Models.Count);
+        Assert.False(page.HasMore);
+    }
+
+    [Fact]
+    public async Task Search_LegacyEndpoint_UsesEntrySearchBehavior()
+    {
+        var client = factory.CreateClientForUser(UserBId, UserBName);
+        var response = await client.GetAsync("/api/search?q=Alpha&offset=0");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var page = await response.ReadJsonAsync<PageableList<EntryListModel>>();
         Assert.Equal(4, page.Models.Count);
         Assert.False(page.HasMore);
     }

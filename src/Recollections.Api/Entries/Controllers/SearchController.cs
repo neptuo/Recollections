@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace Neptuo.Recollections.Entries.Controllers
 {
     [ApiController]
+    [Route("api/entries/search")]
     [Route("api/search")]
     public class SearchController : ControllerBase
     {

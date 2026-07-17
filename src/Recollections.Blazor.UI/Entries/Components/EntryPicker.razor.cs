@@ -73,7 +73,7 @@ namespace Neptuo.Recollections.Entries.Components
             {
                 IsSearching = true;
 
-                var response = await Api.SearchAsync(SearchText, searchOffset);
+                var response = await Api.SearchEntriesAsync(SearchText, searchOffset);
                 SearchResults.AddRange(response.Models);
                 SearchHasMore = response.HasMore;
                 searchOffset = SearchResults.Count;
