@@ -35,7 +35,7 @@
                 <InlineTitleEdit Value="@Model.Title" ValueChanged="@(async value => await SaveTitleAsync(value))" />
                 <UserInformation Owner="@Owner" />
                 <div class="gps">
-                    <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)" IsEnabled="@(Markers.Count != 0)">
+                    <MapToggle DialogTitle="@($"{Model.Title}: Map")" Text="@(IsMapLoading ? "Loading locations..." : Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(IsMapLoading || Markers.Count == 0)" IsEnabled="@(!IsMapLoading && Markers.Count != 0)">
                         <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
@@ -47,16 +47,25 @@
                         1 => "1 image",
                         _ => $"{GalleryItems.Count} images and videos"
                     };
-                    string placeholder = GalleryItems.Count == 0 ? "No images or videos..." : null;
+                    string placeholder = IsMediaLoading ? "Loading images or videos..." : GalleryItems.Count == 0 ? "No images or videos..." : null;
+                    if (IsMediaLoading)
+                        value = null;
                     <div>
-                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => GalleryPreviewModal.Show())" IsClickable="@(GalleryItems.Count > 0)"  />
+                        <InlineLink Icon="image" Value="@value" Placeholder="@placeholder" OnClick="@(() => GalleryPreviewModal.Show())" IsClickable="@(!IsMediaLoading && GalleryItems.Count > 0)"  />
                     </div>
                 }
                 <div class="my-3">
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
                 <div class="mb-3 timeline-narrow">
-                    <Timeline Data="@Entries[Model.Id]" ShowStoryInfo="false" Collapsible="true" />
+                    @if (IsTimelineLoading)
+                    {
+                        <div class="text-muted">Loading timeline...</div>
+                    }
+                    else
+                    {
+                        <Timeline Data="@Entries[Model.Id]" ShowStoryInfo="false" Collapsible="true" />
+                    }
                 </div>
 
                 <div class="chapters">
@@ -74,7 +83,14 @@
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
                             <div class="timeline-narrow">
-                                <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" Collapsible="true" />
+                                @if (IsTimelineLoading)
+                                {
+                                    <div class="text-muted">Loading timeline...</div>
+                                }
+                                else
+                                {
+                                    <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" Collapsible="true" />
+                                }
                             </div>
                         </div>
                     }

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
@@ -29,6 +30,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected IExceptionHandler ExceptionHandler { get; set; }
 
         private string previousStoryId;
+        private long loadVersion;
+        private bool shouldLoadTimelineData;
+        private bool shouldLoadSecondaryData;
+        private string[] timelineChapterIds = [];
 
         [Parameter]
         public string StoryId { get; set; }
@@ -42,6 +47,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<EntryMediaModel> Media { get; set; } = [];
         protected List<MediaModel> AllMedia { get; set; } = [];
         protected List<GalleryModel> GalleryItems { get; } = [];
+        protected bool IsTimelineLoading { get; set; }
+        protected bool IsMapLoading { get; set; }
+        protected bool IsMediaLoading { get; set; }
         protected bool SelectLastChapterTitleEdit { get; set; }
         protected InlineTextEdit LastChapterTitleEdit { get; set; }
         protected GalleryPreviewModal GalleryPreviewModal { get; set; }
@@ -70,6 +78,18 @@ namespace Neptuo.Recollections.Entries.Pages
 
             await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
 
+            if (shouldLoadTimelineData)
+            {
+                shouldLoadTimelineData = false;
+                await LoadTimelineDataAsync(loadVersion, StoryId, timelineChapterIds);
+            }
+
+            if (shouldLoadSecondaryData)
+            {
+                shouldLoadSecondaryData = false;
+                await LoadSecondaryDataAsync(loadVersion, StoryId);
+            }
+
             if (SelectLastChapterTitleEdit)
             {
                 log.Debug("Selecting last chapter title edit.");
@@ -80,30 +100,53 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
+            long currentLoadVersion = Interlocked.Increment(ref loadVersion);
+
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetStoryAsync(StoryId);
 
+            // A newer story load has started while this one was fetching.
+            if (currentLoadVersion != loadVersion)
+                return;
+
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
+            timelineChapterIds = Model.Chapters.Select(c => c.Id).ToArray();
+            Entries.Clear();
+            Entries[Model.Id] = [];
+            foreach (var chapter in Model.Chapters)
+                Entries[chapter.Id] = [];
 
-            var entriesTasks = new Task<PageableList<EntryListModel>>[Model.Chapters.Count + 1];
-            entriesTasks[0] = Api.GetStoryTimelineAsync(Model.Id);
-            for (int i = 0; i < Model.Chapters.Count; i++)
-                entriesTasks[i + 1] = Api.GetStoryChapterTimelineAsync(Model.Id, Model.Chapters[i].Id);
-
-            var entries = await Task.WhenAll(entriesTasks);
-            Entries[Model.Id] = entries[0].Models;
-            for (int i = 0; i < Model.Chapters.Count; i++)
-                Entries[Model.Chapters[i].Id] = entries[i + 1].Models;
-
-            await LoadMapAsync();
-            await LoadMediaAsync();
+            IsTimelineLoading = true;
+            IsMapLoading = true;
+            IsMediaLoading = true;
+            ApplyMap([]);
+            ApplyMedia([]);
+            shouldLoadTimelineData = true;
+            shouldLoadSecondaryData = true;
+            StateHasChanged();
         }
 
         protected async Task LoadMediaAsync()
         {
-            Media.Clear();
-            Media = await Api.GetStoryMediaAsync(StoryId);
+            IsMediaLoading = true;
+            StateHasChanged();
+
+            try
+            {
+                var media = await Api.GetStoryMediaAsync(StoryId);
+                ApplyMedia(media);
+            }
+            finally
+            {
+                IsMediaLoading = false;
+                StateHasChanged();
+            }
+        }
+
+        private void ApplyMedia(List<EntryMediaModel> media)
+        {
+            Media = media;
             GalleryItems.Clear();
             AllMedia.Clear();
             foreach (var entry in Media)
@@ -117,9 +160,9 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
-        private async Task LoadMapAsync()
+        private void ApplyMap(List<MapEntryModel> mapEntries)
         {
-            MapEntries = await Api.GetStoryMapAsync(StoryId);
+            MapEntries = mapEntries;
             Markers.Clear();
             foreach (var entry in MapEntries)
             {
@@ -131,6 +174,50 @@ namespace Neptuo.Recollections.Entries.Pages
                     Title = entry.Entry.Title
                 });
             }
+        }
+
+        private async Task LoadSecondaryDataAsync(long currentLoadVersion, string storyId)
+        {
+            try
+            {
+                var mapTask = Api.GetStoryMapAsync(storyId);
+                var mediaTask = Api.GetStoryMediaAsync(storyId);
+                await Task.WhenAll(mapTask, mediaTask);
+
+                if (currentLoadVersion != loadVersion || storyId != StoryId)
+                    return;
+
+                ApplyMap(mapTask.Result);
+                ApplyMedia(mediaTask.Result);
+            }
+            finally
+            {
+                if (currentLoadVersion == loadVersion && storyId == StoryId)
+                {
+                    IsMapLoading = false;
+                    IsMediaLoading = false;
+                    StateHasChanged();
+                }
+            }
+        }
+
+        private async Task LoadTimelineDataAsync(long currentLoadVersion, string storyId, string[] chapterIds)
+        {
+            var entriesTasks = new Task<PageableList<EntryListModel>>[chapterIds.Length + 1];
+            entriesTasks[0] = Api.GetStoryTimelineAsync(storyId);
+            for (int i = 0; i < chapterIds.Length; i++)
+                entriesTasks[i + 1] = Api.GetStoryChapterTimelineAsync(storyId, chapterIds[i]);
+
+            var entries = await Task.WhenAll(entriesTasks);
+            if (currentLoadVersion != loadVersion || storyId != StoryId)
+                return;
+
+            Entries[storyId] = entries[0].Models;
+            for (int i = 0; i < chapterIds.Length; i++)
+                Entries[chapterIds[i]] = entries[i + 1].Models;
+
+            IsTimelineLoading = false;
+            StateHasChanged();
         }
 
         protected async Task OnMarkerSelectedAsync(int index)
