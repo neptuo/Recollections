@@ -130,7 +130,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task LoadMediaAsync()
         {
             IsMediaLoading = true;
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
 
             try
             {
@@ -140,7 +140,7 @@ namespace Neptuo.Recollections.Entries.Pages
             finally
             {
                 IsMediaLoading = false;
-                await InvokeAsync(StateHasChanged);
+                StateHasChanged();
             }
         }
 
@@ -196,7 +196,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 {
                     IsMapLoading = false;
                     IsMediaLoading = false;
-                    await InvokeAsync(StateHasChanged);
+                    StateHasChanged();
                 }
             }
         }
