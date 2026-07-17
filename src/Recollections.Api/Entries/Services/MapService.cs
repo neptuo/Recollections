@@ -73,27 +73,23 @@ public class MapService
         {
             foreach (List<string> batch in Batch(unresolvedEntryIds, QueryBatchSize))
             {
-                var imageLocations = await dataContext.Entries
-                    .Where(entry => batch.Contains(entry.Id))
-                    .Select(entry => new
+                var imageLocations = await dataContext.Images
+                    .Where(img =>
+                        batch.Contains(img.Entry.Id)
+                        && img.Location != null
+                        && img.Location.Latitude != null
+                        && img.Location.Longitude != null
+                    )
+                    .Select(img => new
                     {
-                        EntryId = entry.Id,
-                        Location = dataContext.Images
-                            .Where(img =>
-                                img.Entry.Id == entry.Id
-                                && img.Location != null
-                                && img.Location.Latitude != null
-                                && img.Location.Longitude != null
-                            )
-                            .Select(img => new LocationModel()
-                            {
-                                Latitude = img.Location.Latitude,
-                                Longitude = img.Location.Longitude,
-                                Altitude = img.Location.Altitude
-                            })
-                            .FirstOrDefault()
+                        EntryId = img.Entry.Id,
+                        Location = new LocationModel()
+                        {
+                            Latitude = img.Location.Latitude,
+                            Longitude = img.Location.Longitude,
+                            Altitude = img.Location.Altitude
+                        }
                     })
-                    .Where(item => item.Location != null)
                     .ToListAsync();
 
                 foreach (var imageLocation in imageLocations)
@@ -115,27 +111,23 @@ public class MapService
         {
             foreach (List<string> batch in Batch(unresolvedEntryIds, QueryBatchSize))
             {
-                var videoLocations = await dataContext.Entries
-                    .Where(entry => batch.Contains(entry.Id))
-                    .Select(entry => new
+                var videoLocations = await dataContext.Videos
+                    .Where(video =>
+                        batch.Contains(video.Entry.Id)
+                        && video.Location != null
+                        && video.Location.Latitude != null
+                        && video.Location.Longitude != null
+                    )
+                    .Select(video => new
                     {
-                        EntryId = entry.Id,
-                        Location = dataContext.Videos
-                            .Where(video =>
-                                video.Entry.Id == entry.Id
-                                && video.Location != null
-                                && video.Location.Latitude != null
-                                && video.Location.Longitude != null
-                            )
-                            .Select(video => new LocationModel()
-                            {
-                                Latitude = video.Location.Latitude,
-                                Longitude = video.Location.Longitude,
-                                Altitude = video.Location.Altitude
-                            })
-                            .FirstOrDefault()
+                        EntryId = video.Entry.Id,
+                        Location = new LocationModel()
+                        {
+                            Latitude = video.Location.Latitude,
+                            Longitude = video.Location.Longitude,
+                            Altitude = video.Location.Altitude
+                        }
                     })
-                    .Where(item => item.Location != null)
                     .ToListAsync();
 
                 foreach (var videoLocation in videoLocations)
