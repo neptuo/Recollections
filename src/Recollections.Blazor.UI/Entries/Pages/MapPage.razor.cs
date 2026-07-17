@@ -77,6 +77,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 "position_unavailable" => "Current location is unavailable right now. Try again in a moment.",
                 "timeout" => "Getting current location took too long. Please try again.",
                 "unsupported" => "Your browser does not support retrieving current location.",
+                "not_initialized" => "The map is still initializing. Please try again in a moment.",
                 _ => "Unable to retrieve current location."
             };
 

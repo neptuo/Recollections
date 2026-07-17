@@ -353,11 +353,11 @@ function toGeolocationErrorCode(error) {
     }
 
     switch (error.code) {
-        case error.PERMISSION_DENIED:
+        case 1:
             return "permission_denied";
-        case error.POSITION_UNAVAILABLE:
+        case 2:
             return "position_unavailable";
-        case error.TIMEOUT:
+        case 3:
             return "timeout";
         default:
             return "unknown";
