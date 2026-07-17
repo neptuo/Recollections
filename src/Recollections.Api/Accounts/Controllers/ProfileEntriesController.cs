@@ -36,11 +36,10 @@ public class ProfileEntriesController(EntriesDataContext db, ShareStatusService 
             .Select(e => e.Story != null ? e.Story.Id : e.Chapter.Story.Id)
             .Distinct();
 
-        var stories = await db.Stories
-            .Where(s => storyIds.Contains(s.Id))
-            .ToListAsync();
+        var stories = db.Stories
+            .Where(s => storyIds.Contains(s.Id));
 
-        var models = await storyMapper.MapAsync(stories, userId, connectedUsers);
+        var (models, _) = await storyMapper.MapAsync(stories, userId, connectedUsers);
 
         return Ok(models);
     });

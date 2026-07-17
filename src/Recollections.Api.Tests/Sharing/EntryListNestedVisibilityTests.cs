@@ -241,7 +241,7 @@ public class EntryListNestedVisibilityTests : IClassFixture<ApiFactory>, IAsyncL
     public async Task Search_User_OnlyReturnsVisibleAttachedBeingsInSearchResults()
     {
         var client = factory.CreateClientForUser(JaneUserId, JaneUserName);
-        var page = await GetPageAsync(client, $"/api/search?q={SearchTerm}&offset=0");
+        var page = await GetPageAsync(client, $"/api/entries/search?q={SearchTerm}&offset=0");
         var modelById = page.Models.ToDictionary(model => model.Id);
 
         Assert.Contains(DirectVisibleEntryId, modelById.Keys);

@@ -61,12 +61,40 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
-            List<Story> entities = await shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectedUsers)
-                .ToListAsync();
-
-            var models = await storyMapper.MapAsync(entities, userId, connectedUsers);
+            var query = shareStatus.OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectedUsers);
+            var (models, _) = await storyMapper.MapAsync(query, userId, connectedUsers);
 
             return Ok(models);
+        }
+
+        [HttpGet("search")]
+        [ProducesDefaultResponseType(typeof(PageableList<StoryListModel>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<PageableList<StoryListModel>>> Search([FromQuery(Name = "q")] string query, int offset)
+        {
+            Ensure.PositiveOrZero(offset, "offset");
+
+            if (String.IsNullOrWhiteSpace(query))
+                return BadRequest();
+
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+
+            var dbQuery = shareStatus
+                .OwnedByOrExplicitlySharedWithUser(db, db.Stories, userId, connectedUsers)
+                .Where(s =>
+                    EF.Functions.Like(s.Title, $"%{query}%")
+                    || EF.Functions.Like(s.Text, $"%{query}%")
+                    || s.Chapters.Any(c => EF.Functions.Like(c.Title, $"%{query}%") || EF.Functions.Like(c.Text, $"%{query}%"))
+                );
+
+            var (models, hasMore) = await storyMapper.MapAsync(dbQuery, userId, connectedUsers, offset);
+            return Ok(new PageableList<StoryListModel>(models, hasMore));
         }
 
         [HttpGet("{storyId}/chapters")]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,9 @@ namespace Neptuo.Recollections.Entries.Pages
 {
     public partial class Search : IDisposable
     {
+        private const string EntrySearchType = "entry";
+        private const string StorySearchType = "story";
+
         [Inject]
         protected Navigator Navigator { get; set; }
 
@@ -33,12 +37,16 @@ namespace Neptuo.Recollections.Entries.Pages
         /// Don't use here. Only for binding purposes.
         /// </summary>
         protected string SearchText { get; set; }
+        protected string SearchType { get; set; } = EntrySearchType;
         protected ElementReference SearchInput { get; set; }
 
-        protected List<EntryListModel> Items { get; } = [];
+        protected List<EntryListModel> EntryItems { get; } = [];
+        protected List<StoryListModel> StoryItems { get; } = [];
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; set; }
         protected bool HasQuery => !String.IsNullOrEmpty(Query);
+        protected bool IsEntryType => SearchType == EntrySearchType;
+        protected bool IsStoryType => SearchType == StorySearchType;
 
         protected string EmptyMessage => HasQuery
             ? $"Nothing matches '{Query}'..."
@@ -87,19 +95,23 @@ namespace Neptuo.Recollections.Entries.Pages
             Log.Debug($"Search executed with '{append}'.");
 
             string lastQuery = Query;
+            string lastType = SearchType;
             SearchText = Query = Navigator.FindQueryParameter("q");
+            SearchType = NormalizeSearchType(Navigator.FindQueryParameter("type"));
 
             if (!append)
             {
-                if (Query == lastQuery)
+                if (Query == lastQuery && SearchType == lastType)
                 {
-                    Log.Debug($"Not appending and query not changed (last '{lastQuery}', current '{Query}').");
+                    Log.Debug($"Not appending and query/type not changed (last '{lastQuery}'/'{lastType}', current '{Query}'/'{SearchType}').");
                     return;
                 }
 
-                Log.Debug($"Clearing '{Items.Count}' items.");
-                Items.Clear();
+                Log.Debug($"Clearing '{EntryItems.Count}' entry items and '{StoryItems.Count}' story items.");
+                EntryItems.Clear();
+                StoryItems.Clear();
                 offset = 0;
+                HasMore = false;
             }
 
             if (String.IsNullOrEmpty(Query))
@@ -109,12 +121,22 @@ namespace Neptuo.Recollections.Entries.Pages
             {
                 IsLoading = true;
 
-                var response = await Api.SearchAsync(Query, offset);
-                Items.AddRange(response.Models);
-                HasMore = response.HasMore;
-                offset = Items.Count;
-
-                Log.Debug($"Found '{response.Models.Count}' items with '{response.HasMore}'.");
+                if (IsEntryType)
+                {
+                    var response = await Api.SearchEntriesAsync(Query, offset);
+                    EntryItems.AddRange(response.Models);
+                    HasMore = response.HasMore;
+                    offset = EntryItems.Count;
+                    Log.Debug($"Found '{response.Models.Count}' entry items with '{response.HasMore}'.");
+                }
+                else
+                {
+                    var response = await Api.SearchStoriesAsync(Query, offset);
+                    StoryItems.AddRange(response.Models);
+                    HasMore = response.HasMore;
+                    offset = StoryItems.Count;
+                    Log.Debug($"Found '{response.Models.Count}' story items with '{response.HasMore}'.");
+                }
             }
             finally
             {
@@ -123,7 +145,18 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
+        protected void OpenEntrySearch()
+            => Navigator.OpenSearch(SearchText, EntrySearchType);
+
+        protected void OpenStorySearch()
+            => Navigator.OpenSearch(SearchText, StorySearchType);
+
         protected Task LoadMoreAsync()
             => SearchAsync(true);
+
+        private static string NormalizeSearchType(string value)
+            => value == StorySearchType
+                ? StorySearchType
+                : EntrySearchType;
     }
 }
