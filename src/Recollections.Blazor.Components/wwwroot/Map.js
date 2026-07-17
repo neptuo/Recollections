@@ -302,9 +302,66 @@ export function centerAt(container, latitude, longitude, zoom) {
     model.map.setView([latitude, longitude], zoom ?? 17);
 }
 
+export async function centerAtCurrentLocation(container) {
+    const model = _mapData.get(container);
+    if (!model || !model.map) {
+        return {
+            isSuccess: false,
+            errorCode: "not_initialized"
+        };
+    }
+
+    if (!navigator.geolocation) {
+        return {
+            isSuccess: false,
+            errorCode: "unsupported"
+        };
+    }
+
+    return await new Promise(resolve => {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                model.map.setView([position.coords.latitude, position.coords.longitude], 17);
+                resolve({
+                    isSuccess: true,
+                    errorCode: null
+                });
+            },
+            error => {
+                resolve({
+                    isSuccess: false,
+                    errorCode: toGeolocationErrorCode(error)
+                });
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    });
+}
+
 export function redraw(container) {
     const model = _mapData.get(container);
     model.tiles.redraw();
+}
+
+function toGeolocationErrorCode(error) {
+    if (!error) {
+        return "unknown";
+    }
+
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            return "permission_denied";
+        case error.POSITION_UNAVAILABLE:
+            return "position_unavailable";
+        case error.TIMEOUT:
+            return "timeout";
+        default:
+            return "unknown";
+    }
 }
 
 export function showMarkerPopover(container, markerIndex, contentElement) {
