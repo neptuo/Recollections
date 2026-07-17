@@ -11,10 +11,10 @@
             </div>
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
                 <div class="btn-group d-flex" role="group" aria-label="Search type">
-                    <button type="button" class="btn @(IsEntryType ? "btn-secondary" : "btn-outline-secondary")" @onclick="OpenEntrySearch">
+                    <button type="button" class="btn @(IsEntryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsEntryType" @onclick="OpenEntrySearch">
                         Entries
                     </button>
-                    <button type="button" class="btn @(IsStoryType ? "btn-secondary" : "btn-outline-secondary")" @onclick="OpenStorySearch">
+                    <button type="button" class="btn @(IsStoryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsStoryType" @onclick="OpenStorySearch">
                         Stories
                     </button>
                 </div>

@@ -12,17 +12,12 @@ namespace Neptuo.Recollections.Entries;
 public class StoryListMapper(DataContext dataContext, IUserNameProvider userNames, ShareStatusService shareStatus)
 {
     private const int PageSize = 10;
-    private const int MaxPageSize = PageSize * 100;
 
     public Task<(List<StoryListModel> models, bool hasMore)> MapAsync(IQueryable<Story> query, string userId, ConnectedUsersModel connectedUsers, int offset)
         => MapAsync(query, userId, connectedUsers, offset, PageSize);
 
     public static int NormalizePageSize(int? pageSize)
-    {
-        int normalizedPageSize = pageSize ?? PageSize;
-        Ensure.Positive(normalizedPageSize, "pageSize");
-        return Math.Min(normalizedPageSize, MaxPageSize);
-    }
+        => EntryListMapper.NormalizePageSize(pageSize);
 
     private async Task<List<StoryListModel>> MapListAsync(List<Story> stories, string userId, ConnectedUsersModel connectedUsers)
     {
