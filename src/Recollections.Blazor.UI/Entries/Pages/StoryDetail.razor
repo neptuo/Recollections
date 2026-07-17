@@ -58,7 +58,14 @@
                     <InlineMarkdownEdit Value="@Model.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveTextAsync(value))" />
                 </div>
                 <div class="mb-3 timeline-narrow">
-                    <Timeline Data="@Entries[Model.Id]" ShowStoryInfo="false" Collapsible="true" />
+                    @if (IsTimelineLoading)
+                    {
+                        <div class="text-muted">Loading timeline...</div>
+                    }
+                    else
+                    {
+                        <Timeline Data="@Entries[Model.Id]" ShowStoryInfo="false" Collapsible="true" />
+                    }
                 </div>
 
                 <div class="chapters">
@@ -76,7 +83,14 @@
                                 <InlineMarkdownEdit Value="@chapter.Text" PlaceHolder="No description..." ValueChanged="@(async value => await SaveChapterTextAsync(chapter, value))" />
                             </div>
                             <div class="timeline-narrow">
-                                <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" Collapsible="true" />
+                                @if (IsTimelineLoading)
+                                {
+                                    <div class="text-muted">Loading timeline...</div>
+                                }
+                                else
+                                {
+                                    <Timeline Data="@Entries[chapter.Id]" ShowStoryInfo="false" Collapsible="true" />
+                                }
                             </div>
                         </div>
                     }

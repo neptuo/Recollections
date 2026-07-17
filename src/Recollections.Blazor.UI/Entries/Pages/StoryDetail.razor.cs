@@ -31,6 +31,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private string previousStoryId;
         private long loadVersion;
+        private bool shouldLoadTimelineData;
         private bool shouldLoadSecondaryData;
 
         [Parameter]
@@ -45,6 +46,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<EntryMediaModel> Media { get; set; } = [];
         protected List<MediaModel> AllMedia { get; set; } = [];
         protected List<GalleryModel> GalleryItems { get; } = [];
+        protected bool IsTimelineLoading { get; set; }
         protected bool IsMapLoading { get; set; }
         protected bool IsMediaLoading { get; set; }
         protected bool SelectLastChapterTitleEdit { get; set; }
@@ -75,6 +77,12 @@ namespace Neptuo.Recollections.Entries.Pages
 
             await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
 
+            if (shouldLoadTimelineData)
+            {
+                shouldLoadTimelineData = false;
+                await LoadTimelineDataAsync(loadVersion, StoryId);
+            }
+
             if (shouldLoadSecondaryData)
             {
                 shouldLoadSecondaryData = false;
@@ -96,27 +104,23 @@ namespace Neptuo.Recollections.Entries.Pages
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetStoryAsync(StoryId);
 
-            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
-            Permissions.IsOwner = UserState.UserId == Model.UserId;
-
-            var entriesTasks = new Task<PageableList<EntryListModel>>[Model.Chapters.Count + 1];
-            entriesTasks[0] = Api.GetStoryTimelineAsync(Model.Id);
-            for (int i = 0; i < Model.Chapters.Count; i++)
-                entriesTasks[i + 1] = Api.GetStoryChapterTimelineAsync(Model.Id, Model.Chapters[i].Id);
-
-            var entries = await Task.WhenAll(entriesTasks);
-            Entries[Model.Id] = entries[0].Models;
-            for (int i = 0; i < Model.Chapters.Count; i++)
-                Entries[Model.Chapters[i].Id] = entries[i + 1].Models;
-
             // A newer story load has started while this one was fetching.
             if (currentLoadVersion != loadVersion)
                 return;
 
+            Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
+            Permissions.IsOwner = UserState.UserId == Model.UserId;
+            Entries.Clear();
+            Entries[Model.Id] = [];
+            foreach (var chapter in Model.Chapters)
+                Entries[chapter.Id] = [];
+
+            IsTimelineLoading = true;
             IsMapLoading = true;
             IsMediaLoading = true;
             ApplyMap([]);
             ApplyMedia([]);
+            shouldLoadTimelineData = true;
             shouldLoadSecondaryData = true;
             StateHasChanged();
         }
@@ -174,6 +178,26 @@ namespace Neptuo.Recollections.Entries.Pages
             IsMapLoading = false;
             ApplyMedia(mediaTask.Result);
             IsMediaLoading = false;
+            StateHasChanged();
+        }
+
+        private async Task LoadTimelineDataAsync(long currentLoadVersion, string storyId)
+        {
+            string[] chapterIds = Model.Chapters.Select(c => c.Id).ToArray();
+            var entriesTasks = new Task<PageableList<EntryListModel>>[chapterIds.Length + 1];
+            entriesTasks[0] = Api.GetStoryTimelineAsync(storyId);
+            for (int i = 0; i < chapterIds.Length; i++)
+                entriesTasks[i + 1] = Api.GetStoryChapterTimelineAsync(storyId, chapterIds[i]);
+
+            var entries = await Task.WhenAll(entriesTasks);
+            if (currentLoadVersion != loadVersion || storyId != StoryId)
+                return;
+
+            Entries[storyId] = entries[0].Models;
+            for (int i = 0; i < chapterIds.Length; i++)
+                Entries[chapterIds[i]] = entries[i + 1].Models;
+
+            IsTimelineLoading = false;
             StateHasChanged();
         }
 
