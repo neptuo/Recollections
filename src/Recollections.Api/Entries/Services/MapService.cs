@@ -51,7 +51,8 @@ public class MapService
             .ToListAsync();
 
         // Resolve locations with fallback chain: entry location → track → image → video
-        var locationById = new Dictionary<string, LocationModel>();
+        var locationById = new Dictionary<string, LocationModel>(items.Count);
+        var unresolvedEntryIds = new List<string>();
         for (int i = 0; i < items.Count; i++)
         {
             var item = items[i];
@@ -60,41 +61,81 @@ public class MapService
             if (!HasLocationValue(location))
                 location = item.TrackLocation;
 
-            if (!HasLocationValue(location))
-            {
-                location = await dataContext.Images
-                    .Where(img => img.Entry.Id == item.Id && img.Location.Latitude != null && img.Location.Longitude != null)
-                    .Select(img => new LocationModel()
+            if (HasLocationValue(location))
+                locationById[item.Id] = location;
+            else
+                unresolvedEntryIds.Add(item.Id);
+        }
+
+        if (unresolvedEntryIds.Count > 0)
+        {
+            var imageLocations = await dataContext.Images
+                .Where(img =>
+                    unresolvedEntryIds.Contains(img.Entry.Id)
+                    && img.Location != null
+                    && img.Location.Latitude != null
+                    && img.Location.Longitude != null
+                )
+                .Select(img => new
+                {
+                    EntryId = img.Entry.Id,
+                    Location = new LocationModel()
                     {
                         Latitude = img.Location.Latitude,
                         Longitude = img.Location.Longitude,
                         Altitude = img.Location.Altitude
-                    })
-                    .FirstOrDefaultAsync();
-            }
+                    }
+                })
+                .ToListAsync();
 
-            if (!HasLocationValue(location))
+            foreach (var imageLocation in imageLocations)
             {
-                location = await dataContext.Videos
-                    .Where(v => v.Entry.Id == item.Id && v.Location.Latitude != null && v.Location.Longitude != null)
-                    .Select(v => new LocationModel()
-                    {
-                        Latitude = v.Location.Latitude,
-                        Longitude = v.Location.Longitude,
-                        Altitude = v.Location.Altitude
-                    })
-                    .FirstOrDefaultAsync();
+                if (!locationById.ContainsKey(imageLocation.EntryId))
+                    locationById[imageLocation.EntryId] = imageLocation.Location;
             }
+        }
 
-            if (HasLocationValue(location))
-                locationById[item.Id] = location;
+        if (locationById.Count > 0 && unresolvedEntryIds.Count > 0)
+        {
+            unresolvedEntryIds = unresolvedEntryIds
+                .Where(entryId => !locationById.ContainsKey(entryId))
+                .ToList();
+        }
+
+        if (unresolvedEntryIds.Count > 0)
+        {
+            var videoLocations = await dataContext.Videos
+                .Where(video =>
+                    unresolvedEntryIds.Contains(video.Entry.Id)
+                    && video.Location != null
+                    && video.Location.Latitude != null
+                    && video.Location.Longitude != null
+                )
+                .Select(video => new
+                {
+                    EntryId = video.Entry.Id,
+                    Location = new LocationModel()
+                    {
+                        Latitude = video.Location.Latitude,
+                        Longitude = video.Location.Longitude,
+                        Altitude = video.Location.Altitude
+                    }
+                })
+                .ToListAsync();
+
+            foreach (var videoLocation in videoLocations)
+            {
+                if (!locationById.ContainsKey(videoLocation.EntryId))
+                    locationById[videoLocation.EntryId] = videoLocation.Location;
+            }
         }
 
         if (locationById.Count == 0)
             return [];
 
         // Enrich with full entry list models
-        var entryQuery = dataContext.Entries.Where(e => locationById.Keys.Contains(e.Id));
+        var entryIds = locationById.Keys.ToList();
+        var entryQuery = dataContext.Entries.Where(e => entryIds.Contains(e.Id));
         var (entryModels, _) = await entryListMapper.MapAsync(entryQuery, userIds, connectedUsers);
 
         var results = new List<MapEntryModel>(entryModels.Count);

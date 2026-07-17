@@ -18,6 +18,7 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
     private const string VisibleEntryId = "mp-list-entry-visible";
     private const string ImageFallbackEntryId = "mp-list-entry-image-fallback";
+    private const string VideoFallbackEntryId = "mp-list-entry-video-fallback";
     private const string HiddenEntryId = "mp-list-entry-hidden";
     private const string OwnEntryId = "mp-list-entry-own";
     private const string NoLocationEntryId = "mp-list-entry-no-location";
@@ -42,6 +43,9 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
             var imageFallbackEntry = await DatabaseSeeder.SeedEntry(entriesDb, ImageFallbackEntryId, UserAId, isSharingInherited: true);
             await DatabaseSeeder.SeedImage(entriesDb, "mp-list-image-visible", imageFallbackEntry, latitude: 49.195, longitude: 16.608);
+
+            var videoFallbackEntry = await DatabaseSeeder.SeedEntry(entriesDb, VideoFallbackEntryId, UserAId, isSharingInherited: true);
+            await DatabaseSeeder.SeedVideo(entriesDb, "mp-list-video-visible", videoFallbackEntry, latitude: 47.376, longitude: 8.541);
 
             var hiddenEntry = await DatabaseSeeder.SeedEntry(entriesDb, HiddenEntryId, UserAId, isSharingInherited: false);
             await DatabaseSeeder.SeedEntryLocation(entriesDb, hiddenEntry, 48.856, 2.352);
@@ -81,12 +85,13 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
 
         Assert.Contains(VisibleEntryId, entryIds);
         Assert.Contains(ImageFallbackEntryId, entryIds);
+        Assert.Contains(VideoFallbackEntryId, entryIds);
         Assert.Contains(OwnEntryId, entryIds);
         Assert.Contains(TrackFallbackEntryId, entryIds);
         Assert.Contains(TrackPreferredEntryId, entryIds);
         Assert.DoesNotContain(HiddenEntryId, entryIds);
         Assert.DoesNotContain(NoLocationEntryId, entryIds);
-        Assert.Equal(5, models.Count);
+        Assert.Equal(6, models.Count);
         Assert.All(models, model => Assert.True(model.Location?.HasValue() == true));
 
         var trackFallback = models.Single(model => model.Entry.Id == TrackFallbackEntryId);
@@ -96,6 +101,10 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var trackPreferred = models.Single(model => model.Entry.Id == TrackPreferredEntryId);
         Assert.Equal(49.02, trackPreferred.Location.Latitude);
         Assert.Equal(15.02, trackPreferred.Location.Longitude);
+
+        var videoFallback = models.Single(model => model.Entry.Id == VideoFallbackEntryId);
+        Assert.Equal(47.376, videoFallback.Location.Latitude);
+        Assert.Equal(8.541, videoFallback.Location.Longitude);
     }
 
     [Fact]
@@ -111,7 +120,7 @@ public class MapListEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         var features = (JArray)JObject.Parse(json)["features"]!;
 
         Assert.NotNull(features);
-        Assert.Equal(2, features.Count);
+        Assert.Equal(3, features.Count);
     }
 }
 
