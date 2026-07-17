@@ -38,6 +38,12 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public bool EnableCountriesView { get; set; }
 
+        [Parameter]
+        public bool EnableCurrentLocationButton { get; set; }
+
+        [Parameter]
+        public EventCallback<string> CurrentLocationError { get; set; }
+
         [CascadingParameter]
         public FormState FormState { get; set; }
 
@@ -188,6 +194,17 @@ namespace Neptuo.Recollections.Components
             {
                 await Interop.SetViewModeAsync(ViewMode, null);
             }
+        }
+
+        protected async Task CenterAtCurrentLocationAsync()
+        {
+            var result = await Interop.CenterAtCurrentLocationAsync();
+            if (result.IsSuccess)
+                return;
+
+            Log.Debug($"Unable to center map at current location. ErrorCode: {result.ErrorCode ?? "<null>"}");
+            if (CurrentLocationError.HasDelegate)
+                await CurrentLocationError.InvokeAsync(result.ErrorCode);
         }
     }
 }

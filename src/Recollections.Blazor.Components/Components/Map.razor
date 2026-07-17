@@ -31,6 +31,12 @@
         <button class="btn btn-sm btn-light btn-search" title="Search" @onclick="@(() => SearchModal.Show())">
             <Icon Identifier="search" />
         </button>
+        @if (EnableCurrentLocationButton)
+        {
+            <button class="btn btn-sm btn-light btn-current-location" title="Current location" @onclick="CenterAtCurrentLocationAsync">
+                <Icon Identifier="location-arrow" />
+            </button>
+        }
     </div>
 
     <TemplateContent Name="Dialogs">

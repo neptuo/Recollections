@@ -31,6 +31,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected MapPopoverHandler PopoverHandler { get; } = new();
         protected EntryCardPopover entryPopover;
         protected Map mapComponent;
+        protected Toast CurrentLocationErrorToast { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
@@ -62,6 +63,23 @@ namespace Neptuo.Recollections.Entries.Pages
             await PopoverHandler.SelectAsync(index, Entries[index].Entry, entryPopover);
             StateHasChanged();
         }
+
+        protected Task OnCurrentLocationErrorAsync(string errorCode)
+        {
+            CurrentLocationErrorToast.Show(GetCurrentLocationErrorMessage(errorCode));
+            return Task.CompletedTask;
+        }
+
+        private static string GetCurrentLocationErrorMessage(string errorCode)
+            => errorCode switch
+            {
+                "permission_denied" => "Location permission was denied. Please allow location access in your browser.",
+                "position_unavailable" => "Current location is unavailable right now. Try again in a moment.",
+                "timeout" => "Getting current location took too long. Please try again.",
+                "unsupported" => "Your browser does not support retrieving current location.",
+                "not_initialized" => "The map is still initializing. Please try again in a moment.",
+                _ => "Unable to retrieve current location."
+            };
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

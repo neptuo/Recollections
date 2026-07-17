@@ -11,8 +11,12 @@
 else
 {
     <div class="mappage">
-        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" EnableCountriesView="true" />
+        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" EnableCountriesView="true" EnableCurrentLocationButton="true" CurrentLocationError="OnCurrentLocationErrorAsync" />
     </div>
 }
 
 <EntryCardPopover @ref="entryPopover" Model="PopoverHandler.SelectedEntry" />
+
+<TemplateContent Name="Dialogs">
+    <Toast @ref="CurrentLocationErrorToast" />
+</TemplateContent>

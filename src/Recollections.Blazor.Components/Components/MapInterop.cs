@@ -142,7 +142,8 @@ namespace Neptuo.Recollections.Components
             => editor.MoveMarker(index, latitude, longitude);
 
         [JSInvokable("MapInterop.MarkerSelected")]
-        public async void MarkerSelected(int index) => await editor.MarkerSelected.InvokeAsync(index);
+        public Task MarkerSelected(int index)
+            => editor.MarkerSelected.InvokeAsync(index);
 
         [JSInvokable("MapInterop.PathSelected")]
         public async Task PathSelected()
@@ -186,6 +187,14 @@ namespace Neptuo.Recollections.Components
         public async Task RedrawAsync()
             => await module.InvokeVoidAsync("redraw", editor.Container);
 
+        public async Task<MapCurrentLocationResult> CenterAtCurrentLocationAsync()
+        {
+            if (module == null)
+                return new MapCurrentLocationResult(false, "not_initialized");
+
+            return await module.InvokeAsync<MapCurrentLocationResult>("centerAtCurrentLocation", editor.Container);
+        }
+
         public async Task SetViewModeAsync(string mode, string countriesGeoJson)
         {
             if (module == null)
@@ -198,6 +207,8 @@ namespace Neptuo.Recollections.Components
         public async Task ShowMarkerPopoverAsync(int markerIndex, ElementReference content)
             => await module.InvokeVoidAsync("showMarkerPopover", editor.Container, markerIndex, content);
     }
+
+    public record MapCurrentLocationResult(bool IsSuccess, string ErrorCode);
 
     public record MapPosition(double Latitude, double Longitude, int Zoom);
 }
