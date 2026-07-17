@@ -33,6 +33,7 @@ namespace Neptuo.Recollections.Entries.Pages
         private long loadVersion;
         private bool shouldLoadTimelineData;
         private bool shouldLoadSecondaryData;
+        private string[] timelineChapterIds = [];
 
         [Parameter]
         public string StoryId { get; set; }
@@ -80,7 +81,7 @@ namespace Neptuo.Recollections.Entries.Pages
             if (shouldLoadTimelineData)
             {
                 shouldLoadTimelineData = false;
-                await LoadTimelineDataAsync(loadVersion, StoryId);
+                await LoadTimelineDataAsync(loadVersion, StoryId, timelineChapterIds);
             }
 
             if (shouldLoadSecondaryData)
@@ -110,6 +111,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
+            timelineChapterIds = Model.Chapters.Select(c => c.Id).ToArray();
             Entries.Clear();
             Entries[Model.Id] = [];
             foreach (var chapter in Model.Chapters)
@@ -128,9 +130,18 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task LoadMediaAsync()
         {
             IsMediaLoading = true;
-            var media = await Api.GetStoryMediaAsync(StoryId);
-            ApplyMedia(media);
-            IsMediaLoading = false;
+            await InvokeAsync(StateHasChanged);
+
+            try
+            {
+                var media = await Api.GetStoryMediaAsync(StoryId);
+                ApplyMedia(media);
+            }
+            finally
+            {
+                IsMediaLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
         }
 
         private void ApplyMedia(List<EntryMediaModel> media)
@@ -167,23 +178,31 @@ namespace Neptuo.Recollections.Entries.Pages
 
         private async Task LoadSecondaryDataAsync(long currentLoadVersion, string storyId)
         {
-            var mapTask = Api.GetStoryMapAsync(storyId);
-            var mediaTask = Api.GetStoryMediaAsync(storyId);
-            await Task.WhenAll(mapTask, mediaTask);
+            try
+            {
+                var mapTask = Api.GetStoryMapAsync(storyId);
+                var mediaTask = Api.GetStoryMediaAsync(storyId);
+                await Task.WhenAll(mapTask, mediaTask);
 
-            if (currentLoadVersion != loadVersion || storyId != StoryId)
-                return;
+                if (currentLoadVersion != loadVersion || storyId != StoryId)
+                    return;
 
-            ApplyMap(mapTask.Result);
-            IsMapLoading = false;
-            ApplyMedia(mediaTask.Result);
-            IsMediaLoading = false;
-            StateHasChanged();
+                ApplyMap(mapTask.Result);
+                ApplyMedia(mediaTask.Result);
+            }
+            finally
+            {
+                if (currentLoadVersion == loadVersion && storyId == StoryId)
+                {
+                    IsMapLoading = false;
+                    IsMediaLoading = false;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
         }
 
-        private async Task LoadTimelineDataAsync(long currentLoadVersion, string storyId)
+        private async Task LoadTimelineDataAsync(long currentLoadVersion, string storyId, string[] chapterIds)
         {
-            string[] chapterIds = Model.Chapters.Select(c => c.Id).ToArray();
             var entriesTasks = new Task<PageableList<EntryListModel>>[chapterIds.Length + 1];
             entriesTasks[0] = Api.GetStoryTimelineAsync(storyId);
             for (int i = 0; i < chapterIds.Length; i++)
