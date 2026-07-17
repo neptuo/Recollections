@@ -1,5 +1,18 @@
 [
     {
+        "version": "0.21.0",
+        "milestone": 58,
+        "breakingChanges": [],
+        "newFeatures": [
+            "Search page now lets you switch between entries and stories",
+            "Map can jump to your current location"
+        ],
+        "bugFixes": [
+            "Faster map loading on map pages",
+            "Faster loading of story detail pages"
+        ]
+    },
+    {
         "version": "0.20.4",
         "milestone": 57,
         "breakingChanges": [],
