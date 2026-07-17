@@ -9,6 +9,8 @@ namespace Neptuo.Recollections.Entries;
 
 public class MapService
 {
+    private const int QueryBatchSize = 250;
+
     private readonly DataContext dataContext;
     private readonly ShareStatusService shareStatus;
     private readonly EntryListMapper entryListMapper;
@@ -69,29 +71,36 @@ public class MapService
 
         if (unresolvedEntryIds.Count > 0)
         {
-            var imageLocations = await dataContext.Images
-                .Where(img =>
-                    unresolvedEntryIds.Contains(img.Entry.Id)
-                    && img.Location != null
-                    && img.Location.Latitude != null
-                    && img.Location.Longitude != null
-                )
-                .Select(img => new
-                {
-                    EntryId = img.Entry.Id,
-                    Location = new LocationModel()
-                    {
-                        Latitude = img.Location.Latitude,
-                        Longitude = img.Location.Longitude,
-                        Altitude = img.Location.Altitude
-                    }
-                })
-                .ToListAsync();
-
-            foreach (var imageLocation in imageLocations)
+            foreach (List<string> batch in Batch(unresolvedEntryIds, QueryBatchSize))
             {
-                if (!locationById.ContainsKey(imageLocation.EntryId))
-                    locationById[imageLocation.EntryId] = imageLocation.Location;
+                var imageLocations = await dataContext.Entries
+                    .Where(entry => batch.Contains(entry.Id))
+                    .Select(entry => new
+                    {
+                        EntryId = entry.Id,
+                        Location = dataContext.Images
+                            .Where(img =>
+                                img.Entry.Id == entry.Id
+                                && img.Location != null
+                                && img.Location.Latitude != null
+                                && img.Location.Longitude != null
+                            )
+                            .Select(img => new LocationModel()
+                            {
+                                Latitude = img.Location.Latitude,
+                                Longitude = img.Location.Longitude,
+                                Altitude = img.Location.Altitude
+                            })
+                            .FirstOrDefault()
+                    })
+                    .Where(item => item.Location != null)
+                    .ToListAsync();
+
+                foreach (var imageLocation in imageLocations)
+                {
+                    if (!locationById.ContainsKey(imageLocation.EntryId))
+                        locationById[imageLocation.EntryId] = imageLocation.Location;
+                }
             }
         }
 
@@ -104,29 +113,36 @@ public class MapService
 
         if (unresolvedEntryIds.Count > 0)
         {
-            var videoLocations = await dataContext.Videos
-                .Where(video =>
-                    unresolvedEntryIds.Contains(video.Entry.Id)
-                    && video.Location != null
-                    && video.Location.Latitude != null
-                    && video.Location.Longitude != null
-                )
-                .Select(video => new
-                {
-                    EntryId = video.Entry.Id,
-                    Location = new LocationModel()
-                    {
-                        Latitude = video.Location.Latitude,
-                        Longitude = video.Location.Longitude,
-                        Altitude = video.Location.Altitude
-                    }
-                })
-                .ToListAsync();
-
-            foreach (var videoLocation in videoLocations)
+            foreach (List<string> batch in Batch(unresolvedEntryIds, QueryBatchSize))
             {
-                if (!locationById.ContainsKey(videoLocation.EntryId))
-                    locationById[videoLocation.EntryId] = videoLocation.Location;
+                var videoLocations = await dataContext.Entries
+                    .Where(entry => batch.Contains(entry.Id))
+                    .Select(entry => new
+                    {
+                        EntryId = entry.Id,
+                        Location = dataContext.Videos
+                            .Where(video =>
+                                video.Entry.Id == entry.Id
+                                && video.Location != null
+                                && video.Location.Latitude != null
+                                && video.Location.Longitude != null
+                            )
+                            .Select(video => new LocationModel()
+                            {
+                                Latitude = video.Location.Latitude,
+                                Longitude = video.Location.Longitude,
+                                Altitude = video.Location.Altitude
+                            })
+                            .FirstOrDefault()
+                    })
+                    .Where(item => item.Location != null)
+                    .ToListAsync();
+
+                foreach (var videoLocation in videoLocations)
+                {
+                    if (!locationById.ContainsKey(videoLocation.EntryId))
+                        locationById[videoLocation.EntryId] = videoLocation.Location;
+                }
             }
         }
 
@@ -135,8 +151,13 @@ public class MapService
 
         // Enrich with full entry list models
         var entryIds = locationById.Keys.ToList();
-        var entryQuery = dataContext.Entries.Where(e => entryIds.Contains(e.Id));
-        var (entryModels, _) = await entryListMapper.MapAsync(entryQuery, userIds, connectedUsers);
+        var entryModels = new List<EntryListModel>(entryIds.Count);
+        foreach (List<string> batch in Batch(entryIds, QueryBatchSize))
+        {
+            var entryQuery = dataContext.Entries.Where(e => batch.Contains(e.Id));
+            var (batchModels, _) = await entryListMapper.MapAsync(entryQuery, userIds, connectedUsers);
+            entryModels.AddRange(batchModels);
+        }
 
         var results = new List<MapEntryModel>(entryModels.Count);
         foreach (var entry in entryModels)
@@ -155,4 +176,10 @@ public class MapService
     }
 
     private static bool HasLocationValue(LocationModel location) => location != null && location.HasValue();
+
+    private static IEnumerable<List<string>> Batch(List<string> values, int size)
+    {
+        for (int i = 0; i < values.Count; i += size)
+            yield return values.Skip(i).Take(size).ToList();
+    }
 }
