@@ -107,7 +107,7 @@ namespace Neptuo.Recollections.Components
             }
             else
             {
-                if (hasMarkersChanged)
+                if (hasMarkersChanged && (editor.Markers?.Count > 0 || !string.IsNullOrEmpty(editor.Path)))
                 {
                     log.Debug("Centering map at markers.");
                     await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
