@@ -85,6 +85,11 @@ export function initialize(container, interop, isEditable) {
             bindEvents(model, container);
         }
 
+        // Set world view before attaching moveend, so this initial position
+        // is not stored in navigation history and does not prevent the later
+        // fitBounds (triggered when real pin data arrives) from running.
+        map.setView([0, 0], 1);
+
         model.map.on("moveend", () => {
             const center = model.map.getCenter(); // { lat, lng }
             const zoom = model.map.getZoom();
