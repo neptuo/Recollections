@@ -113,7 +113,8 @@ export function initialize(container, interop, isEditable) {
 
 export function updateMarkers(container, markers, path, isEditable) {
     const model = _mapData.get(container);
-    
+    if (!model) return;
+
     model.lastMarkers = markers;
     model.lastPath = path;
     model.lastIsEditable = isEditable;
