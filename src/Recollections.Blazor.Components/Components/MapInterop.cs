@@ -21,6 +21,7 @@ namespace Neptuo.Recollections.Components
         private int previousMarkersHashCode;
         private int previousMapPositionHashCode;
         private string previousViewMode;
+        private bool suppressMoveEnd;
 
         private int ComputeMarkersHashCode()
         {
@@ -112,16 +113,17 @@ namespace Neptuo.Recollections.Components
                 {
                     previousMapPositionHashCode = mapPositionHashCode;
                     log.Debug($"Position changed, centering map at lat={position.Latitude}, lon={position.Longitude}, zoom={position.Zoom}");
+                    suppressMoveEnd = true;
                     await CenterAtAsync(position.Latitude, position.Longitude, position.Zoom);
+                    // suppressMoveEnd is cleared by MoveEnd when the animation-end event fires
                 }
             }
-            else
+            else if (hasMarkersChanged)
             {
-                if (hasMarkersChanged)
-                {
-                    log.Debug("Centering map at markers.");
-                    await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
-                }
+                log.Debug("Centering map at markers.");
+                suppressMoveEnd = true;
+                await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
+                // suppressMoveEnd is cleared by MoveEnd when the animation-end event fires
             }
         }
 
@@ -152,6 +154,16 @@ namespace Neptuo.Recollections.Components
         [JSInvokable("MapInterop.MoveEnd")]
         public void MoveEnd(double latitude, double longitude, int zoom)
         {
+            // Suppress and consume the first moveend after programmatic centering to avoid
+            // triggering a navigation that would recreate MapPage and load data twice.
+            // Leaflet fires moveend at the end of the zoom animation, which may be async,
+            // so the flag is cleared here rather than immediately after the centering call.
+            if (suppressMoveEnd)
+            {
+                suppressMoveEnd = false;
+                return;
+            }
+
             // We don't need another round through OnAfterRenderAsync
             var position = new MapPosition(latitude, longitude, zoom);
             previousMapPositionHashCode = position.GetHashCode();
