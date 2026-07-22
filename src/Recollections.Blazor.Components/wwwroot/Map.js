@@ -35,7 +35,8 @@ export function initialize(container, interop, isEditable) {
             isEmptyPoint: false,
             isAdding: false,
             trackPath: null,
-            pathPoints: []
+            pathPoints: [],
+            hasAnimatedInitialFit: false
         };
         _mapData.set(container, model);
 
@@ -85,6 +86,11 @@ export function initialize(container, interop, isEditable) {
             bindEvents(model, container);
         }
 
+        // Set world view before attaching moveend, so this initial position
+        // is not stored in navigation history and does not prevent the later
+        // fitBounds (triggered when real pin data arrives) from running.
+        map.setView([0, 0], 1);
+
         model.map.on("moveend", () => {
             const center = model.map.getCenter(); // { lat, lng }
             const zoom = model.map.getZoom();
@@ -113,7 +119,8 @@ export function initialize(container, interop, isEditable) {
 
 export function updateMarkers(container, markers, path, isEditable) {
     const model = _mapData.get(container);
-    
+    if (!model) return;
+
     model.lastMarkers = markers;
     model.lastPath = path;
     model.lastIsEditable = isEditable;
@@ -143,7 +150,12 @@ export function centerAtMarkers(container) {
     if (points.length == 0) {
         model.map.setView([0, 0], 1);
     } else {
-        model.map.fitBounds(points, { maxZoom: 14 });
+        const shouldAnimate = !model.hasAnimatedInitialFit;
+        model.map.fitBounds(points, {
+            maxZoom: 14,
+            animate: shouldAnimate
+        });
+        model.hasAnimatedInitialFit = true;
     }
 }
 
