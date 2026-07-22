@@ -35,7 +35,8 @@ export function initialize(container, interop, isEditable) {
             isEmptyPoint: false,
             isAdding: false,
             trackPath: null,
-            pathPoints: []
+            pathPoints: [],
+            hasAnimatedInitialFit: false
         };
         _mapData.set(container, model);
 
@@ -149,7 +150,12 @@ export function centerAtMarkers(container) {
     if (points.length == 0) {
         model.map.setView([0, 0], 1);
     } else {
-        model.map.fitBounds(points, { maxZoom: 14 });
+        const shouldAnimate = !model.hasAnimatedInitialFit;
+        model.map.fitBounds(points, {
+            maxZoom: 14,
+            animate: shouldAnimate
+        });
+        model.hasAnimatedInitialFit = true;
     }
 }
 
