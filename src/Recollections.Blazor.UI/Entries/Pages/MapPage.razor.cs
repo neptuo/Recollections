@@ -23,6 +23,8 @@ namespace Neptuo.Recollections.Entries.Pages
         [Inject]
         protected PropertyCollection Properties { get; set; }
 
+        private bool isLoaded;
+
         protected List<MapEntryModel> Entries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
@@ -33,10 +35,13 @@ namespace Neptuo.Recollections.Entries.Pages
         protected Map mapComponent;
         protected Toast CurrentLocationErrorToast { get; set; }
 
-        protected async override Task OnInitializedAsync()
+        protected override async Task OnParametersSetAsync()
         {
-            await base.OnInitializedAsync();
-            await LoadAsync();
+            if (!isLoaded)
+            {
+                isLoaded = true;
+                await LoadAsync();
+            }
         }
 
         private async Task LoadAsync()
