@@ -21,7 +21,6 @@ namespace Neptuo.Recollections.Components
         private int previousMarkersHashCode;
         private int previousMapPositionHashCode;
         private string previousViewMode;
-        private bool isInitializing;
 
         private int ComputeMarkersHashCode()
         {
@@ -70,67 +69,56 @@ namespace Neptuo.Recollections.Components
 
         public async Task InitializeAsync(Map editor)
         {
-            isInitializing = true;
-            try
+            this.editor = editor;
+
+            if (module == null)
             {
-                this.editor = editor;
+                module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
+                await module.InvokeVoidAsync("ensureApi");
 
-                if (module == null)
+                if (self == null)
+                    self = DotNetObjectReference.Create(this);
+
+                await module.InvokeVoidAsync(
+                    "initialize",
+                    editor.Container,
+                    self,
+                    editor.IsEditable
+                );
+            }
+
+            MapPosition position = FindMapPositionFromHistoryEntry();
+
+            var markersHashCode = ComputeMarkersHashCode();
+            var hasMarkersChanged = previousMarkersHashCode != markersHashCode;
+            if (hasMarkersChanged)
+            {
+                log.Debug("Markers changed, updating map markers.");
+                previousMarkersHashCode = markersHashCode;
+
+                await module.InvokeVoidAsync(
+                    "updateMarkers", 
+                    editor.Container, 
+                    editor.Markers,
+                    editor.Path,
+                    editor.IsEditable
+                );
+            }
+
+            if (position != null)
+            {
+                var mapPositionHashCode = position.GetHashCode();
+                if (previousMapPositionHashCode != mapPositionHashCode)
                 {
-                    module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
-                    await module.InvokeVoidAsync("ensureApi");
-
-                    if (self == null)
-                        self = DotNetObjectReference.Create(this);
-
-                    await module.InvokeVoidAsync(
-                        "initialize",
-                        editor.Container,
-                        self,
-                        editor.IsEditable
-                    );
-                }
-
-                MapPosition position = FindMapPositionFromHistoryEntry();
-
-                var markersHashCode = ComputeMarkersHashCode();
-                var hasMarkersChanged = previousMarkersHashCode != markersHashCode;
-                if (hasMarkersChanged)
-                {
-                    log.Debug("Markers changed, updating map markers.");
-                    previousMarkersHashCode = markersHashCode;
-
-                    await module.InvokeVoidAsync(
-                        "updateMarkers", 
-                        editor.Container, 
-                        editor.Markers,
-                        editor.Path,
-                        editor.IsEditable
-                    );
-                }
-
-                if (position != null)
-                {
-                    var mapPositionHashCode = position.GetHashCode();
-                    if (previousMapPositionHashCode != mapPositionHashCode)
-                    {
-                        previousMapPositionHashCode = mapPositionHashCode;
-                        log.Debug($"Position changed, centering map at lat={position.Latitude}, lon={position.Longitude}, zoom={position.Zoom}");
-                        await CenterAtAsync(position.Latitude, position.Longitude, position.Zoom);
-                    }
-                }
-                else
-                {
-                    if (hasMarkersChanged)
-                    {
-                        log.Debug("Centering map at markers.");
-                        await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
-                    }
+                    previousMapPositionHashCode = mapPositionHashCode;
+                    log.Debug($"Position changed, centering map at lat={position.Latitude}, lon={position.Longitude}, zoom={position.Zoom}");
+                    await module.InvokeVoidAsync("centerAtWithoutMoveEnd", editor.Container, position.Latitude, position.Longitude, position.Zoom);
                 }
             }
-            finally
+            else if (hasMarkersChanged)
             {
-                isInitializing = false;
+                log.Debug("Centering map at markers.");
+                await module.InvokeVoidAsync("centerAtMarkersWithoutMoveEnd", editor.Container);
             }
         }
 
@@ -161,11 +149,6 @@ namespace Neptuo.Recollections.Components
         [JSInvokable("MapInterop.MoveEnd")]
         public void MoveEnd(double latitude, double longitude, int zoom)
         {
-            // Skip history update during programmatic initialization to avoid
-            // triggering a navigation that would recreate MapPage and load data twice.
-            if (isInitializing)
-                return;
-
             // We don't need another round through OnAfterRenderAsync
             var position = new MapPosition(latitude, longitude, zoom);
             previousMapPositionHashCode = position.GetHashCode();

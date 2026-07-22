@@ -31,6 +31,7 @@ export function initialize(container, interop, isEditable) {
             map: map,
             tiles: null,
             interop: interop,
+            suppressMoveEnd: false,
             isAdditive: false,
             isEmptyPoint: false,
             isAdding: false,
@@ -86,6 +87,10 @@ export function initialize(container, interop, isEditable) {
         }
 
         model.map.on("moveend", () => {
+            if (model.suppressMoveEnd) {
+                return;
+            }
+
             const center = model.map.getCenter(); // { lat, lng }
             const zoom = model.map.getZoom();
             model.interop.invokeMethod("MapInterop.MoveEnd", center.lat, center.lng, zoom);
@@ -137,14 +142,32 @@ export function updateMarkers(container, markers, path, isEditable) {
     }
 }
 
-export function centerAtMarkers(container) {
-    const model = _mapData.get(container);
+function withSuppressedMoveEnd(model, callback) {
+    model.suppressMoveEnd = true;
+    try {
+        callback();
+    } finally {
+        model.suppressMoveEnd = false;
+    }
+}
+
+function centerAtMarkersCore(model) {
     const points = (model.points || []).concat(model.pathPoints || []);
     if (points.length == 0) {
         model.map.setView([0, 0], 1);
     } else {
         model.map.fitBounds(points, { maxZoom: 14 });
     }
+}
+
+export function centerAtMarkers(container) {
+    const model = _mapData.get(container);
+    centerAtMarkersCore(model);
+}
+
+export function centerAtMarkersWithoutMoveEnd(container) {
+    const model = _mapData.get(container);
+    withSuppressedMoveEnd(model, () => centerAtMarkersCore(model));
 }
 
 function bindEvents(model, container) {
@@ -300,6 +323,11 @@ function moveMarker(model, id, latitude, longitude) {
 export function centerAt(container, latitude, longitude, zoom) {
     const model = _mapData.get(container);
     model.map.setView([latitude, longitude], zoom ?? 17);
+}
+
+export function centerAtWithoutMoveEnd(container, latitude, longitude, zoom) {
+    const model = _mapData.get(container);
+    withSuppressedMoveEnd(model, () => model.map.setView([latitude, longitude], zoom ?? 17));
 }
 
 export async function centerAtCurrentLocation(container) {
