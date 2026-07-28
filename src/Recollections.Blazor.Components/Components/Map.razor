@@ -48,7 +48,7 @@
             <ChildContent>
                 <div class="row">
                     <div class="col">
-                        <input @ref="SearchInput" @bind="SearchQuery" type="text" class="form-control" placeholder="Street, city, country ..." />
+                        <input @ref="SearchInput" @bind="SearchQuery" type="text" id="map-location-search" name="map-location-search" class="form-control" placeholder="Street, city, country ..." />
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" @onclick="@(() => SearchLocationAsync())">Search</button>
