@@ -155,7 +155,8 @@ export function centerAtMarkers(container) {
         const shouldAnimate = !model.hasAnimatedInitialFit;
         model.map.fitBounds(points, {
             maxZoom: 14,
-            animate: shouldAnimate
+            animate: shouldAnimate,
+            duration: shouldAnimate ? 2.5 : undefined
         });
         model.hasAnimatedInitialFit = true;
     }
