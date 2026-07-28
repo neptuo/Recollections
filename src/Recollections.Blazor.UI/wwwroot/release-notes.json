@@ -1,5 +1,15 @@
 [
     {
+        "version": "0.21.1",
+        "milestone": 59,
+        "breakingChanges": [],
+        "newFeatures": [],
+        "bugFixes": [
+            "Map now renders while data is still loading",
+            "Map no longer loads the same data twice"
+        ]
+    },
+    {
         "version": "0.21.0",
         "milestone": 58,
         "breakingChanges": [],
