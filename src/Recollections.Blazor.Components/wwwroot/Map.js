@@ -88,10 +88,10 @@ export function initialize(container, interop, isEditable) {
             bindEvents(model, container);
         }
 
-        // Set world view before attaching moveend, so this initial position
-        // is not stored in navigation history and does not prevent the later
-        // fitBounds (triggered when real pin data arrives) from running.
-        map.setView([0, 0], 1);
+        // Set initial world-centered view before attaching moveend, so this
+        // position is not stored in navigation history and does not prevent
+        // the later fitBounds (triggered when real pin data arrives) from running.
+        setInitialMapView(map);
 
         model.map.on("moveend", () => {
             const center = model.map.getCenter(); // { lat, lng }
@@ -150,7 +150,7 @@ export function centerAtMarkers(container) {
     const model = _mapData.get(container);
     const points = (model.points || []).concat(model.pathPoints || []);
     if (points.length == 0) {
-        model.map.setView([0, 0], 1);
+        setInitialMapView(model.map);
     } else {
         const shouldAnimate = !model.hasAnimatedInitialFit;
         model.map.fitBounds(points, {
@@ -160,6 +160,15 @@ export function centerAtMarkers(container) {
         });
         model.hasAnimatedInitialFit = true;
     }
+}
+
+function setInitialMapView(map) {
+    const viewportHeight = map.getSize().y || 0;
+    const heightBasedZoom = viewportHeight > 0
+        ? Math.ceil(Math.log2(viewportHeight / 256))
+        : 1;
+    const zoom = Math.max(1, Math.min(20, heightBasedZoom));
+    map.setView([0, 0], zoom);
 }
 
 function bindEvents(model, container) {
