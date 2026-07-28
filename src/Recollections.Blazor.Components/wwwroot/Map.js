@@ -24,7 +24,9 @@ export function initialize(container, interop, isEditable) {
     let model = null;
 
     if (!_mapData.has(container)) {
-        const map = Leaflet.map(container.querySelector('.map'));
+        const map = Leaflet.map(container.querySelector('.map'), {
+            zoomAnimationThreshold: 20
+        });
         map.zoomControl.setPosition("topright");
 
         model = {
