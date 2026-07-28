@@ -72,10 +72,21 @@ namespace Neptuo.Recollections.Components
         {
             this.editor = editor;
 
-            if (_initTask == null)
-                _initTask = InitializeOnceAsync();
+            var initTask = _initTask;
+            if (initTask == null || initTask.IsFaulted || initTask.IsCanceled)
+                _initTask = initTask = InitializeOnceAsync();
 
-            await _initTask;
+            try
+            {
+                await initTask;
+            }
+            catch
+            {
+                if (ReferenceEquals(_initTask, initTask))
+                    _initTask = null;
+
+                throw;
+            }
 
             MapPosition position = FindMapPositionFromHistoryEntry();
 
