@@ -24,7 +24,9 @@ export function initialize(container, interop, isEditable) {
     let model = null;
 
     if (!_mapData.has(container)) {
-        const map = Leaflet.map(container.querySelector('.map'));
+        const map = Leaflet.map(container.querySelector('.map'), {
+            zoomAnimationThreshold: 20
+        });
         map.zoomControl.setPosition("topright");
 
         model = {
@@ -35,7 +37,8 @@ export function initialize(container, interop, isEditable) {
             isEmptyPoint: false,
             isAdding: false,
             trackPath: null,
-            pathPoints: []
+            pathPoints: [],
+            hasAnimatedInitialFit: false
         };
         _mapData.set(container, model);
 
@@ -85,6 +88,11 @@ export function initialize(container, interop, isEditable) {
             bindEvents(model, container);
         }
 
+        // Set initial world-centered view before attaching moveend, so this
+        // position is not stored in navigation history and does not prevent
+        // the later fitBounds (triggered when real pin data arrives) from running.
+        setInitialMapView(map);
+
         model.map.on("moveend", () => {
             const center = model.map.getCenter(); // { lat, lng }
             const zoom = model.map.getZoom();
@@ -113,7 +121,8 @@ export function initialize(container, interop, isEditable) {
 
 export function updateMarkers(container, markers, path, isEditable) {
     const model = _mapData.get(container);
-    
+    if (!model) return;
+
     model.lastMarkers = markers;
     model.lastPath = path;
     model.lastIsEditable = isEditable;
@@ -141,10 +150,25 @@ export function centerAtMarkers(container) {
     const model = _mapData.get(container);
     const points = (model.points || []).concat(model.pathPoints || []);
     if (points.length == 0) {
-        model.map.setView([0, 0], 1);
+        setInitialMapView(model.map);
     } else {
-        model.map.fitBounds(points, { maxZoom: 14 });
+        const shouldAnimate = !model.hasAnimatedInitialFit;
+        model.map.fitBounds(points, {
+            maxZoom: 14,
+            animate: shouldAnimate,
+            duration: shouldAnimate ? 2.5 : undefined
+        });
+        model.hasAnimatedInitialFit = true;
     }
+}
+
+function setInitialMapView(map) {
+    const viewportHeight = map.getSize().y || 0;
+    const heightBasedZoom = viewportHeight > 0
+        ? Math.ceil(Math.log2(viewportHeight / 256))
+        : 1;
+    const zoom = Math.max(1, Math.min(20, heightBasedZoom));
+    map.setView([0, 0], zoom);
 }
 
 function bindEvents(model, container) {

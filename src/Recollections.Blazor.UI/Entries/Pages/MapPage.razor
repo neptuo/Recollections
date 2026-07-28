@@ -4,16 +4,15 @@
 
 <DocumentTitle Value="Map" />
 
-@if (IsLoading)
-{
-    <Loading IsLoading="true" />
-}
-else
-{
-    <div class="mappage">
-        <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" EnableCountriesView="true" EnableCurrentLocationButton="true" CurrentLocationError="OnCurrentLocationErrorAsync" />
-    </div>
-}
+<div class="mappage">
+    <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" EnableCountriesView="true" EnableCurrentLocationButton="true" CurrentLocationError="OnCurrentLocationErrorAsync" />
+    @if (IsLoading)
+    {
+        <div class="position-absolute top-0 start-0 w-100 d-flex justify-content-center mt-4" style="z-index: 1000; pointer-events: none;">
+            <Loading IsLoading="true" />
+        </div>
+    }
+</div>
 
 <EntryCardPopover @ref="entryPopover" Model="PopoverHandler.SelectedEntry" />
 

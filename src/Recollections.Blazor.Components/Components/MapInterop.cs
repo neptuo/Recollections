@@ -15,6 +15,7 @@ namespace Neptuo.Recollections.Components
     public class MapInterop(IJSRuntime js, NavigationManager navigationManager, ILog<MapInterop> log)
     {
         private IJSObjectReference module;
+        private Task _initTask;
         private Map editor;
         private DotNetObjectReference<MapInterop> self;
 
@@ -71,20 +72,20 @@ namespace Neptuo.Recollections.Components
         {
             this.editor = editor;
 
-            if (module == null)
+            var initTask = _initTask;
+            if (initTask == null || initTask.IsFaulted || initTask.IsCanceled)
+                _initTask = initTask = InitializeOnceAsync();
+
+            try
             {
-                module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
-                await module.InvokeVoidAsync("ensureApi");
+                await initTask;
+            }
+            catch
+            {
+                if (ReferenceEquals(_initTask, initTask))
+                    _initTask = null;
 
-                if (self == null)
-                    self = DotNetObjectReference.Create(this);
-
-                await module.InvokeVoidAsync(
-                    "initialize",
-                    editor.Container,
-                    self,
-                    editor.IsEditable
-                );
+                throw;
             }
 
             MapPosition position = FindMapPositionFromHistoryEntry();
@@ -117,12 +118,28 @@ namespace Neptuo.Recollections.Components
             }
             else
             {
-                if (hasMarkersChanged)
+                if (hasMarkersChanged && (editor.Markers?.Count > 0 || !string.IsNullOrEmpty(editor.Path)))
                 {
                     log.Debug("Centering map at markers.");
                     await module.InvokeVoidAsync("centerAtMarkers", editor.Container);
                 }
             }
+        }
+
+        private async Task InitializeOnceAsync()
+        {
+            module = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Recollections.Blazor.Components/Map.js");
+            await module.InvokeVoidAsync("ensureApi");
+
+            if (self == null)
+                self = DotNetObjectReference.Create(this);
+
+            await module.InvokeVoidAsync(
+                "initialize",
+                editor.Container,
+                self,
+                editor.IsEditable
+            );
         }
 
         private MapPosition FindMapPositionFromHistoryEntry()
