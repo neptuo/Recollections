@@ -1,6 +1,6 @@
 ﻿namespace Neptuo.Recollections.Accounts
 {
-    public class UserNotificationBirthdaySettings : IUserNotificationDailySettings
+    public class UserNotificationBirthdaySettings
     {
         public User User { get; set; }
         public string UserId { get; set; }
