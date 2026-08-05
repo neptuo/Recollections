@@ -7,24 +7,24 @@ using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Accounts.Notifications
 {
-    public class OnThisDayNotificationBackgroundService : DailyNotificationBackgroundService<OnThisDayNotificationNotifier>
+    public class BirthdayNotificationBackgroundService : DailyNotificationBackgroundService<BirthdayNotificationNotifier>
     {
-        public OnThisDayNotificationBackgroundService(
+        public BirthdayNotificationBackgroundService(
             IServiceScopeFactory scopeFactory,
             TimeProvider timeProvider,
             IOptionsMonitor<NotificationOptions> options,
-            ILogger<OnThisDayNotificationBackgroundService> log)
+            ILogger<BirthdayNotificationBackgroundService> log)
             : base(scopeFactory, timeProvider, options, log)
         { }
 
-        protected override string TopicName => "On this day";
+        protected override string TopicName => "Birthday";
 
-        protected override string TickIntervalConfigurationKey => "Accounts:Notifications:OnThisDay:TickInterval";
+        protected override string TickIntervalConfigurationKey => "Accounts:Notifications:Birthday:TickInterval";
 
         protected override TimeSpan GetConfiguredTickInterval(NotificationOptions options)
-            => options?.OnThisDay?.TickInterval ?? TimeSpan.Zero;
+            => options?.Birthday?.TickInterval ?? TimeSpan.Zero;
 
-        protected override Task RunAsync(OnThisDayNotificationNotifier notifier, CancellationToken stoppingToken)
+        protected override Task RunAsync(BirthdayNotificationNotifier notifier, CancellationToken stoppingToken)
             => notifier.RunAsync(stoppingToken);
     }
 }

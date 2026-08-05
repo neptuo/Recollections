@@ -61,23 +61,34 @@ public partial class Notifications
 
     private async Task EnsureTimeZoneAsync()
     {
-        if (Model?.OnThisDay == null)
+        if (Model == null)
             return;
 
-        if (!String.IsNullOrWhiteSpace(Model.OnThisDay.TimeZone) && Model.OnThisDay.TimeZone != "UTC")
+        bool isOnThisDayMissing = IsTimeZoneMissing(Model.OnThisDay?.TimeZone);
+        bool isBirthdayMissing = IsTimeZoneMissing(Model.Birthday?.TimeZone);
+        if (!isOnThisDayMissing && !isBirthdayMissing)
             return;
 
         try
         {
             string detected = await PushInterop.GetTimeZoneAsync();
-            if (!String.IsNullOrWhiteSpace(detected))
+            if (String.IsNullOrWhiteSpace(detected))
+                return;
+
+            if (isOnThisDayMissing && Model.OnThisDay != null)
                 Model.OnThisDay.TimeZone = detected;
+
+            if (isBirthdayMissing && Model.Birthday != null)
+                Model.Birthday.TimeZone = detected;
         }
         catch
         {
             // Ignore detection failures; user can keep the stored value.
         }
     }
+
+    private static bool IsTimeZoneMissing(string timeZone)
+        => String.IsNullOrWhiteSpace(timeZone) || timeZone == "UTC";
 
     protected async Task SaveAsync()
     {
@@ -100,6 +111,7 @@ public partial class Notifications
             Model.IsEnabled = true;
             Model.NewEntries.IsEnabled = true;
             Model.OnThisDay.IsEnabled = true;
+            Model.Birthday.IsEnabled = true;
             await EnsureTimeZoneAsync();
             await Api.SetNotificationSettingsAsync(Model);
 
@@ -140,6 +152,7 @@ public partial class Notifications
 
         Model = await Api.GetNotificationSettingsAsync();
         Model.OnThisDay ??= new UserNotificationOnThisDaySettingsModel();
+        Model.Birthday ??= new UserNotificationBirthdaySettingsModel();
         await RefreshBrowserStateAsync();
 
         IsLoading = false;

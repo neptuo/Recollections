@@ -173,6 +173,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Name = entity.Name;
             model.Icon = entity.Icon;
             model.Text = entity.Text;
+            model.BirthDate = entity.BirthDate;
         }
 
         private void MapModelToEntity(BeingModel model, Being entity)
@@ -182,6 +183,7 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Name = model.Name;
             entity.Icon = model.Icon;
             entity.Text = model.Text;
+            entity.BirthDate = model.BirthDate?.Date;
         }
     }
 }

@@ -135,6 +135,27 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
+        /// <summary>
+        /// Age of the being in whole years or <c>null</c> when the birth date is not set.
+        /// </summary>
+        protected string Age
+        {
+            get
+            {
+                if (Model?.BirthDate == null)
+                    return null;
+
+                int age = BirthDateUtils.GetAge(Model.BirthDate.Value, DateTime.Today);
+                return age == 1 ? "1 year" : $"{age} years";
+            }
+        }
+
+        protected Task SaveBirthDateAsync(DateTime birthDate)
+        {
+            Model.BirthDate = birthDate == DateTime.MinValue ? null : birthDate.Date;
+            return SaveAsync();
+        }
+
         protected Task SaveTextAsync(string text)
         {
             Model.Text = text;
