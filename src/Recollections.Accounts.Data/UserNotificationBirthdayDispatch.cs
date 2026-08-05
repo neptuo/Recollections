@@ -2,7 +2,7 @@
 
 namespace Neptuo.Recollections.Accounts
 {
-    public class UserNotificationOnThisDayDispatch : IUserNotificationDailyDispatch
+    public class UserNotificationBirthdayDispatch : IUserNotificationDailyDispatch
     {
         public int Id { get; set; }
 

@@ -19,6 +19,8 @@ namespace Neptuo.Recollections.Entries
         public string Icon { get; set; }
         public string Text { get; set; }
 
+        public DateTime? BirthDate { get; set; }
+
         public DateTime Created { get; set; }
 
         public IList<Entry> Entries { get; set; } = new List<Entry>();

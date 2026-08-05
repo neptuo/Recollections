@@ -29,11 +29,14 @@ namespace Neptuo.Recollections.Components.Editors
         {
             base.OnParametersSet();
 
+            // With no value yet, offer today as the starting point of the picker.
+            DateTime pickerValue = Value == DateTime.MinValue ? DateTime.Today : Value;
+
             SelectedDate = new Date 
             {
-                Year = Value.Year, 
-                Month = Value.Month,
-                Day = Value.Day
+                Year = pickerValue.Year, 
+                Month = pickerValue.Month,
+                Day = pickerValue.Day
             };
             SelectedTime = new Time
             {

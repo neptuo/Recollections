@@ -51,7 +51,9 @@ namespace Neptuo.Recollections.Accounts
                 .AddTransient<PushNotificationSender>()
                 .AddTransient<NewEntriesNotificationNotifier>()
                 .AddSingleton<OnThisDayNotificationNotifier>()
-                .AddHostedService<OnThisDayNotificationBackgroundService>();
+                .AddHostedService<OnThisDayNotificationBackgroundService>()
+                .AddSingleton<BirthdayNotificationNotifier>()
+                .AddHostedService<BirthdayNotificationBackgroundService>();
 
             services.TryAddSingleton(TimeProvider.System);
 

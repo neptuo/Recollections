@@ -7,11 +7,13 @@ namespace Neptuo.Recollections.Accounts
         public string PushPublicKey { get; set; }
         public UserNotificationNewEntriesSettingsModel NewEntries { get; set; }
         public UserNotificationOnThisDaySettingsModel OnThisDay { get; set; }
+        public UserNotificationBirthdaySettingsModel Birthday { get; set; }
 
         public UserNotificationSettingsModel()
         {
             NewEntries = new UserNotificationNewEntriesSettingsModel();
             OnThisDay = new UserNotificationOnThisDaySettingsModel();
+            Birthday = new UserNotificationBirthdaySettingsModel();
         }
     }
 }
