@@ -22,6 +22,9 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public bool IsTimeSelection { get; set; }
 
+        [Parameter]
+        public bool ShowAge { get; set; }
+
         protected Date SelectedDate { get; set; }
         protected Time SelectedTime { get; set; }
 
@@ -62,5 +65,11 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected string GetDateCssClass()
             => IsTimeSelection ? "inline-datetime" : "inline-date";
+
+        protected string GetAgeText()
+        {
+            int age = BirthDateUtils.GetAge(Value, DateTime.Today);
+            return age == 1 ? "1 year" : $"{age} years";
+        }
     }
 }
