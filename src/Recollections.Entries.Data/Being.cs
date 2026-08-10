@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Entries
 
         public DateTime? BirthDate { get; set; }
 
+        public int? NameDayMonth { get; set; }
+        public int? NameDayDay { get; set; }
+
         public DateTime Created { get; set; }
 
         public IList<Entry> Entries { get; set; } = new List<Entry>();
