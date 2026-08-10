@@ -25,6 +25,9 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public bool ShowAge { get; set; }
 
+        [Parameter]
+        public bool AllowClear { get; set; }
+
         protected Date SelectedDate { get; set; }
         protected Time SelectedTime { get; set; }
 
@@ -51,6 +54,14 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected void BindValue()
         {
+            if (SelectedDate.ToDateTime() == DateTime.MinValue)
+            {
+                Value = DateTime.MinValue;
+                ValueChanged?.Invoke(Value);
+                StateHasChanged();
+                return;
+            }
+
             Value = new DateTime(
                 SelectedDate.Year.Value,
                 SelectedDate.Month.Value,

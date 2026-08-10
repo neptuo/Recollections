@@ -70,10 +70,6 @@ namespace Neptuo.Recollections.Accounts.Notifications
         protected abstract Task<UserDailyContext> LoadUserAsync(AccountsDataContext db, string userId, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Returns whether this topic was already dispatched to the user on the local day.
-        /// </summary>
-        protected abstract Task<bool> IsAlreadyDispatchedAsync(AccountsDataContext db, string userId, DateTime localDate, CancellationToken cancellationToken);
-
         /// <summary>
         /// Loads the content to notify about. Return content for which
         /// <see cref="HasContent(TContent)"/> is <c>false</c> when there is nothing to send.
@@ -182,7 +178,9 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
             if (!forceSend)
             {
-                bool alreadySent = await IsAlreadyDispatchedAsync(accountsDb, candidate.UserId, localDate, cancellationToken);
+                bool alreadySent = await GetDispatches(accountsDb)
+                    .AsNoTracking()
+                    .AnyAsync(d => d.UserId == candidate.UserId && d.Date == localDate, cancellationToken);
 
                 if (alreadySent)
                 {

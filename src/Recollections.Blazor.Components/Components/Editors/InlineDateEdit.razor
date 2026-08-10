@@ -28,5 +28,5 @@
     </a>
 </div>
 
-<DatePicker @ref="DatePicker" Part="DatePickerPart.Day" Value="SelectedDate" ValueChanged="@(date => { SelectedDate = date; BindValue(); })" />
+<DatePicker @ref="DatePicker" Part="DatePickerPart.Day" Value="SelectedDate" ValueChanged="@(date => { SelectedDate = date; BindValue(); })" AllowClear="@AllowClear" />
 <TimePicker @ref="TimePicker" Value="SelectedTime" ValueChanged="@(time => { SelectedTime = time; BindValue(); })" />

@@ -94,7 +94,7 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 );
             }
 
-            string body = String.Join(", ", beings.Select(b => $"{b.Name} ({b.Age})"));
+            string body = $"You have {beings.Count} beings celebrating a birthday today.";
 
             return SendAsync(
                 subscriptions,

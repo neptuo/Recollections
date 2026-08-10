@@ -21,6 +21,9 @@ namespace Neptuo.Recollections.Components
         [Parameter]
         public Action<Date> ValueChanged { get; set; }
 
+        [Parameter]
+        public bool AllowClear { get; set; }
+
         protected Modal Modal { get; set; }
 
         protected string Title
@@ -144,6 +147,12 @@ namespace Neptuo.Recollections.Components
 
         public void Show() => Modal.Show();
         public void Hide() => Modal.Hide();
+
+        protected void OnClearSelected()
+        {
+            Hide();
+            ValueChanged?.Invoke(new Date());
+        }
 
         public static (int year, int month) PrevMonth(int year, int month)
         {

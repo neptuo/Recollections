@@ -63,6 +63,10 @@
         }
     </ChildContent>
     <Buttons>
+        @if (AllowClear)
+        {
+            <button class="btn btn-secondary btn-sm-expand" @onclick="OnClearSelected">Clear</button>
+        }
         <button class="btn btn-primary btn-sm-expand" @onclick="OnTodaySelected">Today</button>
     </Buttons>
 </Modal>

@@ -55,11 +55,6 @@ namespace Neptuo.Recollections.Accounts.Notifications
                 .Select(s => new UserDailyContext(s.UserId, s.PreferredHour, s.TimeZone))
                 .FirstOrDefaultAsync(cancellationToken);
 
-        protected override Task<bool> IsAlreadyDispatchedAsync(AccountsDataContext db, string userId, DateTime localDate, CancellationToken cancellationToken)
-            => db.NotificationOnThisDayDispatches
-                .AsNoTracking()
-                .AnyAsync(d => d.UserId == userId && d.Date == localDate, cancellationToken);
-
         protected override async Task<int> LoadContentAsync(IServiceProvider services, string userId, DateTime localDate, CancellationToken cancellationToken)
         {
             EntriesDataContext entriesDb = services.GetRequiredService<EntriesDataContext>();

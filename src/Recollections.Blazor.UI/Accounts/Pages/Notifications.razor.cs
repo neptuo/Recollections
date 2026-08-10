@@ -111,7 +111,6 @@ public partial class Notifications
             Model.IsEnabled = true;
             Model.NewEntries.IsEnabled = true;
             Model.OnThisDay.IsEnabled = true;
-            Model.Birthday.IsEnabled = true;
             await EnsureTimeZoneAsync();
             await Api.SetNotificationSettingsAsync(Model);
 
