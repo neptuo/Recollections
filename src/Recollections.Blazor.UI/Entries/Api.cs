@@ -220,9 +220,22 @@ namespace Neptuo.Recollections.Entries
             => faultHandler.Wrap(http.GetFromJsonAsync<List<EntryListModel>>($"beings/{beingId}/highest-altitude"));
 
         public Task<PageableList<EntryListModel>> SearchEntriesAsync(string query, int offset = 0)
+            => SearchEntriesAsync(query, null, null, null, offset);
+
+        public Task<PageableList<EntryListModel>> SearchEntriesAsync(string query, IEnumerable<string> beingIds, DateTime? dateFrom = null, DateTime? dateTo = null, int offset = 0)
         {
             string url = "entries/search";
-            url = QueryHelpers.AddQueryString(url, "q", query);
+            if (!String.IsNullOrWhiteSpace(query))
+                url = QueryHelpers.AddQueryString(url, "q", query);
+            if (beingIds != null)
+            {
+                foreach (string beingId in beingIds.Where(id => !String.IsNullOrEmpty(id)))
+                    url = QueryHelpers.AddQueryString(url, "being", beingId);
+            }
+            if (dateFrom != null)
+                url = QueryHelpers.AddQueryString(url, "from", dateFrom.Value.ToString("yyyy-MM-dd"));
+            if (dateTo != null)
+                url = QueryHelpers.AddQueryString(url, "to", dateTo.Value.ToString("yyyy-MM-dd"));
 
             if (offset > 0)
                 url = QueryHelpers.AddQueryString(url, "offset", offset.ToString());

@@ -4,7 +4,7 @@
 <DocumentTitle Value="Search" />
 
 <div class="card-list">
-    <form @onsubmit="@(() => { Navigator.OpenSearch(SearchText, SearchType); StateHasChanged(); })">
+    <form @onsubmit="@(() => { OpenSearch(); StateHasChanged(); })">
         <div class="row gx-2 my-4">
             <div class="col-md col-sm-12">
                 <input @ref="SearchInput" class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
@@ -19,6 +19,40 @@
                     </button>
                 </div>
             </div>
+            @if (IsEntryType)
+            {
+                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                    <button type="button" class="btn btn-secondary d-block w-100" @onclick="SelectBeings">
+                        @(BeingIds.Count == 0 ? "Any being" : $"{BeingIds.Count} beings")
+                    </button>
+                </div>
+                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                    <div class="btn-group d-flex">
+                        <button type="button" class="btn btn-secondary" @onclick="SelectDateFrom">
+                            From @(DateFrom?.ToString(UiOptions.DateFormat) ?? "any date")
+                        </button>
+                        @if (DateFrom != null)
+                        {
+                            <button type="button" class="btn btn-secondary" title="Clear date from" @onclick="ClearDateFrom">
+                                <Icon Prefix="fas" Identifier="times" />
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                    <div class="btn-group d-flex">
+                        <button type="button" class="btn btn-secondary" @onclick="SelectDateTo">
+                            To @(DateTo?.ToString(UiOptions.DateFormat) ?? "any date")
+                        </button>
+                        @if (DateTo != null)
+                        {
+                            <button type="button" class="btn btn-secondary" title="Clear date to" @onclick="ClearDateTo">
+                                <Icon Prefix="fas" Identifier="times" />
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
                 <button class="btn btn-primary d-block w-100">
                     <Icon Identifier="search" />
@@ -26,6 +60,10 @@
                 </button>
             </div>
         </div>
+
+        <BeingPicker @ref="BeingPicker" Selected="OnBeingsSelected" />
+        <DatePicker @ref="DateFromPicker" Part="DatePickerPart.Day" Value="DateFromValue" ValueChanged="OnDateFromSelected" />
+        <DatePicker @ref="DateToPicker" Part="DatePickerPart.Day" Value="DateToValue" ValueChanged="OnDateToSelected" />
     </form>
 
     <div class="row">
