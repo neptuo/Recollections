@@ -16,6 +16,12 @@
                     Search
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link @(ActiveTab == Tab.Create ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Create))" @onclick:preventDefault>
+                    <Icon Identifier="plus" />
+                    Create
+                </a>
+            </li>
         </ul>
     </TitleContent>
     <ChildContent>
@@ -24,6 +30,12 @@
             @if (ActiveTab == Tab.Timeline)
             {
                 <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@((offset, count) => Api.GetTimelineListAsync(offset, count))" ShowYearSeparators="false" />
+            }
+            else if (ActiveTab == Tab.Create)
+            {
+                <div class="entry-picker-create">
+                    <EntryCreate @ref="EntryCreate" Created="OnEntryCreated" />
+                </div>
             }
             else
             {

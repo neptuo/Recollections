@@ -15,13 +15,15 @@ namespace Neptuo.Recollections.Entries.Components
         protected enum Tab
         {
             Timeline,
-            Search
+            Search,
+            Create
         }
 
         [Parameter]
-        public Action<EntryListModel> Selected { get; set; }
+        public Action<string> Selected { get; set; }
 
         protected Modal Modal { get; set; }
+        protected EntryCreate EntryCreate { get; set; }
 
         private bool wasVisible = false;
 
@@ -40,6 +42,7 @@ namespace Neptuo.Recollections.Entries.Components
             SearchResults.Clear();
             SearchHasMore = false;
             searchOffset = 0;
+            EntryCreate?.Reset();
             StateHasChanged();
 
             Modal.Show();
@@ -85,9 +88,15 @@ namespace Neptuo.Recollections.Entries.Components
         }
 
         protected void OnEntrySelected(EntryListModel entry)
+            => OnEntrySelected(entry.Id);
+
+        protected void OnEntryCreated(EntryModel entry)
+            => OnEntrySelected(entry.Id);
+
+        private void OnEntrySelected(string entryId)
         {
             Hide();
-            Selected?.Invoke(entry);
+            Selected?.Invoke(entryId);
         }
     }
 }

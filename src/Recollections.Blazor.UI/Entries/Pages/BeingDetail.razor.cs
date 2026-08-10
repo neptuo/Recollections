@@ -30,7 +30,6 @@ namespace Neptuo.Recollections.Entries.Pages
         [Parameter]
         public string BeingId { get; set; }
 
-        protected EntryPicker EntryPicker { get; set; }
         protected BeingModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();

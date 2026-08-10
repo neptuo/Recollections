@@ -341,7 +341,7 @@ namespace Neptuo.Recollections.Entries.Pages
             EntryPicker.Show();
         }
 
-        protected async void EntrySelected(EntryListModel entry)
+        protected async void EntrySelected(string entryId)
         {
             var model = new EntryStoryUpdateModel(Model.Id);
 
@@ -349,9 +349,9 @@ namespace Neptuo.Recollections.Entries.Pages
                 model.ChapterId = entrySelectionChapter.Id;
 
             entrySelectionChapter = null;
-            if (await Api.UpdateEntryStoryAsync(entry.Id, model))
+            if (await Api.UpdateEntryStoryAsync(entryId, model))
             {
-                string previousId = Entries.Where(s => s.Value.Any(e => e.Id == entry.Id)).Select(s => s.Key).FirstOrDefault();
+                string previousId = Entries.Where(s => s.Value.Any(e => e.Id == entryId)).Select(s => s.Key).FirstOrDefault();
                 if (previousId == Model.Id)
                     Entries[Model.Id] = (await Api.GetStoryTimelineAsync(Model.Id)).Models;
                 else if (previousId != null)
