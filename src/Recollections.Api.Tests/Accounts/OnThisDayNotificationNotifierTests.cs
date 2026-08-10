@@ -253,7 +253,7 @@ public class OnThisDayNotificationNotifierTests : IClassFixture<ApiFactory>, IAs
         host.FakeTime.SetUtcNow(new DateTimeOffset(2025, 6, 15, 4, 0, 0, TimeSpan.Zero));
         var result = await host.Notifier.RunForUserAsync(AliceUserId, forceSend: true);
 
-        Assert.Equal(OnThisDayTestResult.Sent, result);
+        Assert.Equal(DailyNotificationResult.Sent, result);
         Assert.Single(host.Sender.Sent);
         Assert.Empty(await QueryDispatchesAsync(host, AliceUserId));
     }

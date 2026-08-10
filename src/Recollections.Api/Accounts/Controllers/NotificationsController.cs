@@ -45,10 +45,13 @@ namespace Neptuo.Recollections.Accounts.Controllers
             UserNotificationOnThisDaySettings onThisDay = await db.NotificationOnThisDaySettings
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
+            UserNotificationBirthdaySettings birthday = await db.NotificationBirthdaySettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
             bool hasSubscription = await db.PushSubscriptions
                 .AnyAsync(s => s.UserId == userId && s.RevokedAt == null);
 
-            return Ok(CreateModel(settings, newEntries, onThisDay, hasSubscription));
+            return Ok(CreateModel(settings, newEntries, onThisDay, birthday, hasSubscription));
         }
 
         [HttpPut]
@@ -109,12 +112,29 @@ namespace Neptuo.Recollections.Accounts.Controllers
             onThisDay.PreferredHour = Math.Clamp(onThisDayModel.PreferredHour, 0, 23);
             onThisDay.TimeZone = NormalizeTimeZone(onThisDayModel.TimeZone);
 
+            UserNotificationBirthdaySettings birthday = await db.NotificationBirthdaySettings
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (birthday == null)
+            {
+                birthday = new UserNotificationBirthdaySettings()
+                {
+                    UserId = userId
+                };
+                db.NotificationBirthdaySettings.Add(birthday);
+            }
+
+            UserNotificationBirthdaySettingsModel birthdayModel = model.Birthday ?? new UserNotificationBirthdaySettingsModel();
+            birthday.IsEnabled = birthdayModel.IsEnabled;
+            birthday.PreferredHour = Math.Clamp(birthdayModel.PreferredHour, 0, 23);
+            birthday.TimeZone = NormalizeTimeZone(birthdayModel.TimeZone);
+
             await db.SaveChangesAsync();
 
             bool hasSubscription = await db.PushSubscriptions
                 .AnyAsync(s => s.UserId == userId && s.RevokedAt == null);
 
-            return Ok(CreateModel(settings, newEntries, onThisDay, hasSubscription));
+            return Ok(CreateModel(settings, newEntries, onThisDay, birthday, hasSubscription));
         }
 
         [HttpPost("subscriptions")]
@@ -176,8 +196,28 @@ namespace Neptuo.Recollections.Accounts.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            OnThisDayTestResult result = await notifier.RunForUserAsync(userId, forceSend: true, HttpContext.RequestAborted);
-            if (result == OnThisDayTestResult.NotConfigured)
+            DailyNotificationResult result = await notifier.RunForUserAsync(userId, forceSend: true, HttpContext.RequestAborted);
+            if (result == DailyNotificationResult.NotConfigured)
+                return NotFound(new { result = result.ToString() });
+
+            return Ok(new { result = result.ToString() });
+        }
+
+        [HttpPost("test/birthday")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> TestBirthdayAsync([FromServices] BirthdayNotificationNotifier notifier, [FromServices] IWebHostEnvironment env)
+        {
+            if (!env.IsDevelopment())
+                return NotFound();
+
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            DailyNotificationResult result = await notifier.RunForUserAsync(userId, forceSend: true, HttpContext.RequestAborted);
+            if (result == DailyNotificationResult.NotConfigured)
                 return NotFound(new { result = result.ToString() });
 
             return Ok(new { result = result.ToString() });
@@ -209,7 +249,7 @@ namespace Neptuo.Recollections.Accounts.Controllers
 
             return Ok();
         }
-        private UserNotificationSettingsModel CreateModel(UserNotificationSettings settings, UserNotificationNewEntriesSettings newEntries, UserNotificationOnThisDaySettings onThisDay, bool hasSubscription)
+        private UserNotificationSettingsModel CreateModel(UserNotificationSettings settings, UserNotificationNewEntriesSettings newEntries, UserNotificationOnThisDaySettings onThisDay, UserNotificationBirthdaySettings birthday, bool hasSubscription)
         {
             return new UserNotificationSettingsModel()
             {
@@ -225,6 +265,12 @@ namespace Neptuo.Recollections.Accounts.Controllers
                     IsEnabled = onThisDay?.IsEnabled == true,
                     PreferredHour = onThisDay != null ? Math.Clamp(onThisDay.PreferredHour, 0, 23) : 8,
                     TimeZone = NormalizeTimeZone(onThisDay?.TimeZone)
+                },
+                Birthday = new UserNotificationBirthdaySettingsModel()
+                {
+                    IsEnabled = birthday?.IsEnabled == true,
+                    PreferredHour = birthday != null ? Math.Clamp(birthday.PreferredHour, 0, 23) : 8,
+                    TimeZone = NormalizeTimeZone(birthday?.TimeZone)
                 }
             };
         }

@@ -76,6 +76,32 @@ namespace Neptuo.Recollections.Accounts.Notifications
             );
         }
 
+        public virtual Task<int> SendBirthdayAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, IReadOnlyCollection<BirthdayNotificationItem> beings, DateTime localDate)
+        {
+            Ensure.NotNull(subscriptions, "subscriptions");
+            Ensure.NotNull(beings, "beings");
+            if (beings.Count == 0)
+                return Task.FromResult(0);
+
+            string tag = $"birthday-{localDate:yyyy-MM-dd}";
+
+            if (beings.Count == 1)
+            {
+                BirthdayNotificationItem being = beings.First();
+                return SendAsync(
+                    subscriptions,
+                    new NotificationPayload("Birthday", $"{being.Name} turns {being.Age} today.", $"/beings/{being.BeingId}", tag)
+                );
+            }
+
+            string body = $"You have {beings.Count} beings celebrating a birthday today.";
+
+            return SendAsync(
+                subscriptions,
+                new NotificationPayload("Birthdays", $"{body} celebrate a birthday today.", "/beings", tag)
+            );
+        }
+
         private async Task<int> SendAsync(IEnumerable<UserNotificationPushSubscription> subscriptions, NotificationPayload payload)
         {
             bool hasSubject = !String.IsNullOrWhiteSpace(options.Subject);

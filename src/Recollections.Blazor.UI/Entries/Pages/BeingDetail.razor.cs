@@ -135,6 +135,12 @@ namespace Neptuo.Recollections.Entries.Pages
             return SaveAsync();
         }
 
+        protected Task SaveBirthDateAsync(DateTime birthDate)
+        {
+            Model.BirthDate = birthDate == DateTime.MinValue ? null : birthDate.Date;
+            return SaveAsync();
+        }
+
         protected Task SaveTextAsync(string text)
         {
             Model.Text = text;

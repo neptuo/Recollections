@@ -22,6 +22,12 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public bool IsTimeSelection { get; set; }
 
+        [Parameter]
+        public bool ShowAge { get; set; }
+
+        [Parameter]
+        public bool AllowClear { get; set; }
+
         protected Date SelectedDate { get; set; }
         protected Time SelectedTime { get; set; }
 
@@ -29,11 +35,14 @@ namespace Neptuo.Recollections.Components.Editors
         {
             base.OnParametersSet();
 
+            // With no value yet, offer today as the starting point of the picker.
+            DateTime pickerValue = Value == DateTime.MinValue ? DateTime.Today : Value;
+
             SelectedDate = new Date 
             {
-                Year = Value.Year, 
-                Month = Value.Month,
-                Day = Value.Day
+                Year = pickerValue.Year, 
+                Month = pickerValue.Month,
+                Day = pickerValue.Day
             };
             SelectedTime = new Time
             {
@@ -45,6 +54,14 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected void BindValue()
         {
+            if (SelectedDate.ToDateTime() == DateTime.MinValue)
+            {
+                Value = DateTime.MinValue;
+                ValueChanged?.Invoke(Value);
+                StateHasChanged();
+                return;
+            }
+
             Value = new DateTime(
                 SelectedDate.Year.Value,
                 SelectedDate.Month.Value,
@@ -59,5 +76,11 @@ namespace Neptuo.Recollections.Components.Editors
 
         protected string GetDateCssClass()
             => IsTimeSelection ? "inline-datetime" : "inline-date";
+
+        protected string GetAgeText()
+        {
+            int age = BirthDateUtils.GetAge(Value, DateTime.Today);
+            return age == 1 ? "1 year" : $"{age} years";
+        }
     }
 }

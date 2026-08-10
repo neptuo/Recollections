@@ -1,4 +1,4 @@
-@using Neptuo.Recollections.Accounts
+﻿@using Neptuo.Recollections.Accounts
 @page "/notifications"
 @layout Commons.Layouts.MainLayout
 @inherits UserStateAuthenticatedComponentBase
@@ -73,6 +73,32 @@
                             <div class="col-sm-5 col-md-4">
                                 <label class="form-label" for="onThisDayTimeZone">Time zone</label>
                                 <input class="form-control" type="text" id="onThisDayTimeZone" @bind="Model.OnThisDay.TimeZone" />
+                            </div>
+                        </div>
+                        <div class="form-text mt-2">
+                            Delivered at most once per day shortly after the selected local hour.
+                        </div>
+                    </section>
+
+                    <hr class="my-4" />
+
+                    <section>
+                        <h6 class="mb-3">
+                            <Icon Identifier="cake-candles" CssClass="me-1" />
+                            Birthdays
+                        </h6>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="birthdayEnabled" @bind="Model.Birthday.IsEnabled" />
+                            <label class="form-check-label" for="birthdayEnabled">Remind me about beings' birthdays</label>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-sm-3 col-md-2">
+                                <label class="form-label" for="birthdayHour">Preferred hour</label>
+                                <input class="form-control" type="number" id="birthdayHour" min="0" max="23" @bind="Model.Birthday.PreferredHour" />
+                            </div>
+                            <div class="col-sm-5 col-md-4">
+                                <label class="form-label" for="birthdayTimeZone">Time zone</label>
+                                <input class="form-control" type="text" id="birthdayTimeZone" @bind="Model.Birthday.TimeZone" />
                             </div>
                         </div>
                         <div class="form-text mt-2">
