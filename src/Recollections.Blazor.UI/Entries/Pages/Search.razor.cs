@@ -35,6 +35,7 @@ namespace Neptuo.Recollections.Entries.Pages
         public string Query { get; set; }
 
         private int offset;
+        private string lastSearchUrl;
 
         /// <summary>
         /// Don't use here. Only for binding purposes.
@@ -105,11 +106,16 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Log.Debug($"Search executed with '{append}'.");
 
-            string lastQuery = Query;
-            string lastType = SearchType;
-            List<string> lastBeingIds = [.. BeingIds];
-            DateTime? lastDateFrom = DateFrom;
-            DateTime? lastDateTo = DateTo;
+            string currentUrl = Navigator.GetCurrentUrl();
+            if (!append && currentUrl == lastSearchUrl)
+            {
+                Log.Debug($"Not appending and search URL has not changed.");
+                return;
+            }
+
+            if (!append)
+                lastSearchUrl = currentUrl;
+
             SearchText = Query = Navigator.FindQueryParameter("q");
             SearchType = NormalizeSearchType(Navigator.FindQueryParameter("type"));
             BeingIds.Clear();
@@ -120,12 +126,6 @@ namespace Neptuo.Recollections.Entries.Pages
 
             if (!append)
             {
-                if (Query == lastQuery && SearchType == lastType && BeingIds.SequenceEqual(lastBeingIds) && DateFrom == lastDateFrom && DateTo == lastDateTo)
-                {
-                    Log.Debug($"Not appending and search criteria not changed.");
-                    return;
-                }
-
                 Log.Debug($"Clearing '{EntryItems.Count}' entry items and '{StoryItems.Count}' story items.");
                 EntryItems.Clear();
                 StoryItems.Clear();
