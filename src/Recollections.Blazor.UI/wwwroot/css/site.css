@@ -25952,16 +25952,16 @@ video.pswp__video {
   line-height: 1;
   margin-bottom: 0;
 }
-.entry-picker .entry .entry-new {
+.entry-picker .entry.entry-new {
   margin-top: 0;
 }
-.entry-picker .entry .entry-new .title {
+.entry-picker .entry.entry-new .title {
   padding-left: 0;
 }
-.entry-picker .entry .entry-new .title:before {
+.entry-picker .entry.entry-new .title:before {
   display: none;
 }
-.entry-picker .entry .entry-new .body {
+.entry-picker .entry.entry-new .body {
   padding-left: 0;
 }
 .entry-picker .entry .date {
