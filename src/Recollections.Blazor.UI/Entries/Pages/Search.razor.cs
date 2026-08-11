@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Neptuo.Logging;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Components;
+using Neptuo.Recollections.Entries.Components;
 using Neptuo.Recollections.Entries.Stories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,6 +35,7 @@ namespace Neptuo.Recollections.Entries.Pages
         public string Query { get; set; }
 
         private int offset;
+        private string lastSearchUrl;
 
         /// <summary>
         /// Don't use here. Only for binding purposes.
@@ -39,17 +43,27 @@ namespace Neptuo.Recollections.Entries.Pages
         protected string SearchText { get; set; }
         protected string SearchType { get; set; } = EntrySearchType;
         protected ElementReference SearchInput { get; set; }
+        protected BeingPicker BeingPicker { get; set; }
+        protected DatePicker DateFromPicker { get; set; }
+        protected DatePicker DateToPicker { get; set; }
 
         protected List<EntryListModel> EntryItems { get; } = [];
         protected List<StoryListModel> StoryItems { get; } = [];
+        protected List<string> BeingIds { get; } = [];
+        protected DateTime? DateFrom { get; set; }
+        protected DateTime? DateTo { get; set; }
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; set; }
-        protected bool HasQuery => !String.IsNullOrEmpty(Query);
+        protected bool AreFiltersExpanded { get; set; }
+        protected bool HasSearchCriteria => !String.IsNullOrWhiteSpace(Query) || BeingIds.Count > 0 || DateFrom != null || DateTo != null;
+        protected bool HasEntryFilters => BeingIds.Count > 0 || DateFrom != null || DateTo != null;
         protected bool IsEntryType => SearchType == EntrySearchType;
         protected bool IsStoryType => SearchType == StorySearchType;
+        protected Date? DateFromValue => DateFrom == null ? null : new Date(DateFrom.Value);
+        protected Date? DateToValue => DateTo == null ? null : new Date(DateTo.Value);
 
-        protected string EmptyMessage => HasQuery
-            ? $"Nothing matches '{Query}'..."
+        protected string EmptyMessage => HasSearchCriteria
+            ? "Nothing matches the selected filters..."
             : "Start by filling the search phrase...";
 
         protected override async Task OnInitializedAsync()
@@ -94,19 +108,29 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             Log.Debug($"Search executed with '{append}'.");
 
-            string lastQuery = Query;
-            string lastType = SearchType;
+            string currentUrl = Navigator.GetCurrentUrl();
+            if (!append && currentUrl == lastSearchUrl)
+            {
+                Log.Debug($"Not appending and search URL has not changed.");
+                return;
+            }
+
+            if (!append)
+                lastSearchUrl = currentUrl;
+
             SearchText = Query = Navigator.FindQueryParameter("q");
             SearchType = NormalizeSearchType(Navigator.FindQueryParameter("type"));
+            BeingIds.Clear();
+            if (IsEntryType)
+                BeingIds.AddRange(Navigator.GetQueryString().TryGetValue("being", out var beingIds) ? beingIds.Where(id => !String.IsNullOrWhiteSpace(id)).Distinct() : []);
+            DateFrom = ParseDate(Navigator.FindQueryParameter("from"));
+            DateTo = ParseDate(Navigator.FindQueryParameter("to"));
+
+            if (HasEntryFilters)
+                AreFiltersExpanded = true;
 
             if (!append)
             {
-                if (Query == lastQuery && SearchType == lastType)
-                {
-                    Log.Debug($"Not appending and query/type not changed (last '{lastQuery}'/'{lastType}', current '{Query}'/'{SearchType}').");
-                    return;
-                }
-
                 Log.Debug($"Clearing '{EntryItems.Count}' entry items and '{StoryItems.Count}' story items.");
                 EntryItems.Clear();
                 StoryItems.Clear();
@@ -114,7 +138,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 HasMore = false;
             }
 
-            if (String.IsNullOrEmpty(Query))
+            if (!HasSearchCriteria || (IsStoryType && String.IsNullOrWhiteSpace(Query)))
                 return;
 
             try
@@ -123,7 +147,7 @@ namespace Neptuo.Recollections.Entries.Pages
 
                 if (IsEntryType)
                 {
-                    var response = await Api.SearchEntriesAsync(Query, offset);
+                    var response = await Api.SearchEntriesAsync(Query, BeingIds, DateFrom, DateTo, offset);
                     EntryItems.AddRange(response.Models);
                     HasMore = response.HasMore;
                     offset = EntryItems.Count;
@@ -146,10 +170,60 @@ namespace Neptuo.Recollections.Entries.Pages
         }
 
         protected void OpenEntrySearch()
-            => Navigator.OpenSearch(SearchText, EntrySearchType);
+            => Navigator.OpenSearch(SearchText, EntrySearchType, BeingIds, DateFrom, DateTo);
 
         protected void OpenStorySearch()
             => Navigator.OpenSearch(SearchText, StorySearchType);
+
+        protected void OpenSearch()
+        {
+            if (IsEntryType)
+                OpenEntrySearch();
+            else
+                OpenStorySearch();
+        }
+
+        protected void SelectBeings()
+            => BeingPicker.Show(BeingIds);
+
+        protected void ToggleFilters()
+            => AreFiltersExpanded = !AreFiltersExpanded;
+
+        protected void OnBeingsSelected(List<string> beingIds)
+        {
+            BeingIds.Clear();
+            BeingIds.AddRange(beingIds);
+            StateHasChanged();
+        }
+
+        protected void SelectDateFrom()
+            => DateFromPicker.Show();
+
+        protected void SelectDateTo()
+            => DateToPicker.Show();
+
+        protected void OnDateFromSelected(Date date)
+        {
+            DateFrom = date.ToDateTime();
+            StateHasChanged();
+        }
+
+        protected void OnDateToSelected(Date date)
+        {
+            DateTo = date.ToDateTime();
+            StateHasChanged();
+        }
+
+        protected void ClearDateFrom()
+            => DateFrom = null;
+
+        protected void ClearDateTo()
+            => DateTo = null;
+
+        private static DateTime? ParseDate(string value)
+            => DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime date)
+                ? date
+                : null;
 
         protected Task LoadMoreAsync()
             => SearchAsync(true);

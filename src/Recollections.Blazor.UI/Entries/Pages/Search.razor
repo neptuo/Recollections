@@ -4,12 +4,9 @@
 <DocumentTitle Value="Search" />
 
 <div class="card-list">
-    <form @onsubmit="@(() => { Navigator.OpenSearch(SearchText, SearchType); StateHasChanged(); })">
+    <form @onsubmit="@(() => { OpenSearch(); StateHasChanged(); })">
         <div class="row gx-2 my-4">
-            <div class="col-md col-sm-12">
-                <input @ref="SearchInput" class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
-            </div>
-            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+            <div class="col-md-auto col-sm-12">
                 <div class="btn-group d-flex" role="group" aria-label="Search type">
                     <button type="button" class="btn @(IsEntryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsEntryType" @onclick="OpenEntrySearch">
                         Entries
@@ -19,6 +16,51 @@
                     </button>
                 </div>
             </div>
+            <div class="col-md col-sm-12 mt-2 mt-md-0">
+                <div class="input-group">
+                    <input @ref="SearchInput" class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
+                    @if (IsEntryType)
+                    {
+                        <button type="button" class="btn btn-outline-secondary" title="Toggle additional filters" aria-pressed="@AreFiltersExpanded" @onclick="ToggleFilters">
+                            ...
+                        </button>
+                    }
+                </div>
+            </div>
+            @if (IsEntryType && AreFiltersExpanded)
+            {
+                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                    <button type="button" class="btn btn-secondary d-block w-100" @onclick="SelectBeings">
+                        @(BeingIds.Count == 0 ? "Any being" : $"{BeingIds.Count} beings")
+                    </button>
+                </div>
+                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                    <div class="btn-group d-flex">
+                        <button type="button" class="btn btn-secondary" @onclick="SelectDateFrom">
+                            From @(DateFrom?.ToString(UiOptions.DateFormat) ?? "any date")
+                        </button>
+                        @if (DateFrom != null)
+                        {
+                            <button type="button" class="btn btn-secondary flex-grow-0" title="Clear date from" @onclick="ClearDateFrom">
+                                <Icon Prefix="fas" Identifier="times" />
+                            </button>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
+                    <div class="btn-group d-flex">
+                        <button type="button" class="btn btn-secondary" @onclick="SelectDateTo">
+                            To @(DateTo?.ToString(UiOptions.DateFormat) ?? "any date")
+                        </button>
+                        @if (DateTo != null)
+                        {
+                            <button type="button" class="btn btn-secondary flex-grow-0" title="Clear date to" @onclick="ClearDateTo">
+                                <Icon Prefix="fas" Identifier="times" />
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
                 <button class="btn btn-primary d-block w-100">
                     <Icon Identifier="search" />
@@ -26,6 +68,10 @@
                 </button>
             </div>
         </div>
+
+        <BeingPicker @ref="BeingPicker" Selected="OnBeingsSelected" />
+        <DatePicker @ref="DateFromPicker" Part="DatePickerPart.Day" Value="DateFromValue" ValueChanged="OnDateFromSelected" />
+        <DatePicker @ref="DateToPicker" Part="DatePickerPart.Day" Value="DateToValue" ValueChanged="OnDateToSelected" />
     </form>
 
     <div class="row">

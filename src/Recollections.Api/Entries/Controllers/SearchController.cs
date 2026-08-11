@@ -39,11 +39,20 @@ namespace Neptuo.Recollections.Entries.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery(Name = "q")] string query, int offset)
+        public async Task<IActionResult> Get([FromQuery(Name = "q")] string query, [FromQuery(Name = "being")] string[] beingIds, [FromQuery(Name = "from")] DateTime? dateFrom, [FromQuery(Name = "to")] DateTime? dateTo, int offset)
         {
             Ensure.PositiveOrZero(offset, "offset");
 
-            if (String.IsNullOrEmpty(query) || String.IsNullOrWhiteSpace(query))
+            List<string> selectedBeingIds = beingIds?
+                .Where(id => !String.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .ToList()
+                ?? [];
+
+            bool hasQuery = !String.IsNullOrWhiteSpace(query);
+            if (!hasQuery && selectedBeingIds.Count == 0 && dateFrom == null && dateTo == null)
+                return BadRequest();
+            if (dateFrom != null && dateTo != null && dateFrom.Value.Date > dateTo.Value.Date)
                 return BadRequest();
 
             string userId = HttpContext.User.FindUserId();
@@ -52,10 +61,31 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
+            if (selectedBeingIds.Count > 0)
+            {
+                var accessibleBeingIds = await shareStatus
+                    .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Beings.Where(b => selectedBeingIds.Contains(b.Id)), userId, connectedUsers)
+                    .Select(b => b.Id)
+                    .ToListAsync();
+
+                if (accessibleBeingIds.Count != selectedBeingIds.Count)
+                    return Unauthorized();
+            }
+
             var dbQuery = shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
-                .OrderByDescending(e => e.When)
-                .Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"));
+                .AsQueryable();
+
+            if (hasQuery)
+                dbQuery = dbQuery.Where(e => EF.Functions.Like(e.Title, $"%{query}%") || EF.Functions.Like(e.Text, $"%{query}%") || EF.Functions.Like(e.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Story.Title, $"%{query}%") || EF.Functions.Like(e.Chapter.Title, $"%{query}%"));
+            if (selectedBeingIds.Count > 0)
+                dbQuery = dbQuery.Where(e => selectedBeingIds.All(beingId => e.Beings.Any(b => b.Id == beingId)));
+            if (dateFrom != null)
+                dbQuery = dbQuery.Where(e => e.When >= dateFrom.Value.Date);
+            if (dateTo != null)
+                dbQuery = dbQuery.Where(e => e.When < dateTo.Value.Date.AddDays(1));
+
+            dbQuery = dbQuery.OrderByDescending(e => e.When);
             
             var (models, hasMore) = await entryMapper.MapAsync(dbQuery, [userId], connectedUsers, offset);
             return Ok(new PageableList<EntryListModel>(models, hasMore));
