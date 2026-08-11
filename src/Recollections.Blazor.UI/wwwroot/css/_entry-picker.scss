@@ -21,8 +21,23 @@
         }
     }
 
+    @media (max-width: 575.98px) {
+        .entry-picker-tab-label {
+            display: none;
+        }
+
+        .entry-picker-nav .nav-link {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    }
+
     .entry-picker-search {
         padding: 0.75rem 1rem;
+    }
+
+    .entry-picker-create {
+        padding: 1rem 1rem 0 1rem;
     }
 
     .entry-picker-results {
@@ -66,6 +81,22 @@
                 font-weight: bold;
                 line-height: 1;
                 margin-bottom: 0;
+            }
+        }
+
+        &.entry-new {
+            margin-top: 0;
+
+            .title {
+                padding-left: 0;
+
+                &:before {
+                    display: none;
+                }
+            }
+
+            .body {
+                padding-left: 0;
             }
         }
 

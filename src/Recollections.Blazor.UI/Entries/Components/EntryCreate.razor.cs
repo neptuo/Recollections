@@ -25,6 +25,12 @@ namespace Neptuo.Recollections.Entries.Components
         [Inject]
         protected ElementReferenceInterop ElementInterop { get; set; }
 
+        /// <summary>
+        /// When set, it's invoked with the newly created entry instead of navigating to the entry detail.
+        /// </summary>
+        [Parameter]
+        public EventCallback<EntryModel> Created { get; set; }
+
         public string Title { get; set; }
         public Date When { get; set; }
 
@@ -33,11 +39,18 @@ namespace Neptuo.Recollections.Entries.Components
         protected DatePicker DatePicker { get; set; }
         protected ElementReference WhenInput { get; set; }
 
-        protected override void OnParametersSet()
+        protected override void OnInitialized()
         {
-            base.OnParametersSet();
+            base.OnInitialized();
 
+            Reset();
+        }
+
+        public void Reset()
+        {
+            Title = null;
             When = new Date(DateTime.Today);
+            ErrorMessages.Clear();
         }
 
         public async Task CreateAsync()
@@ -47,7 +60,11 @@ namespace Neptuo.Recollections.Entries.Components
             if (Validate())
             {
                 EntryModel model = await Api.CreateEntryAsync(new EntryModel(Title, When.ToDateTime()));
-                Navigator.OpenEntryDetail(model.Id);
+
+                if (Created.HasDelegate)
+                    await Created.InvokeAsync(model);
+                else
+                    Navigator.OpenEntryDetail(model.Id);
             }
         }
 

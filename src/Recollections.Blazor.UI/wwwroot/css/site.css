@@ -25901,8 +25901,20 @@ video.pswp__video {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
 }
+@media (max-width: 575.98px) {
+  .entry-picker .entry-picker-tab-label {
+    display: none;
+  }
+  .entry-picker .entry-picker-nav .nav-link {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
 .entry-picker .entry-picker-search {
   padding: 0.75rem 1rem;
+}
+.entry-picker .entry-picker-create {
+  padding: 1rem 1rem 0 1rem;
 }
 .entry-picker .entry-picker-results {
   padding: 0 1rem 1rem;
@@ -25939,6 +25951,18 @@ video.pswp__video {
   font-weight: bold;
   line-height: 1;
   margin-bottom: 0;
+}
+.entry-picker .entry.entry-new {
+  margin-top: 0;
+}
+.entry-picker .entry.entry-new .title {
+  padding-left: 0;
+}
+.entry-picker .entry.entry-new .title:before {
+  display: none;
+}
+.entry-picker .entry.entry-new .body {
+  padding-left: 0;
 }
 .entry-picker .entry .date {
   padding-right: 0.5rem;

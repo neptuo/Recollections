@@ -6,14 +6,20 @@
         <ul class="nav nav-pills entry-picker-nav">
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
-                    <Icon Identifier="clock" />
-                    Timeline
+                    <Icon Identifier="timeline" CssClass="fa-rotate-270" />
+                    <span class="entry-picker-tab-label">Timeline</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
                     <Icon Identifier="search" />
-                    Search
+                    <span class="entry-picker-tab-label">Search</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link @(ActiveTab == Tab.Create ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Create))" @onclick:preventDefault>
+                    <Icon Identifier="plus" />
+                    <span class="entry-picker-tab-label">New</span>
                 </a>
             </li>
         </ul>
@@ -24,6 +30,12 @@
             @if (ActiveTab == Tab.Timeline)
             {
                 <Timeline OnClick="@(entry => OnEntrySelected(entry))" DataGetter="@((offset, count) => Api.GetTimelineListAsync(offset, count))" ShowYearSeparators="false" />
+            }
+            else if (ActiveTab == Tab.Create)
+            {
+                <div class="entry-picker-create">
+                    <EntryCreate @ref="EntryCreate" Created="OnEntryCreated" />
+                </div>
             }
             else
             {
