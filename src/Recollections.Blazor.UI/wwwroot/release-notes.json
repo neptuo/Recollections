@@ -1,5 +1,17 @@
 [
     {
+        "version": "0.22.0",
+        "milestone": 60,
+        "breakingChanges": [],
+        "newFeatures": [
+            "Birthday and name day support for beings, including age shown on their detail pages",
+            "Birthday and name day notifications for beings",
+            "Search entries tagged with a combination of beings",
+            "Faster Being detail loading with content appearing progressively"
+        ],
+        "bugFixes": []
+    },
+    {
         "version": "0.21.1",
         "milestone": 59,
         "breakingChanges": [],
