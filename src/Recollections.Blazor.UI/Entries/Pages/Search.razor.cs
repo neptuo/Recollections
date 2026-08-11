@@ -185,6 +185,7 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             BeingIds.Clear();
             BeingIds.AddRange(beingIds);
+            StateHasChanged();
         }
 
         protected void SelectDateFrom()

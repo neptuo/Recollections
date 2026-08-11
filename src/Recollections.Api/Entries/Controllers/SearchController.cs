@@ -61,6 +61,17 @@ namespace Neptuo.Recollections.Entries.Controllers
 
             var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
 
+            if (selectedBeingIds.Count > 0)
+            {
+                var accessibleBeingIds = await shareStatus
+                    .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Beings.Where(b => selectedBeingIds.Contains(b.Id)), userId, connectedUsers)
+                    .Select(b => b.Id)
+                    .ToListAsync();
+
+                if (accessibleBeingIds.Count != selectedBeingIds.Count)
+                    return Unauthorized();
+            }
+
             var dbQuery = shareStatus
                 .OwnedByOrExplicitlySharedWithUser(dataContext, dataContext.Entries, userId, connectedUsers)
                 .AsQueryable();

@@ -26,6 +26,7 @@ public class SearchEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
     private const string FirstBeingId = "sc-search-being-first";
     private const string SecondBeingId = "sc-search-being-second";
     private const string ThirdBeingId = "sc-search-being-third";
+    private const string HiddenBeingId = "sc-search-being-hidden";
 
     public SearchEndpointTests(ApiFactory factory)
     {
@@ -102,6 +103,7 @@ public class SearchEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
             var firstBeing = await DatabaseSeeder.SeedBeing(entriesDb, FirstBeingId, UserAId, isSharingInherited: false);
             var secondBeing = await DatabaseSeeder.SeedBeing(entriesDb, SecondBeingId, UserAId, isSharingInherited: false);
             var thirdBeing = await DatabaseSeeder.SeedBeing(entriesDb, ThirdBeingId, UserAId, isSharingInherited: false);
+            await DatabaseSeeder.SeedBeing(entriesDb, HiddenBeingId, UserAId, isSharingInherited: false);
             await DatabaseSeeder.SeedBeingShare(entriesDb, FirstBeingId, UserBId, Permission.Read);
             await DatabaseSeeder.SeedBeingShare(entriesDb, SecondBeingId, UserBId, Permission.Read);
             await DatabaseSeeder.SeedBeingShare(entriesDb, ThirdBeingId, UserBId, Permission.Read);
@@ -168,6 +170,15 @@ public class SearchEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime
         Assert.DoesNotContain(TextVisibleEntryId, entryIds);
         Assert.DoesNotContain(ChapterVisibleEntryId, entryIds);
         Assert.Equal(1, page.Models.Count);
+    }
+
+    [Fact]
+    public async Task Search_UserB_WithInaccessibleBeing_ReturnsUnauthorized()
+    {
+        var client = factory.CreateClientForUser(UserBId, UserBName);
+        var response = await client.GetAsync($"/api/entries/search?being={FirstBeingId}&being={HiddenBeingId}&offset=0");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]

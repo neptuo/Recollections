@@ -5,6 +5,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -171,9 +172,9 @@ namespace Neptuo.Recollections
                     url = QueryHelpers.AddQueryString(url, "being", beingId);
             }
             if (dateFrom != null)
-                url = QueryHelpers.AddQueryString(url, "from", dateFrom.Value.ToString("yyyy-MM-dd"));
+                url = QueryHelpers.AddQueryString(url, "from", dateFrom.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             if (dateTo != null)
-                url = QueryHelpers.AddQueryString(url, "to", dateTo.Value.ToString("yyyy-MM-dd"));
+                url = QueryHelpers.AddQueryString(url, "to", dateTo.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
 
             return url;
         }

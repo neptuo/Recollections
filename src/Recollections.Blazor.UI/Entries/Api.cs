@@ -8,6 +8,7 @@ using Neptuo.Recollections.Entries.Stories;
 using Neptuo.Recollections.Sharing;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -233,9 +234,9 @@ namespace Neptuo.Recollections.Entries
                     url = QueryHelpers.AddQueryString(url, "being", beingId);
             }
             if (dateFrom != null)
-                url = QueryHelpers.AddQueryString(url, "from", dateFrom.Value.ToString("yyyy-MM-dd"));
+                url = QueryHelpers.AddQueryString(url, "from", dateFrom.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
             if (dateTo != null)
-                url = QueryHelpers.AddQueryString(url, "to", dateTo.Value.ToString("yyyy-MM-dd"));
+                url = QueryHelpers.AddQueryString(url, "to", dateTo.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
 
             if (offset > 0)
                 url = QueryHelpers.AddQueryString(url, "offset", offset.ToString());
