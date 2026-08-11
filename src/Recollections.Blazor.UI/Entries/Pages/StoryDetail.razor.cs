@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
@@ -30,9 +29,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected IExceptionHandler ExceptionHandler { get; set; }
 
         private string previousStoryId;
-        private long loadVersion;
+        private readonly VersionedDeferredSecondaryLoadState<string> loadState = new();
         private bool shouldLoadTimelineData;
-        private bool shouldLoadSecondaryData;
+        private long currentLoadVersion;
         private string[] timelineChapterIds = [];
 
         [Parameter]
@@ -81,13 +80,12 @@ namespace Neptuo.Recollections.Entries.Pages
             if (shouldLoadTimelineData)
             {
                 shouldLoadTimelineData = false;
-                await LoadTimelineDataAsync(loadVersion, StoryId, timelineChapterIds);
+                await LoadTimelineDataAsync(currentLoadVersion, StoryId, timelineChapterIds);
             }
 
-            if (shouldLoadSecondaryData)
+            if (loadState.TryConsumeSecondaryLoad(out long secondaryLoadVersion, out string storyId))
             {
-                shouldLoadSecondaryData = false;
-                await LoadSecondaryDataAsync(loadVersion, StoryId);
+                await LoadSecondaryDataAsync(secondaryLoadVersion, storyId);
             }
 
             if (SelectLastChapterTitleEdit)
@@ -100,13 +98,13 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
-            long currentLoadVersion = Interlocked.Increment(ref loadVersion);
+            currentLoadVersion = loadState.BeginLoad();
 
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetStoryAsync(StoryId);
 
             // A newer story load has started while this one was fetching.
-            if (currentLoadVersion != loadVersion)
+            if (!loadState.IsCurrent(currentLoadVersion))
                 return;
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
@@ -123,7 +121,7 @@ namespace Neptuo.Recollections.Entries.Pages
             ApplyMap([]);
             ApplyMedia([]);
             shouldLoadTimelineData = true;
-            shouldLoadSecondaryData = true;
+            loadState.ScheduleSecondaryLoad(StoryId);
             StateHasChanged();
         }
 
@@ -184,7 +182,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 var mediaTask = Api.GetStoryMediaAsync(storyId);
                 await Task.WhenAll(mapTask, mediaTask);
 
-                if (currentLoadVersion != loadVersion || storyId != StoryId)
+                if (!loadState.IsCurrent(currentLoadVersion, storyId))
                     return;
 
                 ApplyMap(mapTask.Result);
@@ -192,7 +190,7 @@ namespace Neptuo.Recollections.Entries.Pages
             }
             finally
             {
-                if (currentLoadVersion == loadVersion && storyId == StoryId)
+                if (loadState.IsCurrent(currentLoadVersion, storyId))
                 {
                     IsMapLoading = false;
                     IsMediaLoading = false;
@@ -209,7 +207,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 entriesTasks[i + 1] = Api.GetStoryChapterTimelineAsync(storyId, chapterIds[i]);
 
             var entries = await Task.WhenAll(entriesTasks);
-            if (currentLoadVersion != loadVersion || storyId != StoryId)
+            if (!loadState.IsCurrent(currentLoadVersion, storyId))
                 return;
 
             Entries[storyId] = entries[0].Models;

@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
@@ -27,8 +26,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected UiOptions UiOptions { get; set; }
 
         private string previousBeingId;
-        private long loadVersion;
-        private bool shouldLoadSecondaryData;
+        private readonly VersionedDeferredSecondaryLoadState<string> loadState = new();
         private Task secondaryDataTask;
 
         [Parameter]
@@ -73,12 +71,12 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
-            long currentLoadVersion = Interlocked.Increment(ref loadVersion);
+            long currentLoadVersion = loadState.BeginLoad();
 
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetBeingAsync(BeingId);
 
-            if (currentLoadVersion != loadVersion)
+            if (!loadState.IsCurrent(currentLoadVersion))
                 return;
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
@@ -93,7 +91,7 @@ namespace Neptuo.Recollections.Entries.Pages
             StoriesCount = 0;
             AltitudeCount = 0;
             HighestAltitude = null;
-            shouldLoadSecondaryData = true;
+            loadState.ScheduleSecondaryLoad(BeingId);
             StateHasChanged();
         }
 
@@ -122,7 +120,7 @@ namespace Neptuo.Recollections.Entries.Pages
                 var altitudeTask = Api.GetBeingHighestAltitudeAsync(beingId);
                 await Task.WhenAll(mapTask, storiesTask, altitudeTask);
 
-                if (currentLoadVersion != loadVersion || beingId != BeingId)
+                if (!loadState.IsCurrent(currentLoadVersion, beingId))
                     return;
 
                 ApplyMap(mapTask.Result);
@@ -134,7 +132,7 @@ namespace Neptuo.Recollections.Entries.Pages
             }
             finally
             {
-                if (currentLoadVersion == loadVersion && beingId == BeingId)
+                if (loadState.IsCurrent(currentLoadVersion, beingId))
                 {
                     IsMapLoading = false;
                     IsStoriesLoading = false;
@@ -155,10 +153,9 @@ namespace Neptuo.Recollections.Entries.Pages
             await base.OnAfterRenderAsync(firstRender);
             await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
 
-            if (shouldLoadSecondaryData)
+            if (loadState.TryConsumeSecondaryLoad(out long currentLoadVersion, out string beingId))
             {
-                shouldLoadSecondaryData = false;
-                secondaryDataTask = LoadSecondaryDataAsync(loadVersion, BeingId);
+                secondaryDataTask = LoadSecondaryDataAsync(currentLoadVersion, beingId);
                 await secondaryDataTask;
             }
         }
