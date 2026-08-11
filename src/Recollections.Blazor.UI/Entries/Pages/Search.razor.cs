@@ -54,7 +54,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected DateTime? DateTo { get; set; }
         protected bool HasMore { get; private set; }
         protected bool IsLoading { get; set; }
+        protected bool AreFiltersExpanded { get; set; }
         protected bool HasSearchCriteria => !String.IsNullOrWhiteSpace(Query) || BeingIds.Count > 0 || DateFrom != null || DateTo != null;
+        protected bool HasEntryFilters => BeingIds.Count > 0 || DateFrom != null || DateTo != null;
         protected bool IsEntryType => SearchType == EntrySearchType;
         protected bool IsStoryType => SearchType == StorySearchType;
         protected Date? DateFromValue => DateFrom == null ? null : new Date(DateFrom.Value);
@@ -124,6 +126,9 @@ namespace Neptuo.Recollections.Entries.Pages
             DateFrom = ParseDate(Navigator.FindQueryParameter("from"));
             DateTo = ParseDate(Navigator.FindQueryParameter("to"));
 
+            if (HasEntryFilters)
+                AreFiltersExpanded = true;
+
             if (!append)
             {
                 Log.Debug($"Clearing '{EntryItems.Count}' entry items and '{StoryItems.Count}' story items.");
@@ -180,6 +185,9 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected void SelectBeings()
             => BeingPicker.Show(BeingIds);
+
+        protected void ToggleFilters()
+            => AreFiltersExpanded = !AreFiltersExpanded;
 
         protected void OnBeingsSelected(List<string> beingIds)
         {

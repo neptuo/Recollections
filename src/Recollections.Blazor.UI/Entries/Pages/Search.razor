@@ -7,7 +7,15 @@
     <form @onsubmit="@(() => { OpenSearch(); StateHasChanged(); })">
         <div class="row gx-2 my-4">
             <div class="col-md col-sm-12">
-                <input @ref="SearchInput" class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
+                <div class="input-group">
+                    <input @ref="SearchInput" class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
+                    @if (IsEntryType)
+                    {
+                        <button type="button" class="btn btn-outline-secondary" title="Toggle additional filters" aria-pressed="@AreFiltersExpanded" @onclick="ToggleFilters">
+                            ...
+                        </button>
+                    }
+                </div>
             </div>
             <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
                 <div class="btn-group d-flex" role="group" aria-label="Search type">
@@ -19,7 +27,7 @@
                     </button>
                 </div>
             </div>
-            @if (IsEntryType)
+            @if (IsEntryType && AreFiltersExpanded)
             {
                 <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
                     <button type="button" class="btn btn-secondary d-block w-100" @onclick="SelectBeings">
