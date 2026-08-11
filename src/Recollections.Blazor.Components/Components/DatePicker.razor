@@ -22,13 +22,16 @@
         }
         else if (CurrentPart == DatePickerPart.Month)
         {
-            <h5 class="d-flex align-items-center mb-2">
-                <button class="me-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear--)">Prev</button>
-                <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Year)">
-                    @CurrentYear
-                </span>
-                <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear++)">Next</button>
-            </h5>
+            @if (AllowYearSelection)
+            {
+                <h5 class="d-flex align-items-center mb-2">
+                    <button class="me-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear--)">Prev</button>
+                    <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Year)">
+                        @CurrentYear
+                    </span>
+                    <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear++)">Next</button>
+                </h5>
+            }
 
             <div class="row">
                 @for (int i = 0; i < MonthNames.Length - 1; i++)
@@ -48,9 +51,12 @@
         {
             <h5 class="d-flex align-items-center mb-2">
                 <button class="me-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = PrevMonth(CurrentYear, CurrentMonth); })">Prev</button>
-                <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Month)">
+                <span class="@(AllowYearSelection ? "cursor-pointer" : "")" @onclick="OnDayHeaderClicked">
                     @MonthNames[CurrentMonth - 1]
-                    @CurrentYear
+                    @if (AllowYearSelection)
+                    {
+                        @CurrentYear
+                    }
                 </span>
                 <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = NextMonth(CurrentYear, CurrentMonth); })">Next</button>
             </h5>

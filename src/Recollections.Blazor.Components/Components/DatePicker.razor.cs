@@ -19,10 +19,13 @@ namespace Neptuo.Recollections.Components
         public Date? Value { get; set; }
 
         [Parameter]
-        public Action<Date> ValueChanged { get; set; }
+        public EventCallback<Date> ValueChanged { get; set; }
 
         [Parameter]
         public bool AllowClear { get; set; }
+
+        [Parameter]
+        public bool AllowYearSelection { get; set; } = true;
 
         protected Modal Modal { get; set; }
 
@@ -60,43 +63,48 @@ namespace Neptuo.Recollections.Components
         {
             base.OnParametersSet();
 
-            CurrentPart = Part;
+            CurrentPart = AllowYearSelection ? Part : DatePickerPart.Month;
 
             if (Value != null)
             {
-                CurrentYear = Value.Value.Year ?? DateTime.Now.Year;
+                CurrentYear = AllowYearSelection
+                    ? Value.Value.Year ?? DateTime.Now.Year
+                    : 2000;
                 CurrentMonth = Value.Value.Month ?? DateTime.Now.Month;
             }
             else
             {
-                CurrentYear = DateTime.Now.Year;
+                CurrentYear = AllowYearSelection ? DateTime.Now.Year : 2000;
                 CurrentMonth = DateTime.Now.Month;
             }
         }
 
-        protected void OnYearSelected(int year)
+        protected async Task OnYearSelected(int year)
         {
             if (Part == DatePickerPart.Year)
             {
                 Hide();
-                ValueChanged?.Invoke(new Date()
+                await ValueChanged.InvokeAsync(new Date()
                 {
                     Year = year,
                 });
             }
             else
             {
-                CurrentYear = year;
-                CurrentPart = DatePickerPart.Month;
+                if (AllowYearSelection)
+                {
+                    CurrentYear = year;
+                    CurrentPart = DatePickerPart.Month;
+                }
             }
         }
 
-        protected void OnMonthSelected(int month)
+        protected async Task OnMonthSelected(int month)
         {
             if (Part == DatePickerPart.Month)
             {
                 Hide();
-                ValueChanged?.Invoke(new Date()
+                await ValueChanged.InvokeAsync(new Date()
                 {
                     Year = CurrentYear,
                     Month = month
@@ -109,12 +117,12 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        protected void OnDaySelected(int day)
+        protected async Task OnDaySelected(int day)
         {
             if (Part == DatePickerPart.Day)
             {
                 Hide();
-                ValueChanged?.Invoke(new Date()
+                await ValueChanged.InvokeAsync(new Date()
                 {
                     Year = CurrentYear,
                     Month = CurrentMonth,
@@ -123,22 +131,32 @@ namespace Neptuo.Recollections.Components
             }
         }
 
-        protected void OnTodaySelected()
+        protected void OnDayHeaderClicked()
+        {
+            if (AllowYearSelection)
+                CurrentPart = DatePickerPart.Month;
+        }
+
+        protected async Task OnTodaySelected()
         {
             var today = DateTime.Today;
             switch (Part)
             {
                 case DatePickerPart.Year:
-                    OnYearSelected(today.Year);
+                    await OnYearSelected(today.Year);
                     break;
                 case DatePickerPart.Month:
-                    CurrentYear = today.Year;
-                    OnMonthSelected(today.Month);
+                    if (AllowYearSelection)
+                        CurrentYear = today.Year;
+
+                    await OnMonthSelected(today.Month);
                     break;
                 case DatePickerPart.Day:
-                    CurrentYear = today.Year;
+                    if (AllowYearSelection)
+                        CurrentYear = today.Year;
+
                     CurrentMonth = today.Month;
-                    OnDaySelected(today.Day);
+                    await OnDaySelected(today.Day);
                     break;
                 default:
                     throw Ensure.Exception.NotSupported(Part);
@@ -148,10 +166,10 @@ namespace Neptuo.Recollections.Components
         public void Show() => Modal.Show();
         public void Hide() => Modal.Hide();
 
-        protected void OnClearSelected()
+        protected async Task OnClearSelected()
         {
             Hide();
-            ValueChanged?.Invoke(new Date());
+            await ValueChanged.InvokeAsync(new Date());
         }
 
         public static (int year, int month) PrevMonth(int year, int month)
