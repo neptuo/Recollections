@@ -68,15 +68,38 @@ namespace Neptuo.Recollections.Accounts.Notifications
             ShareStatusService shareStatus = services.GetRequiredService<ShareStatusService>();
 
             ConnectedUsersModel connectedUsers = await connections.GetConnectedUsersForAsync(userId);
-            List<Being> beings = await shareStatus
-                .OwnedByOrExplicitlySharedWithUser(entriesDb, entriesDb.Beings.AsNoTracking(), userId, connectedUsers)
+            IQueryable<Being> accessibleBeings = shareStatus
+                .OwnedByOrExplicitlySharedWithUser(entriesDb, entriesDb.Beings.AsNoTracking(), userId, connectedUsers);
+
+            // Load beings with birthday on this date
+            List<Being> birthdayBeings = await accessibleBeings
                 .Where(b => b.BirthDate != null && b.BirthDate.Value.Month == localDate.Month && b.BirthDate.Value.Day == localDate.Day)
                 .OrderBy(b => b.Name)
                 .ToListAsync(cancellationToken);
 
-            return beings
-                .Select(b => new BirthdayNotificationItem(b.Id, b.Name, BirthDateUtils.GetAge(b.BirthDate.Value, localDate)))
-                .ToList();
+            // Load beings with name day on this date
+            List<Being> nameDayBeings = await accessibleBeings
+                .Where(b => b.NameDayMonth != null && b.NameDayDay != null && b.NameDayMonth == localDate.Month && b.NameDayDay == localDate.Day)
+                .OrderBy(b => b.Name)
+                .ToListAsync(cancellationToken);
+
+            var items = new List<BirthdayNotificationItem>();
+
+            // Add birthday notifications
+            foreach (var being in birthdayBeings)
+            {
+                int age = BirthDateUtils.GetAge(being.BirthDate.Value, localDate);
+                items.Add(new BirthdayNotificationItem(being.Id, being.Name, age, "birthday"));
+            }
+
+            // Add name day notifications, avoiding duplicates if a being has both birthday and name day on the same date
+            var birthdayBeingIds = new HashSet<string>(birthdayBeings.Select(b => b.Id));
+            foreach (var being in nameDayBeings.Where(b => !birthdayBeingIds.Contains(b.Id)))
+            {
+                items.Add(new BirthdayNotificationItem(being.Id, being.Name, 0, "nameday"));
+            }
+
+            return items;
         }
 
         protected override bool HasContent(IReadOnlyCollection<BirthdayNotificationItem> beings)
@@ -86,5 +109,5 @@ namespace Neptuo.Recollections.Accounts.Notifications
             => sender.SendBirthdayAsync(subscriptions, beings, localDate);
     }
 
-    public record BirthdayNotificationItem(string BeingId, string Name, int Age);
+    public record BirthdayNotificationItem(string BeingId, string Name, int Age, string Type);
 }

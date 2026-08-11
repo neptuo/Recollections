@@ -166,6 +166,67 @@ public class BirthdayNotificationNotifierTests : IClassFixture<ApiFactory>, IAsy
         Assert.Empty(await QueryDispatchesAsync(host, AliceUserId));
     }
 
+    [Fact]
+    public async Task NameDayToday_SendsBeingWithNameDayNotification()
+    {
+        await using var host = CreateHost();
+        await SeedEnabledUserAsync(host, AliceUserId, preferredHour: 8, timeZone: PragueTz);
+        await SeedBeingWithNameDayAsync(host, AliceUserId, "Bob", nameDayMonth: 6, nameDayDay: 15);
+
+        host.FakeTime.SetUtcNow(new DateTimeOffset(2025, 6, 15, 6, 30, 0, TimeSpan.Zero));
+        await host.Notifier.RunAsync();
+
+        var sent = Assert.Single(host.Sender.Sent);
+        var being = Assert.Single(sent.Beings);
+        Assert.Equal("Bob", being.Name);
+        Assert.Equal("nameday", being.Type);
+        Assert.Equal(0, being.Age);
+    }
+
+    [Fact]
+    public async Task BirthdayAndNameDay_AreIncludedTogether()
+    {
+        await using var host = CreateHost();
+        await SeedEnabledUserAsync(host, AliceUserId, preferredHour: 8, timeZone: PragueTz);
+        await SeedBeingAsync(host, AliceUserId, "Bob", new DateTime(1990, 6, 15));
+        await SeedBeingWithNameDayAsync(host, AliceUserId, "Carol", nameDayMonth: 6, nameDayDay: 15);
+
+        host.FakeTime.SetUtcNow(new DateTimeOffset(2025, 6, 15, 6, 30, 0, TimeSpan.Zero));
+        await host.Notifier.RunAsync();
+
+        var sent = Assert.Single(host.Sender.Sent);
+        Assert.Equal(2, sent.Beings.Count);
+        
+        var bob = sent.Beings.FirstOrDefault(b => b.Name == "Bob");
+        Assert.NotNull(bob);
+        Assert.Equal("birthday", bob.Type);
+        Assert.Equal(35, bob.Age);
+
+        var carol = sent.Beings.FirstOrDefault(b => b.Name == "Carol");
+        Assert.NotNull(carol);
+        Assert.Equal("nameday", carol.Type);
+    }
+
+    [Fact]
+    public async Task BeingWithBothBirthdayAndNameDay_DeduplicatesIfOnSameDay()
+    {
+        await using var host = CreateHost();
+        await SeedEnabledUserAsync(host, AliceUserId, preferredHour: 8, timeZone: PragueTz);
+        await SeedBeingWithBirthdayAndNameDayAsync(host, AliceUserId, "Bob", 
+            birthDate: new DateTime(1990, 6, 15), 
+            nameDayMonth: 6, 
+            nameDayDay: 15);
+
+        host.FakeTime.SetUtcNow(new DateTimeOffset(2025, 6, 15, 6, 30, 0, TimeSpan.Zero));
+        await host.Notifier.RunAsync();
+
+        var sent = Assert.Single(host.Sender.Sent);
+        var being = Assert.Single(sent.Beings);
+        Assert.Equal("Bob", being.Name);
+        // Should include birthday as it comes first
+        Assert.Equal("birthday", being.Type);
+    }
+
     // --------- helpers ---------
 
     private TestHost CreateHost(Action<NotificationOptions> configureOptions = null)
@@ -245,6 +306,41 @@ public class BirthdayNotificationNotifierTests : IClassFixture<ApiFactory>, IAsy
             UserId = userId,
             Name = name,
             BirthDate = birthDate,
+            Created = DateTime.UtcNow,
+            IsSharingInherited = false
+        });
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedBeingWithNameDayAsync(TestHost host, string userId, string name, int? nameDayMonth, int? nameDayDay)
+    {
+        using var scope = host.Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<EntriesDataContext>();
+        db.Beings.Add(new Being
+        {
+            Id = Guid.NewGuid().ToString("N").Substring(0, 32),
+            UserId = userId,
+            Name = name,
+            NameDayMonth = nameDayMonth,
+            NameDayDay = nameDayDay,
+            Created = DateTime.UtcNow,
+            IsSharingInherited = false
+        });
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task SeedBeingWithBirthdayAndNameDayAsync(TestHost host, string userId, string name, DateTime? birthDate, int? nameDayMonth, int? nameDayDay)
+    {
+        using var scope = host.Factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<EntriesDataContext>();
+        db.Beings.Add(new Being
+        {
+            Id = Guid.NewGuid().ToString("N").Substring(0, 32),
+            UserId = userId,
+            Name = name,
+            BirthDate = birthDate,
+            NameDayMonth = nameDayMonth,
+            NameDayDay = nameDayDay,
             Created = DateTime.UtcNow,
             IsSharingInherited = false
         });

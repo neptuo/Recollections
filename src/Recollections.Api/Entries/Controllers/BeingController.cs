@@ -116,6 +116,9 @@ namespace Neptuo.Recollections.Entries.Controllers
                 IsSharingInherited = true
             };
             MapModelToEntity(model, entity);
+            if (!entity.HasValidNameDay())
+                return BadRequest("Name day must contain both a valid month and day, or be empty.");
+
             entity.UserId = userId;
             entity.Created = DateTime.Now;
 
@@ -134,6 +137,8 @@ namespace Neptuo.Recollections.Entries.Controllers
         public Task<IActionResult> Update(string id, BeingModel model) => RunBeingAsync(id, Permission.CoOwner, async entity =>
         {
             MapModelToEntity(model, entity);
+            if (!entity.HasValidNameDay())
+                return BadRequest("Name day must contain both a valid month and day, or be empty.");
 
             db.Beings.Update(entity);
             await db.SaveChangesAsync();
@@ -174,6 +179,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             model.Icon = entity.Icon;
             model.Text = entity.Text;
             model.BirthDate = entity.BirthDate;
+            model.NameDayMonth = entity.NameDayMonth;
+            model.NameDayDay = entity.NameDayDay;
         }
 
         private void MapModelToEntity(BeingModel model, Being entity)
@@ -184,6 +191,8 @@ namespace Neptuo.Recollections.Entries.Controllers
             entity.Icon = model.Icon;
             entity.Text = model.Text;
             entity.BirthDate = model.BirthDate?.Date;
+            entity.NameDayMonth = model.NameDayMonth;
+            entity.NameDayDay = model.NameDayDay;
         }
     }
 }

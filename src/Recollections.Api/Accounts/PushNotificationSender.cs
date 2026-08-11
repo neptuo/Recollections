@@ -85,20 +85,54 @@ namespace Neptuo.Recollections.Accounts.Notifications
 
             string tag = $"birthday-{localDate:yyyy-MM-dd}";
 
+            var birthdayItems = beings.Where(b => b.Type == "birthday").ToList();
+            var nameDayItems = beings.Where(b => b.Type == "nameday").ToList();
+
             if (beings.Count == 1)
             {
                 BirthdayNotificationItem being = beings.First();
+                string title, singleBody;
+
+                if (being.Type == "birthday")
+                {
+                    title = "Birthday";
+                    singleBody = $"{being.Name} turns {being.Age} today.";
+                }
+                else
+                {
+                    title = "Name Day";
+                    singleBody = $"Today is {being.Name}'s name day.";
+                }
+
                 return SendAsync(
                     subscriptions,
-                    new NotificationPayload("Birthday", $"{being.Name} turns {being.Age} today.", $"/beings/{being.BeingId}", tag)
+                    new NotificationPayload(title, singleBody, $"/beings/{being.BeingId}", tag)
                 );
             }
 
-            string body = $"You have {beings.Count} beings celebrating a birthday today.";
+            // Multiple items - create a combined message
+            string titlePrefix = birthdayItems.Count > 0 && nameDayItems.Count > 0 ? "Birthdays & Name Days" :
+                                 birthdayItems.Count > 0 ? "Birthdays" : "Name Days";
+            
+            var parts = new List<string>();
+            if (birthdayItems.Count > 0)
+            {
+                parts.Add(birthdayItems.Count == 1 
+                    ? $"1 being celebrating a birthday" 
+                    : $"{birthdayItems.Count} beings celebrating birthdays");
+            }
+            if (nameDayItems.Count > 0)
+            {
+                parts.Add(nameDayItems.Count == 1 
+                    ? $"1 being celebrating a name day" 
+                    : $"{nameDayItems.Count} beings celebrating name days");
+            }
+
+            string body = $"You have {string.Join(" and ", parts)} today.";
 
             return SendAsync(
                 subscriptions,
-                new NotificationPayload("Birthdays", $"{body} celebrate a birthday today.", "/beings", tag)
+                new NotificationPayload(titlePrefix, body, "/beings", tag)
             );
         }
 

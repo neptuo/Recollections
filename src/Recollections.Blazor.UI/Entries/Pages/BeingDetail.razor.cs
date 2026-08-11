@@ -35,6 +35,13 @@ namespace Neptuo.Recollections.Entries.Pages
         protected BeingModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
+        protected DatePicker NameDayPicker { get; set; }
+        protected Date NameDay => new()
+        {
+            Year = 2000,
+            Month = Model.NameDayMonth,
+            Day = Model.NameDayDay
+        };
 
         protected BeingIconPicker IconPicker { get; set; }
 
@@ -187,6 +194,18 @@ namespace Neptuo.Recollections.Entries.Pages
             Model.BirthDate = birthDate == DateTime.MinValue ? null : birthDate.Date;
             return SaveAsync();
         }
+
+        protected async Task SaveNameDayAsync(Date value)
+        {
+            Model.NameDayMonth = value.Month;
+            Model.NameDayDay = value.Day;
+            await SaveAsync();
+        }
+
+        protected string FormatNameDay()
+            => Model.NameDayMonth.HasValue && Model.NameDayDay.HasValue
+                ? new DateTime(2000, Model.NameDayMonth.Value, Model.NameDayDay.Value).ToString("MMMM d")
+                : null;
 
         protected Task SaveTextAsync(string text)
         {

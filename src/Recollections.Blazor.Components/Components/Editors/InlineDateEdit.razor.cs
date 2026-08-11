@@ -28,6 +28,9 @@ namespace Neptuo.Recollections.Components.Editors
         [Parameter]
         public bool AllowClear { get; set; }
 
+        [Parameter]
+        public string Icon { get; set; } = "calendar-alt";
+
         protected Date SelectedDate { get; set; }
         protected Time SelectedTime { get; set; }
 
