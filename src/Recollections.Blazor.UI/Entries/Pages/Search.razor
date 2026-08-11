@@ -6,7 +6,17 @@
 <div class="card-list">
     <form @onsubmit="@(() => { OpenSearch(); StateHasChanged(); })">
         <div class="row gx-2 my-4">
-            <div class="col-md col-sm-12">
+            <div class="col-md-auto col-sm-12">
+                <div class="btn-group d-flex" role="group" aria-label="Search type">
+                    <button type="button" class="btn @(IsEntryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsEntryType" @onclick="OpenEntrySearch">
+                        Entries
+                    </button>
+                    <button type="button" class="btn @(IsStoryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsStoryType" @onclick="OpenStorySearch">
+                        Stories
+                    </button>
+                </div>
+            </div>
+            <div class="col-md col-sm-12 mt-2 mt-md-0">
                 <div class="input-group">
                     <input @ref="SearchInput" class="form-control" type="text" placeholder="Search phrase..." @bind="SearchText" />
                     @if (IsEntryType)
@@ -15,16 +25,6 @@
                             ...
                         </button>
                     }
-                </div>
-            </div>
-            <div class="col-md-auto col-sm-12 mt-2 mt-md-0">
-                <div class="btn-group d-flex" role="group" aria-label="Search type">
-                    <button type="button" class="btn @(IsEntryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsEntryType" @onclick="OpenEntrySearch">
-                        Entries
-                    </button>
-                    <button type="button" class="btn @(IsStoryType ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsStoryType" @onclick="OpenStorySearch">
-                        Stories
-                    </button>
                 </div>
             </div>
             @if (IsEntryType && AreFiltersExpanded)
