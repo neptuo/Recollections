@@ -6,7 +6,7 @@
         <ul class="nav nav-pills entry-picker-nav">
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
-                    <Icon Identifier="clock" />
+                    <Icon Identifier="timeline" CssClass="fa-rotate-270" />
                     <span class="entry-picker-tab-label">Timeline</span>
                 </a>
             </li>
@@ -19,7 +19,7 @@
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Create ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Create))" @onclick:preventDefault>
                     <Icon Identifier="plus" />
-                    <span class="entry-picker-tab-label">Create</span>
+                    <span class="entry-picker-tab-label">New</span>
                 </a>
             </li>
         </ul>
