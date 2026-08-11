@@ -67,14 +67,20 @@
 
         .title {
             display: block;
+            padding-left: 0;
             font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+
+            &:before {
+                display: none;
+            }
         }
 
         .body {
             margin-bottom: 0;
+            padding-left: 0;
 
             h2 {
                 font-size: 120%;
@@ -82,6 +88,10 @@
                 line-height: 1;
                 margin-bottom: 0;
             }
+        }
+
+        .entry-new {
+            margin-top: 0;
         }
 
         .date {
