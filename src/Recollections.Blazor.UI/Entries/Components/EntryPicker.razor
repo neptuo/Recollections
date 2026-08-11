@@ -7,19 +7,19 @@
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Timeline ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Timeline))" @onclick:preventDefault>
                     <Icon Identifier="clock" />
-                    Timeline
+                    <span class="entry-picker-tab-label">Timeline</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Search ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Search))" @onclick:preventDefault>
                     <Icon Identifier="search" />
-                    Search
+                    <span class="entry-picker-tab-label">Search</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link @(ActiveTab == Tab.Create ? "active" : "")" href="" @onclick="@(() => SwitchTab(Tab.Create))" @onclick:preventDefault>
                     <Icon Identifier="plus" />
-                    Create
+                    <span class="entry-picker-tab-label">Create</span>
                 </a>
             </li>
         </ul>

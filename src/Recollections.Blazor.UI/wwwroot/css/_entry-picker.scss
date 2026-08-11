@@ -21,6 +21,17 @@
         }
     }
 
+    @media (max-width: 575.98px) {
+        .entry-picker-tab-label {
+            display: none;
+        }
+
+        .entry-picker-nav .nav-link {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+    }
+
     .entry-picker-search {
         padding: 0.75rem 1rem;
     }

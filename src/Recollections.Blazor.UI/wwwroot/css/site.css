@@ -25901,6 +25901,15 @@ video.pswp__video {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
 }
+@media (max-width: 575.98px) {
+  .entry-picker .entry-picker-tab-label {
+    display: none;
+  }
+  .entry-picker .entry-picker-nav .nav-link {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
 .entry-picker .entry-picker-search {
   padding: 0.75rem 1rem;
 }
