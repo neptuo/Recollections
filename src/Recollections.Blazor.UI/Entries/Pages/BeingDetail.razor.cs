@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Neptuo.Recollections.Entries.Pages
@@ -26,6 +27,9 @@ namespace Neptuo.Recollections.Entries.Pages
         protected UiOptions UiOptions { get; set; }
 
         private string previousBeingId;
+        private long loadVersion;
+        private bool shouldLoadSecondaryData;
+        private Task secondaryDataTask;
 
         [Parameter]
         public string BeingId { get; set; }
@@ -43,6 +47,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected List<MapEntryModel> MapEntries { get; set; } = new List<MapEntryModel>();
         protected List<MapMarkerModel> Markers { get; } = new List<MapMarkerModel>();
 
+        protected bool IsMapLoading { get; set; }
         protected int StoriesCount { get; set; }
         protected Offcanvas StoriesOffcanvas { get; set; }
         protected bool IsStoriesLoading { get; set; }
@@ -68,25 +73,33 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task LoadAsync()
         {
+            long currentLoadVersion = Interlocked.Increment(ref loadVersion);
+
             Permission userPermission;
             (Model, Owner, userPermission) = await Api.GetBeingAsync(BeingId);
+
+            if (currentLoadVersion != loadVersion)
+                return;
 
             Permissions.IsEditable = UserState.IsEditable && userPermission == Permission.CoOwner;
             Permissions.IsOwner = UserState.UserId == Model.UserId;
 
-            await LoadMapAsync();
-
-            var stories = await Api.GetBeingStoriesAsync(BeingId);
-            StoriesCount = stories.Count;
-
-            var altitudeEntries = await Api.GetBeingHighestAltitudeAsync(BeingId);
-            AltitudeCount = altitudeEntries.Count;
-            HighestAltitude = altitudeEntries.FirstOrDefault()?.Altitude;
+            IsMapLoading = true;
+            IsStoriesLoading = true;
+            IsAltitudeLoading = true;
+            ApplyMap([]);
+            StoryItems.Clear();
+            AltitudeItems.Clear();
+            StoriesCount = 0;
+            AltitudeCount = 0;
+            HighestAltitude = null;
+            shouldLoadSecondaryData = true;
+            StateHasChanged();
         }
 
-        private async Task LoadMapAsync()
+        private void ApplyMap(List<MapEntryModel> mapEntries)
         {
-            MapEntries = await Api.GetBeingMapAsync(BeingId);
+            MapEntries = mapEntries;
             Markers.Clear();
             foreach (var entry in MapEntries)
             {
@@ -100,6 +113,37 @@ namespace Neptuo.Recollections.Entries.Pages
             }
         }
 
+        private async Task LoadSecondaryDataAsync(long currentLoadVersion, string beingId)
+        {
+            try
+            {
+                var mapTask = Api.GetBeingMapAsync(beingId);
+                var storiesTask = Api.GetBeingStoriesAsync(beingId);
+                var altitudeTask = Api.GetBeingHighestAltitudeAsync(beingId);
+                await Task.WhenAll(mapTask, storiesTask, altitudeTask);
+
+                if (currentLoadVersion != loadVersion || beingId != BeingId)
+                    return;
+
+                ApplyMap(mapTask.Result);
+                StoryItems.AddRange(storiesTask.Result);
+                StoriesCount = StoryItems.Count;
+                AltitudeItems.AddRange(altitudeTask.Result);
+                AltitudeCount = AltitudeItems.Count;
+                HighestAltitude = AltitudeItems.FirstOrDefault()?.Altitude;
+            }
+            finally
+            {
+                if (currentLoadVersion == loadVersion && beingId == BeingId)
+                {
+                    IsMapLoading = false;
+                    IsStoriesLoading = false;
+                    IsAltitudeLoading = false;
+                    StateHasChanged();
+                }
+            }
+        }
+
         protected async Task OnMarkerSelectedAsync(int index)
         {
             await PopoverHandler.SelectAsync(index, MapEntries[index].Entry, entryPopover);
@@ -110,6 +154,13 @@ namespace Neptuo.Recollections.Entries.Pages
         {
             await base.OnAfterRenderAsync(firstRender);
             await PopoverHandler.TryShowPopoverAsync(mapComponent, entryPopover);
+
+            if (shouldLoadSecondaryData)
+            {
+                shouldLoadSecondaryData = false;
+                secondaryDataTask = LoadSecondaryDataAsync(loadVersion, BeingId);
+                await secondaryDataTask;
+            }
         }
 
         public async ValueTask DisposeAsync()
@@ -158,25 +209,19 @@ namespace Neptuo.Recollections.Entries.Pages
 
         protected async Task ShowStoriesAsync()
         {
-            IsStoriesLoading = true;
-            StoryItems.Clear();
-            StoriesOffcanvas.Show();
-            StateHasChanged();
+            if (IsStoriesLoading && secondaryDataTask != null)
+                await secondaryDataTask;
 
-            StoryItems.AddRange(await Api.GetBeingStoriesAsync(BeingId));
-            IsStoriesLoading = false;
+            StoriesOffcanvas.Show();
             StateHasChanged();
         }
 
         protected async Task ShowAltitudeAsync()
         {
-            IsAltitudeLoading = true;
-            AltitudeItems.Clear();
-            AltitudeOffcanvas.Show();
-            StateHasChanged();
+            if (IsAltitudeLoading && secondaryDataTask != null)
+                await secondaryDataTask;
 
-            AltitudeItems.AddRange(await Api.GetBeingHighestAltitudeAsync(BeingId));
-            IsAltitudeLoading = false;
+            AltitudeOffcanvas.Show();
             StateHasChanged();
         }
 

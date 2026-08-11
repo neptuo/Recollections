@@ -431,6 +431,9 @@ internal sealed class SampleDataSeeder
         if (options.LargeStoryEntryCount > 0)
             await SeedLargeStoryAsync(entriesDb, imageService, users["jondoe"], mediaFiles, beingsByName, options.LargeStoryEntryCount);
 
+        if (options.LargeBeingEntryCount > 0)
+            await SeedLargeBeingAsync(entriesDb, imageService, users["jondoe"], mediaFiles, options.LargeBeingEntryCount);
+
         Console.WriteLine();
         Console.WriteLine("Sample data seeded successfully.");
         Console.WriteLine($"Source media: {mediaRoot}");
@@ -759,6 +762,96 @@ internal sealed class SampleDataSeeder
         Console.WriteLine($"Seeded large story '{story.Title}' with {entryCount} entries, {mediaIndex} images.");
     }
 
+    private static async Task SeedLargeBeingAsync(EntriesDataContext entriesDb, ImageService imageService, User owner, IReadOnlyList<string> mediaFiles, int entryCount)
+    {
+        Console.WriteLine($"Seeding large being with {entryCount} entries...");
+
+        var being = new Being
+        {
+            Id = Guid.NewGuid().ToString("N"),
+            UserId = owner.Id,
+            Name = "Jon (large test)",
+            Icon = "user",
+            Text = "Auto-generated being for progressive loading performance testing.",
+            Created = DateTime.Now,
+            IsSharingInherited = true
+        };
+        entriesDb.Beings.Add(being);
+
+        int storyCount = Math.Max(1, Math.Min(12, (entryCount + 24) / 25));
+        var stories = new List<Story>(storyCount);
+        for (int i = 0; i < storyCount; i++)
+        {
+            var story = new Story
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = owner.Id,
+                Title = $"Large being journal {i + 1}",
+                Text = "Auto-generated story for progressive loading performance testing.",
+                Created = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Local).AddMonths(i),
+                IsSharingInherited = true
+            };
+
+            stories.Add(story);
+            entriesDb.Stories.Add(story);
+        }
+
+        var random = new Random(84);
+        var seededEntries = new List<SeededEntry>(entryCount);
+        var baseDate = new DateTime(2024, 1, 1, 8, 0, 0, DateTimeKind.Local);
+
+        for (int i = 0; i < entryCount; i++)
+        {
+            var when = baseDate.AddDays(i).AddHours(random.Next(0, 12)).AddMinutes(random.Next(0, 60));
+            double baseLat = 50.08 + (random.NextDouble() - 0.5) * 0.04;
+            double baseLon = 14.42 + (random.NextDouble() - 0.5) * 0.04;
+
+            var entry = new Entry
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = owner.Id,
+                Title = $"Large being entry {i + 1}",
+                Text = $"Entry number {i + 1} associated with the large being.",
+                Story = stories[i % stories.Count],
+                When = when,
+                Created = when.AddMinutes(30),
+                IsSharingInherited = true
+            };
+
+            int locationCount = random.Next(1, 5);
+            for (int loc = 0; loc < locationCount; loc++)
+            {
+                entry.Locations.Add(new OrderedLocation
+                {
+                    Order = loc + 1,
+                    Latitude = baseLat + random.NextDouble() * 0.01,
+                    Longitude = baseLon + random.NextDouble() * 0.01,
+                    Altitude = 180 + random.Next(0, 120)
+                });
+            }
+
+            entry.Beings.Add(being);
+            entriesDb.Entries.Add(entry);
+            seededEntries.Add(new SeededEntry(entry, random.Next(1, 4)));
+        }
+
+        await entriesDb.SaveChangesAsync();
+
+        int mediaIndex = 0;
+        foreach (SeededEntry seededEntry in seededEntries)
+        {
+            for (int i = 0; i < seededEntry.MediaCount; i++)
+            {
+                string mediaFile = mediaFiles[mediaIndex % mediaFiles.Count];
+                mediaIndex++;
+
+                await imageService.CreateAsync(seededEntry.Entry, new PhysicalFileInput(mediaFile));
+            }
+        }
+
+        Console.WriteLine($"Seeded large being '{being.Name}' with {entryCount} entries across {storyCount} stories, {mediaIndex} images.");
+    }
+
     private static IReadOnlyList<string> GetMediaFiles(string mediaRoot, string repositoryRoot)
     {
         Directory.CreateDirectory(mediaRoot);
@@ -832,6 +925,7 @@ internal sealed class SampleDataSeeder
     {
         public string MediaDirectory { get; init; } = Path.Combine("assets", "sample-data", "media");
         public int LargeStoryEntryCount { get; init; } = 0;
+        public int LargeBeingEntryCount { get; init; } = 0;
 
         public static SeedOptions Parse(string[] args)
         {
@@ -860,9 +954,23 @@ internal sealed class SampleDataSeeder
 
                     options = options with { LargeStoryEntryCount = count };
                 }
+                else if (string.Equals(args[i], "--large-being", StringComparison.OrdinalIgnoreCase))
+                {
+                    options = options with { LargeBeingEntryCount = 300 };
+                }
+                else if (string.Equals(args[i], "--being-entries", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 >= args.Length)
+                        throw new ArgumentException("Missing value for '--being-entries'.");
+
+                    if (!int.TryParse(args[++i], out int count) || count <= 0)
+                        throw new ArgumentException("Value for '--being-entries' must be a positive integer.");
+
+                    options = options with { LargeBeingEntryCount = count };
+                }
                 else
                 {
-                    throw new ArgumentException($"Unknown argument '{args[i]}'. Supported arguments: --media <path>, --large, --story-entries <count>.");
+                    throw new ArgumentException($"Unknown argument '{args[i]}'. Supported arguments: --media <path>, --large, --story-entries <count>, --large-being, --being-entries <count>.");
                 }
             }
 
