@@ -25936,23 +25936,15 @@ video.pswp__video {
 .entry-picker .entry {
   margin-top: 1rem;
 }
-.entry-picker .entry.entry-new {
-  margin-top: 0;
-}
 .entry-picker .entry .title {
   display: block;
-  padding-left: 0;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.entry-picker .entry .title:before {
-  display: none;
-}
 .entry-picker .entry .body {
   margin-bottom: 0;
-  padding-left: 0;
 }
 .entry-picker .entry .body h2, .entry-picker .entry .body .h2 {
   font-size: 120%;
@@ -25962,6 +25954,15 @@ video.pswp__video {
 }
 .entry-picker .entry .entry-new {
   margin-top: 0;
+}
+.entry-picker .entry .entry-new .title {
+  padding-left: 0;
+}
+.entry-picker .entry .entry-new .title:before {
+  display: none;
+}
+.entry-picker .entry .entry-new .body {
+  padding-left: 0;
 }
 .entry-picker .entry .date {
   padding-right: 0.5rem;
