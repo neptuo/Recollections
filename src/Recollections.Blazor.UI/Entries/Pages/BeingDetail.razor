@@ -35,19 +35,31 @@
                     <InlineDateEdit Value="@(Model.BirthDate ?? DateTime.MinValue)" ValueChanged="@(async value => await SaveBirthDateAsync(value))" Format="@UiOptions.DateFormat" PlaceHolder="No birth date..." ShowAge="true" AllowClear="true" />
                 </div>
                 <div class="gps">
-                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(Markers.Count == 0)">
+                    <MapToggle DialogTitle="@($"{Model.Name}: Map")" Text="@(IsMapLoading ? "Loading locations..." : Markers.Count == 0 ? "No locations..." : $"{Markers.Count} locations")" IsPlaceHolder="@(IsMapLoading || Markers.Count == 0)" IsEnabled="@(!IsMapLoading && Markers.Count != 0)">
                         <Map @ref="mapComponent" Markers="@Markers" MarkerSelected="OnMarkerSelectedAsync" />
                     </MapToggle>
                 </div>
 
-                @if (StoriesCount > 0)
+                @if (IsStoriesLoading)
+                {
+                    <div class="stories">
+                        <InlineLink Value="Loading stories..." Icon="book" IsClickable="false" />
+                    </div>
+                }
+                else if (StoriesCount > 0)
                 {
                     <div class="stories">
                         <InlineLink Value="@($"{StoriesCount} {(StoriesCount == 1 ? "story" : "stories")}")" Icon="book" OnClick="ShowStoriesAsync" />
                     </div>
                 }
 
-                @if (AltitudeCount > 0)
+                @if (IsAltitudeLoading)
+                {
+                    <div class="altitudes">
+                        <InlineLink Value="Loading highest altitude..." Icon="arrow-up-short-wide" IsClickable="false" />
+                    </div>
+                }
+                else if (AltitudeCount > 0)
                 {
                     <div class="altitudes">
                         <InlineLink Value="@(HighestAltitude != null ? $"{UiOptions.FormatWholeNumber(HighestAltitude.Value)} m" : "Highest altitude")" Icon="arrow-up-short-wide" OnClick="ShowAltitudeAsync" />

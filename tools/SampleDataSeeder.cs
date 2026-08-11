@@ -431,6 +431,9 @@ internal sealed class SampleDataSeeder
         if (options.LargeStoryEntryCount > 0)
             await SeedLargeStoryAsync(entriesDb, imageService, users["jondoe"], mediaFiles, beingsByName, options.LargeStoryEntryCount);
 
+        if (options.LargeBeingEntryCount > 0)
+            await SeedLargeBeingAsync(entriesDb, imageService, users["jondoe"], mediaFiles, options.LargeBeingEntryCount);
+
         Console.WriteLine();
         Console.WriteLine("Sample data seeded successfully.");
         Console.WriteLine($"Source media: {mediaRoot}");
@@ -699,6 +702,110 @@ internal sealed class SampleDataSeeder
             .ToArray();
 
         var random = new Random(42);
+        var seededEntries = SeedLargeEntries(
+            entriesDb,
+            owner.Id,
+            entryCount,
+            random,
+            [story],
+            (index, selectedStory, when) => new Entry
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = owner.Id,
+                Title = $"Day {index + 1}",
+                Text = $"Entry number {index + 1} in the large story. A quick note about the day.",
+                Story = selectedStory,
+                When = when,
+                Created = when.AddMinutes(30),
+                IsSharingInherited = true
+            },
+            entry =>
+            {
+                int beingCount = Math.Min(random.Next(1, 3), ownerBeings.Length);
+                for (int b = 0; b < beingCount; b++)
+                    entry.Beings.Add(ownerBeings[b % ownerBeings.Length]);
+            },
+            3);
+
+        await entriesDb.SaveChangesAsync();
+
+        int mediaIndex = await AttachMediaAsync(imageService, mediaFiles, seededEntries);
+
+        Console.WriteLine($"Seeded large story '{story.Title}' with {entryCount} entries, {mediaIndex} images.");
+    }
+
+    private static async Task SeedLargeBeingAsync(EntriesDataContext entriesDb, ImageService imageService, User owner, IReadOnlyList<string> mediaFiles, int entryCount)
+    {
+        Console.WriteLine($"Seeding large being with {entryCount} entries...");
+
+        var being = new Being
+        {
+            Id = Guid.NewGuid().ToString("N"),
+            UserId = owner.Id,
+            Name = "Jon (large test)",
+            Icon = "user",
+            Text = "Auto-generated being for progressive loading performance testing.",
+            Created = DateTime.Now,
+            IsSharingInherited = true
+        };
+        entriesDb.Beings.Add(being);
+
+        int storyCount = Math.Max(1, Math.Min(12, (entryCount + 24) / 25));
+        var stories = new List<Story>(storyCount);
+        for (int i = 0; i < storyCount; i++)
+        {
+            var story = new Story
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = owner.Id,
+                Title = $"Large being journal {i + 1}",
+                Text = "Auto-generated story for progressive loading performance testing.",
+                Created = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Local).AddMonths(i),
+                IsSharingInherited = true
+            };
+
+            stories.Add(story);
+            entriesDb.Stories.Add(story);
+        }
+
+        var random = new Random(84);
+        var seededEntries = SeedLargeEntries(
+            entriesDb,
+            owner.Id,
+            entryCount,
+            random,
+            stories,
+            (index, story, when) => new Entry
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                UserId = owner.Id,
+                Title = $"Large being entry {index + 1}",
+                Text = $"Entry number {index + 1} associated with the large being.",
+                Story = story,
+                When = when,
+                Created = when.AddMinutes(30),
+                IsSharingInherited = true
+            },
+            entry => entry.Beings.Add(being),
+            4);
+
+        await entriesDb.SaveChangesAsync();
+
+        int mediaIndex = await AttachMediaAsync(imageService, mediaFiles, seededEntries);
+
+        Console.WriteLine($"Seeded large being '{being.Name}' with {entryCount} entries across {storyCount} stories, {mediaIndex} images.");
+    }
+
+    private static List<SeededEntry> SeedLargeEntries(
+        EntriesDataContext entriesDb,
+        string ownerId,
+        int entryCount,
+        Random random,
+        IReadOnlyList<Story> stories,
+        Func<int, Story, DateTime, Entry> createEntry,
+        Action<Entry> configureEntry,
+        int maxLocationCount)
+    {
         var seededEntries = new List<SeededEntry>(entryCount);
         var baseDate = new DateTime(2024, 1, 1, 8, 0, 0, DateTimeKind.Local);
 
@@ -707,43 +814,34 @@ internal sealed class SampleDataSeeder
             var when = baseDate.AddDays(i).AddHours(random.Next(0, 12)).AddMinutes(random.Next(0, 60));
             double baseLat = 50.08 + (random.NextDouble() - 0.5) * 0.04;
             double baseLon = 14.42 + (random.NextDouble() - 0.5) * 0.04;
+            var entry = createEntry(i, stories[i % stories.Count], when);
 
-            var entry = new Entry
-            {
-                Id = Guid.NewGuid().ToString("N"),
-                UserId = owner.Id,
-                Title = $"Day {i + 1}",
-                Text = $"Entry number {i + 1} in the large story. A quick note about the day.",
-                Story = story,
-                When = when,
-                Created = when.AddMinutes(30),
-                IsSharingInherited = true
-            };
-
-            int locationCount = random.Next(1, 4);
-            for (int loc = 0; loc < locationCount; loc++)
-            {
-                entry.Locations.Add(new OrderedLocation
-                {
-                    Order = loc + 1,
-                    Latitude = baseLat + random.NextDouble() * 0.01,
-                    Longitude = baseLon + random.NextDouble() * 0.01,
-                    Altitude = 180 + random.Next(0, 120)
-                });
-            }
-
-            int beingCount = Math.Min(random.Next(1, 3), ownerBeings.Length);
-            for (int b = 0; b < beingCount; b++)
-                entry.Beings.Add(ownerBeings[b % ownerBeings.Length]);
-
+            AddLargeEntryLocations(entry, random, baseLat, baseLon, maxLocationCount);
+            configureEntry(entry);
             entriesDb.Entries.Add(entry);
-
-            int mediaCount = random.Next(1, 4);
-            seededEntries.Add(new SeededEntry(entry, mediaCount));
+            seededEntries.Add(new SeededEntry(entry, random.Next(1, 4)));
         }
 
-        await entriesDb.SaveChangesAsync();
+        return seededEntries;
+    }
 
+    private static void AddLargeEntryLocations(Entry entry, Random random, double baseLat, double baseLon, int maxLocationCount)
+    {
+        int locationCount = random.Next(1, maxLocationCount + 1);
+        for (int loc = 0; loc < locationCount; loc++)
+        {
+            entry.Locations.Add(new OrderedLocation
+            {
+                Order = loc + 1,
+                Latitude = baseLat + random.NextDouble() * 0.01,
+                Longitude = baseLon + random.NextDouble() * 0.01,
+                Altitude = 180 + random.Next(0, 120)
+            });
+        }
+    }
+
+    private static async Task<int> AttachMediaAsync(ImageService imageService, IReadOnlyList<string> mediaFiles, IReadOnlyList<SeededEntry> seededEntries)
+    {
         int mediaIndex = 0;
         foreach (SeededEntry seededEntry in seededEntries)
         {
@@ -751,12 +849,11 @@ internal sealed class SampleDataSeeder
             {
                 string mediaFile = mediaFiles[mediaIndex % mediaFiles.Count];
                 mediaIndex++;
-
                 await imageService.CreateAsync(seededEntry.Entry, new PhysicalFileInput(mediaFile));
             }
         }
 
-        Console.WriteLine($"Seeded large story '{story.Title}' with {entryCount} entries, {mediaIndex} images.");
+        return mediaIndex;
     }
 
     private static IReadOnlyList<string> GetMediaFiles(string mediaRoot, string repositoryRoot)
@@ -832,6 +929,7 @@ internal sealed class SampleDataSeeder
     {
         public string MediaDirectory { get; init; } = Path.Combine("assets", "sample-data", "media");
         public int LargeStoryEntryCount { get; init; } = 0;
+        public int LargeBeingEntryCount { get; init; } = 0;
 
         public static SeedOptions Parse(string[] args)
         {
@@ -860,9 +958,23 @@ internal sealed class SampleDataSeeder
 
                     options = options with { LargeStoryEntryCount = count };
                 }
+                else if (string.Equals(args[i], "--large-being", StringComparison.OrdinalIgnoreCase))
+                {
+                    options = options with { LargeBeingEntryCount = 300 };
+                }
+                else if (string.Equals(args[i], "--being-entries", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i + 1 >= args.Length)
+                        throw new ArgumentException("Missing value for '--being-entries'.");
+
+                    if (!int.TryParse(args[++i], out int count) || count <= 0)
+                        throw new ArgumentException("Value for '--being-entries' must be a positive integer.");
+
+                    options = options with { LargeBeingEntryCount = count };
+                }
                 else
                 {
-                    throw new ArgumentException($"Unknown argument '{args[i]}'. Supported arguments: --media <path>, --large, --story-entries <count>.");
+                    throw new ArgumentException($"Unknown argument '{args[i]}'. Supported arguments: --media <path>, --large, --story-entries <count>, --large-being, --being-entries <count>.");
                 }
             }
 
