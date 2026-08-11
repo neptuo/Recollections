@@ -35,10 +35,12 @@ using var accounts = new AccountsDataContext(DbContextOptions<AccountsDataContex
 using var entries = new EntriesDataContext(DbContextOptions<EntriesDataContext>(connectionString, "Entries"), Schema<EntriesDataContext>("Entries"));
 
 Console.WriteLine("Migrating accounts db.");
+accounts.Database.GetPendingMigrations().ToList().ForEach(m => Console.WriteLine($"Pending migration: {m}"));
 accounts.Database.Migrate();
 accounts.Database.GetAppliedMigrations().ToList().ForEach(m => Console.WriteLine($"Applied migration: {m}"));
 
 Console.WriteLine("Migrating entries db.");
+entries.Database.GetPendingMigrations().ToList().ForEach(m => Console.WriteLine($"Pending migration: {m}"));
 entries.Database.Migrate();
 entries.Database.GetAppliedMigrations().ToList().ForEach(m => Console.WriteLine($"Applied migration: {m}"));
 
