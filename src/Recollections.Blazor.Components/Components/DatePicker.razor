@@ -52,10 +52,13 @@
             <h5 class="d-flex align-items-center mb-2">
                 <button class="me-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = PrevMonth(CurrentYear, CurrentMonth); })">Prev</button>
                 <span class="@(AllowYearSelection ? "cursor-pointer" : "")" @onclick="OnDayHeaderClicked">
-                    @MonthNames[CurrentMonth - 1]
                     @if (AllowYearSelection)
                     {
-                        @CurrentYear
+                        @($"{MonthNames[CurrentMonth - 1]} {CurrentYear}")
+                    }
+                    else
+                    {
+                        @MonthNames[CurrentMonth - 1]
                     }
                 </span>
                 <button class="ms-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = NextMonth(CurrentYear, CurrentMonth); })">Next</button>
