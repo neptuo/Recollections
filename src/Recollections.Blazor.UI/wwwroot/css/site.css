@@ -25914,7 +25914,7 @@ video.pswp__video {
   padding: 0.75rem 1rem;
 }
 .entry-picker .entry-picker-create {
-  padding: 1rem;
+  padding: 1rem 1rem 0 1rem;
 }
 .entry-picker .entry-picker-results {
   padding: 0 1rem 1rem;
@@ -25935,6 +25935,9 @@ video.pswp__video {
 }
 .entry-picker .entry {
   margin-top: 1rem;
+}
+.entry-picker .entry.entry-new {
+  margin-top: 0;
 }
 .entry-picker .entry .title {
   display: block;

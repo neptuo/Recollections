@@ -37,7 +37,7 @@
     }
 
     .entry-picker-create {
-        padding: 1rem;
+        padding: 1rem 1rem 0 1rem;
     }
 
     .entry-picker-results {
@@ -64,6 +64,10 @@
 
     .entry {
         margin-top: 1rem;
+
+        &.entry-new {
+            margin-top: 0;
+        }
 
         .title {
             display: block;
