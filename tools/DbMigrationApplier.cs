@@ -36,9 +36,11 @@ using var entries = new EntriesDataContext(DbContextOptions<EntriesDataContext>(
 
 Console.WriteLine("Migrating accounts db.");
 accounts.Database.Migrate();
+accounts.Database.GetAppliedMigrations().ToList().ForEach(m => Console.WriteLine($"Applied migration: {m}"));
 
 Console.WriteLine("Migrating entries db.");
 entries.Database.Migrate();
+entries.Database.GetAppliedMigrations().ToList().ForEach(m => Console.WriteLine($"Applied migration: {m}"));
 
 Console.WriteLine("Done.");
 
