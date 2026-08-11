@@ -24,6 +24,20 @@ namespace Neptuo.Recollections.Entries
         public int? NameDayMonth { get; set; }
         public int? NameDayDay { get; set; }
 
+        public bool HasValidNameDay()
+        {
+            if (!NameDayMonth.HasValue && !NameDayDay.HasValue)
+                return true;
+
+            if (!NameDayMonth.HasValue || !NameDayDay.HasValue)
+                return false;
+
+            return NameDayMonth >= 1
+                && NameDayMonth <= 12
+                && NameDayDay >= 1
+                && NameDayDay <= DateTime.DaysInMonth(2000, NameDayMonth.Value);
+        }
+
         public DateTime Created { get; set; }
 
         public IList<Entry> Entries { get; set; } = new List<Entry>();

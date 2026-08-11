@@ -34,6 +34,10 @@ namespace Neptuo.Recollections.Entries.Pages
         protected BeingModel Model { get; set; }
         protected OwnerModel Owner { get; set; }
         protected PermissionContainerState Permissions { get; } = new PermissionContainerState();
+        protected bool IsNameDayEditMode { get; set; }
+        protected int? NameDayMonth { get; set; }
+        protected int? NameDayDay { get; set; }
+        protected string NameDayError { get; set; }
 
         protected BeingIconPicker IconPicker { get; set; }
 
@@ -140,6 +144,43 @@ namespace Neptuo.Recollections.Entries.Pages
             Model.BirthDate = birthDate == DateTime.MinValue ? null : birthDate.Date;
             return SaveAsync();
         }
+
+        protected void BeginNameDayEdit()
+        {
+            NameDayMonth = Model.NameDayMonth;
+            NameDayDay = Model.NameDayDay;
+            NameDayError = null;
+            IsNameDayEditMode = true;
+        }
+
+        protected void CancelNameDayEdit()
+        {
+            IsNameDayEditMode = false;
+            NameDayError = null;
+        }
+
+        protected async Task SaveNameDayAsync()
+        {
+            if ((NameDayMonth.HasValue || NameDayDay.HasValue)
+                && (!NameDayMonth.HasValue || !NameDayDay.HasValue
+                    || NameDayMonth < 1 || NameDayMonth > 12
+                    || NameDayDay < 1 || NameDayDay > DateTime.DaysInMonth(2000, NameDayMonth.Value)))
+            {
+                NameDayError = "Enter a valid name-day month and day, or clear both values.";
+                return;
+            }
+
+            Model.NameDayMonth = NameDayMonth;
+            Model.NameDayDay = NameDayDay;
+            await SaveAsync();
+            IsNameDayEditMode = false;
+            NameDayError = null;
+        }
+
+        protected string FormatNameDay()
+            => Model.NameDayMonth.HasValue && Model.NameDayDay.HasValue
+                ? new DateTime(2000, Model.NameDayMonth.Value, Model.NameDayDay.Value).ToString("MMMM d")
+                : null;
 
         protected Task SaveTextAsync(string text)
         {
