@@ -20,7 +20,7 @@ namespace Neptuo.Recollections.Entries.Components
         }
 
         [Parameter]
-        public Action<string> Selected { get; set; }
+        public EventCallback<string> Selected { get; set; }
 
         protected Modal Modal { get; set; }
         protected EntryCreate EntryCreate { get; set; }
@@ -87,16 +87,16 @@ namespace Neptuo.Recollections.Entries.Components
             }
         }
 
-        protected void OnEntrySelected(EntryListModel entry)
+        protected Task OnEntrySelected(EntryListModel entry)
             => OnEntrySelected(entry.Id);
 
-        protected void OnEntryCreated(EntryModel entry)
+        protected Task OnEntryCreated(EntryModel entry)
             => OnEntrySelected(entry.Id);
 
-        private void OnEntrySelected(string entryId)
+        private async Task OnEntrySelected(string entryId)
         {
             Hide();
-            Selected?.Invoke(entryId);
+            await Selected.InvokeAsync(entryId);
         }
     }
 }

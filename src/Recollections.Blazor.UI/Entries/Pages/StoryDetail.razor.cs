@@ -341,7 +341,7 @@ namespace Neptuo.Recollections.Entries.Pages
             EntryPicker.Show();
         }
 
-        protected async void EntrySelected(string entryId)
+        protected async Task EntrySelected(string entryId)
         {
             var model = new EntryStoryUpdateModel(Model.Id);
 
