@@ -38,6 +38,7 @@
                 <div class="d-flex align-items-center">
                     @BeforeTitleContent
                     <h5 class="flex-grow-1 py-2 mb-0 @(OnTitleClick.HasDelegate ? "cursor-pointer" : string.Empty)" @onclick="OnTitleClick">
+                        @TitleContent
                         @Title
                     </h5>
                     @AfterTitleContent
@@ -59,5 +60,6 @@
         </div>;
 
     protected virtual string Title { get; }
+    protected virtual RenderFragment TitleContent { get; } = builder => { };
     protected virtual RenderFragment DefaultBodyContent { get; } = builder => { };
 }

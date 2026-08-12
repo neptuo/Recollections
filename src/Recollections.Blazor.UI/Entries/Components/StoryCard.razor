@@ -13,20 +13,20 @@
         @<div class="p-3">
             @if (Model.Chapters > 0)
             {
-                <div>
+                <div class="information">
                     <Icon Identifier="book" CssClass="uniform" />
                     @Model.Chapters chapters
                 </div>
             }
 
-            <div>
+            <div class="information">
                 <Icon Prefix="fas" Identifier="comment-alt" CssClass="uniform" />
                 @Model.Entries @(Model.Entries == 1 ? "entry" : "entries")
             </div>
 
             @if (Model.MinDate != null || Model.MaxDate != null)
             {
-                <div>
+                <div class="information">
                     <Icon Identifier="calendar" CssClass="uniform" />
                     @(" ")
                     @if (Model.MinDate != null)
@@ -51,7 +51,7 @@
 
             @if (UserState.UserId != Model.UserId)
             {
-                <div>
+                <div class="information">
                     <Icon Identifier="user" CssClass="uniform" />
                     @Model.UserName
                 </div>

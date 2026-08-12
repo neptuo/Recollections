@@ -24,7 +24,7 @@
         {
             @if (AllowYearSelection)
             {
-                <h5 class="d-flex align-items-center mb-2">
+                <h5 class="d-flex align-items-center pb-3 border-1 border-bottom">
                     <button class="me-auto btn btn btn-secondary btn-sm" @onclick="(() => CurrentYear--)">Prev</button>
                     <span class="cursor-pointer" @onclick="(() => CurrentPart = DatePickerPart.Year)">
                         @CurrentYear
@@ -49,7 +49,7 @@
         }
         else
         {
-            <h5 class="d-flex align-items-center mb-2">
+            <h5 class="d-flex align-items-center pb-3 border-1 border-bottom">
                 <button class="me-auto btn btn btn-secondary btn-sm" @onclick="@(() => { (CurrentYear, CurrentMonth) = PrevMonth(CurrentYear, CurrentMonth); })">Prev</button>
                 <span class="@(AllowYearSelection ? "cursor-pointer" : "")" @onclick="OnDayHeaderClicked">
                     @if (AllowYearSelection)
