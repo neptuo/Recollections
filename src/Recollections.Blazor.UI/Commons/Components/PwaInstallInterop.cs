@@ -74,5 +74,8 @@ namespace Neptuo.Recollections.Commons.Components
 
         public ValueTask<string> GetVersionAsync()
             => jSRuntime.InvokeAsync<string>("Pwa.Version");
+
+        public ValueTask<bool> CheckForUpdateAsync()
+            => jSRuntime.InvokeAsync<bool>("Pwa.CheckForUpdate");
     }
 }
