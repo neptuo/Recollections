@@ -10,6 +10,9 @@
 
     protected override string Title => $"{Model.Name}{(UserState.UserId == Model.Id ? " (me)" : string.Empty)}";
 
+    protected override RenderFragment TitleContent =>
+        @<Icon Identifier="@Model.Icon" />;
+
     protected override RenderFragment DefaultBodyContent =>
         @<div class="p-3">
             <div class="information">
