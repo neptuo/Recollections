@@ -1,5 +1,23 @@
 [
     {
+        "version": "0.22.2",
+        "milestone": 61,
+        "breakingChanges": [],
+        "newFeatures": [
+            "More consistent entry cards, story metadata, forms, and datepicker styling"
+        ],
+        "bugFixes": []
+    },
+    {
+        "version": "0.22.1",
+        "milestone": 62,
+        "breakingChanges": [],
+        "newFeatures": [],
+        "bugFixes": [
+            "Read-only users can no longer open the name-day picker"
+        ]
+    },
+    {
         "version": "0.22.0",
         "milestone": 60,
         "breakingChanges": [],
