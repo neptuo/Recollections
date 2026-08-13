@@ -40,6 +40,16 @@
         #app-splash .loading-bar div { background: #fff; }
     </style>
 
+    <script>
+        (function () {
+            try {
+                var theme = window.localStorage.getItem("Recollections.Theme.Applied");
+                if (theme === "light" || theme === "dark")
+                    document.documentElement.setAttribute("data-bs-theme", theme);
+            } catch (e) { }
+        })();
+    </script>
+
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
     <link href="css/site.css" rel="stylesheet" />
 </head>

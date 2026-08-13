@@ -236,8 +236,12 @@ window.Bootstrap = {
         }
     },
     Theme: {
+        StorageKey: "Recollections.Theme.Applied",
         Apply: function (theme) {
             document.documentElement.setAttribute("data-bs-theme", theme);
+            try {
+                window.localStorage.setItem(Bootstrap.Theme.StorageKey, theme);
+            } catch (e) { }
         },
         GetBrowserPreference: function () {
             return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
