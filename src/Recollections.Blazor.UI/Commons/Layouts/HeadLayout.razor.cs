@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Neptuo.Recollections.Accounts;
 using Neptuo.Recollections.Accounts.Components;
+using Neptuo.Recollections.Commons.Components;
 using Neptuo.Recollections.Components;
 using Neptuo.Recollections.Entries.Pages;
 using System;
@@ -24,6 +25,9 @@ public partial class HeadLayout : IDisposable
     [Inject]
     internal NotificationSubscriptionSynchronizer NotificationSynchronizer { get; set; }
 
+    [Inject]
+    internal PwaInstallInterop PwaInstallInterop { get; set; }
+
     [CascadingParameter]
     protected UserState UserState { get; set; }
 
@@ -35,7 +39,7 @@ public partial class HeadLayout : IDisposable
 
     protected override void OnInitialized()
     {
-        Menu = new MenuList(Navigator, UserState, OnChangePassword, OnChangeTheme);
+        Menu = new MenuList(Navigator, UserState, OnChangePassword, OnChangeTheme, OnCheckForUpdate);
         base.OnInitialized();
 
         Navigator.LocationChanged += OnLocationChanged;
@@ -71,6 +75,15 @@ public partial class HeadLayout : IDisposable
         ThemeToast.Show($"Theme changed to {next}");
     }
 
+    protected async void OnCheckForUpdate()
+    {
+        ThemeToast.Show("Checking for updates...", duration: 3000);
+
+        bool hasUpdate = await PwaInstallInterop.CheckForUpdateAsync();
+        if (!hasUpdate)
+            ThemeToast.Show("You are using the latest version.");
+    }
+
     private void OnLocationChanged(string url)
     {
         ExceptionPanel.Hide();
@@ -89,7 +102,7 @@ public class MenuList
     public List<MenuItem> Main { get; } = [];
     public List<MenuItem> User { get; } = [];
 
-    public MenuList(Navigator navigator, UserState userState, Action changePassword, Action changeTheme)
+    public MenuList(Navigator navigator, UserState userState, Action changePassword, Action changeTheme, Action checkForUpdate)
     {
         Add(new MenuItem("Main menu", "bars"), Bottom);
         Add(new MenuItem("Timeline", "timeline", CssClass: "fa-rotate-270", Url: navigator.UrlTimeline(), PageType: typeof(TimelineList), Match: NavLinkMatch.All), Main, Bottom);
@@ -106,6 +119,7 @@ public class MenuList
         Add(new MenuItem("Notifications", "bell", Url: navigator.UrlNotifications()), User);
         Add(new MenuItem("Password", "key", OnClick: changePassword), User);
         Add(new MenuItem("Theme", "moon", OnClick: changeTheme), User);
+        Add(new MenuItem("Check for updates", "sync-alt", OnClick: checkForUpdate), User);
         Add(new MenuItem("Logout", "sign-out-alt", OnClick: () => _ = userState.LogoutAsync()), User);
     }
 

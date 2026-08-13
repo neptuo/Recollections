@@ -19,6 +19,19 @@ window.Pwa = {
             }
         });
     },
+    CheckForUpdate: async function () {
+        if (!("serviceWorker" in navigator)) {
+            return false;
+        }
+
+        try {
+            var registration = await navigator.serviceWorker.ready;
+            await registration.update();
+            return registration.waiting != null;
+        } catch {
+            return false;
+        }
+    },
     Version: async function () {
         try {
             const response = await fetch('service-worker-assets.js', { cache: 'no-store' });
