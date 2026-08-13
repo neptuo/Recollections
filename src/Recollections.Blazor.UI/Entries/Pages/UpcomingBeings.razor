@@ -1,0 +1,70 @@
+@page "/beings/upcoming"
+@inherits UserStateAuthenticatedComponentBase
+@using Neptuo.Recollections.Entries.Beings
+@inject Entries.Api Api
+@inject Navigator Navigator
+@inject UiOptions UiOptions
+
+<DocumentTitle Value="Upcoming birthdays and name days" />
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 my-4">
+    <BeingNavigation IsUpcoming="true" />
+
+    <div class="d-flex flex-wrap gap-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="upcoming-birthdays" @bind="IncludeBirthdays" @bind:after="ApplyFilters" />
+            <label class="form-check-label" for="upcoming-birthdays">Birthdays</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="upcoming-name-days" @bind="IncludeNameDays" @bind:after="ApplyFilters" />
+            <label class="form-check-label" for="upcoming-name-days">Name days</label>
+        </div>
+    </div>
+</div>
+
+<div class="timeline">
+    @if (IsLoading)
+    {
+        <div class="d-flex justify-content-center mt-4" role="status">
+            <div class="spinner-border"><span class="visually-hidden">Loading...</span></div>
+        </div>
+    }
+    else if (Items.Count == 0)
+    {
+        <div class="entry">
+            <div class="body">No upcoming birthdays or name days found...</div>
+        </div>
+    }
+    else
+    {
+        @foreach (UpcomingBeingModel item in Items)
+        {
+            <div class="entry">
+                <div class="title">
+                    <h3>@item.Date.ToString(UiOptions.DateFormat)</h3>
+                </div>
+                <div class="body">
+                    <h2>
+                        <a href="@Navigator.UrlBeingDetail(item.Id)">
+                            <Icon Identifier="@item.Icon" CssClass="me-2" />
+                            @item.Name
+                        </a>
+                    </h2>
+                    <p>
+                        <span class="information">
+                            <Icon Identifier="@(item.IsBirthday ? "cake-candles" : "signature")" />
+                            @(item.IsBirthday ? "Birthday" : "Name day")
+                        </span>
+                        @if (item.IsBirthday)
+                        {
+                            <span class="information">
+                                <Icon Identifier="hourglass-half" />
+                                @item.Age
+                            </span>
+                        }
+                    </p>
+                </div>
+            </div>
+        }
+    }
+</div>

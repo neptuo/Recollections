@@ -174,6 +174,9 @@ namespace Neptuo.Recollections.Entries
         public Task<List<BeingListModel>> GetBeingListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<BeingListModel>>("beings"));
 
+        public Task<List<UpcomingBeingModel>> GetUpcomingBeingListAsync()
+            => faultHandler.Wrap(http.GetFromJsonAsync<List<UpcomingBeingModel>>("beings/upcoming"));
+
         public Task<AuthorizedModel<BeingModel>> GetBeingAsync(string beingId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<BeingModel>>($"beings/{beingId}"));
 

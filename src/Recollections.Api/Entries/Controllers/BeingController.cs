@@ -81,6 +81,24 @@ namespace Neptuo.Recollections.Entries.Controllers
             return Ok(models);
         }
 
+        [HttpGet("upcoming")]
+        [ProducesDefaultResponseType(typeof(List<UpcomingBeingModel>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<List<UpcomingBeingModel>>> GetUpcoming(bool birthdays = true, bool nameDays = true)
+        {
+            string userId = HttpContext.User.FindUserId();
+            if (userId == null)
+                return Unauthorized();
+
+            var connectedUsers = await connections.GetConnectedUsersForAsync(userId);
+            List<Being> beings = await shareStatus
+                .OwnedByOrExplicitlySharedWithUser(db, db.Beings, userId, connectedUsers)
+                .ToListAsync();
+
+            return Ok(UpcomingBeingUtils.Create(beings, DateTime.Today, birthdays, nameDays));
+        }
+
         [HttpGet("{id}")]
         [ProducesDefaultResponseType(typeof(AuthorizedModel<BeingModel>))]
         [ProducesResponseType(StatusCodes.Status200OK)]
