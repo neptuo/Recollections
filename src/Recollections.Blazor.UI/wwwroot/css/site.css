@@ -25630,13 +25630,13 @@ input.input-number-noarrows[type=number] {
   margin-left: -12px;
 }
 .entry-picker .entry .title {
-  position: initial;
-  width: auto;
+  position: relative;
   float: none;
+  width: auto;
+  margin-left: 0;
   padding-right: 0;
   padding-left: 36px;
   text-align: left;
-  position: relative;
 }
 .entry-picker .entry .title:before {
   right: auto;
@@ -25645,13 +25645,14 @@ input.input-number-noarrows[type=number] {
 .entry-picker .entry .body {
   float: none;
   width: auto;
+  margin-left: 0;
+}
+.entry-picker .entry .date-box {
+  width: 100%;
+  float: none;
 }
 .entry-picker .entry:not(.entry-new):last-child::before {
   left: 4px;
-}
-.entry-picker .entry-new .date-box {
-  width: 100%;
-  float: none;
 }
 .entry-picker .entry-more {
   margin-left: 0;
@@ -25668,13 +25669,13 @@ input.input-number-noarrows[type=number] {
   margin-left: -12px;
 }
 .timeline-narrow .entry .title {
-  position: initial;
-  width: auto;
+  position: relative;
   float: none;
+  width: auto;
+  margin-left: 0;
   padding-right: 0;
   padding-left: 36px;
   text-align: left;
-  position: relative;
 }
 .timeline-narrow .entry .title:before {
   right: auto;
@@ -25683,13 +25684,14 @@ input.input-number-noarrows[type=number] {
 .timeline-narrow .entry .body {
   float: none;
   width: auto;
+  margin-left: 0;
+}
+.timeline-narrow .entry .date-box {
+  width: 100%;
+  float: none;
 }
 .timeline-narrow .entry:not(.entry-new):last-child::before {
   left: 4px;
-}
-.timeline-narrow .entry-new .date-box {
-  width: 100%;
-  float: none;
 }
 .timeline-narrow .entry-more {
   margin-left: 0;
@@ -25706,13 +25708,13 @@ input.input-number-noarrows[type=number] {
     margin-left: -12px;
   }
   .entry .title {
-    position: initial;
-    width: auto;
+    position: relative;
     float: none;
+    width: auto;
+    margin-left: 0;
     padding-right: 0;
     padding-left: 36px;
     text-align: left;
-    position: relative;
   }
   .entry .title:before {
     right: auto;
@@ -25721,16 +25723,41 @@ input.input-number-noarrows[type=number] {
   .entry .body {
     float: none;
     width: auto;
+    margin-left: 0;
+  }
+  .entry .date-box {
+    width: 100%;
+    float: none;
   }
   .entry:not(.entry-new):last-child::before {
     left: 4px;
   }
-  .entry-new .date-box {
-    width: 100%;
-    float: none;
-  }
   .entry-more {
     margin-left: 0;
+  }
+}
+@media (min-width: 768px) and (max-width: 1399.98px) {
+  .timeline .entry-new .title {
+    position: relative;
+    float: none;
+    width: auto;
+    margin-left: 15%;
+    padding-right: 0;
+    padding-left: 36px;
+    text-align: left;
+  }
+  .timeline .entry-new .title:before {
+    right: auto;
+    left: -12px;
+  }
+  .timeline .entry-new .body {
+    float: none;
+    width: auto;
+    margin-left: 15%;
+  }
+  .timeline .entry-new .date-box {
+    width: 100%;
+    float: none;
   }
 }
 .mappage {
@@ -26157,4 +26184,4 @@ video.pswp__video {
 .version {
   color: #aaaaaa;
 }
-/*# sourceMappingURL=/Users/marekfisera/.copilot/copilot-worktrees/Recollections/maraf-redesigned-system/src/Recollections.Blazor.UI/wwwroot/css/site.css.map */
+/*# sourceMappingURL=site.css.map */
