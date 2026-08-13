@@ -225,7 +225,7 @@ namespace Neptuo.Recollections
             => uri.NavigateTo(UrlBeings());
 
         public string UrlUpcomingBeings()
-            => "/beings/upcoming";
+            => "/beings/upcoming/list";
 
         public void OpenUpcomingBeings()
             => uri.NavigateTo(UrlUpcomingBeings());

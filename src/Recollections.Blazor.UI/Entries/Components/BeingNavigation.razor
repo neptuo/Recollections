@@ -1,11 +1,11 @@
 @inject Navigator Navigator
 
 <div class="btn-group" role="group" aria-label="Being view">
-    <a class="btn @(!IsUpcoming ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@(!IsUpcoming)" href="@Navigator.UrlBeings()">
+    <a class="btn @(!IsUpcoming ? "btn-secondary" : "btn-outline-secondary")" aria-current="@(!IsUpcoming ? "page" : null)" href="@Navigator.UrlBeings()">
         <Icon Identifier="users" CssClass="me-1" />
         Beings
     </a>
-    <a class="btn @(IsUpcoming ? "btn-secondary" : "btn-outline-secondary")" aria-pressed="@IsUpcoming" href="@Navigator.UrlUpcomingBeings()">
+    <a class="btn @(IsUpcoming ? "btn-secondary" : "btn-outline-secondary")" aria-current="@(IsUpcoming ? "page" : null)" href="@Navigator.UrlUpcomingBeings()">
         <Icon Identifier="cake-candles" CssClass="me-1" />
         Upcoming
     </a>

@@ -1,4 +1,5 @@
 using Neptuo.Recollections.Entries.Beings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace Neptuo.Recollections.Entries.Pages
         protected async Task LoadAsync()
         {
             IsLoading = true;
-            allItems = await Api.GetUpcomingBeingListAsync();
+            allItems = await Api.GetUpcomingBeingListAsync(DateTime.Today);
             ApplyFilters();
             IsLoading = false;
         }

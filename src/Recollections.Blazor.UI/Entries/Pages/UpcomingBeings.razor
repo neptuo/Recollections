@@ -1,4 +1,4 @@
-@page "/beings/upcoming"
+@page "/beings/upcoming/list"
 @inherits UserStateAuthenticatedComponentBase
 @using Neptuo.Recollections.Entries.Beings
 @inject Entries.Api Api
@@ -59,6 +59,7 @@
                         {
                             <span class="information">
                                 <Icon Identifier="hourglass-half" />
+                                <span class="visually-hidden">Age: </span>
                                 @item.Age
                             </span>
                         }

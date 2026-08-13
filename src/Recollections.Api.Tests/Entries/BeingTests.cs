@@ -43,6 +43,26 @@ public class BeingTests
         Assert.Equal(36, result[1].Age);
     }
 
+    [Theory]
+    [InlineData(false, true, false)]
+    [InlineData(true, false, true)]
+    public void Create_ExcludesDisabledEventType(bool includeBirthdays, bool includeNameDays, bool isBirthday)
+    {
+        var being = new Being
+        {
+            Id = "both",
+            Name = "Both",
+            BirthDate = new DateTime(1990, 8, 20),
+            NameDayMonth = 8,
+            NameDayDay = 15
+        };
+
+        List<UpcomingBeingModel> result = UpcomingBeingUtils.Create([being], new DateTime(2026, 8, 12), includeBirthdays, includeNameDays);
+
+        UpcomingBeingModel item = Assert.Single(result);
+        Assert.Equal(isBirthday, item.IsBirthday);
+    }
+
     [Fact]
     public void Create_UsesNextYearAndCalculatesBirthdayAge()
     {

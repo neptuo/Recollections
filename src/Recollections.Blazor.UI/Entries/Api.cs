@@ -174,8 +174,11 @@ namespace Neptuo.Recollections.Entries
         public Task<List<BeingListModel>> GetBeingListAsync()
             => faultHandler.Wrap(http.GetFromJsonAsync<List<BeingListModel>>("beings"));
 
-        public Task<List<UpcomingBeingModel>> GetUpcomingBeingListAsync()
-            => faultHandler.Wrap(http.GetFromJsonAsync<List<UpcomingBeingModel>>("beings/upcoming"));
+        public Task<List<UpcomingBeingModel>> GetUpcomingBeingListAsync(DateTime date)
+        {
+            string url = QueryHelpers.AddQueryString("beings/upcoming/list", "date", date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
+            return faultHandler.Wrap(http.GetFromJsonAsync<List<UpcomingBeingModel>>(url));
+        }
 
         public Task<AuthorizedModel<BeingModel>> GetBeingAsync(string beingId)
             => faultHandler.Wrap(http.GetFromJsonAsync<AuthorizedModel<BeingModel>>($"beings/{beingId}"));
