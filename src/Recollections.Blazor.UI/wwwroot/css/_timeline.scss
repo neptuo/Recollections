@@ -124,6 +124,36 @@ $dot-diameter: 18px;
     }
 }
 
+// Lays the title above the body instead of side by side. $indent shifts the
+// block to keep it aligned with the timeline line, $dot-left positions the dot.
+@mixin entry-stacked($indent: 0, $dot-left: 0) {
+    .title {
+        position: relative;
+        float: none;
+        width: auto;
+        margin-left: $indent;
+        padding-right: 0;
+        padding-left: $gutter;
+        text-align: left;
+
+        &:before {
+            right: auto;
+            left: $dot-left;
+        }
+    }
+
+    .body {
+        float: none;
+        width: auto;
+        margin-left: $indent;
+    }
+
+    .date-box {
+        width: 100%;
+        float: none;
+    }
+}
+
 @mixin narrow() {
     .timeline {
         &:before {
@@ -136,35 +166,10 @@ $dot-diameter: 18px;
     }
 
     .entry {
-        .title {
-            position: initial;
-            width: auto;
-            float: none;
-            padding-right: 0;
-            padding-left: $gutter;
-            text-align: left;
-            position: relative;
+        @include entry-stacked;
 
-            &:before {
-                right: auto;
-                left: 0;
-            }
-        }
-
-        .body {
-            float: none;
-            width: auto;
-        }
-    
         &:not(.entry-new):last-child::before {
             left: 4px;
-        }
-    }
-
-    .entry-new {
-        .date-box {
-            width: 100%;
-            float: none;
         }
     }
 
@@ -194,4 +199,12 @@ $dot-diameter: 18px;
 
 @include media-breakpoint-down(md) {
     @include narrow;
+}
+
+// Below xxl the 15% date column isn't wide enough to fit a full date next to the
+// entry fields, so stack it above them while keeping the timeline line aligned.
+@include media-breakpoint-between(md, xxl) {
+    .timeline .entry-new {
+        @include entry-stacked($indent: 15%, $dot-left: 6px - $dot-diameter);
+    }
 }
