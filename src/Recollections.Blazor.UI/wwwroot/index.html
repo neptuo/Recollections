@@ -43,7 +43,7 @@
     <script>
         (function () {
             try {
-                var theme = window.localStorage.getItem("App.Theme");
+                var theme = window.localStorage.getItem("app-theme");
                 if (theme === "light" || theme === "dark")
                     document.documentElement.setAttribute("data-bs-theme", theme);
             } catch (e) { }

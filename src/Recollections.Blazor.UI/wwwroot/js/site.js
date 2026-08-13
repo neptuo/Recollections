@@ -236,7 +236,7 @@ window.Bootstrap = {
         }
     },
     Theme: {
-        StorageKey: "App.Theme",
+        StorageKey: "app-theme",
         Apply: function (theme) {
             document.documentElement.setAttribute("data-bs-theme", theme);
             try {
