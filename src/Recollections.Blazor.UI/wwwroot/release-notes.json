@@ -1,5 +1,17 @@
 [
     {
+        "version": "0.23.0",
+        "milestone": 63,
+        "breakingChanges": [],
+        "newFeatures": [
+            "Upcoming birthdays and name days timeline with filters",
+            "Manual PWA update check from the main menu and Me menu",
+            "Theme now applies without a flash when the app starts",
+            "Better timeline layout for creating a new entry on medium-sized screens"
+        ],
+        "bugFixes": []
+    },
+    {
         "version": "0.22.2",
         "milestone": 61,
         "breakingChanges": [],
