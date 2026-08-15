@@ -1,5 +1,14 @@
 [
     {
+        "version": "0.23.1",
+        "milestone": 64,
+        "breakingChanges": [],
+        "newFeatures": [],
+        "bugFixes": [
+            "PWA now consistently opens in the standard standalone display mode"
+        ]
+    },
+    {
         "version": "0.23.0",
         "milestone": 63,
         "breakingChanges": [],
